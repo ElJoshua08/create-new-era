@@ -40,6 +40,7 @@ public final class LuaApi {
         fn("print", "print(...)", "Writes its arguments to the console, separated by tabs.");
         fn("sleep", "sleep(seconds)", "Waits in game time. sleep(0) waits one tick.");
         fn("require", "require(module)", "Runs another file on this computer once and returns what it returned. require(\"lib\") finds lib or lib.lua.");
+        module("bus", "The data network: the devices connected to this computer.");
         module("redstone", "Read and send redstone on each side of the computer.");
         module("rs", "Short for redstone.");
         module("os", "Time and waiting.");
@@ -81,6 +82,9 @@ public final class LuaApi {
             member("getAnalogOutput", "getAnalogOutput(side) → 0-15", "Strength this computer sends out of that side.");
             member("getSides", "getSides() → table", "The six side names.");
         }
+        current = "bus";
+        member("list", "list() → table", "Every device on the network, nearest first: name, type, distance, readable, writable.");
+        member("get", "get(name) → device", "A device by name. Its output ports let you read it, its input ports give it orders. device.onChange(fn) runs fn whenever it changes.");
         current = "os";
         member("clock", "clock() → seconds", "Seconds of game time since the program started.");
         member("sleep", "sleep(seconds)", "Same as sleep.");

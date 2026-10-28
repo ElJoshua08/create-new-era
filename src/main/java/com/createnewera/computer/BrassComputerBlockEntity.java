@@ -4,13 +4,23 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 import org.squiddev.cobalt.LuaError;
+import org.squiddev.cobalt.LuaTable;
+import org.squiddev.cobalt.LuaValue;
+import org.squiddev.cobalt.ValueFactory;
+import org.squiddev.cobalt.Varargs;
 
+import com.createnewera.bus.Bus;
+import com.createnewera.bus.BusDevice;
+import com.createnewera.bus.DeviceDrivers;
+import com.createnewera.bus.LuaValues;
 import com.createnewera.network.ComputerSnapshot;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
@@ -25,6 +35,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -83,9 +94,32 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
             return;
         if (running && vm == null)
             start("create_new_era.console.restarted");
-        if (vm != null)
+        if (vm != null) {
+            watchDevices();
             runSlice();
+        }
         syncViewers();
+    }
+
+    /** Last state seen of each device a handler listens to; a difference wakes its handlers. */
+    private final Map<String, Object> deviceSnapshots = new HashMap<>();
+
+    private void watchDevices() {
+        Set<String> watched = vm.watched();
+        if (watched.isEmpty())
+            return;
+        ServerLevel server = (ServerLevel) level;
+        Map<String, BusDevice> reachable = new HashMap<>();
+        for (BusDevice device : Bus.devicesSeenFrom(server, worldPosition))
+            reachable.put(device.name(), device);
+        for (String name : watched) {
+            BusDevice device = reachable.get(name);
+            // a device that drops off the network changes too
+            Object now = device == null ? "gone" : DeviceDrivers.snapshot(server, device.pos());
+            Object before = deviceSnapshots.put(name, now);
+            if (before != null && !before.equals(now))
+                vm.deviceChanged(name);
+        }
     }
 
     /** How much of this tick the program gets; zero without rotation or when overstressed. */
@@ -175,6 +209,7 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
 
     private void halt() {
         vm = null;
+        deviceSnapshots.clear();
         setRunning(false);
     }
 
@@ -344,6 +379,64 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
         @Override
         public double clock() {
             return (level.getGameTime() - startTick) / 20.0;
+        }
+
+        @Override
+        public long now() {
+            return level.getGameTime();
+        }
+
+        @Override
+        public LuaValue busList() {
+            LuaTable list = new LuaTable();
+            int i = 1;
+            for (BusDevice device : Bus.devicesSeenFrom((ServerLevel) level, worldPosition)) {
+                LuaTable entry = new LuaTable();
+                entry.rawset("name", ValueFactory.valueOf(device.name()));
+                entry.rawset("type", ValueFactory.valueOf(device.type()));
+                entry.rawset("distance", ValueFactory.valueOf(Math.round(device.distance() * 10) / 10.0));
+                entry.rawset("readable", ValueFactory.valueOf(device.readable()));
+                entry.rawset("writable", ValueFactory.valueOf(device.writable()));
+                list.rawset(i++, entry);
+            }
+            return list;
+        }
+
+        @Override
+        public LuaValue busInfo(String name) throws LuaError {
+            BusDevice device = reach(name);
+            LuaTable methods = new LuaTable();
+            int i = 1;
+            // every method the device has, allowed or not: calling one its ports don't allow says which port is missing
+            for (String method : DeviceDrivers.methods((ServerLevel) level, device.pos(), true, true).keySet())
+                methods.rawset(i++, ValueFactory.valueOf(method));
+            LuaTable info = new LuaTable();
+            info.rawset("name", ValueFactory.valueOf(device.name()));
+            info.rawset("type", ValueFactory.valueOf(device.type()));
+            info.rawset("methods", methods);
+            return info;
+        }
+
+        @Override
+        public Varargs busCall(String name, String method, Varargs args) throws LuaError {
+            BusDevice device = reach(name);
+            ServerLevel server = (ServerLevel) level;
+            DeviceDrivers.Method call = DeviceDrivers.methods(server, device.pos(), device.readable(), device.writable()).get(method);
+            if (call == null) {
+                // say which port is missing rather than pretending the method doesn't exist
+                boolean exists = DeviceDrivers.methods(server, device.pos(), true, true).containsKey(method);
+                throw new LuaError(exists
+                        ? name + "." + method + " needs " + (device.readable() ? "an input" : "an output") + " port on " + name
+                        : name + " has no " + method);
+            }
+            return LuaValues.of(call.call(args));
+        }
+
+        private BusDevice reach(String name) throws LuaError {
+            BusDevice device = Bus.find((ServerLevel) level, worldPosition, name);
+            if (device == null)
+                throw new LuaError("no device named '" + name + "' on this computer's network");
+            return device;
         }
     }
 }

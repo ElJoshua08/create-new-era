@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.jetbrains.annotations.Nullable;
 import org.squiddev.cobalt.Constants;
@@ -26,6 +28,10 @@ import org.squiddev.cobalt.lib.CoreLibraries;
  * One running program. It lives on the server thread and gets a slice of time each tick:
  * when the slice runs out the watchdog suspends it mid-instruction and the next tick picks
  * up where it stopped, so a busy loop slows its own program down instead of the server.
+ * <p>
+ * The program runs inside a small scheduler written in Lua (the kernel in prelude.lua): the
+ * main code and every event handler are tasks, and the kernel tells us when it next wants to
+ * run. Between those times the computer costs nothing; device changes wake it early.
  */
 public final class LuaComputer {
     /** What the program can touch in the world. */
@@ -46,6 +52,17 @@ public final class LuaComputer {
 
         /** Seconds since the program started, in game time. */
         double clock();
+
+        /** The current game tick, for the kernel's timers. */
+        long now();
+
+        /** The devices this computer can reach, nearest first, as a list of tables. */
+        LuaValue busList() throws LuaError;
+
+        /** One device: its name, type and the methods its ports allow. Errors if it can't be reached. */
+        LuaValue busInfo(String name) throws LuaError;
+
+        Varargs busCall(String name, String method, Varargs args) throws LuaError;
     }
 
     public enum Status { RUNNING, SLEEPING, FINISHED }
@@ -53,15 +70,32 @@ public final class LuaComputer {
     private static final String PRELUDE = loadPrelude();
 
     private final LuaState state;
-    private final LuaThread program;
+    private final LuaThread kernel;
     private long deadline;
+    /** When the kernel asked to run again; MAX_VALUE when it only waits for events. */
     private long wakeTick;
-    // null resumes a program the watchdog suspended; NONE resumes after a yield
-    private @Nullable Varargs resumeArgs = Constants.NONE;
+    private boolean waiting;
+    // null resumes a program the watchdog suspended; otherwise what the kernel's yield returns
+    private @Nullable Varargs resumeArgs;
+    /** Devices with onChange handlers, and the changes waiting to be delivered. */
+    private final Set<String> watched = new LinkedHashSet<>();
+    private final Set<String> changed = new LinkedHashSet<>();
 
-    private LuaComputer(LuaState state, LuaThread program) {
+    private LuaComputer(LuaState state, LuaThread kernel, LuaFunction main) {
         this.state = state;
-        this.program = program;
+        this.kernel = kernel;
+        this.resumeArgs = main;
+    }
+
+    /** Devices a handler listens to; the host checks these for changes each tick. */
+    public Set<String> watched() {
+        return Set.copyOf(watched);
+    }
+
+    /** Wakes the program's onChange handlers for this device. */
+    public void deviceChanged(String name) {
+        if (watched.contains(name))
+            changed.add(name);
     }
 
     /**
@@ -79,10 +113,11 @@ public final class LuaComputer {
 
         LuaTable globals = state.globals();
         LuaFunction prelude = compile(state, PRELUDE, "=prelude", globals);
-        LuaThread.runMain(state, prelude, native_(host));
+        LuaTable natives = native_(host, holder);
+        LuaFunction kernel = (LuaFunction) LuaThread.runMain(state, prelude, natives).first();
 
         LuaFunction main = compile(state, source, "=" + name, globals);
-        holder[0] = new LuaComputer(state, new LuaThread(state, main));
+        holder[0] = new LuaComputer(state, new LuaThread(state, kernel), main);
         return holder[0];
     }
 
@@ -92,14 +127,31 @@ public final class LuaComputer {
      * @throws LuaError the program failed; the message already says where
      */
     public Status tick(long gameTime, long budgetNanos) throws LuaError {
-        if (gameTime < wakeTick)
-            return Status.SLEEPING;
+        if (waiting) {
+            if (changed.isEmpty() && gameTime < wakeTick)
+                return Status.SLEEPING;
+            // the kernel's yield returns the names of the devices that changed
+            LuaTable events = new LuaTable();
+            int i = 1;
+            for (String name : changed)
+                events.rawset(i++, ValueFactory.valueOf(name));
+            changed.clear();
+            resumeArgs = events;
+            waiting = false;
+        }
 
         deadline = System.nanoTime() + budgetNanos;
         Varargs result;
         LuaWatchdog.watch(state, deadline);
         try {
-            result = LuaThread.run(program, resumeArgs);
+            if (resumeArgs == null) {
+                // suspended mid-slice, possibly deep inside a task's coroutine: pick up that exact
+                // coroutine (as CC: Tweaked does); resuming the kernel instead would hand it nothing
+                LuaThread current = state.getCurrentThread();
+                result = LuaThread.run(current == null || current.isMainThread() ? kernel : current, Constants.NONE);
+            } else {
+                result = LuaThread.run(kernel, resumeArgs);
+            }
         } finally {
             LuaWatchdog.release();
         }
@@ -108,17 +160,18 @@ public final class LuaComputer {
             resumeArgs = null;
             return Status.RUNNING;
         }
-        if (program.getStatus() == LuaThread.Status.DEAD)
+        if (kernel.getStatus() == LuaThread.Status.DEAD) {
+            // a task failed: the kernel stops and returns ("error", message)
+            if (result.first().isString() && "error".equals(result.first().toString()))
+                throw new LuaError(result.arg(2).toString());
             return Status.FINISHED;
-
-        resumeArgs = Constants.NONE;
-        if (result.first().isString() && "sleep".equals(result.first().toString())) {
-            double seconds = Math.max(0, result.arg(2).toDouble());
-            // even sleep(0) gives the rest of the world a tick
-            wakeTick = gameTime + Math.max(1, (long) Math.ceil(seconds * 20));
-            return Status.SLEEPING;
         }
-        return Status.RUNNING;
+
+        // the kernel yields ("wait", tick) or ("wait", nil) when only events can wake it
+        LuaValue wake = result.arg(2);
+        wakeTick = wake.isNil() ? Long.MAX_VALUE : (long) wake.toDouble();
+        waiting = true;
+        return Status.SLEEPING;
     }
 
     private static LuaFunction compile(LuaState state, String source, String name, LuaTable env) throws LuaError {
@@ -129,8 +182,8 @@ public final class LuaComputer {
         }
     }
 
-    /** Java side of the API; the prelude wraps it into print, sleep, os and redstone, then drops it. */
-    private static LuaTable native_(Host host) {
+    /** Java side of the API; the prelude wraps it into print, sleep, os, redstone and bus, then drops it. */
+    private static LuaTable native_(Host host, LuaComputer[] self) {
         LuaTable redstone = RegisteredFunction.bind(new RegisteredFunction[] {
                 RegisteredFunction.of("getInput", (state, side) -> ValueFactory.valueOf(host.getInput(side(side)) > 0)),
                 RegisteredFunction.of("getAnalogInput", (state, side) -> ValueFactory.valueOf(host.getInput(side(side)))),
@@ -168,6 +221,19 @@ public final class LuaComputer {
                 }),
         });
         table.rawset("redstone", redstone);
+        table.rawset("now", RegisteredFunction.of("now", state -> ValueFactory.valueOf((double) host.now())).create());
+
+        LuaTable bus = RegisteredFunction.bind(new RegisteredFunction[] {
+                RegisteredFunction.of("list", state -> host.busList()),
+                RegisteredFunction.of("info", (state, name) -> host.busInfo(name.checkString())),
+                RegisteredFunction.ofV("call", (state, args) ->
+                        host.busCall(args.arg(1).checkString(), args.arg(2).checkString(), args.subargs(3))),
+                RegisteredFunction.of("watch", (state, name) -> {
+                    self[0].watched.add(name.checkString());
+                    return Constants.NIL;
+                }),
+        });
+        table.rawset("bus", bus);
         return table;
     }
 

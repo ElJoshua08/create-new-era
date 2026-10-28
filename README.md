@@ -48,6 +48,8 @@ end
 | `sleep(seconds)`, `os.sleep` | Waits in game time (20 ticks a second) |
 | `os.clock()` | Seconds since the program started |
 | `os.speed()` | RPM the computer turns at (negative when it turns the other way) |
+| `bus.list()`, `bus.get(name)` | Devices on the data network, nearest first, and one by name: read it through its output ports, give it orders through its input ports (`getSpeed`, `setSpeed`, `items`, `count`, `fluids`, …) |
+| `device.onChange(fn)` | Runs `fn(device)` whenever the device changes; the program keeps listening after its main code ends |
 | `require(name)` | Runs another file on the computer once and returns what it returned (`require("lib.pid")` finds `lib/pid.lua`) |
 | `redstone.getInput(side)`, `getAnalogInput(side)` | Signal coming in, as on/off or 0–15 |
 | `redstone.setOutput(side, on)`, `setAnalogOutput(side, 0–15)` | Signal going out |
