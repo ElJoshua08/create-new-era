@@ -15,6 +15,7 @@ def devFiles = [
     ['client', 'mods', 'ImmediatelyFast-NeoForge-1.6.15+1.21.1.jar', 'https://cdn.modrinth.com/data/5ZwdcRci/versions/EJzmEPZV/ImmediatelyFast-NeoForge-1.6.15%2B1.21.1.jar', 'f991166f7c82b493481c876e3c83c9fac4159671'],
     ['client', 'mods', 'entityculling-neoforge-1.11.3-mc1.21.1.jar', 'https://cdn.modrinth.com/data/NNAgCjsB/versions/eieYbWYb/entityculling-neoforge-1.11.3-mc1.21.1.jar', 'f122f84f329793675b2625d51b77f990d7de3579'],
     ['client', 'mods', 'lithium-neoforge-0.15.4+mc1.21.1.jar', 'https://cdn.modrinth.com/data/gvQqBUqZ/versions/DDUrRVCA/lithium-neoforge-0.15.4%2Bmc1.21.1.jar', '97212e45c963730bbfc7c44780df99317814c21b'],
+    ['jei', 'mods', 'jei-1.21.1-neoforge-19.70.0.464.jar', 'https://cdn.modrinth.com/data/u6dRKJwZ/versions/ufAsQKnC/jei-1.21.1-neoforge-19.70.0.464.jar', '4e3a3f58c02ca1c9362f7d089dec4a611d475582'],
     ['shaders', 'mods', 'iris-neoforge-1.8.14-beta.1+mc1.21.1.jar', 'https://cdn.modrinth.com/data/YL57xq9U/versions/KduFYu4t/iris-neoforge-1.8.14-beta.1%2Bmc1.21.1.jar', '1bd129cf7bce65d6b1c0543045f0620c98a0f885'],
     ['shaders', 'shaderpacks', 'ComplementaryReimagined_r5.9.3.zip', 'https://cdn.modrinth.com/data/HVnmMxH1/versions/Bqen1mJX/ComplementaryReimagined_r5.9.3.zip', '838139b54cddb56b2e83cd260d8efd960ac536d6'],
     ['shaders', 'shaderpacks', 'ComplementaryUnbound_r5.9.3.zip', 'https://cdn.modrinth.com/data/R6NEzAwj/versions/B1kyfoUZ/ComplementaryUnbound_r5.9.3.zip', '2ee08300e1d6f039e63eae8484dddf57b3aaaf67'],
@@ -24,6 +25,7 @@ def devFiles = [
 
 def enabled = [
     client     : (findProperty('dev_client_mods') ?: 'true').toBoolean(),
+    jei        : (findProperty('dev_jei') ?: 'true').toBoolean(),
     shaders    : (findProperty('dev_shaders') ?: 'true').toBoolean(),
     aeronautics: (findProperty('dev_aeronautics') ?: 'true').toBoolean(),
 ]
@@ -53,7 +55,7 @@ def fetch = { String url, File target, String sha1 ->
 
 def setupDevClient = tasks.register('setupDevClient') {
     group = 'mod development'
-    description = 'Downloads the dev-only client mods, Aeronautics and shaderpacks into run/.'
+    description = 'Downloads the dev-only client mods, JEI, Aeronautics and shaderpacks into run/.'
     def files = devFiles.findAll { enabled[it[0]] }
     def wantShaders = enabled.shaders
     inputs.property('files', files.collect { it[2] })
@@ -78,4 +80,9 @@ def setupDevServer = tasks.register('setupDevServer') {
 }
 
 tasks.matching { it.name == 'runClient' }.configureEach { dependsOn setupDevClient }
+
+// straight into a world on launch: the save folder's name under run/saves
+def devWorld = findProperty('dev_world')
+if (devWorld && file("run/saves/${devWorld}").isDirectory())
+    neoForge.runs.client.programArguments.addAll('--quickPlaySingleplayer', devWorld)
 tasks.matching { it.name in ['runServer', 'runGameTestServer'] }.configureEach { dependsOn setupDevServer }
