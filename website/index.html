@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create: New Era</title>
+<meta name="description" content="Programmable automation for Create: brass computers that run Lua, a data bus, buildable control panels and a mechanical flip-pixel screen. A NeoForge 1.21.1 add-on in early development.">
+<meta name="theme-color" content="#15110d">
+<meta property="og:title" content="Create: New Era">
+<meta property="og:description" content="Programmable automation for Create. Early development: blocks and recipes are in, functionality comes next.">
+<meta property="og:image" content="img/machines.png">
+<link rel="icon" type="image/png" href="img/blocks/brass_computer.png">
+<link rel="preload" href="fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M6 1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-1h-1v-1h-1v-1h1v1h1v1h1v-1h1v-1h1z"/></symbol>
+    <symbol id="i-todo" viewBox="0 0 8 8"><path fill="currentColor" fill-rule="evenodd" shape-rendering="crispEdges" d="M1 1h6v6h-6z M2 2v4h4v-4z"/></symbol>
+    <symbol id="i-down" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M3 0h2v4h2v1h-1v1h-1v1h-2v-1h-1v-1h-1v-1h2z"/></symbol>
+    <symbol id="i-bang" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M3 0h2v5h-2z M3 6h2v2h-2z"/></symbol>
+    <!-- 12x12 cog: octagonal body, eight teeth, square axle hole like Create's shafts -->
+    <symbol id="cog" viewBox="0 0 12 12" shape-rendering="crispEdges">
+      <path style="fill:var(--c-face)" d="M3 2h6v8h-6z M2 3h8v6h-8z M5 0h2v2h-2z M5 10h2v2h-2z M0 5h2v2h-2z M10 5h2v2h-2z M1 1h2v2h-2z M9 1h2v2h-2z M1 9h2v2h-2z M9 9h2v2h-2z"/>
+      <path style="fill:var(--c-hi)" d="M5 0h2v1h-2z M1 1h2v1h-2z M0 5h1v2h-1z M3 2h2v1h-2z M2 3h1v2h-1z"/>
+      <path style="fill:var(--c-lo)" d="M5 11h2v1h-2z M9 10h2v1h-2z M11 5h1v2h-1z M4 4h4v4h-4z"/>
+      <path style="fill:var(--c-hole)" d="M5 5h2v2h-2z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="./"><img class="pixelated" src="img/blocks/brass_computer.png" alt="" width="30" height="33"><span>Create: New Era</span></a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="#program">Lua</a>
+      <a class="hide-sm" href="#blocks">Blocks</a>
+      <a class="hide-sm" href="#roadmap">Roadmap</a>
+      <a href="docs/">Docs</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="Source on GitHub"><svg aria-hidden="true"><use href="#i-github"/></svg><span class="hide-sm">GitHub</span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="hero-top">
+        <span class="chip">Phase 2 · early development</span>
+        <h1 id="hero-title"><span>Create:</span><span class="era">New Era</span></h1>
+      </div>
+      <div class="hero-copy">
+        <p class="lede"><strong>Programmable automation for Create.</strong> Brass computers that run Lua, a data bus that reaches every machine, buildable control panels, and a mechanical flip-pixel screen.</p>
+        <div class="actions">
+          <a class="btn btn-brass" href="#download"><svg aria-hidden="true"><use href="#i-down"/></svg>Download</a>
+          <a class="btn btn-dark" href="docs/">Read the docs</a>
+        </div>
+        <p class="fine">For NeoForge on Minecraft 1.21.1. The Brass Computer already runs Lua and drives redstone. The data bus, drawing on screens and the panel controls come next.</p>
+      </div>
+
+      <div class="monitor">
+        <div class="monitor-frame">
+          <div class="monitor-glass">
+            <canvas id="board" role="img" aria-label="A flip-pixel screen of 132 by 84 plates cycling through a name plate, a factory dashboard, a train departure board and a stress gauge"></canvas>
+          </div>
+        </div>
+        <div class="rail">
+          <button class="tbtn" id="board-play" type="button" aria-pressed="false"><span>Play</span></button>
+          <button class="tbtn" id="board-next" type="button">Next frame</button>
+          <div class="seg" role="group" aria-label="Pixel shape">
+            <button type="button" data-shape="square" aria-pressed="true">Square</button>
+            <button type="button" data-shape="disc" aria-pressed="false">Disc</button>
+          </div>
+        </div>
+        <div class="meta">
+          <p class="caption">A browser model of a 3 × 2 Brass Screen. Move across it to flip plates. The dashboards are illustrations: in game, screens join into panes today and learn to draw in phase 4.</p>
+          <span class="status" id="board-status" aria-live="off">1/4</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="idea-title">
+    <div class="wrap idea">
+      <div>
+        <h2 id="idea-title" class="px px-18" style="color:var(--fg-3);margin:0 0 27px;font-weight:400">The idea</h2>
+        <p class="big">CC: Tweaked lets you program Minecraft. Create: New Era is meant to feel like part of Create itself: <em>brass computers</em> running Lua, a <em>data bus</em> that reaches every machine, <em>control desks</em> you build block by block, and a <em>screen made of moving parts</em>. Built for factories, fluids, trains and Create: Aeronautics ships alike.</p>
+      </div>
+      <div class="ledger">
+        <h3>Works today</h3>
+        <ul>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>The Brass Computer runs Lua programs, written in its own in-game editor</span></li>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>Programs read and send redstone on all six sides</span></li>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>Brass Screens facing the same way join into one pane</span></li>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>13 blocks and items with recipes, Create-style tooltips and a Ponder scene for each</span></li>
+        </ul>
+        <div class="divider" role="presentation"></div>
+        <h3>Not yet</h3>
+        <ul>
+          <li class="off"><svg aria-hidden="true"><use href="#i-todo"/></svg><span>The data bus, drawing on screens, wired panel controls and the servo. See the <a href="#roadmap">roadmap</a>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section prog" id="program" aria-labelledby="program-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="program-title">Write a program</h2>
+        <p>The Brass Computer runs Lua today. Right-click it to open the editor, write a program and press Run. Every new computer starts with this one, which blinks a redstone signal out of its back.</p>
+      </div>
+      <div class="prog-grid">
+        <figure class="editor-fig">
+          <div class="editor" id="editor">
+            <div class="ed-bar">
+              <span class="ed-title">Brass Computer</span>
+              <span class="ed-state" id="ed-state">Running</span>
+              <button class="ed-btn" id="ed-run" type="button">Run</button>
+              <button class="ed-btn" id="ed-stop" type="button">Stop</button>
+            </div>
+            <div class="ed-main">
+              <pre class="ed-code" aria-label="Lua program"><code><span class="ln" data-line="1"><i>1</i><span class="c">-- Blinks a redstone signal out of the back.</span></span><span class="ln" data-line="2"><i>2</i><span class="c">-- Edit me, then press Run (Ctrl+R).</span></span><span class="ln" data-line="3"><i>3</i><span class="k">while</span> <span class="k">true</span> <span class="k">do</span></span><span class="ln" data-line="4"><i>4</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;back&quot;</span>, <span class="k">true</span>)</span><span class="ln" data-line="5"><i>5</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="6"><i>6</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;back&quot;</span>, <span class="k">false</span>)</span><span class="ln" data-line="7"><i>7</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="8"><i>8</i><span class="k">end</span></span></code></pre>
+              <div class="ed-rs" aria-label="Redstone on each side">
+                <span class="ed-label">Redstone</span>
+                <div class="ed-rs-head" aria-hidden="true"><span></span><span>in</span><span>out</span></div>
+                <ul><li data-side="front"><span class="sn">front</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li><li data-side="back"><span class="sn">back</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li><li data-side="left"><span class="sn">left</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li><li data-side="right"><span class="sn">right</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li><li data-side="top"><span class="sn">top</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li><li data-side="bottom"><span class="sn">bottom</span><span class="cell in" title="in"></span><span class="cell out" title="out"></span></li></ul>
+              </div>
+            </div>
+            <ol class="ed-console" id="ed-console" aria-live="polite"><li class="sys">Running</li></ol>
+          </div>
+          <figcaption>A mock-up of the in-game editor running that default program. Try Stop and Run: stopping turns the outputs off, as it does in game.</figcaption>
+        </figure>
+        <div class="api-side">
+          <h3>What a program can do today</h3>
+          <dl class="api">
+            <dt><code>print(...)</code></dt><dd>Writes a line to the console under the editor.</dd>
+            <dt><code>sleep(seconds)</code></dt><dd>Waits in game time, 20 ticks a second. Also <code>os.sleep</code>.</dd>
+            <dt><code>os.clock()</code></dt><dd>Seconds since the program started.</dd>
+            <dt><code>redstone.getInput(side)</code></dt><dd>Signal coming in, as on/off. <code>getAnalogInput</code> gives 0 to 15.</dd>
+            <dt><code>redstone.setOutput(side, on)</code></dt><dd>Signal going out. <code>setAnalogOutput</code> takes 0 to 15.</dd>
+          </dl>
+          <p class="api-note">Sides are named from the computer's front: <code>front</code>, <code>back</code>, <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>. A program that loops without sleeping only slows itself down, never the server.</p>
+          <a class="btn btn-dark" href="docs/lua.html">Lua API reference</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="blocks" aria-labelledby="blocks-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="blocks-title">The machines</h2>
+        <p>Built from Create parts you already make: brass casing, electron tubes, precision mechanisms. Hover, tap or hold <kbd>Shift</kbd> to read each tooltip, and <kbd>Ctrl</kbd> for controls, the way you would in game. In game, hold <kbd>W</kbd> over any of them for its Ponder scene.</p>
+      </div>
+
+      <div class="shelf-row">
+        <div class="item" tabindex="0" role="button" aria-expanded="false" data-tip="t-computer"><img class="pixelated" src="img/blocks/brass_computer.png" alt="Brass Computer, lit while a program runs" width="172" height="192"></div>
+        <div class="item" tabindex="0" role="button" aria-expanded="false" data-tip="t-screen"><img class="pixelated" src="img/blocks/brass_screen.png" alt="Brass Screen" width="172" height="192"></div>
+        <div class="item" tabindex="0" role="button" aria-expanded="false" data-tip="t-adapter"><img class="pixelated" src="img/blocks/universal_adapter.png" alt="Universal Adapter" width="172" height="192"></div>
+        <div class="item" tabindex="0" role="button" aria-expanded="false" data-tip="t-servo"><img class="pixelated" src="img/blocks/bearing_servo.png" alt="Bearing Servo" width="172" height="192"></div>
+      </div>
+      <div class="shelf-plank" role="presentation"></div>
+      <div class="tooltips">
+        <div class="tip" id="t-computer"><span class="name">Brass Computer</span><span class="hint">Hold [<b>Shift</b>]</span><span class="hint hint-ctrl">Hold [<b>Ctrl</b>]</span><div class="sum-wrap"><div class="sum"><p>Runs <em>Lua</em> programs you write in its built-in <em>editor</em>. For now they work with <em>redstone</em>; the <em>data bus</em> comes next.</p><dl class="beh"><dt>When running</dt><dd>The screen lights up. The program gets a <em>slice of time</em> every tick and keeps going while nobody watches.</dd><dt>Redstone</dt><dd>Every face is a <em>side</em>: front, back, left, right, top and bottom. Read signals with <em>redstone.getInput</em>, send them with <em>redstone.setOutput</em>.</dd><dt>When the world loads</dt><dd>A program that was running <em>starts again</em> from the top.</dd></dl></div></div><div class="ctl-wrap"><div class="sum"><dl class="beh"><dt>When R-Clicked</dt><dd>Opens the <em>editor</em>. <em>Ctrl+R</em> runs, <em>Ctrl+T</em> stops.</dd><dt>When Wrenched</dt><dd>Turns the computer. The sides turn with its <em>front</em>.</dd></dl></div></div></div>
+        <div class="tip" id="t-screen"><span class="name">Brass Screen</span><span class="hint">Hold [<b>Shift</b>]</span><span class="hint hint-ctrl">Hold [<b>Ctrl</b>]</span><div class="sum-wrap"><div class="sum"><p>Joins with its neighbours into one big display made of <em>flip pixels</em> that turn when they change.</p><dl class="beh"><dt>Next to another screen</dt><dd>Screens facing the <em>same way</em> merge into <em>one pane</em> and the brass frame between them disappears.</dd><dt>Pixels</dt><dd><em>48 by 48</em> flip pixels per block. Pick <em>square plates</em> or <em>round discs</em> in the client config.</dd></dl></div></div><div class="ctl-wrap"><div class="sum"><dl class="beh"><dt>When Wrenched</dt><dd>Turns the screen. It joins whatever screens it now lines up with.</dd></dl></div></div></div>
+        <div class="tip" id="t-adapter"><span class="name">Universal Adapter</span><span class="hint">Hold [<b>Shift</b>]</span><div class="sum-wrap"><div class="sum"><p>Attach to any block to expose what it can do, <em>kinetics</em>, <em>items</em> or <em>fluids</em>, on the data bus.</p><dl class="beh"><dt>When placed</dt><dd>Sticks to the face you click, so it fits on <em>any side</em> of a machine.</dd><dt>Coming soon</dt><dd>Arrives with the <em>data bus</em>. Until then it doesn't do anything.</dd></dl></div></div></div>
+        <div class="tip" id="t-servo"><span class="name">Bearing Servo</span><span class="hint">Hold [<b>Shift</b>]</span><div class="sum-wrap"><div class="sum"><p>Turns an attached <em>contraption</em> to an exact angle on command.</p><dl class="beh"><dt>When placed</dt><dd>Faces you, like Create's <em>bearings</em>.</dd><dt>Coming soon</dt><dd>Programs will set its <em>angle</em> in degrees, for gimbals, turrets and flaps.</dd></dl></div></div></div>
+      </div>
+
+      <div class="desk-wrap">
+        <h3>Panel controls</h3>
+        <p>Small blocks you place on any face to build real control desks. Each one starts as a Control Plate plus one part.</p>
+        <div class="desk">
+          <div class="desk-grid">
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-button"><img class="pixelated" src="img/blocks/panel_button.png" alt="Panel Button" width="130" height="133"><div class="tip" id="t-button"><span class="name">Panel Button</span><div class="sum-wrap"><div class="sum"><p>A momentary <em>push button</em> for programs to react to.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will see each <em>press</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-switch"><img class="pixelated" src="img/blocks/panel_switch.png" alt="Panel Switch" width="130" height="133"><div class="tip" id="t-switch"><span class="name">Panel Switch</span><div class="sum-wrap"><div class="sum"><p>An <em>on/off</em> lever a program can read.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-knob"><img class="pixelated" src="img/blocks/panel_knob.png" alt="Panel Knob" width="130" height="133"><div class="tip" id="t-knob"><span class="name">Panel Knob</span><div class="sum-wrap"><div class="sum"><p>A rotary knob that dials in a <em>value</em>.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will read its <em>value</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-slider"><img class="pixelated" src="img/blocks/panel_slider.png" alt="Panel Slider" width="130" height="133"><div class="tip" id="t-slider"><span class="name">Panel Slider</span><div class="sum-wrap"><div class="sum"><p>A fader for a smooth <em>0 to 100%</em> value.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-lamp"><img class="pixelated" src="img/blocks/panel_lamp.png" alt="Panel Lamp" width="130" height="133"><div class="tip" id="t-lamp"><span class="name">Panel Lamp</span><div class="sum-wrap"><div class="sum"><p>An indicator light a program can switch and <em>colour</em>.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will switch it and pick its <em>colour</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-nixie"><img class="pixelated" src="img/blocks/nixie_digit.png" alt="Nixie Digit" width="130" height="133"><div class="tip" id="t-nixie"><span class="name">Nixie Digit</span><div class="sum-wrap"><div class="sum"><p>One glowing <em>digit</em>; place several in a row to show whole numbers.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will show <em>digits</em> on it.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-gauge"><img class="pixelated" src="img/blocks/panel_gauge.png" alt="Panel Gauge" width="130" height="133"><div class="tip" id="t-gauge"><span class="name">Panel Gauge</span><div class="sum-wrap"><div class="sum"><p>A needle dial that shows any <em>value</em>.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will move its <em>needle</em>.</dd></dl></div></div></div></div>
+            <div class="item small" tabindex="0" role="button" aria-expanded="false" data-tip="t-keypad"><img class="pixelated" src="img/blocks/panel_keypad.png" alt="Panel Keypad" width="130" height="133"><div class="tip" id="t-keypad"><span class="name">Panel Keypad</span><div class="sum-wrap"><div class="sum"><p>Twelve keys to <em>type numbers</em> into a program.</p><dl class="beh"><dt>Coming soon</dt><dd>Programs will get the <em>numbers</em> typed in.</dd></dl></div></div></div></div>
+          </div>
+        </div>
+        <div class="shift-bar">
+          <button class="key" id="shift-key" type="button" aria-pressed="false">Shift</button>
+          <button class="key" id="ctrl-key" type="button" aria-pressed="false">Ctrl</button>
+          <span>Hold Shift or Ctrl on your keyboard, or press these keys, to open every summary or the controls, like in game.</span>
+        </div>
+        <p class="plate-note"><span class="slot"><img src="img/blocks/control_plate.png" alt="Control Plate" width="48" height="48"></span><span>The <strong>Control Plate</strong> is the andesite base for every panel control: 2 andesite alloy and a brass sheet make four. <a href="docs/blocks.html">All recipes</a></span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section screen-sec" id="screen" aria-labelledby="screen-title">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="screen-title">A screen made of moving parts</h2>
+        <p>The Brass Screen is designed as a grid of physical flip pixels. When the picture changes, each pixel turns over on its axis: the old colour on the front, the new one on the back. Brush across the plates. Drawing on screens arrives in phase 4.</p>
+      </div>
+      <div class="screen-grid">
+        <div class="plates-box">
+          <div class="plates" id="plates" aria-hidden="true"></div>
+          <p class="plates-hint"><button class="tbtn" id="plates-sweep" type="button">Flip them all</button></p>
+        </div>
+        <ul class="facts">
+          <li>
+            <h3>48 pixels per block</h3>
+            <p>Screens facing the same way already merge into one pane in game, and the brass frame between them disappears. A 3 × 2 screen has 132 × 84 plates inside its bezel, like the board at the top of this page.</p>
+          </li>
+          <li>
+            <h3>Only what changes moves</h3>
+            <p>A pixel that already shows the right colour stays still. A counter going up turns only its digits.</p>
+          </li>
+          <li>
+            <h3>Square plates or round discs</h3>
+            <p>Each player picks the shape in the client config; it's purely visual. Try both:</p>
+            <div class="seg" role="group" aria-label="Pixel shape" style="margin-top:15px">
+              <button type="button" data-shape="square" aria-pressed="true">Square</button>
+              <button type="button" data-shape="disc" aria-pressed="false">Disc</button>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <figure class="proto">
+        <img class="pixelated" src="img/screen.png" alt="Prototype render of a 3 by 2 brass screen showing a factory dashboard with a speed gauge, a three-digit counter, a fill bar and a production graph" width="576" height="384" loading="lazy">
+        <figcaption>Prototype of a 3 × 2 screen at 48 px per block, rendered outside the game with <code>tools/screen/proto_screen.py</code>. Its labels are in Spanish, the mod's other language.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="roadmap" aria-labelledby="roadmap-title">
+    <div class="wrap road-grid">
+      <div class="section-head">
+        <h2 id="roadmap-title">Roadmap</h2>
+        <p>Seven phases, in order. The first is done and the second is well under way; everything after that is planned, not built.</p>
+      </div>
+      <ol class="road">
+        <li class="done">
+          <span class="cog" style="--c-face:#e4b763;--c-hi:#ffeb8c;--c-lo:#9e6947;--c-hole:#3a2411"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 1 <span class="tag done">Done</span></div><h3>Foundation</h3><p>Blocks, recipes, creative tab, Create and Aeronautics dependencies.</p></div>
+        </li>
+        <li class="active">
+          <span class="cog" style="--c-face:#d67b5b;--c-hi:#e8a083;--c-lo:#904931;--c-hole:#2a120a"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 2 <span class="tag next">In progress</span></div><h3>Lua runtime</h3><p>A sandboxed VM on the computer with an in-game editor. The VM, the editor and the redstone API are done; files and multiple programs are still to come.</p></div>
+        </li>
+        <li class="later">
+          <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 3</div><h3>Data bus</h3><p>Cables and adapters that expose Create machines as typed peripherals.</p></div>
+        </li>
+        <li class="later">
+          <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 4</div><h3>Flip-pixel screens</h3><p>Multiblock screens and a declarative UI library for good-looking dashboards. Screens already join into one pane.</p></div>
+        </li>
+        <li class="later">
+          <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 5</div><h3>Panels</h3><p>Wire the controls to programs.</p></div>
+        </li>
+        <li class="later">
+          <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 6</div><h3>Aeronautics</h3><p>Servos, sensors, then autonomous and remote-piloted drones with signal towers.</p></div>
+        </li>
+        <li class="later">
+          <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>
+          <div><div class="phase">Phase 7</div><h3>Visual programming</h3><p>Node-based programming for people who'd rather not write Lua.</p></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="download" aria-labelledby="download-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="download-title">Download</h2>
+      </div>
+      <div class="dl-grid">
+        <div class="download">
+          <h3>Releases</h3>
+          <p class="notice"><svg aria-hidden="true" style="color:var(--amber)"><use href="#i-bang"/></svg><span><strong>Early development, no release yet.</strong> When the first build is published it will appear on the GitHub releases page.</span></p>
+          <a class="btn btn-brass" href="https://github.com/ElJoshua08/create-new-era/releases"><svg aria-hidden="true"><use href="#i-github"/></svg>GitHub releases</a>
+          <p class="alt">Want to try it now? <a href="docs/building.html">Build it from source</a> with <code>./gradlew build</code>.</p>
+        </div>
+        <div class="gui">
+          <h3>Requirements</h3>
+          <table class="req">
+            <tbody>
+              <tr><th scope="row">Minecraft</th><td>1.21.1</td></tr>
+              <tr><th scope="row">NeoForge</th><td>21.1.265+</td></tr>
+              <tr><th scope="row">Create</th><td>6.0.10+</td></tr>
+              <tr><th scope="row">Create: Aeronautics<span class="opt">Optional</span></th><td>1.3+</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <p>Create: New Era is an unofficial add-on. It isn't affiliated with the Create team.</p>
+      <p><a href="https://github.com/Creators-of-Create/create">Create</a> by simibubi and the Creators of Create · <a href="https://modrinth.com/mod/create-aeronautics">Create: Aeronautics</a> and <a href="https://github.com/ryanhcode/sable">Sable</a> · Pixel type: <a href="https://github.com/IdreesInc/Monocraft">Monocraft</a> (<a href="fonts/Monocraft-OFL.txt">SIL Open Font License</a>).</p>
+      <p>Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a>, the VM from CC: Tweaked (MIT). Block images are rendered from the mod's own models with <code>tools/render/iso_render.py</code>.</p>
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>: copy it, fork it, ship it in a modpack.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="docs/">Docs</a>
+      <a href="https://github.com/ElJoshua08/create-new-era">GitHub</a>
+      <a href="https://github.com/ElJoshua08/create-new-era/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/flipdots.js"></script>
+<script src="assets/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+name: create-new-era
+
+# Static site for create-new-era.tryberyl.dev. Beryl routes the domain to 127.0.0.1:8098.
+services:
+  web:
+    build: { context: .., dockerfile: deploy/website.Dockerfile }
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8098:80"
+    mem_limit: 64m

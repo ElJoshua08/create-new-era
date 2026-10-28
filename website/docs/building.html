@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Building from source · Create: New Era docs</title>
+<meta name="description" content="Build Create: New Era from source, the dev environment and the asset tools.">
+<meta name="theme-color" content="#15110d">
+<link rel="icon" type="image/png" href="../img/blocks/brass_computer.png">
+<link rel="preload" href="../fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
+<symbol id="i-bang" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M3 0h2v5h-2z M3 6h2v2h-2z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 8 8"><path fill="currentColor" fill-rule="evenodd" shape-rendering="crispEdges" d="M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1z M2 1v1h-1v4h1v1h4v-1h1v-4h-1v-1z M3.5 2h1v2h1.5v1h-2.5z"/></symbol>
+</defs></svg>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="../"><img class="pixelated" src="../img/blocks/brass_computer.png" alt="" width="30" height="33"><span>Create: New Era</span></a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="../#blocks">Blocks</a>
+      <a class="hide-sm" href="../#roadmap">Roadmap</a>
+      <a href="./" aria-current="page">Docs</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="Source on GitHub"><svg aria-hidden="true"><use href="#i-github"/></svg><span class="hide-sm">GitHub</span></a>
+    </nav>
+  </div>
+</header>
+<div class="wrap docs">
+  <aside class="side" aria-label="Documentation">
+    <details id="side-nav" open><summary>Contents</summary><div class="groups">
+    <h2>Start</h2><ul><li><a href="index.html">Getting started</a></li></ul><h2>Reference</h2><ul><li><a href="lua.html">Lua API</a></li><li><a href="blocks.html">Blocks and recipes</a></li><li><a href="config.html">Client config</a></li></ul><h2>Development</h2><ul><li><a href="building.html" aria-current="page">Building from source</a><ul><li><a href="building.html#dev">Dev environment</a></li><li><a href="building.html#tools">Asset tools</a></li></ul></li></ul><h2>Planned</h2><ul><li><a href="planned.html">Data bus, screens, drones</a></li></ul>
+    </div></details>
+  </aside>
+  <main id="main" class="doc">
+    <header>
+      <h1>Building from source</h1>
+      <p class="intro">There's no release yet, so building the jar yourself is the way to try the mod. You only need a JDK 17 or newer to start Gradle; it downloads JDK 21 on its own.</p>
+    </header>
+
+    <h2 id="build">Build and run</h2>
+<pre><code>git clone https://github.com/ElJoshua08/create-new-era.git
+cd create-new-era
+
+./gradlew build              <span class="c"># jar ends up in build/libs/</span>
+./gradlew runClient          <span class="c"># play with the mod</span>
+./gradlew runGameTestServer  <span class="c"># in-game tests: blocks, recipes, screens joining, Lua programs, Ponder structures</span>
+./gradlew runData            <span class="c"># regenerate blockstates, item models, loot tables, tags, en_us</span></code></pre>
+    <p>On Windows use <code>gradlew.bat</code> instead of <code>./gradlew</code>.</p>
+
+    <h3>Versions it builds against</h3>
+    <p>Set in <code>gradle.properties</code>:</p>
+    <div class="table-scroll"><table class="t">
+      <thead><tr><th>Property</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td><code>minecraft_version</code></td><td><code>1.21.1</code></td></tr>
+        <tr><td><code>neo_version</code></td><td><code>21.1.265</code></td></tr>
+        <tr><td><code>create_version</code></td><td><code>6.0.10-280</code></td></tr>
+        <tr><td><code>ponder_version</code></td><td><code>1.0.87+mc1.21.1</code></td></tr>
+        <tr><td><code>flywheel_version</code></td><td><code>1.0.6</code></td></tr>
+        <tr><td><code>registrate_version</code></td><td><code>MC1.21-1.3.0+67</code></td></tr>
+        <tr><td><code>parchment_mappings_version</code></td><td><code>2024.11.17</code></td></tr>
+        <tr><td><code>mod_version</code></td><td><code>0.1.0</code></td></tr>
+      </tbody>
+    </table></div>
+    <p>Create <code>6.0.10-280</code> is what Create: Aeronautics 1.3.2 builds against, and it needs Ponder <code>1.0.82</code> or newer.</p>
+
+    <h2 id="dev">Dev environment</h2>
+    <p><code>runClient</code> downloads a realistic modpack into <code>run/</code> the first time, so the mod is tested against what players actually run. Every file is pinned from Modrinth and checksum-verified (SHA-1); a mismatch stops the build.</p>
+    <ul>
+      <li>Sodium, Lithium, ModernFix, FerriteCore, ImmediatelyFast, Entity Culling</li>
+      <li>Iris with Complementary Reimagined (enabled on first launch) and Unbound</li>
+      <li>Create: Aeronautics and Sable</li>
+    </ul>
+    <p>The mods go into the run folders like a real install, not onto the classpath, so client-only mods never reach the dev server. The server and GameTest runs use <code>run/server/</code> and only get Aeronautics and Sable. The shaderpack is picked once; after that, your in-game choice wins.</p>
+    <div class="table-scroll"><table class="t">
+      <thead><tr><th>File</th><th>Folder</th><th>Switch</th></tr></thead>
+      <tbody><tr><td><code>sodium-neoforge-0.8.13+mc1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>modernfix-neoforge-5.27.27+mc1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>ferritecore-7.0.3-neoforge.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>ImmediatelyFast-NeoForge-1.6.15+1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>entityculling-neoforge-1.11.3-mc1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>lithium-neoforge-0.15.4+mc1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_client_mods</code></td></tr><tr><td><code>iris-neoforge-1.8.14-beta.1+mc1.21.1.jar</code></td><td><code>mods/</code></td><td><code>dev_shaders</code></td></tr><tr><td><code>ComplementaryReimagined_r5.9.3.zip</code></td><td><code>shaderpacks/</code></td><td><code>dev_shaders</code></td></tr><tr><td><code>ComplementaryUnbound_r5.9.3.zip</code></td><td><code>shaderpacks/</code></td><td><code>dev_shaders</code></td></tr><tr><td><code>create-aeronautics-bundled-1.21.1-1.3.2.jar</code></td><td><code>mods/</code></td><td><code>dev_aeronautics</code></td></tr><tr><td><code>sable-neoforge-1.21.1-2.0.6.jar</code></td><td><code>mods/</code></td><td><code>dev_aeronautics</code></td></tr></tbody>
+    </table></div>
+    <h3>Switching groups off</h3>
+    <p>Each group has a flag in <code>gradle.properties</code>:</p>
+<pre><code><span class="c"># Sodium + optimization mods in runClient</span>
+dev_client_mods=<span class="k">true</span>
+<span class="c"># Iris + Complementary shaderpacks in runClient</span>
+dev_shaders=<span class="k">true</span>
+<span class="c"># Create: Aeronautics + Sable in every run</span>
+dev_aeronautics=<span class="k">true</span></code></pre>
+    <p>To bump a version, replace its URL and SHA-1 in <code>gradle/dev-mods.gradle</code>. The downloads run as the <code>setupDevClient</code> and <code>setupDevServer</code> tasks before the matching run tasks.</p>
+
+    <h2 id="tools">Asset tools</h2>
+    <p>Block textures and models are generated by script so they stay consistent with Create's palette. They're plain Python 3 with Pillow; the renderer also uses NumPy.</p>
+    <div class="table-scroll"><table class="t">
+      <thead><tr><th>Script</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>tools/textures/gen_textures.py</code></td><td>Detail atlases, with palettes sampled from Create's casings. Block bodies reuse Create's own casing textures by reference; the atlas only holds the parts Create doesn't have: screens, dials, LEDs, ports. Also draws the Control Plate item.</td></tr>
+        <tr><td><code>tools/models/gen_models.py</code></td><td>Block models from compact element lists. Output is plain vanilla JSON, so Blockbench opens it directly.</td></tr>
+        <tr><td><code>tools/render/iso_render.py</code></td><td>Renders block models to PNG without launching the game. Made the block images on this site.</td></tr>
+        <tr><td><code>tools/screen/proto_screen.py</code></td><td>Prototype of the flip-pixel screen look, used to pick the screen resolution before writing the in-game renderer.</td></tr>
+        <tr><td><code>tools/ponder/gen_ponder.py</code></td><td>Writes the structures the Ponder scenes play out on. The scenes themselves live in <code>NewEraPonderScenes.java</code>; positions must match.</td></tr>
+      </tbody>
+    </table></div>
+<pre><code>python3 tools/textures/gen_textures.py
+python3 tools/models/gen_models.py
+
+<span class="c"># each --assets folder contains assets/&lt;namespace&gt;/{models,textures}</span>
+python3 tools/render/iso_render.py out.png create_new_era:block/brass_computer \
+    --assets src/main/resources --assets &lt;create assets&gt; --assets &lt;vanilla assets&gt; \
+    --size 384 --yaw 270     <span class="c"># yaw 270 shows the computer's front</span>
+
+python3 tools/screen/proto_screen.py OUT_DIR Monocraft.ttf --res 32 48 64 --blocks 3 2
+python3 tools/ponder/gen_ponder.py</code></pre>
+    <p>The renderer needs Create's and Minecraft's assets to draw the casings; point <code>--assets</code> at an extracted copy of each jar. Join model names with <code>+</code> to draw several models into one tile.</p>
+
+    <nav class="pager" aria-label="Pages"><a class="prev" href="config.html"><span>Previous</span><b>Client config</b></a><a class="next" href="planned.html"><span>Next</span><b>Planned features</b></a></nav>
+  </main>
+</div>
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <p>Create: New Era is an unofficial add-on. It isn't affiliated with the Create team.</p>
+      <p>Pixel type: <a href="https://github.com/IdreesInc/Monocraft">Monocraft</a> (<a href="../fonts/Monocraft-OFL.txt">SIL Open Font License</a>). Found a mistake in these docs? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT), bundled in the jar.</p>
+    </div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="../">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era">GitHub</a>
+      <a href="https://github.com/ElJoshua08/create-new-era/releases">Releases</a>
+    </nav>
+  </div>
+</footer>
+<script>
+  // the contents disclosure starts closed on narrow screens, where it sits above the article
+  if (window.matchMedia('(max-width: 959px)').matches) document.getElementById('side-nav').removeAttribute('open');
+</script>
+</body>
+</html>

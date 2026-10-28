@@ -1,0 +1,12 @@
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	root * /srv
+	encode zstd gzip
+	file_server
+	@assets path /assets/* /fonts/* /img/*
+	header @assets Cache-Control "public, max-age=3600"
+}
