@@ -42,6 +42,9 @@ public class CreateNewEra {
                     .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
 
     public CreateNewEra(IEventBus modEventBus, ModContainer modContainer) {
+        // before any content: builders hang client-setup listeners (Flywheel visuals among them)
+        // off this bus while they're declared, and before it's set those are silently dropped
+        REGISTRATE.registerEventListeners(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModBlocks.register();
         ModBlockEntities.register();
@@ -49,7 +52,6 @@ public class CreateNewEra {
         ModComponents.register(modEventBus);
         ModRecipes.register(modEventBus);
         ModLang.register();
-        REGISTRATE.registerEventListeners(modEventBus);
         ModNetwork.register(modEventBus);
         BusEvents.register(NeoForge.EVENT_BUS);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
