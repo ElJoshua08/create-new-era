@@ -13,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -28,6 +29,7 @@ public final class BusEvents {
 
     public static void register(IEventBus gameBus) {
         gameBus.addListener(BusEvents::wrench);
+        gameBus.addListener(BusEvents::punch);
         gameBus.addListener(BusEvents::blockBroken);
         gameBus.addListener(BusEvents::chunkSent);
     }
@@ -56,6 +58,30 @@ public final class BusEvents {
             Bus.flip(server, part);
             server.playSound(null, pos, SoundEvents.COPPER_BULB_TURN_ON, SoundSource.BLOCKS, 0.5f, part.mode() == PortMode.IN ? 1.6f : 1.2f);
         }
+    }
+
+    /**
+     * Hitting a part knocks off just the part, not the block it's on. The event has no hit
+     * point, so it's found again from where the player is looking.
+     */
+    private static void punch(PlayerInteractEvent.LeftClickBlock event) {
+        var player = event.getEntity();
+        if (!(player.pick(player.blockInteractionRange(), 1, false) instanceof BlockHitResult hit)
+                || !hit.getBlockPos().equals(event.getPos()))
+            return;
+        List<BusPort> parts = event.getLevel() instanceof ServerLevel server
+                ? BusData.get(server).portsAt(event.getPos())
+                : clientParts.apply(event.getPos());
+        BusPort part = PartGeometry.partAt(parts, hit.getDirection(), hit.getLocation());
+        if (part == null)
+            return;
+        event.setCanceled(true);
+        if (event.getAction() != PlayerInteractEvent.LeftClickBlock.Action.START || !(event.getLevel() instanceof ServerLevel server))
+            return;
+        Bus.removePart(server, part);
+        if (!player.getAbilities().instabuild)
+            player.getInventory().placeItemBackInInventory(item(part));
+        server.playSound(null, event.getPos(), SoundEvents.COPPER_BREAK, SoundSource.BLOCKS, 0.6f, 1.4f);
     }
 
     /** The parts fall off with the block they were stuck to. */
