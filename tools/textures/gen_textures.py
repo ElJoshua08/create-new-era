@@ -9,6 +9,7 @@ Run: python3 tools/textures/gen_textures.py
 """
 from pathlib import Path
 
+import pixel_iso as iso
 from PIL import Image, ImageColor
 
 OUT = Path(__file__).resolve().parents[2] / "src/main/resources/assets/create_new_era/textures/block"
@@ -353,59 +354,43 @@ BUS_REGIONS = {
 
 
 def draw_bus_parts():
-    """Ports: a copper plate with a dark socket. Expansions: a small green board with brass contacts."""
+    """The parts as they sit on a machine, with the same Create ramps as their item sprites:
+    a copper plate with a socket whose near lip catches the light, a circuit board with a chip."""
     c = Canvas(16, 16)
+    hx = lambda col: "#%02x%02x%02x" % col[:3]
+    cu, pcb, br, sl = [[hx(v) for v in r] for r in (iso.COPPER, iso.PCB, iso.BRASS, iso.SLATE)]
     x, y = BUS_REGIONS["port_top"][:2]
-    c.rect(x, y, 4, 4, COPPER[4])
-    c.rect(x, y, 4, 1, COPPER[6])
-    c.rect(x, y, 1, 4, COPPER[5])
-    c.rect(x + 3, y, 1, 4, COPPER[2])
-    c.rect(x, y + 3, 4, 1, COPPER[1])
-    c.rect(x + 1, y + 1, 2, 2, SLATE[0])
+    rows = [[cu[5], cu[6], cu[5], cu[4]],
+            [cu[5], sl[0], sl[0], cu[3]],
+            [cu[4], sl[1], sl[0], cu[3]],
+            [cu[3], cu[5], cu[5], cu[1]]]
+    for j, row in enumerate(rows):
+        for i, col in enumerate(row):
+            c.px(x + i, y + j, col)
     x, y = BUS_REGIONS["port_side"][:2]
-    c.rect(x, y, 4, 1, COPPER[2])
-    c.px(*BUS_REGIONS["light_out"][:2], AMBER[2])
-    c.px(*BUS_REGIONS["light_in"][:2], PHOSPHOR[2])
+    for i, col in enumerate([cu[3], cu[3], cu[2], cu[1]]):
+        c.px(x + i, y, col)
+    c.px(*BUS_REGIONS["light_out"][:2], hx(iso.AMBER[2]))
+    c.px(*BUS_REGIONS["light_in"][:2], hx(iso.GREEN[2]))
     x, y = BUS_REGIONS["expansion_top"][:2]
-    c.rect(x, y, 6, 6, PHOSPHOR[0])
-    c.rect(x, y, 6, 1, PHOSPHOR[1])
-    c.rect(x + 2, y + 2, 2, 2, SLATE[1])
-    for i in (0, 2, 4):
-        c.px(x + 1 + i // 2 * 2, y + 5, BRASS[5])
-    c.px(x + 1, y + 1, BRASS[5])
-    c.px(x + 4, y + 1, COPPER[5])
+    c.rect(x, y, 6, 6, pcb[3])
+    c.rect(x, y, 6, 1, pcb[5])
+    c.rect(x, y, 1, 6, pcb[4])
+    c.rect(x + 5, y, 1, 6, pcb[1])
+    c.rect(x + 2, y + 2, 2, 2, sl[1])
+    c.px(x + 2, y + 2, sl[3])
+    c.px(x + 1, y + 1, cu[4])
+    c.px(x + 4, y + 1, cu[4])
+    for i in (1, 3, 5):
+        c.px(x + i - 1, y + 5, br[5])
     x, y = BUS_REGIONS["expansion_side"][:2]
-    c.rect(x, y, 6, 1, BRASS[3])
+    for i in range(6):
+        c.px(x + i, y, br[5] if i % 2 == 0 else pcb[1])
     c.img.save(OUT / "bus_parts.png")
 
-
 def draw_bus_items():
-    """Inventory sprites for the port and the port expansion."""
-    c = Canvas(16, 16)
-    c.rect(3, 5, 10, 8, COPPER[3])
-    c.rect(3, 5, 10, 1, COPPER[6])
-    c.rect(3, 5, 1, 8, COPPER[5])
-    c.rect(12, 5, 1, 8, COPPER[1])
-    c.rect(3, 12, 10, 1, COPPER[0])
-    c.rect(6, 7, 4, 4, SLATE[0])
-    c.rect(7, 8, 2, 2, SLATE[2])
-    c.rect(7, 2, 2, 3, AMBER[2])
-    c.rect(6, 3, 4, 1, AMBER[2])
-    c.img.save(ITEM_OUT / "bus_port.png")
-
-    c = Canvas(16, 16)
-    c.rect(2, 4, 12, 9, PHOSPHOR[0])
-    c.rect(2, 4, 12, 1, PHOSPHOR[1])
-    c.rect(2, 12, 12, 1, "#1f4a28")
-    c.rect(6, 6, 4, 4, SLATE[1])
-    c.rect(6, 6, 4, 1, SLATE[3])
-    for x in (3, 5, 10, 12):
-        c.px(x, 6, COPPER[5])
-        c.px(x, 9, COPPER[5])
-    for x in range(3, 14, 2):
-        c.rect(x, 13, 1, 2, BRASS[5])
-    c.img.save(ITEM_OUT / "port_expansion.png")
-
+    iso_data_port().img.save(ITEM_OUT / "bus_port.png")
+    iso_port_expansion().img.save(ITEM_OUT / "port_expansion.png")
 
 def draw_editor_checker():
     """Computer editor background: the design's dark checker, tiled by the GUI."""
@@ -418,24 +403,81 @@ def draw_editor_checker():
     c.img.save(gui / "editor_checker.png")
 
 
-def draw_control_plate_item():
-    """Inventory sprite: the andesite plate every control is built on, seen slightly from above."""
-    c = Canvas(16, 16)
-    c.rect(1, 5, 14, 6, ANDESITE[4])
-    c.rect(1, 5, 14, 1, ANDESITE[6])
-    c.rect(1, 5, 1, 6, ANDESITE[5])
-    c.rect(14, 5, 1, 6, ANDESITE[2])
-    c.rect(1, 11, 14, 2, ANDESITE[1])
-    c.rect(1, 13, 14, 1, ANDESITE[0])
-    c.rect(3, 7, 10, 2, ANDESITE[3])
-    for bx in (3, 12):
-        c.px(bx, 6, BRASS[5])
-        c.px(bx, 9, BRASS[3])
-    c.rect(6, 7, 4, 2, BRASS[4])
-    c.px(6, 7, BRASS[6])
-    ITEM_OUT.mkdir(parents=True, exist_ok=True)
-    c.img.save(ITEM_OUT / "control_plate.png")
+# ---- item sprites, Create style (tools/textures/pixel_iso.py) ----
 
+def iso_control_plate():
+    s = iso.Sprite()
+    iso.box(s, 8, 3, 4, 4, 3, iso.ANDESITE, iso.ANDESITE, "plate", top_index=5)
+    iso.shade_top_edges(s, "plate", iso.ANDESITE)
+    iso.speckle(s, "plate", iso.ANDESITE, 3, 0.2)
+    iso.speckle(s, "plate", iso.ANDESITE, 4, 0.15, "left")
+    # four brass rivets, and a dark mounting hole where a control sits
+    for cell in ((0.6, 0.6), (3.4, 0.6), (0.6, 3.4), (3.4, 3.4)):
+        x, y = iso.on_top(8, 3, *cell)
+        s.set(x, y, iso.BRASS[6])
+        s.set(x - 1, y, iso.BRASS[4])
+    for (cs, ct) in ((1.6, 2), (2, 1.6), (2, 2), (2.4, 2), (2, 2.4)):
+        x, y = iso.on_top(8, 3, cs, ct)
+        s.set(x, y, iso.ANDESITE[1])
+    x, y = iso.on_top(8, 3, 2, 2.4)
+    s.set(x, y + 1, iso.ANDESITE[6])
+    iso.outline(s, iso.ANDESITE)
+    return s
+
+
+def iso_data_port():
+    s = iso.Sprite()
+    # the port as it sits on a machine: a thick copper plate, seen from above at 3/4
+    iso.box(s, 8, 3, 4, 4, 3, iso.COPPER, iso.COPPER, "port", top_index=4)
+    iso.shade_top_edges(s, "port", iso.COPPER)
+    iso.speckle(s, "port", iso.COPPER, 7, 0.12)
+    # the socket: an iso diamond hole; its back walls in shade, contacts in the bottom
+    tl = iso.on_top(8, 3, 1, 1)
+    hole_poly = [tl, iso.on_top(8, 3, 3, 1), iso.on_top(8, 3, 3, 3), iso.on_top(8, 3, 1, 3)]
+    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(hole_poly, x + 0.5, y + 0.5)}
+    for x, y in hole:
+        wall = (x, y - 1) not in hole
+        s.set(x, y, iso.COPPER[1] if wall else (15, 24, 48, 255))
+    for x, y in hole:
+        if (x, y + 1) not in hole:
+            s.set(x, y + 1, iso.COPPER[6])
+    cx, cy = iso.on_top(8, 3, 2, 2)
+    s.set(cx - 1, cy, iso.BRASS[5])
+    s.set(cx, cy, iso.BRASS[6])
+    # the amber lamp on the front corner
+    x, y = iso.on_top(8, 3, 3.6, 3.6)
+    s.set(x, y - 1, iso.AMBER[3])
+    s.set(x - 1, y - 1, iso.AMBER[2])
+    iso.outline(s, iso.COPPER)
+    return s
+
+
+def iso_port_expansion():
+    s = iso.Sprite()
+    iso.box(s, 6, 4, 5, 3, 2, iso.PCB, iso.PCB, "board", top_index=4)
+    iso.shade_top_edges(s, "board", iso.PCB)
+    # copper traces running to the edge
+    for cs in (0.5, 1.5, 2.5, 3.5, 4.5):
+        x, y = iso.on_top(6, 4, cs, 2.6)
+        s.set(x, y, iso.COPPER[4])
+    for ct in (0.5, 1, 1.5):
+        x, y = iso.on_top(6, 4, 4, ct)
+        s.set(x, y, iso.COPPER[4])
+    # gold fingers along the front-left edge
+    for (x, y), f in list(s.face.items()):
+        if f == "board:left" and x % 2 == 0:
+            s.set(x, y, iso.BRASS[5], f)
+    # the chip: a small slate box on top
+    iso.box(s, 7, 4, 2, 1, 1, iso.SLATE, iso.SLATE, "chip", top_index=3)
+    x, y = iso.on_top(7, 4, 1, 0.5)
+    s.set(x, y, iso.SLATE[4])
+    iso.outline(s, iso.PCB)
+    return s
+
+
+
+def draw_control_plate_item():
+    iso_control_plate().img.save(ITEM_OUT / "control_plate.png")
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
