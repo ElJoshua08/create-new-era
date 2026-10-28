@@ -87,6 +87,16 @@ public class CodeEditor {
         anchorRow = -1;
         undo.clear();
         redo.clear();
+        savedText = getText();
+    }
+
+    /** Puts the cursor at the start of a line (1-based) and scrolls it into view. */
+    public void goToLine(int line) {
+        anchorRow = -1;
+        row = Mth.clamp(line - 1, 0, lines.size() - 1);
+        col = indentOf(lines.get(row)).length();
+        wantedCol = col;
+        scrollRow = Math.max(0, row - visibleRows() / 2);
     }
 
     /** Marks a line (1-based) with a red square in the gutter, or clears it with -1. */
@@ -421,6 +431,13 @@ public class CodeEditor {
         lastEdit = kind;
         lastEditTime = now;
 
+        rawInsert(text);
+        scrollToCursor();
+        onChange.run();
+    }
+
+    /** Inserts at the cursor, replacing any selection, with no undo bookkeeping. */
+    private void rawInsert(String text) {
         if (hasSelection())
             deleteSelection();
         String current = getText();
@@ -437,8 +454,72 @@ public class CodeEditor {
             col = lines.get(row).length() - tail.length();
         }
         wantedCol = col;
+    }
+
+    // ---- completion support ----
+
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    /** The file from its start up to the cursor. */
+    public String textBeforeCursor() {
+        StringBuilder out = new StringBuilder();
+        for (int r = 0; r < row; r++)
+            out.append(lines.get(r)).append('\n');
+        return out.append(lines.get(row), 0, col).toString();
+    }
+
+    /** Top-left of the cursor's cell on screen. */
+    public int[] cursorScreenPos() {
+        return new int[] {x + GUTTER + PAD + (col - scrollCol) * CELL, y + PAD + (row - scrollRow) * LINE};
+    }
+
+    /**
+     * Replaces the cursor line from column {@code from} up to the cursor with a suggestion.
+     * "$0" in it marks where the cursor ends up; new lines keep the current indent.
+     */
+    public void applyCompletion(int from, String insert) {
+        pushUndo();
+        lastEdit = EditKind.OTHER;
+        anchorRow = -1;
+        String line = lines.get(row);
+        lines.set(row, line.substring(0, Math.min(from, col)) + line.substring(col));
+        col = Math.min(from, col);
+        String text = insert.replace("\n", "\n" + indentOf(line));
+        // calling a function that already has its brackets: just the name
+        if (text.endsWith("($0)") && lines.get(row).substring(col).startsWith("("))
+            text = text.substring(0, text.length() - 4);
+        int caret = text.indexOf("$0");
+        if (caret < 0) {
+            rawInsert(text);
+        } else {
+            rawInsert(text.substring(0, caret));
+            int caretRow = row, caretCol = col;
+            rawInsert(text.substring(caret + 2));
+            row = caretRow;
+            col = caretCol;
+            wantedCol = col;
+        }
+        dedentedRow = -1;
         scrollToCursor();
         onChange.run();
+    }
+
+    // ---- saved state ----
+
+    private String savedText = "";
+
+    public boolean isDirty() {
+        return !getText().equals(savedText);
+    }
+
+    public void markSaved() {
+        savedText = getText();
     }
 
     private void newLine() {

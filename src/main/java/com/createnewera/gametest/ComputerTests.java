@@ -3,6 +3,7 @@ package com.createnewera.gametest;
 import com.createnewera.CreateNewEra;
 import com.createnewera.computer.BrassComputerBlock;
 import com.createnewera.computer.BrassComputerBlockEntity;
+import com.createnewera.computer.ComputerFiles;
 import com.createnewera.computer.ConsoleLine;
 import com.createnewera.network.EditorActionPayload;
 import com.createnewera.registry.ModBlocks;
@@ -29,7 +30,7 @@ public class ComputerTests {
     private static BrassComputerBlockEntity run(GameTestHelper helper, String source) {
         helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.FACING, Direction.NORTH));
         BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
-        computer.setSource(source);
+        computer.setProgram(ComputerFiles.STARTUP, source);
         computer.start("create_new_era.console.running");
         return computer;
     }
@@ -71,7 +72,7 @@ public class ComputerTests {
         helper.runAfterDelay(10, () -> {
             helper.assertBlockProperty(BACK, RedstoneLampBlock.LIT, true);
             helper.assertBlockProperty(COMPUTER, BrassComputerBlock.RUNNING, true);
-            computer.handleAction(null, EditorActionPayload.Action.STOP, computer.getSource());
+            computer.handleAction(null, EditorActionPayload.Action.STOP, "", "");
             // the lamp turns off a few ticks after losing power
             helper.runAfterDelay(6, () -> {
                 helper.assertBlockProperty(BACK, RedstoneLampBlock.LIT, false);
@@ -101,7 +102,7 @@ public class ComputerTests {
     public static void errorsPointAtTheLine(GameTestHelper helper) {
         var computer = run(helper, "print('ok')\nlocal t = nil\nt.x = 1");
         helper.succeedWhen(() -> {
-            expectPrinted(helper, computer, ConsoleLine.Kind.ERROR, "program:3:");
+            expectPrinted(helper, computer, ConsoleLine.Kind.ERROR, "startup.lua:3:");
             helper.assertBlockProperty(COMPUTER, BrassComputerBlock.RUNNING, false);
         });
     }
@@ -109,7 +110,7 @@ public class ComputerTests {
     @GameTest(template = EMPTY)
     public static void compileErrorsAreReported(GameTestHelper helper) {
         var computer = run(helper, "while true\nprint('no do')");
-        helper.succeedWhen(() -> expectPrinted(helper, computer, ConsoleLine.Kind.ERROR, "program:"));
+        helper.succeedWhen(() -> expectPrinted(helper, computer, ConsoleLine.Kind.ERROR, "startup.lua:"));
     }
 
     // far more work than one tick's slice: the program has to be suspended and resumed many times
@@ -121,6 +122,25 @@ public class ComputerTests {
             expectPrinted(helper, computer, ConsoleLine.Kind.OUTPUT, "done\t3000000");
             if (helper.getTick() - start < 2)
                 helper.fail("finished in a single tick, so the time slice isn't being enforced");
+        });
+    }
+
+    // modules load from other files on the same computer, once, and errors name the file they came from
+    @GameTest(template = EMPTY)
+    public static void requireLoadsOtherFiles(GameTestHelper helper) {
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.FACING, Direction.NORTH));
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        computer.handleAction(null, EditorActionPayload.Action.SAVE, "lib/greet.lua",
+                "print('loading') return { hi = function(n) return 'hi ' .. n end }");
+        computer.handleAction(null, EditorActionPayload.Action.SAVE, "broken.lua", "local x = nil\nreturn x.y");
+        computer.setProgram("main.lua", "local g = require('lib.greet')\nrequire('lib/greet.lua')\nprint(g.hi('bob'))\nrequire('broken')");
+        computer.start("create_new_era.console.running");
+        helper.succeedWhen(() -> {
+            expectPrinted(helper, computer, ConsoleLine.Kind.OUTPUT, "hi bob");
+            expectPrinted(helper, computer, ConsoleLine.Kind.ERROR, "broken.lua:2:");
+            long loads = computer.getConsole().stream().filter(l -> l.text().equals("loading")).count();
+            if (loads != 1)
+                helper.fail("module ran " + loads + " times");
         });
     }
 }

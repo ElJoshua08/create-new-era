@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 /** Client-side handlers for server packets. Only ever loaded on the client. */
 public final class ClientPayloads {
     public static void openEditor(OpenEditorPayload payload) {
-        Minecraft.getInstance().setScreen(new ComputerEditorScreen(payload.pos(), payload.source(), payload.snapshot()));
+        Minecraft.getInstance().setScreen(new ComputerEditorScreen(payload));
     }
 
     public static void computerState(ComputerStatePayload payload) {

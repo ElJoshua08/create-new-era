@@ -47,17 +47,23 @@ end
 | `print(...)` | Writes a line to the console under the editor |
 | `sleep(seconds)`, `os.sleep` | Waits in game time (20 ticks a second) |
 | `os.clock()` | Seconds since the program started |
+| `require(name)` | Runs another file on the computer once and returns what it returned (`require("lib.pid")` finds `lib/pid.lua`) |
 | `redstone.getInput(side)`, `getAnalogInput(side)` | Signal coming in, as on/off or 0–15 |
 | `redstone.setOutput(side, on)`, `setAnalogOutput(side, 0–15)` | Signal going out |
 | `redstone.getOutput(side)`, `getAnalogOutput(side)`, `getSides()` | What we're sending, and the side names |
 
 Sides are named from the computer's front: `front`, `back`, `left`, `right`, `top`, `bottom` (left and right as you see them facing it). `rs` is short for `redstone`. The usual `string`, `table`, `math`, `coroutine`, `utf8` and `bit32` libraries are there.
 
+The editor works like a small VS Code: files open in tabs, the side panel switches between **Files**, **Redstone** (live signal on every side) and **Flows** (coming with the data bus), suggestions pop up as you type, and the window, the console and the side panel can all be dragged to any size. Clicking an error in the console jumps to its line.
+
 **Editor shortcuts:**
 
 | Key | Does |
 | --- | --- |
-| Ctrl+R / Ctrl+T | Run / stop the program |
+| Ctrl+R / Ctrl+T | Run the open file / stop |
+| Ctrl+Space | Suggestions (Tab or Enter to accept) |
+| Ctrl+N, Ctrl+W, Ctrl+Tab | New file, close tab, next tab |
+| Ctrl+B | Show or hide the side panel |
 | Ctrl+S | Save (it also autosaves while you type) |
 | Ctrl+Z / Ctrl+Y | Undo / redo |
 | Ctrl+D, Ctrl+/ | Duplicate line, comment lines in or out |
@@ -110,6 +116,16 @@ Every block can be rotated with Create's wrench, has collision shapes fitted to 
 ```
 
 You only need a JDK 17 or newer to start Gradle; it downloads JDK 21 on its own.
+
+### Live reloading
+
+`runClient` starts on the JetBrains Runtime with a debug port, so most code changes don't need a restart:
+
+```sh
+./gradlew hotswap   # recompile and swap the changed classes into the running game
+```
+
+Textures, models and lang are copied too: press F3+T in game. Recipes and other data: `/reload`. New blocks, items or network payloads still need a restart. Turn it off with `dev_hotswap=false`.
 
 ### Dev environment
 

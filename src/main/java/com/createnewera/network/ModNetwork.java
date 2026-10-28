@@ -30,7 +30,7 @@ public final class ModNetwork {
         if (!level.isLoaded(payload.pos()) || !player.canInteractWithBlock(payload.pos(), 4))
             return;
         if (level.getBlockEntity(payload.pos()) instanceof BrassComputerBlockEntity computer)
-            computer.handleAction(player, payload.action(), payload.source());
+            computer.handleAction(player, payload.action(), payload.name(), payload.argument());
     }
 
     private ModNetwork() {}

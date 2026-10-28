@@ -1,0 +1,41 @@
+// Live code reloading for runClient (dev_hotswap=true in gradle.properties).
+//
+// runClient starts on the JetBrains Runtime, whose enhanced class redefinition accepts almost any
+// change (new methods, fields, classes), with a debug port on 127.0.0.1:5005. Then:
+//   ./gradlew hotswap    recompile and push changed classes into the running game
+// runServer listens on 5006 the same way: ./gradlew hotswap -Pport=5006
+// Resources (textures, models, lang) are copied too: press F3+T in game to reload them.
+// Registration (new blocks, items, payloads) still needs a restart.
+
+if (!project.findProperty('dev_hotswap').toBoolean())
+    return
+
+def hotswapPort = (project.findProperty('port') ?: '5005').toInteger()
+def classesDir = layout.buildDirectory.dir('classes/java/main')
+def stateFile = layout.buildDirectory.file('hotswap/classes.properties')
+def hotswapTool = file('tools/hotswap/HotSwap.java')
+def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+
+[client: 5005, server: 5006].each { run, port ->
+    neoForge.runs.getByName(run).jvmArguments.addAll(
+            '-XX:+AllowEnhancedClassRedefinition',
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:${port}")
+}
+
+// remember what the game started with, so hotswap only sends what changed since
+tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
+    doFirst {
+        providers.exec {
+            commandLine launcher.get().executablePath.asFile, hotswapTool, 'baseline',
+                    classesDir.get().asFile, stateFile.get().asFile
+        }.result.get()
+    }
+}
+
+tasks.register('hotswap', Exec) {
+    group = 'neoforged runs'
+    description = 'Recompiles and reloads changed classes in the running dev client'
+    dependsOn 'classes'
+    executable = launcher.map { it.executablePath.asFile.absolutePath }.get()
+    args hotswapTool, 'swap', classesDir.get().asFile, stateFile.get().asFile, hotswapPort
+}

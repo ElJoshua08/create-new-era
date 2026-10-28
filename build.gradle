@@ -41,6 +41,9 @@ base {
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// the JetBrains Runtime can redefine classes far beyond plain HotSwap (gradle/hotswap.gradle)
+if (project.findProperty('dev_hotswap').toBoolean())
+    java.toolchain.vendor = JvmVendorSpec.JETBRAINS
 
 neoForge {
     // Specify the version of NeoForge to use.
@@ -115,6 +118,7 @@ neoForge {
 }
 
 apply from: 'gradle/dev-mods.gradle'
+apply from: 'gradle/hotswap.gradle'
 
 // Sets up a dependency configuration called 'localRuntime'.
 // This configuration should be used instead of 'runtimeOnly' to declare

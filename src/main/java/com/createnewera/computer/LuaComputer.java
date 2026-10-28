@@ -38,6 +38,9 @@ public final class LuaComputer {
 
         void setOutput(ComputerSide side, int strength);
 
+        /** For require: the file a module name resolves to, as {name, contents}, or null. */
+        @Nullable String[] readFile(String module);
+
         /** Seconds since the program started, in game time. */
         double clock();
     }
@@ -58,8 +61,12 @@ public final class LuaComputer {
         this.program = program;
     }
 
-    /** Compiles and prepares the program; it starts running on the first {@link #tick}. */
-    public static LuaComputer start(String source, Host host) throws LuaError {
+    /**
+     * Compiles and prepares a program; it starts running on the first {@link #tick}.
+     *
+     * @param name file name, shown in error messages ("startup.lua:3: ...")
+     */
+    public static LuaComputer start(String source, String name, Host host) throws LuaError {
         var holder = new LuaComputer[1];
         LuaState state = LuaState.builder()
                 .interruptHandler(() -> System.nanoTime() > holder[0].deadline ? InterruptAction.SUSPEND : InterruptAction.CONTINUE)
@@ -71,7 +78,7 @@ public final class LuaComputer {
         LuaFunction prelude = compile(state, PRELUDE, "=prelude", globals);
         LuaThread.runMain(state, prelude, native_(host));
 
-        LuaFunction main = compile(state, source, "=program", globals);
+        LuaFunction main = compile(state, source, "=" + name, globals);
         holder[0] = new LuaComputer(state, new LuaThread(state, main));
         return holder[0];
     }
@@ -150,6 +157,11 @@ public final class LuaComputer {
                     return Constants.NIL;
                 }),
                 RegisteredFunction.of("clock", state -> ValueFactory.valueOf(host.clock())),
+                RegisteredFunction.ofV("read", (state, args) -> {
+                    String[] file = host.readFile(args.arg(1).checkString());
+                    return file == null ? Constants.NIL
+                            : ValueFactory.varargsOf(ValueFactory.valueOf(file[1]), ValueFactory.valueOf(file[0]));
+                }),
         });
         table.rawset("redstone", redstone);
         return table;

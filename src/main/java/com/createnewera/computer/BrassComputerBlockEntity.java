@@ -33,7 +33,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 /** Holds the program, runs it, and keeps whoever has the editor open up to date. */
 public class BrassComputerBlockEntity extends BlockEntity {
-    public static final int MAX_SOURCE = 16384;
+    public static final int MAX_SOURCE = ComputerFiles.MAX_FILE;
     /** Per computer per tick. Generous for real work, small enough that runaway loops don't lag the server. */
     static final long BUDGET_NANOS = 1_000_000;
 
@@ -48,7 +48,9 @@ public class BrassComputerBlockEntity extends BlockEntity {
             end
             """;
 
-    private String source = DEFAULT_PROGRAM;
+    private final ComputerFiles files = new ComputerFiles();
+    /** The file Run last started, which is what restarts when the world loads. */
+    private String entry = ComputerFiles.STARTUP;
     /** Saved: a computer that was running when the chunk unloaded starts its program again. */
     private boolean running;
     private final int[] outputs = new int[ComputerSide.values().length];
@@ -88,11 +90,33 @@ public class BrassComputerBlockEntity extends BlockEntity {
         }
     }
 
-    public void handleAction(ServerPlayer player, EditorActionPayload.Action action, String newSource) {
-        setSource(newSource);
+    /**
+     * @param name the file the action is about (ignored by STOP and CLOSE)
+     * @param argument file contents for SAVE, the new name for RENAME
+     */
+    public void handleAction(@Nullable ServerPlayer player, EditorActionPayload.Action action, String name, String argument) {
         switch (action) {
-            case SAVE -> {}
-            case RUN -> start("create_new_era.console.running");
+            case SAVE -> {
+                String problem = files.write(name, argument);
+                if (problem != null)
+                    log(ConsoleLine.Kind.ERROR, name + ": " + problem);
+                setChanged();
+            }
+            case DELETE -> {
+                if (files.delete(name))
+                    setChanged();
+            }
+            case RENAME -> {
+                if (files.rename(name, argument)) {
+                    if (entry.equals(name))
+                        entry = argument;
+                    setChanged();
+                }
+            }
+            case RUN -> {
+                entry = name;
+                start("create_new_era.console.running");
+            }
             case STOP -> {
                 if (running) {
                     log(ConsoleLine.Kind.SYSTEM, "create_new_era.console.stopped");
@@ -107,15 +131,20 @@ public class BrassComputerBlockEntity extends BlockEntity {
     public void openEditor(ServerPlayer player) {
         viewers.add(player);
         lastSent = snapshot();
-        PacketDistributor.sendToPlayer(player, new OpenEditorPayload(worldPosition, source, lastSent));
+        PacketDistributor.sendToPlayer(player, new OpenEditorPayload(worldPosition, files.names(), files.asMap(), entry, lastSent));
     }
 
-    /** @param reason lang key for the console line announcing the start */
+    /** Starts {@link #entry}. @param reason lang key for the console line announcing the start */
     public void start(String reason) {
         halt();
         log(ConsoleLine.Kind.SYSTEM, reason);
+        String source = files.read(entry);
+        if (source == null) {
+            log(ConsoleLine.Kind.ERROR, "no file named " + entry);
+            return;
+        }
         try {
-            vm = LuaComputer.start(source, new Host());
+            vm = LuaComputer.start(source, entry, new Host());
             startTick = level.getGameTime();
             setRunning(true);
         } catch (LuaError e) {
@@ -140,17 +169,15 @@ public class BrassComputerBlockEntity extends BlockEntity {
         return running;
     }
 
-    public String getSource() {
-        return source;
+    public ComputerFiles getFiles() {
+        return files;
     }
 
-    public void setSource(String newSource) {
-        if (newSource.length() > MAX_SOURCE)
-            newSource = newSource.substring(0, MAX_SOURCE);
-        if (!newSource.equals(source)) {
-            source = newSource;
-            setChanged();
-        }
+    /** Writes a file and makes it the one Run and restarts use. */
+    public void setProgram(String name, String source) {
+        files.write(name, source);
+        entry = name;
+        setChanged();
     }
 
     public List<ConsoleLine> getConsole() {
@@ -228,7 +255,8 @@ public class BrassComputerBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putString("Source", source);
+        tag.put("Disk", files.save());
+        tag.putString("Entry", entry);
         tag.putBoolean("Running", running);
         tag.putIntArray("Outputs", outputs);
         ListTag lines = new ListTag();
@@ -239,8 +267,11 @@ public class BrassComputerBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        if (tag.contains("Source"))
-            source = tag.getString("Source");
+        if (tag.contains("Disk"))
+            files.load(tag.getCompound("Disk"));
+        else if (tag.contains("Source")) // single-program computers from before files existed
+            files.write(ComputerFiles.STARTUP, tag.getString("Source"));
+        entry = tag.contains("Entry") ? tag.getString("Entry") : ComputerFiles.STARTUP;
         running = tag.getBoolean("Running");
         int[] saved = tag.getIntArray("Outputs");
         Arrays.fill(outputs, 0);
@@ -269,6 +300,12 @@ public class BrassComputerBlockEntity extends BlockEntity {
         @Override
         public void setOutput(ComputerSide side, int strength) {
             BrassComputerBlockEntity.this.setOutput(side, strength);
+        }
+
+        @Override
+        public @Nullable String[] readFile(String module) {
+            String name = files.resolve(module);
+            return name == null ? null : new String[] {name, files.read(name)};
         }
 
         @Override

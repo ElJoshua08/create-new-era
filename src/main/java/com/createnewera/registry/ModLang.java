@@ -27,14 +27,24 @@ public final class ModLang {
         lang("create_new_era.editor.running", "Running");
         lang("create_new_era.editor.stopped", "Stopped");
         lang("create_new_era.editor.saved", "Saved");
-        lang("create_new_era.editor.hints", "Ctrl+R run  Ctrl+T stop  Esc close");
-        lang("create_new_era.editor.run", "Run (Ctrl+R)");
+        lang("create_new_era.editor.run", "Run this file (Ctrl+R)");
         lang("create_new_era.editor.stop", "Stop (Ctrl+T)");
         lang("create_new_era.console.running", "Running");
         lang("create_new_era.console.restarted", "Restarted after the world loaded");
         lang("create_new_era.console.stopped", "Stopped");
         lang("create_new_era.console.finished", "Program finished");
 
+        lang("create_new_era.editor.files", "Files");
+        lang("create_new_era.editor.new_file", "name.lua");
+        lang("create_new_era.editor.delete_confirm", "Click × to delete");
+        lang("create_new_era.editor.bad_name", "Names can use letters, numbers, _ - . and /");
+        lang("create_new_era.editor.file_exists", "%s already exists");
+        lang("create_new_era.editor.flows", "Flows");
+        lang("create_new_era.editor.flows_soon", "Once the data bus arrives, this shows what moves between your machines and programs, live.");
+        lang("create_new_era.editor.line_col", "Ln %s, Col %s");
+        lang("create_new_era.editor.panel.files", "Files (Ctrl+B)");
+        lang("create_new_era.editor.panel.redstone", "Redstone");
+        lang("create_new_era.editor.panel.flows", "Flows");
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
         lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. For now they work with _redstone_; the _data bus_ comes next.");
         lang("block.create_new_era.brass_computer.tooltip.condition1", "When running");
