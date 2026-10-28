@@ -4,6 +4,7 @@ import com.createnewera.CreateNewEra;
 import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusData;
 import com.createnewera.bus.BusPort;
+import com.createnewera.bus.PartGeometry;
 import com.createnewera.bus.PortMode;
 import com.createnewera.computer.BrassComputerBlock;
 import com.createnewera.computer.BrassComputerBlockEntity;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -204,10 +206,82 @@ public class BusTests {
     public static void computersHaveLimitedPorts(GameTestHelper helper) {
         computer(helper);
         for (int i = 0; i < Bus.COMPUTER_PORTS; i++)
-            if (Bus.placePort(helper.getLevel(), helper.absolutePos(COMPUTER), Direction.UP, i, 0, PortMode.IN) == null)
+            if (Bus.placePort(helper.getLevel(), helper.absolutePos(COMPUTER), Direction.UP, i * 4, 0, PortMode.IN) == null)
                 helper.fail("port " + (i + 1) + " refused");
         if (Bus.placePort(helper.getLevel(), helper.absolutePos(COMPUTER), Direction.UP, 9, 9, PortMode.IN) != null)
             helper.fail("took more ports than it has room for");
+        helper.succeed();
+    }
+
+    // a click anywhere on any face lands inside the part it places, so what you see is what you clicked
+    @GameTest(template = ROOM)
+    public static void partsLandWhereYouClick(GameTestHelper helper) {
+        BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));
+        for (Direction face : Direction.values()) {
+            for (double[] at : new double[][] {{0.5, 0.5}, {0.1, 0.1}, {0.9, 0.2}, {0.3, 0.95}}) {
+                Vec3 hit = pointOnFace(pos, face, at[0], at[1]);
+                int[] spot = PartGeometry.spotAt(pos, face, hit, BusPort.Kind.PORT.size);
+                BusPort part = new BusPort(0, pos, face, spot[0], spot[1], BusPort.Kind.PORT, PortMode.OUT);
+                if (!PartGeometry.box(part).inflate(1 / 16.0).contains(hit))
+                    helper.fail("click " + hit + " on " + face + " placed a port at " + PartGeometry.box(part));
+                if (PartGeometry.partAt(java.util.List.of(part), face, hit) == null && at[0] > 0.2 && at[0] < 0.8 && at[1] > 0.2 && at[1] < 0.8)
+                    helper.fail("couldn't find the port just placed under " + hit + " on " + face);
+            }
+            if (PartGeometry.spotAt(pos, face, pointOnFace(pos, face, 0.5, 0.5), 4)[0] != 6)
+                helper.fail("a centred click should centre the port on " + face);
+        }
+        helper.succeed();
+    }
+
+    /** A point on a block's face, with s and t running across it from one corner, 0 to 1. */
+    private static Vec3 pointOnFace(BlockPos pos, Direction face, double s, double t) {
+        Vec3 corner = Vec3.atLowerCornerOf(pos);
+        return switch (face.getAxis()) {
+            case Y -> corner.add(s, face == Direction.UP ? 1 : 0, t);
+            case Z -> corner.add(s, t, face == Direction.SOUTH ? 1 : 0);
+            case X -> corner.add(face == Direction.EAST ? 1 : 0, t, s);
+        };
+    }
+
+    // expansions only go on computers, add ports, and run out
+    @GameTest(template = ROOM)
+    public static void expansionsAddComputerPorts(GameTestHelper helper) {
+        computer(helper);
+        chest(helper, CHEST, 1);
+        var level = helper.getLevel();
+        BlockPos pc = helper.absolutePos(COMPUTER);
+        if (Bus.placePart(level, helper.absolutePos(CHEST), Direction.UP, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
+            helper.fail("an expansion went on a chest");
+        for (int i = 0; i < Bus.COMPUTER_PORTS; i++)
+            Bus.placePort(level, pc, Direction.UP, i * 4, 0, PortMode.IN);
+        if (Bus.placePort(level, pc, Direction.UP, 0, 4, PortMode.IN) != null)
+            helper.fail("a fifth port fit without an expansion");
+        if (Bus.placePart(level, pc, Direction.WEST, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) == null)
+            helper.fail("the expansion didn't go on");
+        if (Bus.placePort(level, pc, Direction.UP, 0, 4, PortMode.IN) == null)
+            helper.fail("the expansion added no ports");
+        // overlapping the expansion is refused
+        if (Bus.placePort(level, pc, Direction.WEST, 2, 2, PortMode.IN) != null)
+            helper.fail("a port went on top of the expansion");
+        Bus.placePart(level, pc, Direction.EAST, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT);
+        Bus.placePart(level, pc, Direction.DOWN, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT);
+        if (Bus.placePart(level, pc, Direction.DOWN, 8, 8, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
+            helper.fail("took more than " + Bus.MAX_EXPANSIONS + " expansions");
+        helper.succeed();
+    }
+
+    // the wrench turns a port around; other parts have no direction
+    @GameTest(template = ROOM)
+    public static void wrenchFlipsPorts(GameTestHelper helper) {
+        chest(helper, CHEST, 1);
+        var level = helper.getLevel();
+        BusPort port = Bus.placePort(level, helper.absolutePos(CHEST), Direction.UP, 4, 4, PortMode.OUT);
+        Bus.flip(level, port);
+        if (BusData.get(level).port(port.id()).mode() != PortMode.IN)
+            helper.fail("the wrench didn't turn the port");
+        Bus.removePart(level, BusData.get(level).port(port.id()));
+        if (!BusData.get(level).portsAt(helper.absolutePos(CHEST)).isEmpty())
+            helper.fail("the port didn't come off");
         helper.succeed();
     }
 }

@@ -23,6 +23,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -38,6 +39,8 @@ public class BusData extends SavedData {
     /** span id → the two port ids it joins */
     private final Map<Long, long[]> spans = new LinkedHashMap<>();
     private final Map<BlockPos, String> names = new HashMap<>();
+    /** chunk → ids of the parts in it */
+    private final Map<Long, Set<Long>> byChunk = new HashMap<>();
     private long nextId = 1;
 
     public static BusData get(ServerLevel level) {
@@ -46,17 +49,34 @@ public class BusData extends SavedData {
 
     // ---- ports ----
 
-    /** @return the new port, or null when that spot is taken or off the face */
-    public @Nullable BusPort addPort(BlockPos pos, Direction face, int u, int v, PortMode mode) {
-        if (u < 0 || u > 15 || v < 0 || v > 15)
+    /** @return the new part, or null when it would overlap another or hang off the face */
+    public @Nullable BusPort addPart(BlockPos pos, Direction face, int u, int v, BusPort.Kind kind, PortMode mode) {
+        if (u < 0 || v < 0 || u + kind.size > 16 || v + kind.size > 16)
             return null;
-        for (BusPort p : ports.values())
-            if (p.pos().equals(pos) && p.face() == face && p.u() == u && p.v() == v)
+        for (BusPort p : portsAt(pos))
+            if (p.overlaps(face, u, v, kind.size))
                 return null;
-        BusPort port = new BusPort(nextId++, pos.immutable(), face, u, v, mode);
+        BusPort port = new BusPort(nextId++, pos.immutable(), face, u, v, kind, mode);
         ports.put(port.id(), port);
+        index(port);
         setDirty();
         return port;
+    }
+
+    public @Nullable BusPort addPort(BlockPos pos, Direction face, int u, int v, PortMode mode) {
+        return addPart(pos, face, u, v, BusPort.Kind.PORT, mode);
+    }
+
+    /** Parts in one chunk, for sending to the players who can see it. */
+    public List<BusPort> partsInChunk(long chunk) {
+        List<BusPort> out = new ArrayList<>();
+        for (long id : byChunk.getOrDefault(chunk, Set.of()))
+            out.add(ports.get(id));
+        return out;
+    }
+
+    private void index(BusPort port) {
+        byChunk.computeIfAbsent(ChunkPos.asLong(port.pos()), k -> new HashSet<>()).add(port.id());
     }
 
     public @Nullable BusPort port(long id) {
@@ -71,10 +91,14 @@ public class BusData extends SavedData {
         return out;
     }
 
-    /** Takes the port off, and every span plugged into it. */
+    /** Takes the part off, and every span plugged into it. */
     public boolean removePort(long id) {
-        if (ports.remove(id) == null)
+        BusPort removed = ports.remove(id);
+        if (removed == null)
             return false;
+        Set<Long> chunk = byChunk.get(ChunkPos.asLong(removed.pos()));
+        if (chunk != null)
+            chunk.remove(id);
         spans.values().removeIf(s -> s[0] == id || s[1] == id);
         setDirty();
         return true;
@@ -99,9 +123,11 @@ public class BusData extends SavedData {
 
     // ---- spans ----
 
-    /** @return the span's id, or null if the ports are missing, the same, or already joined */
+    /** @return the span's id, or null if the ports are missing, the same, already joined, or not ports */
     public @Nullable Long connect(long a, long b) {
         if (a == b || !ports.containsKey(a) || !ports.containsKey(b))
+            return null;
+        if (ports.get(a).kind() != BusPort.Kind.PORT || ports.get(b).kind() != BusPort.Kind.PORT)
             return null;
         for (long[] s : spans.values())
             if ((s[0] == a && s[1] == b) || (s[0] == b && s[1] == a))
@@ -190,6 +216,7 @@ public class BusData extends SavedData {
             t.putByte("U", (byte) p.u());
             t.putByte("V", (byte) p.v());
             t.putBoolean("Out", p.mode() == PortMode.OUT);
+            t.putString("Kind", p.kind().name());
             portList.add(t);
         }
         tag.put("Ports", portList);
@@ -218,9 +245,13 @@ public class BusData extends SavedData {
         data.nextId = tag.getLong("NextId");
         for (Tag t : tag.getList("Ports", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
-            NbtUtils.readBlockPos(c, "Pos").ifPresent(pos -> data.ports.put(c.getLong("Id"), new BusPort(c.getLong("Id"), pos,
-                    Direction.from3DDataValue(c.getByte("Face")), c.getByte("U"), c.getByte("V"),
-                    c.getBoolean("Out") ? PortMode.OUT : PortMode.IN)));
+            BusPort.Kind kind = c.contains("Kind") ? BusPort.Kind.valueOf(c.getString("Kind")) : BusPort.Kind.PORT;
+            NbtUtils.readBlockPos(c, "Pos").ifPresent(pos -> {
+                BusPort port = new BusPort(c.getLong("Id"), pos, Direction.from3DDataValue(c.getByte("Face")),
+                        c.getByte("U"), c.getByte("V"), kind, c.getBoolean("Out") ? PortMode.OUT : PortMode.IN);
+                data.ports.put(port.id(), port);
+                data.index(port);
+            });
         }
         for (Tag t : tag.getList("Spans", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;

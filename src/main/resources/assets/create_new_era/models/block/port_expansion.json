@@ -1,0 +1,79 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "parts": "create_new_era:block/bus_parts",
+    "particle": "create_new_era:block/bus_parts"
+  },
+  "elements": [
+    {
+      "name": "board",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        6,
+        1,
+        6
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            6,
+            14,
+            7
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            6,
+            14,
+            7
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            6,
+            14,
+            7
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            6,
+            14,
+            7
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            0,
+            14,
+            6
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            0,
+            14,
+            6
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools/textures"))
-from gen_textures import PART_REGIONS, REGIONS  # noqa: E402
+from gen_textures import BUS_REGIONS, PART_REGIONS, REGIONS  # noqa: E402
 
 OUT = ROOT / "src/main/resources/assets/create_new_era/models/block"
 FACES = ["north", "south", "east", "west", "up", "down"]
@@ -248,6 +248,37 @@ def computer_off():
 
 
 MODELS["brass_computer_off"] = computer_off()
+
+
+def bus(name, sub=None):
+    """Bus atlas region as model uv (the atlas is 16 px, so 1:1)."""
+    x, y, w, h = BUS_REGIONS[name]
+    if sub:
+        x, y, w, h = x + sub[0], y + sub[1], sub[2], sub[3]
+    return [x, y, x + w, y + h]
+
+
+# Bus mini-blocks, authored pointing up from the corner of the face; the game moves them to
+# their spot on the grid and turns them to their face (see PartGeometry). Not block models of
+# their own: they're drawn on top of whatever block they sit on.
+BUS_TEX = {"parts": "create_new_era:block/bus_parts", "particle": "create_new_era:block/bus_parts"}
+
+
+def port(light):
+    return model(BUS_TEX, [
+        box("plate", [0, 0, 0], [4, 1, 4], {"up": ("parts", bus("port_top")), "down": ("parts", bus("port_top")),
+                                            "sides": ("parts", bus("port_side"))}),
+        # a one-pixel lamp on the corner: green takes orders in, amber sends data out
+        box("light", [0.5, 1, 0.5], [1.5, 1.5, 1.5], {"all": ("parts", bus(light))}),
+    ])
+
+
+MODELS["bus_port_in"] = port("light_in")
+MODELS["bus_port_out"] = port("light_out")
+MODELS["port_expansion"] = model(BUS_TEX, [
+    box("board", [0, 0, 0], [6, 1, 6], {"up": ("parts", bus("expansion_top")), "down": ("parts", bus("expansion_top")),
+                                        "sides": ("parts", bus("expansion_side"))}),
+])
 
 
 def main():

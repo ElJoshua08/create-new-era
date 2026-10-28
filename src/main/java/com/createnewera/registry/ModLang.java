@@ -48,6 +48,22 @@ public final class ModLang {
         lang("create_new_era.editor.paused_rotation", "Paused: needs rotation");
         lang("create_new_era.editor.paused_stress", "Paused: overstressed");
         lang("create_new_era.editor.rpm", "%s RPM");
+        // data bus
+        lang("item.create_new_era.bus_port.tooltip.summary", "A _data port_ for the bus. Sticks to _any face_ of _any block_, Create machines included, without changing how the block works.");
+        lang("item.create_new_era.bus_port.tooltip.condition1", "Output (amber light)");
+        lang("item.create_new_era.bus_port.tooltip.behaviour1", "The block _publishes_ what it's doing: programs can _read_ it.");
+        lang("item.create_new_era.bus_port.tooltip.condition2", "Input (green light)");
+        lang("item.create_new_era.bus_port.tooltip.behaviour2", "The block _takes orders_: programs can _control_ it.");
+        lang("item.create_new_era.bus_port.tooltip.control1", "When R-Clicked on a face");
+        lang("item.create_new_era.bus_port.tooltip.action1", "Sticks a port where you click.");
+        lang("item.create_new_era.bus_port.tooltip.control2", "Wrench on a port");
+        lang("item.create_new_era.bus_port.tooltip.action2", "Turns it between _input_ and _output_. _Sneak_ to take it off.");
+        lang("item.create_new_era.port_expansion.tooltip.summary", "Stick it on a _Brass Computer_ for _4 more ports_. Up to 3 per computer.");
+        lang("item.create_new_era.port_expansion.tooltip.control1", "When R-Clicked on a computer");
+        lang("item.create_new_era.port_expansion.tooltip.action1", "Sticks the expansion where you click.");
+        lang("create_new_era.bus.no_room", "No room for a port there");
+        lang("create_new_era.bus.expansion_needs_computer", "Port expansions go on a Brass Computer, up to 3");
+
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
         lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. For now they work with _redstone_; the _data bus_ comes next.");
         lang("block.create_new_era.brass_computer.tooltip.condition1", "When rotated");

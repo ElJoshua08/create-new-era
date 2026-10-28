@@ -1,0 +1,148 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "parts": "create_new_era:block/bus_parts",
+    "particle": "create_new_era:block/bus_parts"
+  },
+  "elements": [
+    {
+      "name": "plate",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        4,
+        1,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            4,
+            4,
+            5
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            4,
+            4,
+            5
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            4,
+            4,
+            5
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            4,
+            4,
+            5
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ]
+        }
+      }
+    },
+    {
+      "name": "light",
+      "from": [
+        0.5,
+        1,
+        0.5
+      ],
+      "to": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

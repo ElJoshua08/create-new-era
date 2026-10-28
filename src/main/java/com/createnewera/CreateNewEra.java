@@ -1,6 +1,7 @@
 package com.createnewera;
 
 import com.createnewera.config.ClientConfig;
+import com.createnewera.bus.BusEvents;
 import com.createnewera.network.ModNetwork;
 import com.createnewera.registry.ModBlockEntities;
 import com.createnewera.registry.ModBlocks;
@@ -21,6 +22,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 
 @Mod(CreateNewEra.MOD_ID)
@@ -45,6 +47,7 @@ public class CreateNewEra {
         ModLang.register();
         REGISTRATE.registerEventListeners(modEventBus);
         ModNetwork.register(modEventBus);
+        BusEvents.register(NeoForge.EVENT_BUS);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         LOGGER.info("Create: New Era loaded");
     }

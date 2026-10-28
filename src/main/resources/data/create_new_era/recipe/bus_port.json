@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "create:copper_sheet"
+    },
+    {
+      "item": "create:electron_tube"
+    }
+  ],
+  "result": {
+    "id": "create_new_era:bus_port",
+    "count": 4
+  }
+}

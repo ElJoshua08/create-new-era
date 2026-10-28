@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "create:brass_sheet"
+    },
+    {
+      "item": "create:electron_tube"
+    },
+    {
+      "item": "create:precision_mechanism"
+    }
+  ],
+  "result": {
+    "id": "create_new_era:port_expansion",
+    "count": 1
+  }
+}

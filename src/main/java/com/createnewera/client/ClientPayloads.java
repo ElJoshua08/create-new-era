@@ -1,6 +1,8 @@
 package com.createnewera.client;
 
 import com.createnewera.client.editor.ComputerEditorScreen;
+import com.createnewera.client.bus.ClientBusParts;
+import com.createnewera.network.BusPartsPayload;
 import com.createnewera.network.ComputerStatePayload;
 import com.createnewera.network.OpenEditorPayload;
 
@@ -15,6 +17,10 @@ public final class ClientPayloads {
     public static void computerState(ComputerStatePayload payload) {
         if (Minecraft.getInstance().screen instanceof ComputerEditorScreen editor && editor.getPos().equals(payload.pos()))
             editor.update(payload.snapshot());
+    }
+
+    public static void busParts(BusPartsPayload payload) {
+        ClientBusParts.set(payload.chunk(), payload.parts());
     }
 
     private ClientPayloads() {}

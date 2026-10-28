@@ -341,6 +341,72 @@ def draw_screen_glass():
     c.img.save(OUT / "screen_glass.png")
 
 
+# Third atlas: the bus mini-blocks (ports and expansions), 16 px.
+BUS_REGIONS = {
+    "port_top": (0, 0, 4, 4),
+    "port_side": (0, 4, 4, 1),
+    "light_out": (4, 0, 1, 1),
+    "light_in": (5, 0, 1, 1),
+    "expansion_top": (8, 0, 6, 6),
+    "expansion_side": (8, 6, 6, 1),
+}
+
+
+def draw_bus_parts():
+    """Ports: a copper plate with a dark socket. Expansions: a small green board with brass contacts."""
+    c = Canvas(16, 16)
+    x, y = BUS_REGIONS["port_top"][:2]
+    c.rect(x, y, 4, 4, COPPER[4])
+    c.rect(x, y, 4, 1, COPPER[6])
+    c.rect(x, y, 1, 4, COPPER[5])
+    c.rect(x + 3, y, 1, 4, COPPER[2])
+    c.rect(x, y + 3, 4, 1, COPPER[1])
+    c.rect(x + 1, y + 1, 2, 2, SLATE[0])
+    x, y = BUS_REGIONS["port_side"][:2]
+    c.rect(x, y, 4, 1, COPPER[2])
+    c.px(*BUS_REGIONS["light_out"][:2], AMBER[2])
+    c.px(*BUS_REGIONS["light_in"][:2], PHOSPHOR[2])
+    x, y = BUS_REGIONS["expansion_top"][:2]
+    c.rect(x, y, 6, 6, PHOSPHOR[0])
+    c.rect(x, y, 6, 1, PHOSPHOR[1])
+    c.rect(x + 2, y + 2, 2, 2, SLATE[1])
+    for i in (0, 2, 4):
+        c.px(x + 1 + i // 2 * 2, y + 5, BRASS[5])
+    c.px(x + 1, y + 1, BRASS[5])
+    c.px(x + 4, y + 1, COPPER[5])
+    x, y = BUS_REGIONS["expansion_side"][:2]
+    c.rect(x, y, 6, 1, BRASS[3])
+    c.img.save(OUT / "bus_parts.png")
+
+
+def draw_bus_items():
+    """Inventory sprites for the port and the port expansion."""
+    c = Canvas(16, 16)
+    c.rect(3, 5, 10, 8, COPPER[3])
+    c.rect(3, 5, 10, 1, COPPER[6])
+    c.rect(3, 5, 1, 8, COPPER[5])
+    c.rect(12, 5, 1, 8, COPPER[1])
+    c.rect(3, 12, 10, 1, COPPER[0])
+    c.rect(6, 7, 4, 4, SLATE[0])
+    c.rect(7, 8, 2, 2, SLATE[2])
+    c.rect(7, 2, 2, 3, AMBER[2])
+    c.rect(6, 3, 4, 1, AMBER[2])
+    c.img.save(ITEM_OUT / "bus_port.png")
+
+    c = Canvas(16, 16)
+    c.rect(2, 4, 12, 9, PHOSPHOR[0])
+    c.rect(2, 4, 12, 1, PHOSPHOR[1])
+    c.rect(2, 12, 12, 1, "#1f4a28")
+    c.rect(6, 6, 4, 4, SLATE[1])
+    c.rect(6, 6, 4, 1, SLATE[3])
+    for x in (3, 5, 10, 12):
+        c.px(x, 6, COPPER[5])
+        c.px(x, 9, COPPER[5])
+    for x in range(3, 14, 2):
+        c.rect(x, 13, 1, 2, BRASS[5])
+    c.img.save(ITEM_OUT / "port_expansion.png")
+
+
 def draw_editor_checker():
     """Computer editor background: the design's dark checker, tiled by the GUI."""
     c = Canvas(2, 2)
@@ -398,7 +464,9 @@ def main():
     draw_parts()
     draw_screen_glass()
     draw_editor_checker()
+    draw_bus_parts()
     draw_control_plate_item()
+    draw_bus_items()
     print(f"atlas written to {OUT / 'computing_details.png'}")
 
 

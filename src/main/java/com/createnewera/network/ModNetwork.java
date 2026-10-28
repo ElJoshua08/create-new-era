@@ -20,6 +20,8 @@ public final class ModNetwork {
                 (payload, context) -> ClientPayloads.openEditor(payload));
         registrar.playToClient(ComputerStatePayload.TYPE, ComputerStatePayload.STREAM_CODEC,
                 (payload, context) -> ClientPayloads.computerState(payload));
+        registrar.playToClient(BusPartsPayload.TYPE, BusPartsPayload.STREAM_CODEC,
+                (payload, context) -> ClientPayloads.busParts(payload));
         registrar.playToServer(EditorActionPayload.TYPE, EditorActionPayload.STREAM_CODEC, ModNetwork::editorAction);
     }
 

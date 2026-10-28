@@ -141,5 +141,21 @@
   "create_new_era.editor.paused_stress": "En pausa: sobreestresado",
   "create_new_era.editor.rpm": "%s RPM",
   "create_new_era.ponder.brass_computer.text_7": "Los lados se nombran desde el frente del ordenador: front, back, left, right, top y bottom",
-  "create_new_era.ponder.brass_computer.text_8": "Mientras un programa funciona la pantalla se enciende, y sigue funcionando aunque nadie mire"
+  "create_new_era.ponder.brass_computer.text_8": "Mientras un programa funciona la pantalla se enciende, y sigue funcionando aunque nadie mire",
+  "item.create_new_era.bus_port": "Puerto de datos",
+  "item.create_new_era.port_expansion": "Ampliación de puertos",
+  "item.create_new_era.bus_port.tooltip.summary": "Un _puerto de datos_ para el bus. Se pega a _cualquier cara_ de _cualquier bloque_, máquinas de Create incluidas, sin cambiar cómo funciona.",
+  "item.create_new_era.bus_port.tooltip.condition1": "Salida (luz ámbar)",
+  "item.create_new_era.bus_port.tooltip.behaviour1": "El bloque _publica_ lo que hace: los programas pueden _leerlo_.",
+  "item.create_new_era.bus_port.tooltip.condition2": "Entrada (luz verde)",
+  "item.create_new_era.bus_port.tooltip.behaviour2": "El bloque _acepta órdenes_: los programas pueden _controlarlo_.",
+  "item.create_new_era.bus_port.tooltip.control1": "Al hacer clic derecho en una cara",
+  "item.create_new_era.bus_port.tooltip.action1": "Pega un puerto donde pinchas.",
+  "item.create_new_era.bus_port.tooltip.control2": "Llave inglesa en un puerto",
+  "item.create_new_era.bus_port.tooltip.action2": "Lo cambia entre _entrada_ y _salida_. _Agachado_ lo quitas.",
+  "item.create_new_era.port_expansion.tooltip.summary": "Pégala en un _ordenador de latón_ para tener _4 puertos más_. Hasta 3 por ordenador.",
+  "item.create_new_era.port_expansion.tooltip.control1": "Al hacer clic derecho en un ordenador",
+  "item.create_new_era.port_expansion.tooltip.action1": "Pega la ampliación donde pinchas.",
+  "create_new_era.bus.no_room": "No hay sitio para un puerto ahí",
+  "create_new_era.bus.expansion_needs_computer": "Las ampliaciones van en un ordenador de latón, hasta 3"
 }

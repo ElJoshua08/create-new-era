@@ -40,7 +40,8 @@ public final class DirectionalShape {
                 Math.max(p[0], q[0]), Math.max(p[1], q[1]), Math.max(p[2], q[2]));
     }
 
-    private static double[] map(double x, double y, double z, Direction facing) {
+    /** A point (in pixels) of something authored facing up, where it ends up facing {@code facing}. */
+    public static double[] map(double x, double y, double z, Direction facing) {
         return switch (facing) {
             case UP -> new double[] {x, y, z};
             case DOWN -> new double[] {x, 16 - y, 16 - z};

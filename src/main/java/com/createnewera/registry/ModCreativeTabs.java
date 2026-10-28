@@ -25,6 +25,8 @@ public final class ModCreativeTabs {
                         output.accept(ModBlocks.BRASS_SCREEN);
                         output.accept(ModBlocks.UNIVERSAL_ADAPTER);
                         output.accept(ModBlocks.BEARING_SERVO);
+                        output.accept(ModItems.BUS_PORT);
+                        output.accept(ModItems.PORT_EXPANSION);
                         output.accept(ModItems.CONTROL_PLATE);
                         output.accept(ModBlocks.PANEL_BUTTON);
                         output.accept(ModBlocks.PANEL_SWITCH);

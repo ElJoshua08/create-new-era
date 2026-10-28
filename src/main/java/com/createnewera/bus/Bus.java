@@ -10,30 +10,83 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 import com.createnewera.computer.BrassComputerBlock;
+import com.createnewera.network.BusPartsPayload;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 /** The network as one computer sees it, and the rules for changing it. */
 public final class Bus {
-    /** Ports a computer has room for before it needs a port expansion. */
+    /** Ports a computer has room for on its own; each expansion adds as many again. */
     public static final int COMPUTER_PORTS = 4;
+    public static final int MAX_EXPANSIONS = 3;
+
+    public static @Nullable BusPort placePort(ServerLevel level, BlockPos pos, Direction face, int u, int v, PortMode mode) {
+        return placePart(level, pos, face, u, v, BusPort.Kind.PORT, mode);
+    }
 
     /**
-     * Puts a port on a block's face. Computers take a limited number of ports.
+     * Puts a part on a block's face and tells the players who can see it. Computers take a
+     * limited number of ports; expansions only go on computers.
      *
-     * @return the port, or null if it can't go there
+     * @return the part, or null if it can't go there
      */
-    public static @Nullable BusPort placePort(ServerLevel level, BlockPos pos, Direction face, int u, int v, PortMode mode) {
+    public static @Nullable BusPort placePart(ServerLevel level, BlockPos pos, Direction face, int u, int v,
+                                              BusPort.Kind kind, PortMode mode) {
         if (level.getBlockState(pos).isAir())
             return null;
         BusData data = BusData.get(level);
-        if (level.getBlockState(pos).getBlock() instanceof BrassComputerBlock && data.portsAt(pos).size() >= COMPUTER_PORTS)
+        boolean computer = level.getBlockState(pos).getBlock() instanceof BrassComputerBlock;
+        List<BusPort> here = data.portsAt(pos);
+        long ports = here.stream().filter(p -> p.kind() == BusPort.Kind.PORT).count();
+        long expansions = here.stream().filter(p -> p.kind() == BusPort.Kind.EXPANSION).count();
+        if (kind == BusPort.Kind.EXPANSION && (!computer || expansions >= MAX_EXPANSIONS))
             return null;
-        return data.addPort(pos, face, u, v, mode);
+        if (kind == BusPort.Kind.PORT && computer && ports >= COMPUTER_PORTS * (1 + expansions))
+            return null;
+        BusPort part = data.addPart(pos, face, u, v, kind, mode);
+        if (part != null)
+            sync(level, pos);
+        return part;
+    }
+
+    public static void removePart(ServerLevel level, BusPort part) {
+        if (BusData.get(level).removePort(part.id()))
+            sync(level, part.pos());
+    }
+
+    /** The wrench: a port's input becomes its output and back. */
+    public static void flip(ServerLevel level, BusPort part) {
+        if (part.kind() == BusPort.Kind.PORT && BusData.get(level).setMode(part.id(), part.mode().flipped()))
+            sync(level, part.pos());
+    }
+
+    /** The block a part sat on is gone: so are its parts. */
+    public static void blockRemoved(ServerLevel level, BlockPos pos) {
+        BusData data = BusData.get(level);
+        if (data.portsAt(pos).isEmpty())
+            return;
+        data.removeAllAt(pos);
+        sync(level, pos);
+    }
+
+    /** Sends the chunk's parts to everyone who has it loaded. */
+    public static void sync(ServerLevel level, BlockPos pos) {
+        ChunkPos chunk = new ChunkPos(pos);
+        PacketDistributor.sendToPlayersTrackingChunk(level, chunk,
+                new BusPartsPayload(chunk.toLong(), BusData.get(level).partsInChunk(chunk.toLong())));
+    }
+
+    public static void sendChunk(ServerPlayer player, ServerLevel level, ChunkPos chunk) {
+        List<BusPort> parts = BusData.get(level).partsInChunk(chunk.toLong());
+        if (!parts.isEmpty())
+            PacketDistributor.sendToPlayer(player, new BusPartsPayload(chunk.toLong(), parts));
     }
 
     /**
@@ -48,7 +101,7 @@ public final class Bus {
         Map<BlockPos, boolean[]> modes = new LinkedHashMap<>(); // pos → {readable, writable}
         for (long id : reachable) {
             BusPort port = data.port(id);
-            if (port == null || port.pos().equals(computer))
+            if (port == null || port.pos().equals(computer) || port.kind() != BusPort.Kind.PORT)
                 continue;
             boolean[] m = modes.computeIfAbsent(port.pos(), p -> new boolean[2]);
             if (port.mode() == PortMode.OUT)
@@ -62,7 +115,7 @@ public final class Bus {
             BlockPos pos = e.getKey();
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) {
-                data.removeAllAt(pos);
+                blockRemoved(level, pos);
                 continue;
             }
             String type = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
