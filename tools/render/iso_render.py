@@ -124,7 +124,9 @@ def homography(src, dst):
     return vt[-1].reshape(3, 3)
 
 
-def render(assets, refs, size=384, yaw=0, pitch=30.0):
+def render(assets, refs, size=384, yaw=0, pitch=30.0, zoom=1.0, center=(8, 8, 8)):
+    """refs are model names or model dicts. zoom < 1 and a center (in pixels) frame scenes
+    bigger than one block."""
     view_yaw = math.radians(225 + yaw)
     p = math.radians(pitch)
     # camera basis: looking down at the block from the south-east by default
@@ -135,10 +137,10 @@ def render(assets, refs, size=384, yaw=0, pitch=30.0):
 
     color = np.zeros((size, size, 4), np.float32)
     depth = np.full((size, size), np.inf, np.float32)
-    scale = size / 2.1
+    scale = size / 2.1 * zoom
 
     def project(pt):
-        q = (np.asarray(pt, dtype=np.float64) / 16.0) - 0.5
+        q = (np.asarray(pt, dtype=np.float64) - np.asarray(center, dtype=np.float64)) / 16.0
         return np.array([size / 2 + q @ right * scale, size / 2 - q @ up * scale]), q @ fwd
 
     for ref in refs:
