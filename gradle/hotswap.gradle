@@ -14,7 +14,10 @@ def hotswapPort = (project.findProperty('port') ?: '5005').toInteger()
 def classesDir = layout.buildDirectory.dir('classes/java/main')
 def stateFile = layout.buildDirectory.file('hotswap/classes.properties')
 def hotswapTool = file('tools/hotswap/HotSwap.java')
-def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
+def launcher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(21)
+    vendor = JvmVendorSpec.JETBRAINS
+}
 
 [client: 5005, server: 5006].each { run, port ->
     neoForge.runs.getByName(run).jvmArguments.addAll(
@@ -31,10 +34,7 @@ def baseline = tasks.register('hotswapBaseline', Exec) {
 tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
     dependsOn baseline
     // ModDevGradle launches with the default toolchain; enhanced redefinition needs the JetBrains Runtime
-    javaLauncher = javaToolchains.launcherFor {
-        languageVersion = JavaLanguageVersion.of(21)
-        vendor = JvmVendorSpec.JETBRAINS
-    }
+    javaLauncher = launcher
 }
 
 tasks.register('hotswap', Exec) {

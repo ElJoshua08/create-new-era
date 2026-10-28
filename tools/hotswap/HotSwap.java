@@ -43,22 +43,48 @@ public class HotSwap {
         }
 
         VirtualMachine vm = attach(Integer.parseInt(args[3]));
+        Map<String, String> failed = new HashMap<>();
+        int reloaded = 0, notLoaded = 0;
         try {
             Map<ReferenceType, byte[]> redefine = new HashMap<>();
-            int notLoaded = 0;
+            Map<ReferenceType, String> names = new HashMap<>();
             for (var e : changed.entrySet()) {
                 List<ReferenceType> loaded = vm.classesByName(e.getKey());
                 if (loaded.isEmpty())
                     notLoaded++; // the game will load the new version from disk when it first needs it
-                for (ReferenceType type : loaded)
+                for (ReferenceType type : loaded) {
                     redefine.put(type, e.getValue());
+                    names.put(type, e.getKey());
+                }
             }
-            vm.redefineClasses(redefine);
-            System.out.printf("hotswap: reloaded %d classes (%d not loaded yet)%n", redefine.size(), notLoaded);
-            for (String name : changed.keySet().stream().sorted().toList())
-                System.out.println("  " + name);
+            try {
+                vm.redefineClasses(redefine);
+                reloaded = redefine.size();
+            } catch (RuntimeException | LinkageError all) {
+                // one class the VM can't take (say, a new superclass) fails the whole batch: go one by one
+                for (var e : redefine.entrySet()) {
+                    try {
+                        vm.redefineClasses(Map.of(e.getKey(), e.getValue()));
+                        reloaded++;
+                    } catch (RuntimeException | LinkageError one) {
+                        failed.put(names.get(e.getKey()), one.getMessage());
+                    }
+                }
+            }
         } finally {
             vm.dispose();
+        }
+
+        System.out.printf("hotswap: reloaded %d classes (%d not loaded yet)%n", reloaded, notLoaded);
+        for (String name : changed.keySet().stream().sorted().toList())
+            System.out.println((failed.containsKey(name) ? "  ! " : "    ") + name);
+        if (!failed.isEmpty()) {
+            System.out.println();
+            System.out.println("hotswap: " + failed.size() + " class(es) changed in a way a running game can't take,");
+            System.out.println("for example a new superclass or a new block. Restart the game for those:");
+            failed.forEach((name, why) -> System.out.println("  " + name + ": " + why));
+            // leave them out of the state, so they're offered again until the game restarts
+            failed.keySet().forEach(name -> now.put(name, before.getOrDefault(name, "")));
         }
         save(state, now);
     }
