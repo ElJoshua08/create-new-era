@@ -20,7 +20,7 @@ public final class ClientPayloads {
     }
 
     public static void busParts(BusPartsPayload payload) {
-        ClientBusParts.set(payload.chunk(), payload.parts());
+        ClientBusParts.set(payload.chunk(), payload.parts(), payload.spans());
     }
 
     private ClientPayloads() {}

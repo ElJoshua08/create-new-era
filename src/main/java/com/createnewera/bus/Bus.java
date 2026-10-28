@@ -2,6 +2,7 @@ package com.createnewera.bus;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /** The network as one computer sees it, and the rules for changing it. */
@@ -56,9 +59,11 @@ public final class Bus {
         return part;
     }
 
+    /** Takes a part off, with the cables plugged into it. */
     public static void removePart(ServerLevel level, BusPort part) {
-        if (BusData.get(level).removePort(part.id()))
-            sync(level, part.pos());
+        List<BusSpan> cut = BusData.get(level).removePort(part.id());
+        if (cut != null)
+            syncCut(level, part.pos(), cut);
     }
 
     /** The wrench: a port's input becomes its output and back. */
@@ -72,21 +77,100 @@ public final class Bus {
         BusData data = BusData.get(level);
         if (data.portsAt(pos).isEmpty())
             return;
-        data.removeAllAt(pos);
-        sync(level, pos);
+        syncCut(level, pos, data.removeAllAt(pos));
+    }
+
+    public enum Laid {
+        OK, SAME_PART, TOO_FAR, NO_ROUTE, COLOR_CLASH, ALREADY_JOINED
+    }
+
+    /** Where a cable from one part to another would run, or null if it can't. */
+    public static @Nullable List<Vec3> route(ServerLevel level, BusPort from, BusPort to, boolean aerial) {
+        return aerial ? CableRoute.aerial(from, to) : CableRoute.surface(level, from, to);
+    }
+
+    /** A cable worked out before laying it: what's wrong with it, or where it would run. */
+    public record Plan(Laid result, List<Vec3> points) {
+        static Plan refused(Laid why) {
+            return new Plan(why, List.of());
+        }
+    }
+
+    /** Checks a cable before laying it, so the spool can say what's wrong without spending any. */
+    public static Plan plan(ServerLevel level, BusPort from, BusPort to, @Nullable DyeColor color, boolean aerial) {
+        if (from.id() == to.id())
+            return Plan.refused(Laid.SAME_PART);
+        BusData data = BusData.get(level);
+        if (!data.accepts(from.id(), color, -1) || !data.accepts(to.id(), color, -1))
+            return Plan.refused(Laid.COLOR_CLASH);
+        for (BusSpan s : data.spansAt(from.id()))
+            if (s.touches(to.id()))
+                return Plan.refused(Laid.ALREADY_JOINED);
+        List<Vec3> points = route(level, from, to, aerial);
+        if (points == null)
+            return Plan.refused(aerial ? Laid.TOO_FAR : Laid.NO_ROUTE);
+        return new Plan(Laid.OK, points);
+    }
+
+    public static @Nullable BusSpan lay(ServerLevel level, BusPort from, BusPort to, @Nullable DyeColor color, boolean aerial, List<Vec3> points) {
+        BusSpan span = BusData.get(level).connect(from.id(), to.id(), color, aerial, points);
+        if (span != null)
+            sync(level, from.pos());
+        return span;
+    }
+
+    public static @Nullable BusSpan cut(ServerLevel level, long spanId) {
+        BusData data = BusData.get(level);
+        BusSpan span = data.span(spanId);
+        BusPort a = span == null ? null : data.port(span.a());
+        if (span == null || data.disconnect(spanId) == null)
+            return null;
+        if (a != null)
+            sync(level, a.pos());
+        return span;
+    }
+
+    /** A span changed (dye, casing): resend the chunk it's sent with. */
+    public static void spanChanged(ServerLevel level, long spanId) {
+        BusData data = BusData.get(level);
+        BusSpan span = data.span(spanId);
+        BusPort a = span == null ? null : data.port(span.a());
+        if (a != null)
+            sync(level, a.pos());
+    }
+
+    /** Resends the chunk a part was in, and the chunks of the cables that went with it. */
+    private static void syncCut(ServerLevel level, BlockPos pos, List<BusSpan> cut) {
+        BusData data = BusData.get(level);
+        Set<Long> chunks = new HashSet<>();
+        chunks.add(ChunkPos.asLong(pos));
+        for (BusSpan span : cut) {
+            BusPort a = data.port(span.a());
+            if (a != null)
+                chunks.add(ChunkPos.asLong(a.pos()));
+        }
+        for (long chunk : chunks)
+            sync(level, new ChunkPos(chunk));
     }
 
     /** Sends the chunk's parts to everyone who has it loaded. */
     public static void sync(ServerLevel level, BlockPos pos) {
-        ChunkPos chunk = new ChunkPos(pos);
-        PacketDistributor.sendToPlayersTrackingChunk(level, chunk,
-                new BusPartsPayload(chunk.toLong(), BusData.get(level).partsInChunk(chunk.toLong())));
+        sync(level, new ChunkPos(pos));
+    }
+
+    private static void sync(ServerLevel level, ChunkPos chunk) {
+        PacketDistributor.sendToPlayersTrackingChunk(level, chunk, payload(level, chunk));
     }
 
     public static void sendChunk(ServerPlayer player, ServerLevel level, ChunkPos chunk) {
-        List<BusPort> parts = BusData.get(level).partsInChunk(chunk.toLong());
-        if (!parts.isEmpty())
-            PacketDistributor.sendToPlayer(player, new BusPartsPayload(chunk.toLong(), parts));
+        BusPartsPayload payload = payload(level, chunk);
+        if (!payload.parts().isEmpty() || !payload.spans().isEmpty())
+            PacketDistributor.sendToPlayer(player, payload);
+    }
+
+    private static BusPartsPayload payload(ServerLevel level, ChunkPos chunk) {
+        BusData data = BusData.get(level);
+        return new BusPartsPayload(chunk.toLong(), data.partsInChunk(chunk.toLong()), data.spansInChunk(chunk.toLong()));
     }
 
     /**

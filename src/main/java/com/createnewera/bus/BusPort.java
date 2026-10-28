@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
 /**
- * A mini-block stuck to one face of a block: a port, a port expansion, and later splices and
+ * A mini-block stuck to one face of a block: a port, a port expansion, a splice, and later
  * antennas. It's stored apart from the block, so it can sit on any block (a Create machine
  * included) without changing it.
  *
@@ -16,7 +16,9 @@ public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind 
     public enum Kind {
         PORT(4),
         /** Gives a computer more ports. */
-        EXPANSION(6);
+        EXPANSION(6),
+        /** Joins cables in the middle of a run; it isn't a device. */
+        SPLICE(4);
 
         /** Footprint on the face, in pixels. */
         public final int size;
@@ -24,6 +26,11 @@ public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind 
         Kind(int size) {
             this.size = size;
         }
+    }
+
+    /** Ports and splices take cables; expansions don't. */
+    public boolean takesCables() {
+        return kind != Kind.EXPANSION;
     }
 
     public BusPort withMode(PortMode newMode) {

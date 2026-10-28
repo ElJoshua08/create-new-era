@@ -4,7 +4,9 @@ import static com.createnewera.CreateNewEra.REGISTRATE;
 
 import com.createnewera.bus.BusPartItem;
 import com.createnewera.bus.BusPort;
+import com.createnewera.cable.CableSpoolItem;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
 import net.minecraft.world.item.Item;
 
@@ -29,6 +31,19 @@ public final class ModItems {
     public static final ItemEntry<BusPartItem> PORT_EXPANSION = REGISTRATE
             .item("port_expansion", p -> new BusPartItem(p, BusPort.Kind.EXPANSION))
             .lang("Port Expansion")
+            .register();
+
+    /** Joins cables mid-run: sticks to any face like a port, but it isn't a device. */
+    public static final ItemEntry<BusPartItem> CABLE_SPLICE = REGISTRATE
+            .item("cable_splice", p -> new BusPartItem(p, BusPort.Kind.SPLICE))
+            .lang("Cable Splice")
+            .register();
+
+    /** Data cable on a reel; its durability is the metres left. Models in resources, one per colour. */
+    public static final ItemEntry<CableSpoolItem> CABLE_SPOOL = REGISTRATE
+            .item("cable_spool", CableSpoolItem::new)
+            .lang("Cable Spool")
+            .model(NonNullBiConsumer.noop())
             .register();
 
     public static void register() {}

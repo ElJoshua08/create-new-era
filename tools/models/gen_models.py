@@ -281,6 +281,13 @@ MODELS["port_expansion"] = model(BUS_TEX, [
 ])
 
 
+MODELS["cable_splice"] = model(BUS_TEX, [
+    box("plate", [0, 0, 0], [4, 1, 4], {"up": ("parts", bus("splice_top")), "down": ("parts", bus("splice_top")),
+                                        "sides": ("parts", bus("splice_side"))}),
+    box("boss", [1, 1, 1], [3, 2, 3], {"all": ("parts", bus("splice_boss"))}),
+])
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for name, m in MODELS.items():

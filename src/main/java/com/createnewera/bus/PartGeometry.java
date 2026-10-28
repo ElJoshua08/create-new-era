@@ -33,6 +33,11 @@ public final class PartGeometry {
                 outside.getX() + Math.max(a[0], b[0]) / 16, outside.getY() + Math.max(a[1], b[1]) / 16, outside.getZ() + Math.max(a[2], b[2]) / 16);
     }
 
+    /** Where a cable plugs in: the middle of the part. */
+    public static Vec3 anchor(BusPort part) {
+        return box(part).getCenter();
+    }
+
     /**
      * The grid spot a part of {@code size} gets when placed where the player clicked: centred
      * on the click, pushed back inside the face if it would hang off an edge.

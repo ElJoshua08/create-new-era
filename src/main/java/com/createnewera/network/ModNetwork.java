@@ -1,5 +1,6 @@
 package com.createnewera.network;
 
+import com.createnewera.cable.CableActions;
 import com.createnewera.client.ClientPayloads;
 import com.createnewera.computer.BrassComputerBlockEntity;
 
@@ -23,6 +24,10 @@ public final class ModNetwork {
         registrar.playToClient(BusPartsPayload.TYPE, BusPartsPayload.STREAM_CODEC,
                 (payload, context) -> ClientPayloads.busParts(payload));
         registrar.playToServer(EditorActionPayload.TYPE, EditorActionPayload.STREAM_CODEC, ModNetwork::editorAction);
+        registrar.playToServer(CableActionPayload.TYPE, CableActionPayload.STREAM_CODEC, (payload, context) -> {
+            if (context.player() instanceof ServerPlayer player)
+                CableActions.handle(player, payload.span(), payload.attack());
+        });
     }
 
     private static void editorAction(EditorActionPayload payload, IPayloadContext context) {

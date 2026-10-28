@@ -63,6 +63,28 @@ public final class ModLang {
         lang("item.create_new_era.port_expansion.tooltip.action1", "Sticks the expansion where you click.");
         lang("create_new_era.bus.no_room", "No room for a port there");
         lang("create_new_era.bus.expansion_needs_computer", "Port expansions go on a Brass Computer, up to 3");
+        // cables
+        lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
+        lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");
+        lang("item.create_new_era.cable_spool.tooltip.control1", "R-Click a port, then another");
+        lang("item.create_new_era.cable_spool.tooltip.action1", "Hangs a cable between them, up to _24 blocks_.");
+        lang("item.create_new_era.cable_spool.tooltip.control2", "Sneak on the second click");
+        lang("item.create_new_era.cable_spool.tooltip.action2", "Runs it _flat along the faces_ in between instead. Red when they aren't joined.");
+        lang("item.create_new_era.cable_spool.tooltip.condition1", "Dyed");
+        lang("item.create_new_era.cable_spool.tooltip.behaviour1", "Same dye on all four sides in a crafting grid. Cables of _different colours never join_: separate networks. Bare copper joins any.");
+        lang("item.create_new_era.cable_splice.tooltip.summary", "Joins cables _in the middle of a run_. Sticks to any face like a port, but it isn't a device.");
+        lang("item.create_new_era.cable_splice.tooltip.control1", "When R-Clicked on a face");
+        lang("item.create_new_era.cable_splice.tooltip.action1", "Sticks a splice where you click.");
+        lang("create_new_era.cable.started", "Cable started: click the other end (sneak to run it along faces)");
+        lang("create_new_era.cable.cancelled", "Cable let go");
+        lang("create_new_era.cable.laid", "Laid %s m of cable");
+        lang("create_new_era.cable.metres_left", "%s / %s m of cable");
+        lang("create_new_era.cable.not_enough", "Needs %s m, the spool has %s m");
+        lang("create_new_era.cable.color_clash", "That part already has cable of another colour");
+        lang("create_new_era.cable.same_part", "Pick a different part");
+        lang("create_new_era.cable.too_far", "Too far to hang a cable (24 blocks at most)");
+        lang("create_new_era.cable.no_route", "No way along the faces between them");
+        lang("create_new_era.cable.already_joined", "Those two are already joined");
 
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
         lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. For now they work with _redstone_; the _data bus_ comes next.");

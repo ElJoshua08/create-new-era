@@ -350,6 +350,9 @@ BUS_REGIONS = {
     "light_in": (5, 0, 1, 1),
     "expansion_top": (8, 0, 6, 6),
     "expansion_side": (8, 6, 6, 1),
+    "splice_top": (0, 8, 4, 4),
+    "splice_side": (0, 12, 4, 1),
+    "splice_boss": (4, 8, 2, 2),
 }
 
 
@@ -386,11 +389,54 @@ def draw_bus_parts():
     x, y = BUS_REGIONS["expansion_side"][:2]
     for i in range(6):
         c.px(x + i, y, br[5] if i % 2 == 0 else pcb[1])
+    # the splice: a brass plate with a copper boss the cables are clamped under
+    x, y = BUS_REGIONS["splice_top"][:2]
+    rows = [[br[5], br[6], br[5], br[4]],
+            [br[5], br[4], br[4], br[3]],
+            [br[4], br[4], br[3], br[3]],
+            [br[3], br[3], br[3], br[1]]]
+    for j, row in enumerate(rows):
+        for i, col in enumerate(row):
+            c.px(x + i, y + j, col)
+    x, y = BUS_REGIONS["splice_side"][:2]
+    for i, col in enumerate([br[3], br[3], br[2], br[1]]):
+        c.px(x + i, y, col)
+    x, y = BUS_REGIONS["splice_boss"][:2]
+    c.px(x, y, cu[6])
+    c.px(x + 1, y, cu[4])
+    c.px(x, y + 1, cu[4])
+    c.px(x + 1, y + 1, cu[2])
     c.img.save(OUT / "bus_parts.png")
 
 def draw_bus_items():
     iso_data_port().img.save(ITEM_OUT / "bus_port.png")
     iso_port_expansion().img.save(ITEM_OUT / "port_expansion.png")
+    iso_cable_splice().img.save(ITEM_OUT / "cable_splice.png")
+
+
+DYES = {"white": "#f9fffe", "orange": "#f9801d", "magenta": "#c74ebd", "light_blue": "#3ab3da",
+        "yellow": "#fed83d", "lime": "#80c71f", "pink": "#f38baa", "gray": "#474f52",
+        "light_gray": "#9d9d97", "cyan": "#169c9c", "purple": "#8932b8", "blue": "#3c44aa",
+        "brown": "#835432", "green": "#5e7c16", "red": "#b02e26", "black": "#1d1d21"}
+
+
+def draw_cables():
+    """Cable jackets, drawn on laid cables: a braid of diagonal strands one step lighter, like
+    woven sleeving. Bare copper, and one per dye."""
+    out = OUT / "cable"
+    out.mkdir(exist_ok=True)
+
+    def braid(name, base):
+        img = Image.new("RGBA", (16, 16))
+        for y in range(16):
+            for x in range(16):
+                f = (1.12, 1.0, 0.86, 0.94)[(x + y) % 4]
+                img.putpixel((x, y), tuple(max(0, min(255, int(c * f))) for c in base) + (255,))
+        img.save(out / f"{name}.png")
+
+    braid("copper", iso.COPPER[3][:3])
+    for name, col in DYES.items():
+        braid(name, ImageColor.getrgb(col))
 
 def draw_editor_checker():
     """Computer editor background: the design's dark checker, tiled by the GUI."""
@@ -452,6 +498,22 @@ def iso_data_port():
     return s
 
 
+def iso_cable_splice():
+    s = iso.Sprite()
+    # a brass plate with a copper boss in the middle, and the two cables it joins running off
+    # towards the near corners
+    iso.box(s, 8, 4, 4, 4, 2, iso.BRASS, iso.BRASS, "plate", top_index=4)
+    iso.shade_top_edges(s, "plate", iso.BRASS)
+    for c in (3.0, 3.5):
+        for x, y in (iso.on_top(8, 4, c, 2), iso.on_top(8, 4, 2, c)):
+            s.set(x, y, iso.COPPER[3])
+            s.set(x, y - 1, iso.COPPER[5])
+    iso.box(s, 8, 4, 2, 2, 2, iso.COPPER, iso.COPPER, "boss", top_index=5)
+    iso.shade_top_edges(s, "boss", iso.COPPER)
+    iso.outline(s, iso.BRASS)
+    return s
+
+
 def iso_port_expansion():
     s = iso.Sprite()
     iso.box(s, 6, 4, 5, 3, 2, iso.PCB, iso.PCB, "board", top_index=4)
@@ -509,6 +571,7 @@ def main():
     draw_bus_parts()
     draw_control_plate_item()
     draw_bus_items()
+    draw_cables()
     print(f"atlas written to {OUT / 'computing_details.png'}")
 
 

@@ -82,8 +82,8 @@ public class RegistrationTests {
         var level = helper.getLevel();
         CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
         int count = ModCreativeTabs.MAIN.get().getDisplayItems().size();
-        if (count != 15)
-            helper.fail("main tab has " + count + " items, expected 15");
+        if (count != 17)
+            helper.fail("main tab has " + count + " items, expected 17");
         helper.succeed();
     }
 

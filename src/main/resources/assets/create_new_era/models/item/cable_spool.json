@@ -1,0 +1,365 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "create_new_era:item/cable_spool/copper_full"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "create_new_era:dye": 0,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 0,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/copper_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 0,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/copper_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 1,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 1,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/white_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 1,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/white_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 2,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 2,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/orange_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 2,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/orange_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 3,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 3,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/magenta_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 3,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/magenta_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 4,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 4,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/light_blue_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 4,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/light_blue_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 5,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 5,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/yellow_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 5,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/yellow_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 6,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 6,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/lime_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 6,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/lime_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 7,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 7,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/pink_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 7,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/pink_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 8,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 8,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/gray_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 8,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/gray_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 9,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 9,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/light_gray_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 9,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/light_gray_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 10,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 10,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/cyan_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 10,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/cyan_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 11,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 11,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/purple_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 11,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/purple_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 12,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 12,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/blue_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 12,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/blue_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 13,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 13,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/brown_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 13,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/brown_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 14,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 14,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/green_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 14,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/green_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 15,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 15,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/red_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 15,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/red_full"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 16,
+        "create_new_era:fill": 0
+      },
+      "model": "create_new_era:item/cable_spool/empty"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 16,
+        "create_new_era:fill": 1
+      },
+      "model": "create_new_era:item/cable_spool/black_half"
+    },
+    {
+      "predicate": {
+        "create_new_era:dye": 16,
+        "create_new_era:fill": 2
+      },
+      "model": "create_new_era:item/cable_spool/black_full"
+    }
+  ]
+}

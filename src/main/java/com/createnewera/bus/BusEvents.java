@@ -105,6 +105,7 @@ public final class BusEvents {
         return switch (part.kind()) {
             case PORT -> ModItems.BUS_PORT.asStack();
             case EXPANSION -> ModItems.PORT_EXPANSION.asStack();
+            case SPLICE -> ModItems.CABLE_SPLICE.asStack();
         };
     }
 

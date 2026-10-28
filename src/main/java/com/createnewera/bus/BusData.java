@@ -19,13 +19,16 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.DoubleTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Every port, cable span and device name in one dimension. Kept outside the blocks so ports
@@ -36,8 +39,7 @@ public class BusData extends SavedData {
     private static final Pattern NAME = Pattern.compile("[a-z][a-z0-9_]{0,31}");
 
     private final Map<Long, BusPort> ports = new LinkedHashMap<>();
-    /** span id → the two port ids it joins */
-    private final Map<Long, long[]> spans = new LinkedHashMap<>();
+    private final Map<Long, BusSpan> spans = new LinkedHashMap<>();
     private final Map<BlockPos, String> names = new HashMap<>();
     /** chunk → ids of the parts in it */
     private final Map<Long, Set<Long>> byChunk = new HashMap<>();
@@ -91,25 +93,37 @@ public class BusData extends SavedData {
         return out;
     }
 
-    /** Takes the part off, and every span plugged into it. */
-    public boolean removePort(long id) {
+    /**
+     * Takes the part off, and every span plugged into it.
+     *
+     * @return the spans that went with it, or null if there was no such part
+     */
+    public @Nullable List<BusSpan> removePort(long id) {
         BusPort removed = ports.remove(id);
         if (removed == null)
-            return false;
+            return null;
         Set<Long> chunk = byChunk.get(ChunkPos.asLong(removed.pos()));
         if (chunk != null)
             chunk.remove(id);
-        spans.values().removeIf(s -> s[0] == id || s[1] == id);
+        List<BusSpan> cut = spansAt(id);
+        for (BusSpan span : cut)
+            spans.remove(span.id());
         setDirty();
-        return true;
+        return cut;
     }
 
-    /** The block went away: so do its ports and its name. */
-    public void removeAllAt(BlockPos pos) {
+    /**
+     * The block went away: so do its ports and its name.
+     *
+     * @return the spans cut on the way
+     */
+    public List<BusSpan> removeAllAt(BlockPos pos) {
+        List<BusSpan> cut = new ArrayList<>();
         for (BusPort p : portsAt(pos))
-            removePort(p.id());
+            cut.addAll(removePort(p.id()));
         if (names.remove(pos) != null)
             setDirty();
+        return cut;
     }
 
     public boolean setMode(long id, PortMode mode) {
@@ -123,34 +137,108 @@ public class BusData extends SavedData {
 
     // ---- spans ----
 
-    /** @return the span's id, or null if the ports are missing, the same, already joined, or not ports */
-    public @Nullable Long connect(long a, long b) {
+    /**
+     * Lays a span. Both ends must take cables and accept its colour: a part that already has a
+     * dyed cable only takes that colour, or bare copper.
+     *
+     * @return the span, or null if the parts are missing, the same, already joined, or clash
+     */
+    public @Nullable BusSpan connect(long a, long b, @Nullable DyeColor color, boolean aerial, List<Vec3> points) {
         if (a == b || !ports.containsKey(a) || !ports.containsKey(b))
             return null;
-        if (ports.get(a).kind() != BusPort.Kind.PORT || ports.get(b).kind() != BusPort.Kind.PORT)
+        if (!ports.get(a).takesCables() || !ports.get(b).takesCables())
             return null;
-        for (long[] s : spans.values())
-            if ((s[0] == a && s[1] == b) || (s[0] == b && s[1] == a))
+        if (!accepts(a, color, -1) || !accepts(b, color, -1))
+            return null;
+        for (BusSpan s : spans.values())
+            if (s.touches(a) && s.touches(b))
                 return null;
-        long id = nextId++;
-        spans.put(id, new long[] {a, b});
+        BusSpan span = new BusSpan(nextId++, a, b, color, BusSpan.Casing.NONE, aerial, List.copyOf(points));
+        spans.put(span.id(), span);
         setDirty();
-        return id;
+        return span;
     }
 
-    public boolean disconnect(long spanId) {
-        boolean removed = spans.remove(spanId) != null;
-        if (removed)
+    /** A bare hanging span straight between two parts, for tests and old saves. */
+    public @Nullable BusSpan connect(long a, long b) {
+        if (!ports.containsKey(a) || !ports.containsKey(b))
+            return null;
+        return connect(a, b, null, true, List.of(PartGeometry.anchor(ports.get(a)), PartGeometry.anchor(ports.get(b))));
+    }
+
+    /** @return the span taken out, or null if there was none */
+    public @Nullable BusSpan disconnect(long spanId) {
+        BusSpan removed = spans.remove(spanId);
+        if (removed != null)
             setDirty();
         return removed;
     }
 
-    /** Every port reachable from the given ones through spans, the given ones included. */
+    public @Nullable BusSpan span(long id) {
+        return spans.get(id);
+    }
+
+    public List<BusSpan> spansAt(long port) {
+        List<BusSpan> out = new ArrayList<>();
+        for (BusSpan s : spans.values())
+            if (s.touches(port))
+                out.add(s);
+        return out;
+    }
+
+    /** The colour a part's cables have fixed for it, or null while it only has bare ones (or none). */
+    public @Nullable DyeColor colorAt(long port, long ignoringSpan) {
+        for (BusSpan s : spans.values())
+            if (s.touches(port) && s.id() != ignoringSpan && s.color() != null)
+                return s.color();
+        return null;
+    }
+
+    /** Whether a cable of this colour can plug into the part, leaving one span out of the count. */
+    public boolean accepts(long port, @Nullable DyeColor color, long ignoringSpan) {
+        return BusSpan.compatible(colorAt(port, ignoringSpan), color);
+    }
+
+    /** Re-dyes a span; refused if either end already has cables of another colour. */
+    public boolean dye(long spanId, @Nullable DyeColor color) {
+        BusSpan span = spans.get(spanId);
+        if (span == null || span.color() == color || !accepts(span.a(), color, spanId) || !accepts(span.b(), color, spanId))
+            return false;
+        spans.put(spanId, span.withColor(color));
+        setDirty();
+        return true;
+    }
+
+    public boolean encase(long spanId, BusSpan.Casing casing) {
+        BusSpan span = spans.get(spanId);
+        if (span == null || span.casing() == casing)
+            return false;
+        spans.put(spanId, span.withCasing(casing));
+        setDirty();
+        return true;
+    }
+
+    /** Spans whose first end is in this chunk: each span is sent with that chunk only. */
+    public List<BusSpan> spansInChunk(long chunk) {
+        List<BusSpan> out = new ArrayList<>();
+        for (BusSpan s : spans.values()) {
+            BusPort a = ports.get(s.a());
+            if (a != null && ChunkPos.asLong(a.pos()) == chunk)
+                out.add(s);
+        }
+        return out;
+    }
+
+    /**
+     * Every part reachable from the given ones through spans, the given ones included. Colours
+     * never need checking here: a part can't hold two clashing colours, so whatever a span
+     * reaches is on its network.
+     */
     public Set<Long> network(Collection<Long> from) {
         Map<Long, List<Long>> links = new HashMap<>();
-        for (long[] s : spans.values()) {
-            links.computeIfAbsent(s[0], k -> new ArrayList<>()).add(s[1]);
-            links.computeIfAbsent(s[1], k -> new ArrayList<>()).add(s[0]);
+        for (BusSpan s : spans.values()) {
+            links.computeIfAbsent(s.a(), k -> new ArrayList<>()).add(s.b());
+            links.computeIfAbsent(s.b(), k -> new ArrayList<>()).add(s.a());
         }
         Set<Long> seen = new HashSet<>();
         Deque<Long> todo = new ArrayDeque<>();
@@ -221,13 +309,25 @@ public class BusData extends SavedData {
         }
         tag.put("Ports", portList);
         ListTag spanList = new ListTag();
-        spans.forEach((id, s) -> {
+        for (BusSpan s : spans.values()) {
             CompoundTag t = new CompoundTag();
-            t.putLong("Id", id);
-            t.putLong("A", s[0]);
-            t.putLong("B", s[1]);
+            t.putLong("Id", s.id());
+            t.putLong("A", s.a());
+            t.putLong("B", s.b());
+            if (s.color() != null)
+                t.putString("Color", s.color().getSerializedName());
+            if (s.casing() != BusSpan.Casing.NONE)
+                t.putString("Casing", s.casing().name());
+            t.putBoolean("Aerial", s.aerial());
+            ListTag points = new ListTag();
+            for (Vec3 p : s.points()) {
+                points.add(DoubleTag.valueOf(p.x));
+                points.add(DoubleTag.valueOf(p.y));
+                points.add(DoubleTag.valueOf(p.z));
+            }
+            t.put("Points", points);
             spanList.add(t);
-        });
+        }
         tag.put("Spans", spanList);
         ListTag nameList = new ListTag();
         names.forEach((pos, name) -> {
@@ -255,7 +355,19 @@ public class BusData extends SavedData {
         }
         for (Tag t : tag.getList("Spans", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;
-            data.spans.put(c.getLong("Id"), new long[] {c.getLong("A"), c.getLong("B")});
+            long a = c.getLong("A"), b = c.getLong("B");
+            if (!data.ports.containsKey(a) || !data.ports.containsKey(b))
+                continue;
+            ListTag raw = c.getList("Points", Tag.TAG_DOUBLE);
+            List<Vec3> points = new ArrayList<>();
+            for (int i = 0; i + 2 < raw.size(); i += 3)
+                points.add(new Vec3(raw.getDouble(i), raw.getDouble(i + 1), raw.getDouble(i + 2)));
+            if (points.size() < 2) // saved before cables had routes: hang it straight
+                points = List.of(PartGeometry.anchor(data.ports.get(a)), PartGeometry.anchor(data.ports.get(b)));
+            DyeColor color = c.contains("Color") ? DyeColor.byName(c.getString("Color"), null) : null;
+            BusSpan.Casing casing = c.contains("Casing") ? BusSpan.Casing.valueOf(c.getString("Casing")) : BusSpan.Casing.NONE;
+            boolean aerial = !c.contains("Aerial") || c.getBoolean("Aerial");
+            data.spans.put(c.getLong("Id"), new BusSpan(c.getLong("Id"), a, b, color, casing, aerial, List.copyOf(points)));
         }
         for (Tag t : tag.getList("Names", Tag.TAG_COMPOUND)) {
             CompoundTag c = (CompoundTag) t;

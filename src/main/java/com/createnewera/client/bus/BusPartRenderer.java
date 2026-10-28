@@ -39,6 +39,7 @@ public final class BusPartRenderer {
     private static final ModelResourceLocation PORT_IN = model("bus_port_in");
     private static final ModelResourceLocation PORT_OUT = model("bus_port_out");
     private static final ModelResourceLocation EXPANSION = model("port_expansion");
+    private static final ModelResourceLocation SPLICE = model("cable_splice");
     /** Parts further than this aren't worth drawing: they're a few pixels across. */
     private static final double RANGE = 48;
 
@@ -48,6 +49,7 @@ public final class BusPartRenderer {
             event.register(PORT_IN);
             event.register(PORT_OUT);
             event.register(EXPANSION);
+            event.register(SPLICE);
         });
         gameBus.addListener(BusPartRenderer::render);
         gameBus.addListener(BusPartRenderer::outline);
@@ -82,6 +84,7 @@ public final class BusPartRenderer {
                 BakedModel model = models.getModel(switch (part.kind()) {
                     case PORT -> part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
                     case EXPANSION -> EXPANSION;
+                    case SPLICE -> SPLICE;
                 });
                 BlockPos outside = part.pos().relative(part.face());
                 pose.pushPose();
