@@ -570,7 +570,7 @@ public class ComputerEditorScreen extends Screen {
 
     private void refreshCompletion(boolean explicit) {
         CodeEditor editor = editor();
-        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, explicit);
+        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), explicit);
         selected = 0;
         listTop = 0;
     }

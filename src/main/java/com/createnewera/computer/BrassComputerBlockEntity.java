@@ -22,6 +22,7 @@ import com.createnewera.bus.BusDevice;
 import com.createnewera.bus.DeviceDrivers;
 import com.createnewera.bus.LuaValues;
 import com.createnewera.network.ComputerSnapshot;
+import com.createnewera.network.NetworkDevice;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.createnewera.network.ComputerStatePayload;
@@ -192,6 +193,7 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
 
     public void openEditor(ServerPlayer player) {
         viewers.add(player);
+        devicesListedAt = level.getGameTime() - 20; // a fresh list for a newly opened editor
         lastSent = snapshot();
         PacketDistributor.sendToPlayer(player, new OpenEditorPayload(worldPosition, files.names(), files.asMap(), entry, lastSent));
     }
@@ -294,7 +296,29 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
             in.add(getInput(side));
             out.add(outputs[side.ordinal()]);
         }
-        return new ComputerSnapshot(running, getConsole(), in, out, Math.round(getSpeed()), overStressed);
+        return new ComputerSnapshot(running, getConsole(), in, out, Math.round(getSpeed()), overStressed, networkDevices());
+    }
+
+    private List<NetworkDevice> devicesForEditor = List.of();
+    private long devicesListedAt = -20;
+
+    /** The network as the editor's suggestions need it, worked out again once a second. */
+    private List<NetworkDevice> networkDevices() {
+        long now = level.getGameTime();
+        if (now - devicesListedAt < 20)
+            return devicesForEditor;
+        devicesListedAt = now;
+        ServerLevel server = (ServerLevel) level;
+        List<NetworkDevice> out = new ArrayList<>();
+        for (BusDevice device : Bus.devicesSeenFrom(server, worldPosition)) {
+            if (out.size() == ComputerSnapshot.MAX_DEVICES)
+                break;
+            List<String> methods = new ArrayList<>(DeviceDrivers.methods(server, device.pos(), device.readable(), device.writable()).keySet());
+            out.add(new NetworkDevice(device.name(), device.type(), (int) Math.round(device.distance()),
+                    device.readable(), device.writable(), methods));
+        }
+        devicesForEditor = List.copyOf(out);
+        return devicesForEditor;
     }
 
     private void syncViewers() {

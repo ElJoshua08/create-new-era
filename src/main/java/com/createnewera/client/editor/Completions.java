@@ -12,10 +12,14 @@ import java.util.regex.Pattern;
 
 import com.createnewera.client.editor.LuaApi.Entry;
 import com.createnewera.client.editor.LuaApi.Kind;
+import com.createnewera.network.NetworkDevice;
 
 /** Works out what to suggest at the cursor. Pure text in, ranked suggestions out. */
 public final class Completions {
     private static final Pattern SIDE_ARG = Pattern.compile("\\b(?:redstone|rs)\\s*\\.\\s*\\w+\\s*\\(\\s*([\"'])(\\w*)$");
+    private static final Pattern DEVICE_ARG = Pattern.compile("\\bbus\\s*[.:]\\s*(?:get|info)\\s*\\(\\s*([\"'])(\\w*)$");
+    /** {@code local press = bus.get("press")}: the variable holds that device */
+    private static final Pattern DEVICE_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*bus\\s*[.:]\\s*get\\s*\\(\\s*[\"'](\\w+)[\"']\\s*\\)");
     private static final Pattern REQUIRE_ARG = Pattern.compile("\\brequire\\s*\\(?\\s*([\"'])([\\w./\\-]*)$");
     private static final Pattern MEMBER = Pattern.compile("([A-Za-z_]\\w*)\\s*([.:])\\s*(\\w*)$");
     private static final Pattern WORD = Pattern.compile("([A-Za-z_]\\w*)$");
@@ -37,14 +41,18 @@ public final class Completions {
      * @param beforeCursor the file from its start up to the cursor
      * @param document     the whole file, for names it defines
      * @param files        files on the computer, for require("...")
+     * @param devices      the computer's network, nearest first, for device names and their methods
      * @param explicit     Ctrl+Space: suggest even with nothing typed
      */
-    public static Result complete(String beforeCursor, String document, List<String> files, boolean explicit) {
+    public static Result complete(String beforeCursor, String document, List<String> files, List<NetworkDevice> devices,
+                                  boolean explicit) {
         int lineStart = beforeCursor.lastIndexOf('\n') + 1;
         String line = beforeCursor.substring(lineStart);
         Matcher m;
         if ((m = SIDE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(LuaApi.SIDES, "side"));
+        if ((m = DEVICE_ARG.matcher(line)).find())
+            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices));
         if ((m = REQUIRE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(modules(files), "file on this computer"));
 
@@ -65,6 +73,8 @@ public final class Completions {
             String base = m.group(1), query = m.group(3);
             List<Entry> members = LuaApi.MEMBERS.get(base);
             if (members == null)
+                members = deviceMethods(document, base, devices);
+            if (members == null)
                 members = fieldsSeen(document, base);
             if (query.isEmpty() && members.isEmpty())
                 return Result.NONE;
@@ -82,6 +92,40 @@ public final class Completions {
 
     private static List<Entry> values(List<String> names, String detail) {
         return names.stream().map(n -> new Entry(n, Kind.VALUE, n, detail, "")).toList();
+    }
+
+    /** Device names in distance order: rank keeps that order among equally good matches. */
+    private static List<Entry> deviceNames(List<NetworkDevice> devices) {
+        return devices.stream().map(d -> new Entry(d.name(), Kind.VALUE, d.name(),
+                d.type() + " · " + d.distance() + " m", access(d))).toList();
+    }
+
+    private static String access(NetworkDevice d) {
+        String can = d.readable() && d.writable() ? "Read it and give it orders."
+                : d.readable() ? "Read it (it has an output port; an input port would let you give it orders)."
+                : "Give it orders (it has an input port; an output port would let you read it).";
+        return can + (d.methods().isEmpty() ? "" : " " + String.join(", ", d.methods()));
+    }
+
+    /** What a variable holding {@code bus.get("name")} can do, or null if it isn't one. */
+    private static List<Entry> deviceMethods(String document, String base, List<NetworkDevice> devices) {
+        Matcher m = DEVICE_VAR.matcher(document);
+        String name = null;
+        while (m.find())
+            if (m.group(1).equals(base))
+                name = m.group(2);
+        if (name == null)
+            return null;
+        for (NetworkDevice d : devices)
+            if (d.name().equals(name)) {
+                List<Entry> out = new ArrayList<>();
+                for (String method : d.methods())
+                    out.add(new Entry(method, Kind.FUNCTION, method + "($0)", d.name() + " · " + d.type(), ""));
+                out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function()\n  $0\nend)",
+                        "runs when " + d.name() + " changes", ""));
+                return out;
+            }
+        return null;
     }
 
     private static List<String> modules(List<String> files) {
