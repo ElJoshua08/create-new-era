@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The editor · Create: New Era Guide</title>
+<meta name="description" content="The Brass Computer's editor: layout, files and tabs, suggestions, console and keyboard shortcuts.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0d0b" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem('cne-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" type="image/png" href="../img/blocks/brass_computer.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-root="./">
+<a class="skip" href="#content">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="logo" href="index.html"><img src="../img/blocks/brass_computer.png" alt="" width="24" height="27"><span class="word">Create: New Era</span></a>
+    <nav class="set-tabs" aria-label="Documentation sets"><a href="index.html" aria-current="true">Guide</a><a href="dev/index.html">Development</a></nav>
+    <button class="search-btn" type="button" aria-label="Search docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search docs…</span><kbd>Ctrl K</kbd></button>
+    <nav class="top-links" aria-label="Site">
+      <a class="hide-sm" href="../index.html">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="GitHub repository"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle light and dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+    </nav>
+  </div>
+</header>
+<div class="scrim"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Guide">
+    <div class="drawer-head"><span class="word">Create: New Era</span><button class="icon-btn drawer-close" type="button" aria-label="Close navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <nav class="drawer-tabs" aria-label="Documentation sets"><a href="index.html" aria-current="true">Guide</a><a href="dev/index.html">Development</a></nav>
+    <nav><h2>Getting started</h2><ul><li><a href="index.html">Introduction</a></li><li><a href="install.html">Installing</a></li></ul><h2>Programming</h2><ul><li><a href="computer.html">The Brass Computer</a></li><li><a href="editor.html" aria-current="page">The editor</a></li><li><a href="files.html">Files and require</a></li><li><a href="lua.html">Lua API reference</a></li><li><a href="examples.html">Examples</a></li></ul><h2>Reference</h2><ul><li><a href="blocks.html">Blocks and recipes</a></li><li><a href="config.html">Client config</a></li></ul><h2>Roadmap</h2><ul><li><a href="planned.html">Planned features</a></li></ul></nav>
+    <div class="side-foot">
+      <a href="../index.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home page</a>
+      <a href="https://github.com/ElJoshua08/create-new-era"><svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
+  </aside>
+  <main class="content" id="content">
+    <p class="crumb">Guide · Programming</p>
+
+    <header>
+      <h1>The editor</h1>
+      <p class="intro">Right-click a Brass Computer to open its editor, a small VS Code-like window with file tabs, a console, a side panel and suggestions as you type.</p>
+    </header>
+    <div class="callout info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>With Create's wrench in your hand, right-click turns the computer instead of opening the editor. The game doesn't pause while the editor is open, and it closes if you walk more than 8 blocks away.</p></div>
+    <h2 id="layout">Layout<a class="heading-anchor" href="#layout" aria-label="Link to this section">#</a></h2>
+    <ul>
+      <li><strong>Title bar</strong> with Run and Stop. Drag it to move the window, double-click it (or use its button) to maximise.</li>
+      <li><strong>Tabs</strong> for the files you have open, above the code.</li>
+      <li><strong>Code</strong> with Lua syntax highlighting and line numbers.</li>
+      <li><strong>Status bar</strong> with the program's state: <em>Running: startup.lua · 64 RPM</em>, <em>Stopped</em>, or in amber <em>Paused: needs rotation</em> / <em>Paused: overstressed</em> when the computer isn't turning or its network is overstressed. It also shows the cursor's line and column.</li>
+      <li><strong>Console</strong> under the code. Drag the divider above it to make it taller or shorter.</li>
+      <li><strong>Side panel</strong>, picked from the activity bar on the right edge: <strong>Files</strong>, <strong>Redstone</strong> (what comes in and goes out on each side, live) and <strong>Flows</strong>, which will show what moves between machines and programs once the data bus arrives. Click the active icon or press <kbd>Ctrl</kbd>+<kbd>B</kbd> to hide it; drag its edge to resize it.</li>
+    </ul>
+    <p>Drag any window edge to resize it. The window position and size, both dividers and the open panel are remembered across games in <code>config/create_new_era-editor.properties</code>.</p>
+    <h2 id="files-and-tabs">Files and tabs<a class="heading-anchor" href="#files-and-tabs" aria-label="Link to this section">#</a></h2>
+    <ul>
+      <li><strong>New file:</strong> the <strong>+</strong> in the Files panel or <kbd>Ctrl</kbd>+<kbd>N</kbd>. Type a name and press <kbd>Enter</kbd> (<kbd>Esc</kbd> cancels). Without an extension, <code>.lua</code> is added. Names can use letters, numbers, <code>_ - . /</code>.</li>
+      <li><strong>Open:</strong> click a file in the panel. It opens in a tab.</li>
+      <li><strong>Rename:</strong> the rename button next to the file. Renaming the file that runs keeps it as the one that runs.</li>
+      <li><strong>Delete:</strong> click the <strong>×</strong> next to the file, then again within three seconds to confirm. If you delete the last file, a fresh <code>startup.lua</code> appears.</li>
+      <li><strong>Tabs:</strong> click to switch; close with the tab's <strong>×</strong>, a middle-click or <kbd>Ctrl</kbd>+<kbd>W</kbd>. <kbd>Ctrl</kbd>+<kbd>Tab</kbd> cycles through them.</li>
+    </ul>
+    <p>Files save on their own a moment after you stop typing, when you close a tab or the editor, and when you run. <kbd>Ctrl</kbd>+<kbd>S</kbd> saves right away.</p>
+    <h2 id="running">Running<a class="heading-anchor" href="#running" aria-label="Link to this section">#</a></h2>
+    <p><strong>Run</strong> (<kbd>Ctrl</kbd>+<kbd>R</kbd>) saves every open file and runs the file in the active tab. <strong>Stop</strong> (<kbd>Ctrl</kbd>+<kbd>T</kbd>) ends it and turns its outputs off. Clicking an error in the console opens the file it names at its line.</p>
+    <h2 id="suggestions">Suggestions<a class="heading-anchor" href="#suggestions" aria-label="Link to this section">#</a></h2>
+    <p>A suggestion list opens as you type a name or after a <code>.</code>, and <kbd>Ctrl</kbd>+<kbd>Space</kbd> opens it anywhere. Move with <kbd>↑</kbd> <kbd>↓</kbd> or <kbd>PgUp</kbd> <kbd>PgDn</kbd>, accept with <kbd>Tab</kbd> or <kbd>Enter</kbd>, close with <kbd>Esc</kbd>. The pane beside the list shows the selected item's signature and what it does. Matching is fuzzy: <code>gai</code> finds <code>getAnalogInput</code>.</p>
+    <p>What it suggests depends on where the cursor is:</p>
+    <ul>
+      <li>Functions and libraries a program can use (<code>print</code>, <code>redstone</code>, <code>math</code>…), and after <code>redstone.</code>, <code>string.</code> and the other libraries, their members.</li>
+      <li>Side names inside the quotes of a redstone call: <code>rs.getInput("</code> offers <code>front</code>, <code>back</code>…</li>
+      <li>File names inside <code>require("</code>.</li>
+      <li>Variables and functions from the file you're editing, and fields you've used on your own tables.</li>
+      <li>Keywords, and snippets that write a whole block for you:</li>
+    </ul>
+    <div class="table-scroll"><table class="t"><thead><tr><th>Snippet</th><th>Writes</th></tr></thead><tbody><tr><td><code>for</code></td><td><code>for i = 1, … do … end</code></td></tr><tr><td><code>forp</code></td><td><code>for k, v in pairs(…) do … end</code></td></tr><tr><td><code>fori</code></td><td><code>for i, v in ipairs(…) do … end</code></td></tr><tr><td><code>while</code></td><td><code>while … do … end</code></td></tr><tr><td><code>loop</code></td><td><code>while true do … sleep(0) end</code></td></tr><tr><td><code>if</code></td><td><code>if … then … end</code></td></tr><tr><td><code>ife</code></td><td><code>if … then … else … end</code></td></tr><tr><td><code>fn</code></td><td><code>function …() … end</code></td></tr><tr><td><code>lfn</code></td><td><code>local function …() … end</code></td></tr></tbody></table></div>
+    <p>Nothing pops up inside comments or ordinary strings.</p>
+    <h2 id="keyboard-shortcuts">Keyboard shortcuts<a class="heading-anchor" href="#keyboard-shortcuts" aria-label="Link to this section">#</a></h2>
+    <div class="table-scroll"><table class="t"><thead><tr><th>Keys</th><th>Does</th></tr></thead><tbody><tr><td><kbd>Ctrl</kbd>+<kbd>R</kbd></td><td>Run the open file (saves everything first)</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>T</kbd></td><td>Stop the program</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save all open files</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>Space</kbd></td><td>Show suggestions</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>New file</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>W</kbd></td><td>Close the tab</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>Tab</kbd></td><td>Next tab (Ctrl+Shift+Tab: previous)</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>B</kbd></td><td>Show or hide the side panel</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Undo</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd></td><td>Redo</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>Duplicate the line</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>/</kbd></td><td>Comment lines in or out</td></tr><tr><td><kbd>Tab</kbd></td><td>Indent (Shift+Tab: unindent)</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>A</kbd></td><td>Select all</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd></td><td>Copy</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>X</kbd></td><td>Cut</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>Paste</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>←</kbd></td><td>Move by word (also Ctrl+→)</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>Home</kbd></td><td>Start of file (Ctrl+End: end)</td></tr><tr><td><kbd>Esc</kbd></td><td>Close suggestions; otherwise save and close the editor</td></tr></tbody></table></div>
+
+    <nav class="pager" aria-label="Pages"><a class="prev" href="computer.html"><span>Previous</span><b>The Brass Computer</b></a><a class="next" href="files.html"><span>Next</span><b>Files and require</b></a></nav>
+    <footer class="page-foot">
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT). Unofficial add-on, not affiliated with the Create team.</p>
+      
+      <p>Found a mistake? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+    </footer>
+  </main>
+  <aside class="toc" aria-label="On this page">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h14M11 18h10"/></svg>On this page</h2><ul><li><a class="l2" href="#layout">Layout</a></li><li><a class="l2" href="#files-and-tabs">Files and tabs</a></li><li><a class="l2" href="#running">Running</a></li><li><a class="l2" href="#suggestions">Suggestions</a></li><li><a class="l2" href="#keyboard-shortcuts">Keyboard shortcuts</a></li></ul>
+  </aside>
+</div>
+<dialog class="search-dialog" id="search" aria-label="Search docs">
+  <div class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search-input" type="search" placeholder="Search the Guide and Development docs" autocomplete="off" aria-controls="search-results"></div>
+  <ul class="search-results" id="search-results" role="listbox"></ul>
+</dialog>
+<script src="search-index.js"></script>
+<script src="../assets/docs.js"></script>
+</body>
+</html>

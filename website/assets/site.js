@@ -77,7 +77,7 @@
   // ---------- editor mock-up: plays the default program in game time ----------
   const editor = document.getElementById('editor');
   if (editor) {
-    const out = editor.querySelector('[data-side="back"] .out');
+    const out = editor.querySelector('[data-side="top"] .out');
     const lines = editor.querySelectorAll('.ln');
     const state = document.getElementById('ed-state');
     const consoleEl = document.getElementById('ed-console');
@@ -94,7 +94,7 @@
     const run = () => {
       clearInterval(timer);
       running = true; on = false;
-      state.textContent = 'Running'; state.classList.remove('off');
+      state.textContent = 'Running · 64 RPM'; state.classList.remove('off');
       step();
       timer = setInterval(step, 500);
     };

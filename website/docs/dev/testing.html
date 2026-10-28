@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameTests and datagen · Create: New Era Development</title>
+<meta name="description" content="Automated in-game tests and generated resources for Create: New Era.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0d0b" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem('cne-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" type="image/png" href="../../img/blocks/brass_computer.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../../assets/docs.css">
+</head>
+<body data-root="../">
+<a class="skip" href="#content">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="logo" href="../index.html"><img src="../../img/blocks/brass_computer.png" alt="" width="24" height="27"><span class="word">Create: New Era</span></a>
+    <nav class="set-tabs" aria-label="Documentation sets"><a href="../index.html">Guide</a><a href="../dev/index.html" aria-current="true">Development</a></nav>
+    <button class="search-btn" type="button" aria-label="Search docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search docs…</span><kbd>Ctrl K</kbd></button>
+    <nav class="top-links" aria-label="Site">
+      <a class="hide-sm" href="../../index.html">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="GitHub repository"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle light and dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+    </nav>
+  </div>
+</header>
+<div class="scrim"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Development">
+    <div class="drawer-head"><span class="word">Create: New Era</span><button class="icon-btn drawer-close" type="button" aria-label="Close navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <nav class="drawer-tabs" aria-label="Documentation sets"><a href="../index.html">Guide</a><a href="../dev/index.html" aria-current="true">Development</a></nav>
+    <nav><h2>Start</h2><ul><li><a href="../dev/index.html">Overview</a></li><li><a href="../dev/building.html">Building</a></li></ul><h2>Working on the mod</h2><ul><li><a href="../dev/dev-runs.html">Dev runs</a></li><li><a href="../dev/hot-reload.html">Live reloading</a></li><li><a href="../dev/testing.html" aria-current="page">GameTests and datagen</a></li><li><a href="../dev/tools.html">Asset tools</a></li></ul><h2>Project</h2><ul><li><a href="../dev/layout.html">Project layout</a></li><li><a href="../dev/license.html">License and credits</a></li></ul></nav>
+    <div class="side-foot">
+      <a href="../../index.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home page</a>
+      <a href="https://github.com/ElJoshua08/create-new-era"><svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
+  </aside>
+  <main class="content" id="content">
+    <p class="crumb">Development · Working on the mod</p>
+
+    <header>
+      <h1>GameTests and datagen</h1>
+      <p class="intro">Behaviour is checked by GameTests running inside a real server, and the repetitive resources are generated rather than hand-written.</p>
+    </header>
+    <h2 id="gametests">GameTests<a class="heading-anchor" href="#gametests" aria-label="Link to this section">#</a></h2>
+    <div class="codeblock"><div class="code-head"><span>Terminal</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code>./gradlew runGameTestServer   <span class="c"># starts a server in run/server/, runs every test, exits</span></code></pre></div>
+    <p>The tests live in <code>src/main/java/com/createnewera/gametest/</code>.</p>
+    <h3 id="computer">Computer<a class="heading-anchor" href="#computer" aria-label="Link to this section">#</a></h3>
+    <ul><li>Prints and finishes</li><li>Drives redstone out</li><li>Stopping clears outputs</li><li>Reads redstone in</li><li>Sleep waits in game time</li><li>Errors point at the line</li><li>Compile errors are reported</li><li>Long computation spans ticks</li><li>Require loads other files</li><li>Pauses without rotation</li><li>Speed sets the time slice</li></ul>
+    <h3 id="blocks-and-registration">Blocks and registration<a class="heading-anchor" href="#blocks-and-registration" aria-label="Link to this section">#</a></h3>
+    <ul><li>Every block places in every facing</li><li>Every recipe loads</li><li>Creative tabs build</li><li>Screens join</li><li>Ponder structures load</li></ul>
+    <h2 id="datagen">Datagen<a class="heading-anchor" href="#datagen" aria-label="Link to this section">#</a></h2>
+    <div class="codeblock"><div class="code-head"><span>Terminal</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code>./gradlew runData   <span class="c"># writes src/generated/resources</span></code></pre></div>
+    <p>Generates blockstates, item models, loot tables, tags and the English lang file into <code>src/generated/resources/</code>. Commit the output. It runs in its own folder, <code>run/data/</code>, because the client-only dev mods in <code>run/</code> hang datagen. The Spanish translation is hand-written in <code>src/main/resources/assets/create_new_era/lang/es_es.json</code>.</p>
+
+    <nav class="pager" aria-label="Pages"><a class="prev" href="../dev/hot-reload.html"><span>Previous</span><b>Live reloading</b></a><a class="next" href="../dev/tools.html"><span>Next</span><b>Asset tools</b></a></nav>
+    <footer class="page-foot">
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT). Unofficial add-on, not affiliated with the Create team.</p>
+      
+      <p>Found a mistake? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+    </footer>
+  </main>
+  <aside class="toc" aria-label="On this page">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h14M11 18h10"/></svg>On this page</h2><ul><li><a class="l2" href="#gametests">GameTests</a></li><li><a class="l3" href="#computer">Computer</a></li><li><a class="l3" href="#blocks-and-registration">Blocks and registration</a></li><li><a class="l2" href="#datagen">Datagen</a></li></ul>
+  </aside>
+</div>
+<dialog class="search-dialog" id="search" aria-label="Search docs">
+  <div class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search-input" type="search" placeholder="Search the Guide and Development docs" autocomplete="off" aria-controls="search-results"></div>
+  <ul class="search-results" id="search-results" role="listbox"></ul>
+</dialog>
+<script src="../search-index.js"></script>
+<script src="../../assets/docs.js"></script>
+</body>
+</html>

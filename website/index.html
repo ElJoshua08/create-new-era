@@ -63,7 +63,7 @@
           <a class="btn btn-brass" href="#download"><svg aria-hidden="true"><use href="#i-down"/></svg>Download</a>
           <a class="btn btn-dark" href="docs/">Read the docs</a>
         </div>
-        <p class="fine">For NeoForge on Minecraft 1.21.1. The Brass Computer already runs Lua and drives redstone. The data bus, drawing on screens and the panel controls come next.</p>
+        <p class="fine">For NeoForge on Minecraft 1.21.1. The Brass Computer already runs Lua and drives redstone, powered by a shaft like any Create machine. The data bus, drawing on screens and the panel controls come next.</p>
       </div>
 
       <div class="monitor">
@@ -97,7 +97,8 @@
       <div class="ledger">
         <h3>Works today</h3>
         <ul>
-          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>The Brass Computer runs Lua programs, written in its own in-game editor</span></li>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>The Brass Computer runs Lua programs, written in its own multi-file editor</span></li>
+          <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>It runs on rotational force: the faster the shaft, the faster the program</span></li>
           <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>Programs read and send redstone on all six sides</span></li>
           <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>Brass Screens facing the same way join into one pane</span></li>
           <li><svg aria-hidden="true" style="color:var(--phosphor)"><use href="#i-check"/></svg><span>13 blocks and items with recipes, Create-style tooltips and a Ponder scene for each</span></li>
@@ -115,19 +116,19 @@
     <div class="wrap">
       <div class="section-head">
         <h2 id="program-title">Write a program</h2>
-        <p>The Brass Computer runs Lua today. Right-click it to open the editor, write a program and press Run. Every new computer starts with this one, which blinks a redstone signal out of its back.</p>
+        <p>The Brass Computer runs Lua today. Run a shaft into its back, right-click it to open the editor, write a program and press Run. Every new computer starts with this one, which blinks a redstone signal out of its top: put a lamp on it.</p>
       </div>
       <div class="prog-grid">
         <figure class="editor-fig">
           <div class="editor" id="editor">
             <div class="ed-bar">
               <span class="ed-title">Brass Computer</span>
-              <span class="ed-state" id="ed-state">Running</span>
+              <span class="ed-state" id="ed-state">Running · 64 RPM</span>
               <button class="ed-btn" id="ed-run" type="button">Run</button>
               <button class="ed-btn" id="ed-stop" type="button">Stop</button>
             </div>
             <div class="ed-main">
-              <pre class="ed-code" aria-label="Lua program"><code><span class="ln" data-line="1"><i>1</i><span class="c">-- Blinks a redstone signal out of the back.</span></span><span class="ln" data-line="2"><i>2</i><span class="c">-- Edit me, then press Run (Ctrl+R).</span></span><span class="ln" data-line="3"><i>3</i><span class="k">while</span> <span class="k">true</span> <span class="k">do</span></span><span class="ln" data-line="4"><i>4</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;back&quot;</span>, <span class="k">true</span>)</span><span class="ln" data-line="5"><i>5</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="6"><i>6</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;back&quot;</span>, <span class="k">false</span>)</span><span class="ln" data-line="7"><i>7</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="8"><i>8</i><span class="k">end</span></span></code></pre>
+              <pre class="ed-code" aria-label="Lua program"><code><span class="ln" data-line="1"><i>1</i><span class="c">-- Blinks a redstone signal out of the top: put a lamp on it.</span></span><span class="ln" data-line="2"><i>2</i><span class="c">-- Edit me, then press Run (Ctrl+R).</span></span><span class="ln" data-line="3"><i>3</i><span class="k">while</span> <span class="k">true</span> <span class="k">do</span></span><span class="ln" data-line="4"><i>4</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;top&quot;</span>, <span class="k">true</span>)</span><span class="ln" data-line="5"><i>5</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="6"><i>6</i>  <span class="b">redstone</span>.setOutput(<span class="s">&quot;top&quot;</span>, <span class="k">false</span>)</span><span class="ln" data-line="7"><i>7</i>  <span class="b">sleep</span>(<span class="n">0.5</span>)</span><span class="ln" data-line="8"><i>8</i><span class="k">end</span></span></code></pre>
               <div class="ed-rs" aria-label="Redstone on each side">
                 <span class="ed-label">Redstone</span>
                 <div class="ed-rs-head" aria-hidden="true"><span></span><span>in</span><span>out</span></div>
@@ -144,10 +145,12 @@
             <dt><code>print(...)</code></dt><dd>Writes a line to the console under the editor.</dd>
             <dt><code>sleep(seconds)</code></dt><dd>Waits in game time, 20 ticks a second. Also <code>os.sleep</code>.</dd>
             <dt><code>os.clock()</code></dt><dd>Seconds since the program started.</dd>
+            <dt><code>os.speed()</code></dt><dd>The computer's rotation speed in RPM.</dd>
+            <dt><code>require(name)</code></dt><dd>Loads another file on the computer, like <code>require("lib.pid")</code>.</dd>
             <dt><code>redstone.getInput(side)</code></dt><dd>Signal coming in, as on/off. <code>getAnalogInput</code> gives 0 to 15.</dd>
             <dt><code>redstone.setOutput(side, on)</code></dt><dd>Signal going out. <code>setAnalogOutput</code> takes 0 to 15.</dd>
           </dl>
-          <p class="api-note">Sides are named from the computer's front: <code>front</code>, <code>back</code>, <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>. A program that loops without sleeping only slows itself down, never the server.</p>
+          <p class="api-note">Sides are named from the computer's front: <code>front</code>, <code>back</code>, <code>left</code>, <code>right</code>, <code>top</code>, <code>bottom</code>. The faster the shaft turns, the more time the program gets each tick: up to 2 ms at 256 RPM, for 2 SU per RPM. With no rotation it pauses where it is and carries on later.</p>
           <a class="btn btn-dark" href="docs/lua.html">Lua API reference</a>
         </div>
       </div>
@@ -169,7 +172,7 @@
       </div>
       <div class="shelf-plank" role="presentation"></div>
       <div class="tooltips">
-        <div class="tip" id="t-computer"><span class="name">Brass Computer</span><span class="hint">Hold [<b>Shift</b>]</span><span class="hint hint-ctrl">Hold [<b>Ctrl</b>]</span><div class="sum-wrap"><div class="sum"><p>Runs <em>Lua</em> programs you write in its built-in <em>editor</em>. For now they work with <em>redstone</em>; the <em>data bus</em> comes next.</p><dl class="beh"><dt>When running</dt><dd>The screen lights up. The program gets a <em>slice of time</em> every tick and keeps going while nobody watches.</dd><dt>Redstone</dt><dd>Every face is a <em>side</em>: front, back, left, right, top and bottom. Read signals with <em>redstone.getInput</em>, send them with <em>redstone.setOutput</em>.</dd><dt>When the world loads</dt><dd>A program that was running <em>starts again</em> from the top.</dd></dl></div></div><div class="ctl-wrap"><div class="sum"><dl class="beh"><dt>When R-Clicked</dt><dd>Opens the <em>editor</em>. <em>Ctrl+R</em> runs, <em>Ctrl+T</em> stops.</dd><dt>When Wrenched</dt><dd>Turns the computer. The sides turn with its <em>front</em>.</dd></dl></div></div></div>
+        <div class="tip" id="t-computer"><span class="name">Brass Computer</span><span class="hint">Hold [<b>Shift</b>]</span><span class="hint hint-ctrl">Hold [<b>Ctrl</b>]</span><div class="sum-wrap"><div class="sum"><p>Runs <em>Lua</em> programs you write in its built-in <em>editor</em>. For now they work with <em>redstone</em>; the <em>data bus</em> comes next.</p><dl class="beh"><dt>When rotated</dt><dd>Takes a <em>shaft</em> in its back. The <em>faster</em> it spins, the faster programs run. Without rotation they <em>pause</em> and carry on when it turns again.</dd><dt>Redstone</dt><dd>Every face is a <em>side</em>: front, back, left, right, top and bottom. Read signals with <em>redstone.getInput</em>, send them with <em>redstone.setOutput</em>.</dd><dt>When the world loads</dt><dd>A program that was running <em>starts again</em> from the top.</dd></dl></div></div><div class="ctl-wrap"><div class="sum"><dl class="beh"><dt>When R-Clicked</dt><dd>Opens the <em>editor</em>. <em>Ctrl+R</em> runs, <em>Ctrl+T</em> stops.</dd><dt>When Wrenched</dt><dd>Turns the computer. The sides turn with its <em>front</em>.</dd></dl></div></div></div>
         <div class="tip" id="t-screen"><span class="name">Brass Screen</span><span class="hint">Hold [<b>Shift</b>]</span><span class="hint hint-ctrl">Hold [<b>Ctrl</b>]</span><div class="sum-wrap"><div class="sum"><p>Joins with its neighbours into one big display made of <em>flip pixels</em> that turn when they change.</p><dl class="beh"><dt>Next to another screen</dt><dd>Screens facing the <em>same way</em> merge into <em>one pane</em> and the brass frame between them disappears.</dd><dt>Pixels</dt><dd><em>48 by 48</em> flip pixels per block. Pick <em>square plates</em> or <em>round discs</em> in the client config.</dd></dl></div></div><div class="ctl-wrap"><div class="sum"><dl class="beh"><dt>When Wrenched</dt><dd>Turns the screen. It joins whatever screens it now lines up with.</dd></dl></div></div></div>
         <div class="tip" id="t-adapter"><span class="name">Universal Adapter</span><span class="hint">Hold [<b>Shift</b>]</span><div class="sum-wrap"><div class="sum"><p>Attach to any block to expose what it can do, <em>kinetics</em>, <em>items</em> or <em>fluids</em>, on the data bus.</p><dl class="beh"><dt>When placed</dt><dd>Sticks to the face you click, so it fits on <em>any side</em> of a machine.</dd><dt>Coming soon</dt><dd>Arrives with the <em>data bus</em>. Until then it doesn't do anything.</dd></dl></div></div></div>
         <div class="tip" id="t-servo"><span class="name">Bearing Servo</span><span class="hint">Hold [<b>Shift</b>]</span><div class="sum-wrap"><div class="sum"><p>Turns an attached <em>contraption</em> to an exact angle on command.</p><dl class="beh"><dt>When placed</dt><dd>Faces you, like Create's <em>bearings</em>.</dd><dt>Coming soon</dt><dd>Programs will set its <em>angle</em> in degrees, for gimbals, turrets and flaps.</dd></dl></div></div></div>
@@ -250,7 +253,7 @@
         </li>
         <li class="active">
           <span class="cog" style="--c-face:#d67b5b;--c-hi:#e8a083;--c-lo:#904931;--c-hole:#2a120a"><svg aria-hidden="true"><use href="#cog"/></svg></span>
-          <div><div class="phase">Phase 2 <span class="tag next">In progress</span></div><h3>Lua runtime</h3><p>A sandboxed VM on the computer with an in-game editor. The VM, the editor and the redstone API are done; files and multiple programs are still to come.</p></div>
+          <div><div class="phase">Phase 2 <span class="tag next">In progress</span></div><h3>Lua runtime</h3><p>A sandboxed VM on the computer with an in-game editor. Done: the VM, a multi-file editor with suggestions, <code>require</code>, the redstone API and running on rotation.</p></div>
         </li>
         <li class="later">
           <span class="cog" style="--c-face:#828784;--c-hi:#b4b9b5;--c-lo:#505351;--c-hole:#1d1f1c"><svg aria-hidden="true"><use href="#cog"/></svg></span>

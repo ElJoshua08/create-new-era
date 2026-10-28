@@ -46,12 +46,12 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
     static final float FULL_SPEED = 256;
 
     public static final String DEFAULT_PROGRAM = """
-            -- Blinks a redstone signal out of the back.
+            -- Blinks a redstone signal out of the top: put a lamp on it.
             -- Edit me, then press Run (Ctrl+R).
             while true do
-              redstone.setOutput("back", true)
+              redstone.setOutput("top", true)
               sleep(0.5)
-              redstone.setOutput("back", false)
+              redstone.setOutput("top", false)
               sleep(0.5)
             end
             """;

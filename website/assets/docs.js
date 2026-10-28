@@ -65,6 +65,7 @@
   const input = document.getElementById('search-input');
   const list = document.getElementById('search-results');
   const index = window.DOCS_SEARCH || [];
+  const base = document.body.dataset.root || './';
   let sel = 0, hits = [];
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const render = () => {
@@ -73,7 +74,7 @@
     hits = (words.length ? index.filter((e) => words.every((w) => (e.title + ' ' + e.page).toLowerCase().includes(w))) : index.filter((e) => !e.hash)).slice(0, 12);
     sel = 0;
     list.innerHTML = hits.length
-      ? hits.map((e, i) => `<li><a href="${e.url}" role="option" aria-selected="${i === sel}">${esc(e.title)}${e.hash ? `<small>${esc(e.page)}</small>` : ''}</a></li>`).join('')
+      ? hits.map((e, i) => `<li><a href="${base}${e.url}" role="option" aria-selected="${i === sel}">${esc(e.title)}${e.hash ? `<small>${esc(e.page)}</small>` : ''}</a></li>`).join('')
       : '<li class="search-empty">No results for “' + esc(input.value) + '”</li>';
   };
   const move = (d) => {

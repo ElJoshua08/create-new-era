@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Examples · Create: New Era Guide</title>
+<meta name="description" content="Whole Lua programs for the Brass Computer that you can paste and run.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0d0b" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem('cne-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="icon" type="image/png" href="../img/blocks/brass_computer.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="../assets/docs.css">
+</head>
+<body data-root="./">
+<a class="skip" href="#content">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="logo" href="index.html"><img src="../img/blocks/brass_computer.png" alt="" width="24" height="27"><span class="word">Create: New Era</span></a>
+    <nav class="set-tabs" aria-label="Documentation sets"><a href="index.html" aria-current="true">Guide</a><a href="dev/index.html">Development</a></nav>
+    <button class="search-btn" type="button" aria-label="Search docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search docs…</span><kbd>Ctrl K</kbd></button>
+    <nav class="top-links" aria-label="Site">
+      <a class="hide-sm" href="../index.html">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="GitHub repository"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle light and dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+    </nav>
+  </div>
+</header>
+<div class="scrim"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Guide">
+    <div class="drawer-head"><span class="word">Create: New Era</span><button class="icon-btn drawer-close" type="button" aria-label="Close navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <nav class="drawer-tabs" aria-label="Documentation sets"><a href="index.html" aria-current="true">Guide</a><a href="dev/index.html">Development</a></nav>
+    <nav><h2>Getting started</h2><ul><li><a href="index.html">Introduction</a></li><li><a href="install.html">Installing</a></li></ul><h2>Programming</h2><ul><li><a href="computer.html">The Brass Computer</a></li><li><a href="editor.html">The editor</a></li><li><a href="files.html">Files and require</a></li><li><a href="lua.html">Lua API reference</a></li><li><a href="examples.html" aria-current="page">Examples</a></li></ul><h2>Reference</h2><ul><li><a href="blocks.html">Blocks and recipes</a></li><li><a href="config.html">Client config</a></li></ul><h2>Roadmap</h2><ul><li><a href="planned.html">Planned features</a></li></ul></nav>
+    <div class="side-foot">
+      <a href="../index.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home page</a>
+      <a href="https://github.com/ElJoshua08/create-new-era"><svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
+  </aside>
+  <main class="content" id="content">
+    <p class="crumb">Guide · Programming</p>
+
+    <header>
+      <h1>Examples</h1>
+      <p class="intro">Each one is a whole program: paste it into a file, then press Run. For one split across files, see <a href="files.html#example">Files and require</a>.</p>
+    </header>
+<h2 id="blink">Blink<a class="heading-anchor" href="#blink" aria-label="Link to this section">#</a></h2><p>The program every new computer starts with. It pulses the top twice a second: put a lamp on the computer.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="c">-- Blinks a redstone signal out of the top: put a lamp on it.</span>
+<span class="c">-- Edit me, then press Run (Ctrl+R).</span>
+<span class="k">while</span> <span class="k">true</span> <span class="k">do</span>
+  <span class="b">redstone</span>.setOutput(<span class="s">&quot;top&quot;</span>, <span class="k">true</span>)
+  <span class="b">sleep</span>(<span class="n">0.5</span>)
+  <span class="b">redstone</span>.setOutput(<span class="s">&quot;top&quot;</span>, <span class="k">false</span>)
+  <span class="b">sleep</span>(<span class="n">0.5</span>)
+<span class="k">end</span></code></pre></div><h2 id="repeat-a-signal">Repeat a signal<a class="heading-anchor" href="#repeat-a-signal" aria-label="Link to this section">#</a></h2><p>Copies whatever comes in on the left to the right, once a tick. Put a lever on the computer's left and a lamp on its right.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">while</span> <span class="k">true</span> <span class="k">do</span>
+  <span class="b">rs</span>.setOutput(<span class="s">&quot;right&quot;</span>, <span class="b">rs</span>.getInput(<span class="s">&quot;left&quot;</span>))
+  <span class="b">sleep</span>(<span class="n">0</span>) <span class="c">-- waits one tick</span>
+<span class="k">end</span></code></pre></div><h2 id="count-pulses">Count pulses<a class="heading-anchor" href="#count-pulses" aria-label="Link to this section">#</a></h2><p>Counts rising edges on the left and prints the total each time it goes up.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">local</span> count, was = <span class="n">0</span>, <span class="k">false</span>
+<span class="k">while</span> <span class="k">true</span> <span class="k">do</span>
+  <span class="k">local</span> on = <span class="b">rs</span>.getInput(<span class="s">&quot;left&quot;</span>)
+  <span class="k">if</span> on <span class="k">and</span> <span class="k">not</span> was <span class="k">then</span>
+    count = count + <span class="n">1</span>
+    <span class="b">print</span>(<span class="s">&quot;pulses: &quot;</span> .. count)
+  <span class="k">end</span>
+  was = on
+  <span class="b">sleep</span>(<span class="n">0</span>)
+<span class="k">end</span></code></pre></div><h2 id="fade-up">Fade up<a class="heading-anchor" href="#fade-up" aria-label="Link to this section">#</a></h2><p>Raises the analog output on top from 0 to 15, then stops. The output stays at 15 after the program finishes.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">for</span> strength = <span class="n">0</span>, <span class="n">15</span> <span class="k">do</span>
+  <span class="b">rs</span>.setAnalogOutput(<span class="s">&quot;top&quot;</span>, strength)
+  <span class="b">sleep</span>(<span class="n">0.25</span>)
+<span class="k">end</span>
+<span class="b">print</span>(<span class="s">&quot;done after &quot;</span> .. <span class="b">os</span>.clock() .. <span class="s">&quot; s&quot;</span>)</code></pre></div><h2 id="read-every-side">Read every side<a class="heading-anchor" href="#read-every-side" aria-label="Link to this section">#</a></h2><p>Prints the signal strength coming into each side once.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">for</span> _, side <span class="k">in</span> <span class="b">ipairs</span>(<span class="b">rs</span>.getSides()) <span class="k">do</span>
+  <span class="b">print</span>(side, <span class="b">rs</span>.getAnalogInput(side))
+<span class="k">end</span></code></pre></div><h2 id="slow-down-warning">Slow-down warning<a class="heading-anchor" href="#slow-down-warning" aria-label="Link to this section">#</a></h2><p>Lights a lamp on top while the shaft turns slower than 64 RPM in either direction, and prints the speed every five seconds. At 0 RPM the program itself pauses, so the lamp keeps its last state.</p><div class="codeblock"><div class="code-head"><span>Lua</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">local</span> last = <span class="n">0</span>
+<span class="k">while</span> <span class="k">true</span> <span class="k">do</span>
+  <span class="k">local</span> rpm = <span class="b">math</span>.abs(<span class="b">os</span>.speed())
+  <span class="b">rs</span>.setOutput(<span class="s">&quot;top&quot;</span>, rpm &lt; <span class="n">64</span>)
+  <span class="k">if</span> <span class="b">os</span>.clock() - last &gt;= <span class="n">5</span> <span class="k">then</span>
+    <span class="b">print</span>(rpm .. <span class="s">&quot; RPM&quot;</span>)
+    last = <span class="b">os</span>.clock()
+  <span class="k">end</span>
+  <span class="b">sleep</span>(<span class="n">0.5</span>)
+<span class="k">end</span></code></pre></div>
+    <nav class="pager" aria-label="Pages"><a class="prev" href="lua.html"><span>Previous</span><b>Lua API reference</b></a><a class="next" href="blocks.html"><span>Next</span><b>Blocks and recipes</b></a></nav>
+    <footer class="page-foot">
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT). Unofficial add-on, not affiliated with the Create team.</p>
+      
+      <p>Found a mistake? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+    </footer>
+  </main>
+  <aside class="toc" aria-label="On this page">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h14M11 18h10"/></svg>On this page</h2><ul><li><a class="l2" href="#blink">Blink</a></li><li><a class="l2" href="#repeat-a-signal">Repeat a signal</a></li><li><a class="l2" href="#count-pulses">Count pulses</a></li><li><a class="l2" href="#fade-up">Fade up</a></li><li><a class="l2" href="#read-every-side">Read every side</a></li><li><a class="l2" href="#slow-down-warning">Slow-down warning</a></li></ul>
+  </aside>
+</div>
+<dialog class="search-dialog" id="search" aria-label="Search docs">
+  <div class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search-input" type="search" placeholder="Search the Guide and Development docs" autocomplete="off" aria-controls="search-results"></div>
+  <ul class="search-results" id="search-results" role="listbox"></ul>
+</dialog>
+<script src="search-index.js"></script>
+<script src="../assets/docs.js"></script>
+</body>
+</html>

@@ -31,13 +31,13 @@ CC: Tweaked lets you program Minecraft. Create: New Era is meant to feel like pa
 
 ### Brass Computer
 
-Right-click it to open the editor, write some Lua, press **Run**. Every new computer comes with a program that blinks a redstone signal out of its back:
+Right-click it to open the editor, write some Lua, press **Run**. Every new computer comes with a program that blinks a redstone signal out of its top (put a lamp on it):
 
 ```lua
 while true do
-  redstone.setOutput("back", true)
+  redstone.setOutput("top", true)
   sleep(0.5)
-  redstone.setOutput("back", false)
+  redstone.setOutput("top", false)
   sleep(0.5)
 end
 ```
