@@ -35,8 +35,9 @@ def part(name, sub=None):
     return [x / 2, y / 2, (x + w) / 2, (y + h) / 2]
 
 
-def box(name, frm, to, faces, rotation=None):
-    """faces: {face: (texture_var, uv or None)}; 'sides' and 'all' expand."""
+def box(name, frm, to, faces, rotation=None, cull=False):
+    """faces: {face: (texture_var, uv or None)}; 'sides' and 'all' expand.
+    cull: faces lying on the block boundary get a cullface, so joined blocks hide them."""
     expanded = {}
     # group keys first so a specific face always overrides them
     groups = ("all", "sides", "caps")
@@ -50,11 +51,19 @@ def box(name, frm, to, faces, rotation=None):
         spec = {"texture": "#" + tex}
         if uv is not None:
             spec["uv"] = uv
+        if cull and on_boundary(f, frm, to):
+            spec["cullface"] = f
         out[f] = spec
     el = {"name": name, "from": frm, "to": to, "faces": out}
     if rotation:
         el["rotation"] = rotation
     return el
+
+
+def on_boundary(face, frm, to):
+    axis, value = {"north": (2, frm[2] == 0), "south": (2, to[2] == 16), "west": (0, frm[0] == 0),
+                   "east": (0, to[0] == 16), "down": (1, frm[1] == 0), "up": (1, to[1] == 16)}[face]
+    return value
 
 
 def model(textures, elements):
@@ -136,17 +145,6 @@ MODELS = {
             }),
         ],
     ),
-    "brass_screen": model(
-        {"casing": "create:block/brass_casing", "parts": PARTS, "particle": "create:block/brass_casing"},
-        [
-            box("back", [0, 0, 2], [16, 16, 16], {"all": ("casing", None)}),
-            box("frame_top", [0, 14, 0], [16, 16, 2], {"all": ("casing", None)}),
-            box("frame_bottom", [0, 0, 0], [16, 2, 2], {"all": ("casing", None)}),
-            box("frame_left", [14, 2, 0], [16, 14, 2], {"all": ("casing", None)}),
-            box("frame_right", [0, 2, 0], [2, 14, 2], {"all": ("casing", None)}),
-            box("glass", [2, 2, 1.5], [14, 14, 1.5], {"north": ("parts", part("screen_off"))}),
-        ],
-    ),
     "panel_button": panel(
         bezel(5, 11),
         box("cap", [6, 3, 6], [10, 5, 10], {"up": ("parts", part("cap_red")), "sides": ("parts", part("cap_red_side"))}),
@@ -185,6 +183,66 @@ MODELS = {
         box("keys", [3, 2, 2], [13, 3, 14], {"up": ("parts", part("keypad")), "sides": ("parts", part("slate_side", (0, 0, 10, 1)))}),
     ),
 }
+
+
+# Brass screen, front facing north. Screens next to each other (same facing) join:
+# a side with a neighbour swaps its brass frame strip for glass, so the wall reads as one pane.
+# The blockstate (datagen, ModBlocks) picks the pieces. Seen from the front, +x is the
+# screen's left. Corners: frame unless both adjoining sides are joined.
+SCREEN_TEX = {"casing": "create:block/brass_casing", "glass": "create_new_era:block/screen_glass",
+              "particle": "create:block/brass_casing"}
+SCREEN_EDGES = {
+    "up": ([2, 14, 0], [14, 16, 2]),
+    "down": ([2, 0, 0], [14, 2, 2]),
+    "left": ([14, 2, 0], [16, 14, 2]),
+    "right": ([0, 2, 0], [2, 14, 2]),
+}
+SCREEN_CORNERS = {
+    "up_left": ([14, 14, 0], [16, 16, 2]),
+    "up_right": ([0, 14, 0], [2, 16, 2]),
+    "down_left": ([14, 0, 0], [16, 2, 2]),
+    "down_right": ([0, 0, 0], [2, 2, 2]),
+}
+
+
+def screen_frame(name, frm, to):
+    # default uv keeps the casing texture lined up across pieces
+    return box(name, frm, to, {"all": ("casing", None)}, cull=True)
+
+
+def screen_glass(name, frm, to):
+    return box(name, [frm[0], frm[1], 1.5], [to[0], to[1], 1.5], {"north": ("glass", None)})
+
+
+def screen_models():
+    core = [box("back", [0, 0, 2], [16, 16, 16], {"all": ("casing", None)}, cull=True),
+            screen_glass("glass", [2, 2], [14, 14])]
+    models = {"brass_screen_core": model(SCREEN_TEX, core)}
+    for side, (frm, to) in {**SCREEN_EDGES, **SCREEN_CORNERS}.items():
+        models[f"brass_screen_frame_{side}"] = model(SCREEN_TEX, [screen_frame(side, frm, to)])
+        models[f"brass_screen_glass_{side}"] = model(SCREEN_TEX, [screen_glass(side, frm, to)])
+    # a lone screen, for the item and anything that wants the whole model
+    lone = core + [screen_frame(side, frm, to) for side, (frm, to) in {**SCREEN_EDGES, **SCREEN_CORNERS}.items()]
+    models["brass_screen"] = model(SCREEN_TEX, lone)
+    return models
+
+
+MODELS.update(screen_models())
+
+
+def computer_off():
+    """The computer with no program running: same body, dark screen glass."""
+    m = json.loads(json.dumps(MODELS["brass_computer"]))
+    m["textures"]["parts"] = PARTS
+    for el in m["elements"]:
+        if el["name"] == "screen":
+            el["faces"]["north"] = {"texture": "#parts", "uv": part("screen_off", (0, 0, 12, 9))}
+        if el["name"] == "led_bus":
+            el["faces"] = {f: {"texture": "#details", "uv": region("led_red", (0, 0, 2, 1))} for f in el["faces"]}
+    return m
+
+
+MODELS["brass_computer_off"] = computer_off()
 
 
 def main():

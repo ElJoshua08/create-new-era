@@ -1,19 +1,851 @@
 {
-  "variants": {
-    "facing=east": {
-      "model": "create_new_era:block/brass_screen",
-      "y": 90
+  "multipart": [
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_core"
+      },
+      "when": {
+        "facing": "north"
+      }
     },
-    "facing=north": {
-      "model": "create_new_era:block/brass_screen"
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_left"
+      },
+      "when": {
+        "facing": "north",
+        "left": "false"
+      }
     },
-    "facing=south": {
-      "model": "create_new_era:block/brass_screen",
-      "y": 180
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_left"
+      },
+      "when": {
+        "facing": "north",
+        "left": "true"
+      }
     },
-    "facing=west": {
-      "model": "create_new_era:block/brass_screen",
-      "y": 270
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_right"
+      },
+      "when": {
+        "facing": "north",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_right"
+      },
+      "when": {
+        "facing": "north",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up"
+      },
+      "when": {
+        "facing": "north",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up"
+      },
+      "when": {
+        "facing": "north",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down"
+      },
+      "when": {
+        "down": "false",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down"
+      },
+      "when": {
+        "down": "true",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left"
+      },
+      "when": {
+        "facing": "north",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left"
+      },
+      "when": {
+        "facing": "north",
+        "left": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_left"
+      },
+      "when": {
+        "facing": "north",
+        "left": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right"
+      },
+      "when": {
+        "facing": "north",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right"
+      },
+      "when": {
+        "facing": "north",
+        "right": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_right"
+      },
+      "when": {
+        "facing": "north",
+        "right": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left"
+      },
+      "when": {
+        "down": "false",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left"
+      },
+      "when": {
+        "down": "true",
+        "facing": "north",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_left"
+      },
+      "when": {
+        "down": "true",
+        "facing": "north",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right"
+      },
+      "when": {
+        "down": "false",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right"
+      },
+      "when": {
+        "down": "true",
+        "facing": "north",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_right"
+      },
+      "when": {
+        "down": "true",
+        "facing": "north",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_core",
+        "y": 90
+      },
+      "when": {
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_left",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_left",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_right",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_right",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down",
+        "y": 90
+      },
+      "when": {
+        "down": "false",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down",
+        "y": 90
+      },
+      "when": {
+        "down": "true",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "left": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_left",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "left": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "right": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_right",
+        "y": 90
+      },
+      "when": {
+        "facing": "east",
+        "right": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 90
+      },
+      "when": {
+        "down": "false",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 90
+      },
+      "when": {
+        "down": "true",
+        "facing": "east",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_left",
+        "y": 90
+      },
+      "when": {
+        "down": "true",
+        "facing": "east",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 90
+      },
+      "when": {
+        "down": "false",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 90
+      },
+      "when": {
+        "down": "true",
+        "facing": "east",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_right",
+        "y": 90
+      },
+      "when": {
+        "down": "true",
+        "facing": "east",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_core",
+        "y": 180
+      },
+      "when": {
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_left",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_left",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_right",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_right",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down",
+        "y": 180
+      },
+      "when": {
+        "down": "false",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down",
+        "y": 180
+      },
+      "when": {
+        "down": "true",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "left": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_left",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "left": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "right": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_right",
+        "y": 180
+      },
+      "when": {
+        "facing": "south",
+        "right": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 180
+      },
+      "when": {
+        "down": "false",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 180
+      },
+      "when": {
+        "down": "true",
+        "facing": "south",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_left",
+        "y": 180
+      },
+      "when": {
+        "down": "true",
+        "facing": "south",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 180
+      },
+      "when": {
+        "down": "false",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 180
+      },
+      "when": {
+        "down": "true",
+        "facing": "south",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_right",
+        "y": 180
+      },
+      "when": {
+        "down": "true",
+        "facing": "south",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_core",
+        "y": 270
+      },
+      "when": {
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_left",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_left",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_right",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_right",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "right": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down",
+        "y": 270
+      },
+      "when": {
+        "down": "false",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down",
+        "y": 270
+      },
+      "when": {
+        "down": "true",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_left",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "left": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_left",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "left": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "up": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_up_right",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "right": "false",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_up_right",
+        "y": 270
+      },
+      "when": {
+        "facing": "west",
+        "right": "true",
+        "up": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 270
+      },
+      "when": {
+        "down": "false",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_left",
+        "y": 270
+      },
+      "when": {
+        "down": "true",
+        "facing": "west",
+        "left": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_left",
+        "y": 270
+      },
+      "when": {
+        "down": "true",
+        "facing": "west",
+        "left": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 270
+      },
+      "when": {
+        "down": "false",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_frame_down_right",
+        "y": 270
+      },
+      "when": {
+        "down": "true",
+        "facing": "west",
+        "right": "false"
+      }
+    },
+    {
+      "apply": {
+        "model": "create_new_era:block/brass_screen_glass_down_right",
+        "y": 270
+      },
+      "when": {
+        "down": "true",
+        "facing": "west",
+        "right": "true"
+      }
     }
-  }
+  ]
 }

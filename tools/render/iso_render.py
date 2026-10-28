@@ -155,9 +155,9 @@ def render(assets, refs, size=384, yaw=0, pitch=30.0):
                     corners = [tuple(m @ (np.array(c) - o) + o) for c in corners]
                 pts, depths = zip(*(project(c) for c in corners))
                 pts = np.array(pts)
-                # back-face cull
+                # back-face cull; edge-on faces (straight-on views) would smear into lines
                 e1, e2 = pts[1] - pts[0], pts[3] - pts[0]
-                if e1[0] * e2[1] - e1[1] * e2[0] < 0:
+                if e1[0] * e2[1] - e1[1] * e2[0] < 1e-6:
                     continue
                 try:
                     tex = assets.texture(resolve(tex_map, spec["texture"]))

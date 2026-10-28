@@ -2,10 +2,14 @@ package com.createnewera.registry;
 
 import static com.createnewera.CreateNewEra.REGISTRATE;
 
+import java.util.Map;
+
+import com.createnewera.block.BrassScreenBlock;
 import com.createnewera.block.DirectionalPartBlock;
 import com.createnewera.block.DirectionalPartBlock.Placement;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.HorizontalMachineBlock;
+import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -14,34 +18,40 @@ import com.tterrag.registrate.providers.RegistrateItemModelProvider;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 
 public final class ModBlocks {
     static {
         REGISTRATE.setCreativeTab(ModCreativeTabs.MAIN);
     }
 
-    public static final BlockEntry<HorizontalMachineBlock> BRASS_COMPUTER = REGISTRATE
-            .block("brass_computer", HorizontalMachineBlock::new)
+    public static final BlockEntry<BrassComputerBlock> BRASS_COMPUTER = REGISTRATE
+            .block("brass_computer", BrassComputerBlock::new)
             .initialProperties(SharedProperties::softMetal)
-            .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops())
+            .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops()
+                    .lightLevel(s -> s.getValue(BrassComputerBlock.RUNNING) ? 4 : 0))
             .transform(TagGen.pickaxeOnly())
-            .blockstate((c, p) -> p.horizontalBlock(c.get(), existing(p, c.getName())))
+            // the screen is lit only while a program runs
+            .blockstate((c, p) -> p.horizontalBlock(c.get(),
+                    s -> existing(p, s.getValue(BrassComputerBlock.RUNNING) ? "brass_computer" : "brass_computer_off")))
             .lang("Brass Computer")
             .item().model(ModBlocks::blockItemModel).build()
             .register();
 
-    public static final BlockEntry<HorizontalMachineBlock> BRASS_SCREEN = REGISTRATE
-            .block("brass_screen", HorizontalMachineBlock::new)
+    public static final BlockEntry<BrassScreenBlock> BRASS_SCREEN = REGISTRATE
+            .block("brass_screen", BrassScreenBlock::new)
             .initialProperties(SharedProperties::softMetal)
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops())
             .transform(TagGen.pickaxeOnly())
-            .blockstate((c, p) -> p.horizontalBlock(c.get(), existing(p, c.getName())))
+            .blockstate(ModBlocks::screenBlockstate)
             .lang("Brass Screen")
             .item().model(ModBlocks::blockItemModel).build()
             .register();
@@ -90,6 +100,39 @@ public final class ModBlocks {
                 .lang(english)
                 .item().model(ModBlocks::blockItemModel).build()
                 .register();
+    }
+
+    /** Core plus, per side and corner, either the brass frame or glass; see gen_models.py. */
+    private static void screenBlockstate(DataGenContext<Block, BrassScreenBlock> c, RegistrateBlockstateProvider p) {
+        var builder = p.getMultipartBuilder(c.get());
+        Map<String, BooleanProperty> edges = Map.of(
+                "up", BrassScreenBlock.UP, "down", BrassScreenBlock.DOWN,
+                "left", BrassScreenBlock.LEFT, "right", BrassScreenBlock.RIGHT);
+        for (Direction facing : Direction.Plane.HORIZONTAL) {
+            int y = ((int) facing.toYRot() + 180) % 360;
+            builder.part().modelFile(existing(p, "brass_screen_core")).rotationY(y).addModel()
+                    .condition(HorizontalMachineBlock.FACING, facing).end();
+            edges.forEach((name, joined) -> {
+                screenPart(builder, p, "frame_" + name, y, facing).condition(joined, false).end();
+                screenPart(builder, p, "glass_" + name, y, facing).condition(joined, true).end();
+            });
+            for (String vertical : new String[] {"up", "down"}) {
+                for (String horizontal : new String[] {"left", "right"}) {
+                    String corner = vertical + "_" + horizontal;
+                    BooleanProperty v = edges.get(vertical), h = edges.get(horizontal);
+                    // frame unless both adjoining sides are joined, split in two parts to avoid an OR
+                    screenPart(builder, p, "frame_" + corner, y, facing).condition(v, false).end();
+                    screenPart(builder, p, "frame_" + corner, y, facing).condition(v, true).condition(h, false).end();
+                    screenPart(builder, p, "glass_" + corner, y, facing).condition(v, true).condition(h, true).end();
+                }
+            }
+        }
+    }
+
+    private static MultiPartBlockStateBuilder.PartBuilder screenPart(MultiPartBlockStateBuilder builder,
+            RegistrateBlockstateProvider p, String piece, int y, Direction facing) {
+        return builder.part().modelFile(existing(p, "brass_screen_" + piece)).rotationY(y).addModel()
+                .condition(HorizontalMachineBlock.FACING, facing);
     }
 
     private static double[] box(double x1, double y1, double z1, double x2, double y2, double z2) {

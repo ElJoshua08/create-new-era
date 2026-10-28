@@ -1,0 +1,408 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/brass_casing",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/brass_casing",
+    "parts": "create_new_era:block/interface_parts"
+  },
+  "elements": [
+    {
+      "name": "back",
+      "from": [
+        0,
+        0,
+        2
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "frame_top",
+      "from": [
+        0,
+        13,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "frame_bottom",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        4,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "frame_left",
+      "from": [
+        14,
+        4,
+        0
+      ],
+      "to": [
+        16,
+        13,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "frame_right",
+      "from": [
+        0,
+        4,
+        0
+      ],
+      "to": [
+        2,
+        13,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "screen",
+      "from": [
+        2,
+        4,
+        1
+      ],
+      "to": [
+        14,
+        13,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            10.0,
+            10.0,
+            16.0,
+            14.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "led_power",
+      "from": [
+        3,
+        1.5,
+        -0.5
+      ],
+      "to": [
+        5,
+        2.5,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        },
+        "up": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        },
+        "down": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            3.0,
+            9.0,
+            3.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "led_bus",
+      "from": [
+        6,
+        1.5,
+        -0.5
+      ],
+      "to": [
+        8,
+        2.5,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        },
+        "up": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        },
+        "down": {
+          "texture": "#details",
+          "uv": [
+            10.0,
+            3.0,
+            11.0,
+            3.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "port",
+      "from": [
+        16,
+        6,
+        6
+      ],
+      "to": [
+        16.5,
+        10,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            2.0,
+            8.5,
+            3.0
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            2.0,
+            8.5,
+            3.0
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            11.0,
+            7.0,
+            13.0,
+            9.0
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            2.0,
+            8.5,
+            3.0
+          ]
+        },
+        "up": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            2.0,
+            8.5,
+            3.0
+          ]
+        },
+        "down": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            2.0,
+            8.5,
+            3.0
+          ]
+        }
+      }
+    }
+  ]
+}

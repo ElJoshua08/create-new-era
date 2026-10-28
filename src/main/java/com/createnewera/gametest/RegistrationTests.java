@@ -1,15 +1,25 @@
 package com.createnewera.gametest;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import com.createnewera.CreateNewEra;
+import com.createnewera.block.BrassScreenBlock;
 import com.createnewera.registry.ModBlocks;
 import com.createnewera.registry.ModCreativeTabs;
 import com.tterrag.registrate.util.entry.BlockEntry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
@@ -74,6 +84,71 @@ public class RegistrationTests {
         int count = ModCreativeTabs.MAIN.get().getDisplayItems().size();
         if (count != 13)
             helper.fail("main tab has " + count + " items, expected 13");
+        helper.succeed();
+    }
+
+    // a 2x2 wall facing north joins into one pane; a screen facing elsewhere stays apart
+    @GameTest(template = EMPTY)
+    public static void screensJoin(GameTestHelper helper) {
+        BlockState north = ModBlocks.BRASS_SCREEN.getDefaultState().setValue(BrassScreenBlock.FACING, Direction.NORTH);
+        BlockPos[] wall = {new BlockPos(0, 1, 1), new BlockPos(1, 1, 1), new BlockPos(0, 2, 1), new BlockPos(1, 2, 1)};
+        for (BlockPos pos : wall)
+            placeLikeAPlayer(helper, pos, north);
+        placeLikeAPlayer(helper, new BlockPos(2, 1, 1), north.setValue(BrassScreenBlock.FACING, Direction.EAST));
+
+        // facing north, the viewer's left is east (+x)
+        expectJoins(helper, wall[0], true, false, true, false);
+        expectJoins(helper, wall[1], true, false, false, true);
+        expectJoins(helper, wall[2], false, true, true, false);
+        expectJoins(helper, wall[3], false, true, false, true);
+        expectJoins(helper, new BlockPos(2, 1, 1), false, false, false, false);
+
+        helper.destroyBlock(wall[1]);
+        expectJoins(helper, wall[0], true, false, false, false);
+        helper.succeed();
+    }
+
+    private static void placeLikeAPlayer(GameTestHelper helper, BlockPos pos, BlockState state) {
+        helper.setBlock(pos, Block.updateFromNeighbourShapes(state, helper.getLevel(), helper.absolutePos(pos)));
+    }
+
+    private static void expectJoins(GameTestHelper helper, BlockPos pos, boolean up, boolean down, boolean left, boolean right) {
+        BlockState s = helper.getBlockState(pos);
+        boolean[] actual = {s.getValue(BrassScreenBlock.UP), s.getValue(BrassScreenBlock.DOWN),
+                s.getValue(BrassScreenBlock.LEFT), s.getValue(BrassScreenBlock.RIGHT)};
+        boolean[] expected = {up, down, left, right};
+        if (!Arrays.equals(actual, expected))
+            helper.fail("screen at " + pos + " joins " + Arrays.toString(actual)
+                    + ", expected " + Arrays.toString(expected));
+    }
+
+    // every block in every Ponder structure must resolve to the state we wrote, or the scene shows the wrong thing
+    @GameTest(template = EMPTY)
+    public static void ponderStructuresLoad(GameTestHelper helper) {
+        var blocks = helper.getLevel().holderLookup(Registries.BLOCK);
+        for (String name : List.of("computer/intro", "screen/join", "adapter/attach", "servo/intro", "controls/desk")) {
+            String path = "/assets/create_new_era/ponder/" + name + ".nbt";
+            try (InputStream in = RegistrationTests.class.getResourceAsStream(path)) {
+                if (in == null) {
+                    helper.fail("missing " + path);
+                    return;
+                }
+                CompoundTag tag = NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap());
+                for (Tag entry : tag.getList("palette", Tag.TAG_COMPOUND)) {
+                    CompoundTag written = (CompoundTag) entry;
+                    BlockState state = NbtUtils.readBlockState(blocks, written);
+                    if (state.isAir())
+                        helper.fail(name + ": unknown block " + written.getString("Name"));
+                    // readBlockState silently drops properties it doesn't know
+                    CompoundTag properties = written.getCompound("Properties");
+                    for (String key : properties.getAllKeys())
+                        if (state.getProperties().stream().noneMatch(p -> p.getName().equals(key)))
+                            helper.fail(name + ": " + written.getString("Name") + " has no property " + key);
+                }
+            } catch (IOException e) {
+                helper.fail(name + ": " + e);
+            }
+        }
         helper.succeed();
     }
 }

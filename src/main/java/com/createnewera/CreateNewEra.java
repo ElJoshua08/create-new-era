@@ -1,6 +1,8 @@
 package com.createnewera;
 
 import com.createnewera.config.ClientConfig;
+import com.createnewera.network.ModNetwork;
+import com.createnewera.registry.ModBlockEntities;
 import com.createnewera.registry.ModBlocks;
 import com.createnewera.registry.ModCreativeTabs;
 import com.createnewera.registry.ModItems;
@@ -34,9 +36,11 @@ public class CreateNewEra {
     public CreateNewEra(IEventBus modEventBus, ModContainer modContainer) {
         ModCreativeTabs.register(modEventBus);
         ModBlocks.register();
+        ModBlockEntities.register();
         ModItems.register();
         ModLang.register();
         REGISTRATE.registerEventListeners(modEventBus);
+        ModNetwork.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         LOGGER.info("Create: New Era loaded");
     }

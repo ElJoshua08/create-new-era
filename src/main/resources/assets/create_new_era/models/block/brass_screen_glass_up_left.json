@@ -1,0 +1,29 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/brass_casing",
+    "glass": "create_new_era:block/screen_glass",
+    "particle": "create:block/brass_casing"
+  },
+  "elements": [
+    {
+      "name": "up_left",
+      "from": [
+        14,
+        14,
+        1.5
+      ],
+      "to": [
+        16,
+        16,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glass"
+        }
+      }
+    }
+  ]
+}

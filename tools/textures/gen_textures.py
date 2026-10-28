@@ -329,6 +329,29 @@ def draw_parts():
     c.img.save(OUT / "interface_parts.png")
 
 
+def draw_screen_glass():
+    """Unpowered screen glass for joined screens: tiles seamlessly, so a wall of
+    screens reads as one pane. Same flip-plate grid as screen_off, no highlight."""
+    c = Canvas(16, 16)
+    c.rect(0, 0, 16, 16, GLASS[1])
+    for j in range(16):
+        for i in range(16):
+            if i % 2 == 1 or j % 2 == 1:
+                c.px(i, j, GLASS[0])
+    c.img.save(OUT / "screen_glass.png")
+
+
+def draw_editor_checker():
+    """Computer editor background: the design's dark checker, tiled by the GUI."""
+    c = Canvas(2, 2)
+    c.rect(0, 0, 2, 2, "#383838")
+    c.px(1, 0, "#3c3c3c")
+    c.px(0, 1, "#3c3c3c")
+    gui = OUT.parent / "gui"
+    gui.mkdir(exist_ok=True)
+    c.img.save(gui / "editor_checker.png")
+
+
 def draw_control_plate_item():
     """Inventory sprite: the andesite plate every control is built on, seen slightly from above."""
     c = Canvas(16, 16)
@@ -373,6 +396,8 @@ def main():
     draw_brass_panel(c, *REGIONS["brass_panel"][:2])
     c.img.save(OUT / "computing_details.png")
     draw_parts()
+    draw_screen_glass()
+    draw_editor_checker()
     draw_control_plate_item()
     print(f"atlas written to {OUT / 'computing_details.png'}")
 
