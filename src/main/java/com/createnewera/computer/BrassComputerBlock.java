@@ -3,6 +3,7 @@ package com.createnewera.computer;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusPort;
 import com.createnewera.bus.PartGeometry;
 import com.createnewera.registry.ModBlockEntities;
@@ -12,6 +13,7 @@ import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -97,6 +99,18 @@ public class BrassComputerBlock extends HorizontalKineticBlock implements IBE<Br
         Direction preferred = getPreferredHorizontalFacing(context);
         Direction facing = preferred != null ? preferred.getOpposite() : context.getHorizontalDirection().getOpposite();
         return defaultBlockState().setValue(HORIZONTAL_FACING, facing);
+    }
+
+    /** Its own ports come with it, and turn with it. */
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+        if (!(level instanceof ServerLevel server))
+            return;
+        if (oldState.is(this) && oldState.getValue(HORIZONTAL_FACING) != state.getValue(HORIZONTAL_FACING))
+            Bus.turnSockets(server, pos, oldState, state);
+        else
+            Bus.fillSockets(server, pos, state);
     }
 
     @Override

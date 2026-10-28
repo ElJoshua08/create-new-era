@@ -87,11 +87,18 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 
+    /** Whether its own ports have been put in its sockets since it loaded. */
+    private boolean socketsFilled;
+
     @Override
     public void tick() {
         super.tick();
         if (level.isClientSide)
             return;
+        if (!socketsFilled) { // computers placed before they came with their own ports
+            Bus.fillSockets((ServerLevel) level, worldPosition, getBlockState());
+            socketsFilled = true;
+        }
         if (running && vm == null)
             start("create_new_era.console.restarted");
         if (vm != null) {

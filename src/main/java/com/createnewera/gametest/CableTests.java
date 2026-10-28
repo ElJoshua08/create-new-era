@@ -11,8 +11,10 @@ import com.createnewera.bus.CableRoute;
 import com.createnewera.bus.PartGeometry;
 import com.createnewera.bus.PortMode;
 import com.createnewera.cable.CableSpoolItem;
+import com.createnewera.computer.BrassComputerBlock;
 import com.createnewera.cable.SpoolDyeRecipe;
 import com.createnewera.registry.ModComponents;
+import com.createnewera.registry.ModBlocks;
 import com.createnewera.registry.ModItems;
 
 import net.minecraft.core.BlockPos;
@@ -147,6 +149,28 @@ public class CableTests {
             helper.fail("spool has " + CableSpoolItem.metresLeft(spool) + " m left after laying " + used);
         if (spool.has(ModComponents.CABLE_START.get()))
             helper.fail("the spool still holds a cable start");
+        helper.succeed();
+    }
+
+    // the ports a computer comes with, in its side sockets, take cables like any other
+    @GameTest(template = ROOM)
+    public static void cablesReachTheComputersSockets(GameTestHelper helper) {
+        BlockPos at = new BlockPos(2, 1, 2);
+        helper.setBlock(at, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        BlockPos pc = helper.absolutePos(at);
+        // it comes with its own ports, already in its sockets
+        BusPort own = BusData.get(helper.getLevel()).portsAt(pc).stream().findFirst().orElse(null);
+        if (own == null)
+            helper.fail("the computer came without ports");
+        BusPort chest = part(helper, new BlockPos(0, 1, 4), BusPort.Kind.PORT);
+        Player player = helper.makeMockPlayer(GameType.CREATIVE);
+        ItemStack spool = ModItems.CABLE_SPOOL.asStack();
+        click(helper, player, spool, own);
+        if (!spool.has(ModComponents.CABLE_START.get()))
+            helper.fail("clicking the socket port didn't start a cable");
+        click(helper, player, spool, chest);
+        if (BusData.get(helper.getLevel()).spansAt(own.id()).size() != 1)
+            helper.fail("no cable from the socket port");
         helper.succeed();
     }
 

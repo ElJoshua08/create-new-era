@@ -69,18 +69,14 @@ public class BusTests {
         return port;
     }
 
-    /** A port in the computer's next free socket. */
+    /** One of the computer's own ports, the ones it comes with in its sockets. */
     private static BusPort socketPort(GameTestHelper helper, PortMode mode) {
         BlockPos pc = helper.absolutePos(COMPUTER);
-        var here = BusData.get(helper.getLevel()).portsAt(pc);
-        for (var socket : BrassComputerBlock.sockets(helper.getLevel().getBlockState(pc), pc))
-            if (here.stream().noneMatch(socket::takenBy)) {
-                BusPort port = Bus.placePort(helper.getLevel(), pc, socket.face(), socket.u(), socket.v(), mode);
-                if (port == null)
-                    helper.fail("a free socket refused its port: " + socket);
+        var level = helper.getLevel();
+        for (BusPort port : BusData.get(level).portsAt(pc))
+            if (Bus.builtIn(level.getBlockState(pc), port))
                 return port;
-            }
-        helper.fail("no free socket");
+        helper.fail("the computer has no ports of its own");
         return null;
     }
 
@@ -224,20 +220,27 @@ public class BusTests {
         computer(helper);
         var level = helper.getLevel();
         BlockPos pc = helper.absolutePos(COMPUTER);
-        var sockets = BrassComputerBlock.sockets(level.getBlockState(pc), pc);
-        // facing north, its sockets are on the east and west sides, two each
-        if (sockets.stream().filter(s -> s.face() == Direction.EAST).count() != 2 || sockets.stream().filter(s -> s.face() == Direction.WEST).count() != 2)
-            helper.fail("sockets on the wrong faces: " + sockets);
-        if (Bus.placePort(level, pc, Direction.UP, 6, 6, PortMode.IN) != null)
-            helper.fail("a port went on top while the sockets were free");
-        // a click anywhere on a side snaps into the nearest free socket there
-        BusPort snapped = Bus.placePort(level, pc, Direction.EAST, 0, 0, PortMode.IN);
-        if (snapped == null || sockets.stream().noneMatch(s -> s.face() == Direction.EAST && s.u() == snapped.u() && s.v() == snapped.v()))
-            helper.fail("didn't snap into a socket: " + snapped);
-        for (int i = 1; i < Bus.COMPUTER_PORTS; i++)
-            socketPort(helper, PortMode.IN);
+        var own = BusData.get(level).portsAt(pc);
+        // it comes with four, one per socket, on its east and west sides while it faces north
+        if (own.size() != Bus.COMPUTER_PORTS || !own.stream().allMatch(p -> Bus.builtIn(level.getBlockState(pc), p)))
+            helper.fail("expected its four own ports, got " + own);
+        if (own.stream().anyMatch(p -> p.face() != Direction.EAST && p.face() != Direction.WEST))
+            helper.fail("own ports on the wrong faces: " + own);
         if (Bus.placePort(level, pc, Direction.UP, 6, 6, PortMode.IN) != null)
             helper.fail("took more ports than it has room for");
+
+        // turned, its ports turn with it and a hanging cable follows
+        chest(helper, CHEST, 1);
+        BusPort chestPort = port(helper, CHEST, PortMode.OUT);
+        link(helper, own.get(0), chestPort);
+        helper.setBlock(COMPUTER, level.getBlockState(pc).setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.EAST));
+        var turned = BusData.get(level).portsAt(pc);
+        if (turned.size() != Bus.COMPUTER_PORTS || turned.stream().anyMatch(p -> p.face() != Direction.NORTH && p.face() != Direction.SOUTH))
+            helper.fail("ports didn't turn with the computer: " + turned);
+        BusPort moved = BusData.get(level).port(own.get(0).id());
+        var span = BusData.get(level).spansAt(moved.id());
+        if (span.size() != 1 || span.get(0).points().stream().noneMatch(p -> p.distanceTo(PartGeometry.anchor(moved)) < 1e-6))
+            helper.fail("the cable didn't follow its port: " + span);
         helper.succeed();
     }
 
@@ -280,8 +283,6 @@ public class BusTests {
         BlockPos pc = helper.absolutePos(COMPUTER);
         if (Bus.placePart(level, helper.absolutePos(CHEST), Direction.UP, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
             helper.fail("an expansion went on a chest");
-        for (int i = 0; i < Bus.COMPUTER_PORTS; i++)
-            socketPort(helper, PortMode.IN);
         if (Bus.placePort(level, pc, Direction.UP, 0, 4, PortMode.IN) != null)
             helper.fail("a fifth port fit without an expansion");
         if (Bus.placePart(level, pc, Direction.WEST, 6, 4, BusPort.Kind.EXPANSION, PortMode.OUT) != null)

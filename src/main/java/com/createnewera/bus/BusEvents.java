@@ -43,7 +43,8 @@ public final class BusEvents {
                 ? BusData.get(server).portsAt(pos)
                 : clientParts.apply(pos);
         BusPort part = PartGeometry.partAt(parts, event.getFace(), event.getHitVec().getLocation());
-        if (part == null)
+        // a computer's own ports stay put: the wrench turns the computer instead
+        if (part == null || Bus.builtIn(event.getLevel().getBlockState(pos), part))
             return;
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
@@ -73,7 +74,8 @@ public final class BusEvents {
                 ? BusData.get(server).portsAt(event.getPos())
                 : clientParts.apply(event.getPos());
         BusPort part = PartGeometry.partAt(parts, hit.getDirection(), hit.getLocation());
-        if (part == null)
+        // hitting a computer's own port is hitting the computer
+        if (part == null || Bus.builtIn(event.getLevel().getBlockState(event.getPos()), part))
             return;
         event.setCanceled(true);
         if (event.getAction() != PlayerInteractEvent.LeftClickBlock.Action.START || !(event.getLevel() instanceof ServerLevel server))
@@ -93,7 +95,8 @@ public final class BusEvents {
             return;
         if (!event.getPlayer().getAbilities().instabuild)
             for (BusPort part : parts)
-                Block.popResource(server, event.getPos(), item(part));
+                if (!Bus.builtIn(event.getState(), part))
+                    Block.popResource(server, event.getPos(), item(part));
         Bus.blockRemoved(server, event.getPos());
     }
 

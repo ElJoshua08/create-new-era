@@ -3,6 +3,7 @@ package com.createnewera.client.bus;
 import java.util.List;
 
 import com.createnewera.CreateNewEra;
+import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusEvents;
 import com.createnewera.bus.BusPort;
 import com.createnewera.bus.PartGeometry;
@@ -80,6 +81,9 @@ public final class BusPartRenderer {
         for (List<BusPort> chunk : ClientBusParts.chunks()) {
             for (BusPort part : chunk) {
                 if (part.pos().distToCenterSqr(camera) > RANGE * RANGE)
+                    continue;
+                // a computer's own ports are its sockets, drawn by its model
+                if (Bus.builtIn(mc.level.getBlockState(part.pos()), part))
                     continue;
                 BakedModel model = models.getModel(switch (part.kind()) {
                     case PORT -> part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;

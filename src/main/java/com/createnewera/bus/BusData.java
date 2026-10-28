@@ -126,6 +126,28 @@ public class BusData extends SavedData {
         return cut;
     }
 
+    /** Moves a part to another spot on its block, e.g. when the block turns. */
+    public @Nullable BusPort movePart(long id, Direction face, int u, int v) {
+        BusPort part = ports.get(id);
+        if (part == null)
+            return null;
+        BusPort moved = new BusPort(id, part.pos(), face, u, v, part.kind(), part.mode());
+        ports.put(id, moved);
+        setDirty();
+        return moved;
+    }
+
+    /** Moves the end of a span that plugs into a part, after the part moved. */
+    public void moveSpanEnd(long spanId, long port, Vec3 anchor) {
+        BusSpan span = spans.get(spanId);
+        if (span == null || span.points().size() < 2)
+            return;
+        List<Vec3> points = new ArrayList<>(span.points());
+        points.set(span.a() == port ? 0 : points.size() - 1, anchor);
+        spans.put(spanId, new BusSpan(span.id(), span.a(), span.b(), span.color(), span.casing(), span.aerial(), List.copyOf(points)));
+        setDirty();
+    }
+
     public boolean setMode(long id, PortMode mode) {
         BusPort port = ports.get(id);
         if (port == null)

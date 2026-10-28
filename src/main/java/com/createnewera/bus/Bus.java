@@ -82,6 +82,58 @@ public final class Bus {
         return part;
     }
 
+    /**
+     * Whether a part is one of a computer's own ports, sitting in one of its sockets: those come
+     * with the computer and can't be taken off.
+     */
+    public static boolean builtIn(BlockState state, BusPort part) {
+        return part.kind() == BusPort.Kind.PORT && state.getBlock() instanceof BrassComputerBlock
+                && BrassComputerBlock.sockets(state, part.pos()).stream()
+                        .anyMatch(s -> s.face() == part.face() && s.u() == part.u() && s.v() == part.v());
+    }
+
+    /** Puts a computer's own ports in whichever of its sockets are missing one. */
+    public static void fillSockets(ServerLevel level, BlockPos pos, BlockState state) {
+        BusData data = BusData.get(level);
+        List<BusPort> here = data.portsAt(pos);
+        boolean added = false;
+        for (BrassComputerBlock.Socket socket : BrassComputerBlock.sockets(state, pos))
+            if (here.stream().noneMatch(socket::takenBy))
+                added |= data.addPart(pos, socket.face(), socket.u(), socket.v(), BusPort.Kind.PORT, PortMode.IN) != null;
+        if (added)
+            sync(level, pos);
+    }
+
+    /**
+     * The computer turned: its own ports turn with it, socket for socket. Hanging cables follow
+     * them; cables laid flat along faces no longer fit their route, so they're cut.
+     */
+    public static void turnSockets(ServerLevel level, BlockPos pos, BlockState from, BlockState to) {
+        BusData data = BusData.get(level);
+        List<BrassComputerBlock.Socket> before = BrassComputerBlock.sockets(from, pos);
+        List<BrassComputerBlock.Socket> after = BrassComputerBlock.sockets(to, pos);
+        List<BusSpan> cut = new ArrayList<>();
+        for (BusPort part : data.portsAt(pos)) {
+            if (part.kind() != BusPort.Kind.PORT)
+                continue;
+            for (int i = 0; i < before.size(); i++) {
+                BrassComputerBlock.Socket old = before.get(i), now = after.get(i);
+                if (old.face() != part.face() || old.u() != part.u() || old.v() != part.v())
+                    continue;
+                BusPort moved = data.movePart(part.id(), now.face(), now.u(), now.v());
+                for (BusSpan span : data.spansAt(part.id())) {
+                    if (span.aerial())
+                        data.moveSpanEnd(span.id(), part.id(), PartGeometry.anchor(moved));
+                    else
+                        data.disconnect(span.id());
+                    cut.add(span); // its chunk gets resent either way
+                }
+            }
+        }
+        syncCut(level, pos, cut);
+        fillSockets(level, pos, to);
+    }
+
     /** Why a part couldn't go on a computer, for telling the player. */
     public static String refusalOnComputer(ServerLevel level, BlockPos pos, BusPort.Kind kind) {
         if (kind != BusPort.Kind.PORT)
