@@ -89,9 +89,27 @@ def bezel(lo, hi):
         "up": ("parts", part("bezel")), "sides": ("details", region("brass_bar", (0, 0, hi - lo, 1))),
     })
 
+def bus(name, sub=None):
+    """Bus atlas region as model uv (the atlas is 16 px, so 1:1)."""
+    x, y, w, h = BUS_REGIONS[name]
+    if sub:
+        x, y, w, h = x + sub[0], y + sub[1], sub[2], sub[3]
+    return [x, y, x + w, y + h]
+
+
+def socket(name, x, z):
+    """A 6x6 socket plate standing a quarter pixel off a side face, centred on (y 8, z)."""
+    lo, hi = (x, x + 0.25) if x == 16 else (x - 0.25, x)
+    face = "east" if x == 16 else "west"
+    return box(name, [lo, 5, z - 3], [hi, 11, z + 3], {
+        face: ("parts", bus("socket")), "sides": ("parts", bus("socket_rim")), "caps": ("parts", bus("socket_rim")),
+    })
+
+
 MODELS = {
     "brass_computer": model(
-        {"casing": "create:block/brass_casing", "details": DETAILS, "particle": "create:block/brass_casing"},
+        {"casing": "create:block/brass_casing", "details": DETAILS, "parts": "create_new_era:block/bus_parts",
+         "particle": "create:block/brass_casing"},
         [
             # frame pieces keep default uv so the casing texture lines up across them
             # body, then a back plate framing a 6x6 hole: the shaft driving the computer turns inside it
@@ -107,11 +125,10 @@ MODELS = {
             box("screen", [2, 4, 1], [14, 13, 2], {"north": ("details", region("screen"))}),
             box("led_power", [3, 1.5, -0.5], [5, 2.5, 0], {"all": ("details", region("led_green", (0, 0, 2, 1)))}),
             box("led_bus", [6, 1.5, -0.5], [8, 2.5, 0], {"all": ("details", region("led_amber", (0, 0, 2, 1)))}),
-            box("port", [16, 6, 6], [16.5, 10, 10], {
-                "east": ("details", region("port")),
-                "sides": ("details", region("copper_bar", (0, 0, 1, 2))),
-                "caps": ("details", region("copper_bar", (0, 0, 1, 2))),
-            }),
+            # the sockets for its four own ports, two on each side; BrassComputerBlock.SOCKETS
+            # puts the ports on them
+            *[socket(name, x, z) for name, x, z in
+              (("socket_east_front", 16, 4), ("socket_east_back", 16, 12), ("socket_west_front", 0, 4), ("socket_west_back", 0, 12))],
         ],
     ),
     "bearing_servo": model(
@@ -249,13 +266,6 @@ def computer_off():
 
 MODELS["brass_computer_off"] = computer_off()
 
-
-def bus(name, sub=None):
-    """Bus atlas region as model uv (the atlas is 16 px, so 1:1)."""
-    x, y, w, h = BUS_REGIONS[name]
-    if sub:
-        x, y, w, h = x + sub[0], y + sub[1], sub[2], sub[3]
-    return [x, y, x + w, y + h]
 
 
 # Bus mini-blocks, authored pointing up from the corner of the face; the game moves them to

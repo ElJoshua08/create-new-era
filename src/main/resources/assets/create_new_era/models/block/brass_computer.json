@@ -4,6 +4,7 @@
   "textures": {
     "casing": "create:block/brass_casing",
     "details": "create_new_era:block/computing_details",
+    "parts": "create_new_era:block/bus_parts",
     "particle": "create:block/brass_casing"
   },
   "elements": [
@@ -467,70 +468,277 @@
       }
     },
     {
-      "name": "port",
+      "name": "socket_east_front",
       "from": [
         16,
-        6,
-        6
+        5,
+        1
       ],
       "to": [
-        16.5,
-        10,
-        10
+        16.25,
+        11,
+        7
       ],
       "faces": {
         "north": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            8.0,
-            2.0,
-            8.5,
-            3.0
+            8,
+            14,
+            14,
+            15
           ]
         },
         "south": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            8.0,
-            2.0,
-            8.5,
-            3.0
+            8,
+            14,
+            14,
+            15
           ]
         },
         "east": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            11.0,
-            7.0,
-            13.0,
-            9.0
+            8,
+            8,
+            14,
+            14
           ]
         },
         "west": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            8.0,
-            2.0,
-            8.5,
-            3.0
+            8,
+            14,
+            14,
+            15
           ]
         },
         "up": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            8.0,
-            2.0,
-            8.5,
-            3.0
+            8,
+            14,
+            14,
+            15
           ]
         },
         "down": {
-          "texture": "#details",
+          "texture": "#parts",
           "uv": [
-            8.0,
-            2.0,
-            8.5,
-            3.0
+            8,
+            14,
+            14,
+            15
+          ]
+        }
+      }
+    },
+    {
+      "name": "socket_east_back",
+      "from": [
+        16,
+        5,
+        9
+      ],
+      "to": [
+        16.25,
+        11,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            8,
+            14,
+            14
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        }
+      }
+    },
+    {
+      "name": "socket_west_front",
+      "from": [
+        -0.25,
+        5,
+        1
+      ],
+      "to": [
+        0,
+        11,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            8,
+            14,
+            14
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        }
+      }
+    },
+    {
+      "name": "socket_west_back",
+      "from": [
+        -0.25,
+        5,
+        9
+      ],
+      "to": [
+        0,
+        11,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            8,
+            14,
+            14
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            14,
+            14,
+            15
           ]
         }
       }

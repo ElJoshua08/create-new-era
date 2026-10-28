@@ -353,6 +353,8 @@ BUS_REGIONS = {
     "splice_top": (0, 8, 4, 4),
     "splice_side": (0, 12, 4, 1),
     "splice_boss": (4, 8, 2, 2),
+    "socket": (8, 8, 6, 6),
+    "socket_rim": (8, 14, 6, 1),
 }
 
 
@@ -406,6 +408,21 @@ def draw_bus_parts():
     c.px(x + 1, y, cu[4])
     c.px(x, y + 1, cu[4])
     c.px(x + 1, y + 1, cu[2])
+    # a socket on the computer's side for one of its four own ports: a brass rim round a dark
+    # slot with two copper contacts, so an empty one reads as "a port goes here"
+    x, y = BUS_REGIONS["socket"][:2]
+    c.rect(x, y, 6, 6, br[4])
+    c.rect(x, y, 6, 1, br[6])
+    c.rect(x, y, 1, 6, br[5])
+    c.rect(x + 5, y, 1, 6, br[2])
+    c.rect(x, y + 5, 6, 1, br[1])
+    c.rect(x + 1, y + 1, 4, 4, sl[0])
+    c.rect(x + 1, y + 1, 4, 1, sl[1])
+    c.px(x + 2, y + 3, cu[4])
+    c.px(x + 3, y + 3, cu[3])
+    x, y = BUS_REGIONS["socket_rim"][:2]
+    for i, col in enumerate([br[4], br[3], br[3], br[3], br[2], br[1]]):
+        c.px(x + i, y, col)
     c.img.save(OUT / "bus_parts.png")
 
 def draw_bus_items():

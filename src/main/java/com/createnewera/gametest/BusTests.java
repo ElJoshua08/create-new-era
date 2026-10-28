@@ -60,11 +60,28 @@ public class BusTests {
     }
 
     private static BusPort port(GameTestHelper helper, BlockPos pos, PortMode mode) {
+        if (pos.equals(COMPUTER))
+            return socketPort(helper, mode);
         // inputs and outputs on different spots, so a block can carry one of each
         BusPort port = Bus.placePort(helper.getLevel(), helper.absolutePos(pos), Direction.UP, mode == PortMode.OUT ? 8 : 4, 8, mode);
         if (port == null)
             helper.fail("couldn't place a port on " + pos);
         return port;
+    }
+
+    /** A port in the computer's next free socket. */
+    private static BusPort socketPort(GameTestHelper helper, PortMode mode) {
+        BlockPos pc = helper.absolutePos(COMPUTER);
+        var here = BusData.get(helper.getLevel()).portsAt(pc);
+        for (var socket : BrassComputerBlock.sockets(helper.getLevel().getBlockState(pc), pc))
+            if (here.stream().noneMatch(socket::takenBy)) {
+                BusPort port = Bus.placePort(helper.getLevel(), pc, socket.face(), socket.u(), socket.v(), mode);
+                if (port == null)
+                    helper.fail("a free socket refused its port: " + socket);
+                return port;
+            }
+        helper.fail("no free socket");
+        return null;
     }
 
     private static void link(GameTestHelper helper, BusPort a, BusPort b) {
@@ -205,10 +222,21 @@ public class BusTests {
     @GameTest(template = ROOM)
     public static void computersHaveLimitedPorts(GameTestHelper helper) {
         computer(helper);
-        for (int i = 0; i < Bus.COMPUTER_PORTS; i++)
-            if (Bus.placePort(helper.getLevel(), helper.absolutePos(COMPUTER), Direction.UP, i * 4, 0, PortMode.IN) == null)
-                helper.fail("port " + (i + 1) + " refused");
-        if (Bus.placePort(helper.getLevel(), helper.absolutePos(COMPUTER), Direction.UP, 9, 9, PortMode.IN) != null)
+        var level = helper.getLevel();
+        BlockPos pc = helper.absolutePos(COMPUTER);
+        var sockets = BrassComputerBlock.sockets(level.getBlockState(pc), pc);
+        // facing north, its sockets are on the east and west sides, two each
+        if (sockets.stream().filter(s -> s.face() == Direction.EAST).count() != 2 || sockets.stream().filter(s -> s.face() == Direction.WEST).count() != 2)
+            helper.fail("sockets on the wrong faces: " + sockets);
+        if (Bus.placePort(level, pc, Direction.UP, 6, 6, PortMode.IN) != null)
+            helper.fail("a port went on top while the sockets were free");
+        // a click anywhere on a side snaps into the nearest free socket there
+        BusPort snapped = Bus.placePort(level, pc, Direction.EAST, 0, 0, PortMode.IN);
+        if (snapped == null || sockets.stream().noneMatch(s -> s.face() == Direction.EAST && s.u() == snapped.u() && s.v() == snapped.v()))
+            helper.fail("didn't snap into a socket: " + snapped);
+        for (int i = 1; i < Bus.COMPUTER_PORTS; i++)
+            socketPort(helper, PortMode.IN);
+        if (Bus.placePort(level, pc, Direction.UP, 6, 6, PortMode.IN) != null)
             helper.fail("took more ports than it has room for");
         helper.succeed();
     }
@@ -253,17 +281,19 @@ public class BusTests {
         if (Bus.placePart(level, helper.absolutePos(CHEST), Direction.UP, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
             helper.fail("an expansion went on a chest");
         for (int i = 0; i < Bus.COMPUTER_PORTS; i++)
-            Bus.placePort(level, pc, Direction.UP, i * 4, 0, PortMode.IN);
+            socketPort(helper, PortMode.IN);
         if (Bus.placePort(level, pc, Direction.UP, 0, 4, PortMode.IN) != null)
             helper.fail("a fifth port fit without an expansion");
-        if (Bus.placePart(level, pc, Direction.WEST, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) == null)
+        if (Bus.placePart(level, pc, Direction.WEST, 6, 4, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
+            helper.fail("an expansion covered a socket");
+        if (Bus.placePart(level, pc, Direction.UP, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT) == null)
             helper.fail("the expansion didn't go on");
-        if (Bus.placePort(level, pc, Direction.UP, 0, 4, PortMode.IN) == null)
+        if (Bus.placePort(level, pc, Direction.UP, 0, 8, PortMode.IN) == null)
             helper.fail("the expansion added no ports");
         // overlapping the expansion is refused
-        if (Bus.placePort(level, pc, Direction.WEST, 2, 2, PortMode.IN) != null)
+        if (Bus.placePort(level, pc, Direction.UP, 2, 2, PortMode.IN) != null)
             helper.fail("a port went on top of the expansion");
-        Bus.placePart(level, pc, Direction.EAST, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT);
+        Bus.placePart(level, pc, Direction.UP, 10, 0, BusPort.Kind.EXPANSION, PortMode.OUT);
         Bus.placePart(level, pc, Direction.DOWN, 0, 0, BusPort.Kind.EXPANSION, PortMode.OUT);
         if (Bus.placePart(level, pc, Direction.DOWN, 8, 8, BusPort.Kind.EXPANSION, PortMode.OUT) != null)
             helper.fail("took more than " + Bus.MAX_EXPANSIONS + " expansions");

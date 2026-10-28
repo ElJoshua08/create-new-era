@@ -1,5 +1,10 @@
 package com.createnewera.computer;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.createnewera.bus.BusPort;
+import com.createnewera.bus.PartGeometry;
 import com.createnewera.registry.ModBlockEntities;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
@@ -23,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.Tags;
 
 /**
@@ -34,6 +40,45 @@ public class BrassComputerBlock extends HorizontalKineticBlock implements IBE<Br
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");
     /** Stress per RPM, as Create counts it. */
     public static final double STRESS_IMPACT = 2.0;
+
+    /**
+     * The sockets for its own four ports, two on each side, as the model draws them facing
+     * north: the middle of each, in pixels.
+     */
+    private static final int[][] SOCKETS = {{16, 8, 4}, {16, 8, 12}, {0, 8, 4}, {0, 8, 12}};
+
+    /** Where one of the computer's own ports goes: the face, and the spot on its grid. */
+    public record Socket(Direction face, int u, int v) {
+        public boolean takenBy(BusPort part) {
+            return part.overlaps(face, u, v, BusPort.Kind.PORT.size);
+        }
+
+        /** Whether a part of this size at another spot would cover any of the socket. */
+        public boolean overlaps(Socket other, int size) {
+            int own = BusPort.Kind.PORT.size;
+            return face == other.face && u < other.u + size && other.u < u + own && v < other.v + size && other.v < v + own;
+        }
+    }
+
+    public static List<Socket> sockets(BlockState state, BlockPos pos) {
+        // quarter turns clockwise (seen from above) from facing north, as the blockstate turns the model
+        int turns = (state.getValue(HORIZONTAL_FACING).get2DDataValue() + 2) % 4;
+        List<Socket> out = new ArrayList<>(SOCKETS.length);
+        for (int[] socket : SOCKETS) {
+            double x = socket[0], z = socket[2];
+            Direction face = x == 16 ? Direction.EAST : Direction.WEST;
+            for (int i = 0; i < turns; i++) {
+                double turned = 16 - z;
+                z = x;
+                x = turned;
+                face = face.getClockWise();
+            }
+            Vec3 middle = new Vec3(pos.getX() + x / 16, pos.getY() + socket[1] / 16.0, pos.getZ() + z / 16);
+            int[] spot = PartGeometry.spotAt(pos, face, middle, BusPort.Kind.PORT.size);
+            out.add(new Socket(face, spot[0], spot[1]));
+        }
+        return out;
+    }
 
     public BrassComputerBlock(Properties properties) {
         super(properties);

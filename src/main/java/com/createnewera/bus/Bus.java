@@ -35,28 +35,61 @@ public final class Bus {
     }
 
     /**
-     * Puts a part on a block's face and tells the players who can see it. Computers take a
-     * limited number of ports; expansions only go on computers.
+     * Puts a part on a block's face and tells the players who can see it. A computer's first
+     * ports go in its sockets (snapping to the nearest free one on the face), more need
+     * expansions, and nothing else may cover a socket; expansions only go on computers.
      *
      * @return the part, or null if it can't go there
      */
     public static @Nullable BusPort placePart(ServerLevel level, BlockPos pos, Direction face, int u, int v,
                                               BusPort.Kind kind, PortMode mode) {
-        if (level.getBlockState(pos).isAir())
+        BlockState state = level.getBlockState(pos);
+        if (state.isAir())
             return null;
         BusData data = BusData.get(level);
-        boolean computer = level.getBlockState(pos).getBlock() instanceof BrassComputerBlock;
-        List<BusPort> here = data.portsAt(pos);
-        long ports = here.stream().filter(p -> p.kind() == BusPort.Kind.PORT).count();
-        long expansions = here.stream().filter(p -> p.kind() == BusPort.Kind.EXPANSION).count();
-        if (kind == BusPort.Kind.EXPANSION && (!computer || expansions >= MAX_EXPANSIONS))
+        boolean computer = state.getBlock() instanceof BrassComputerBlock;
+        if (kind == BusPort.Kind.EXPANSION && !computer)
             return null;
-        if (kind == BusPort.Kind.PORT && computer && ports >= COMPUTER_PORTS * (1 + expansions))
-            return null;
+        if (computer) {
+            List<BusPort> here = data.portsAt(pos);
+            long ports = here.stream().filter(p -> p.kind() == BusPort.Kind.PORT).count();
+            long expansions = here.stream().filter(p -> p.kind() == BusPort.Kind.EXPANSION).count();
+            List<BrassComputerBlock.Socket> sockets = BrassComputerBlock.sockets(state, pos);
+            List<BrassComputerBlock.Socket> free = sockets.stream().filter(s -> here.stream().noneMatch(s::takenBy)).toList();
+            if (kind == BusPort.Kind.EXPANSION && expansions >= MAX_EXPANSIONS)
+                return null;
+            if (kind == BusPort.Kind.PORT) {
+                if (ports >= COMPUTER_PORTS * (1 + expansions))
+                    return null;
+                int askedU = u, askedV = v;
+                BrassComputerBlock.Socket socket = free.stream().filter(s -> s.face() == face)
+                        .min(Comparator.comparingInt(s -> Math.abs(s.u() - askedU) + Math.abs(s.v() - askedV))).orElse(null);
+                if (socket != null) {
+                    u = socket.u();
+                    v = socket.v();
+                } else if (!free.isEmpty()) {
+                    return null; // the sockets come first
+                }
+            }
+            BrassComputerBlock.Socket spot = new BrassComputerBlock.Socket(face, u, v);
+            boolean inSocket = kind == BusPort.Kind.PORT && sockets.contains(spot);
+            if (!inSocket && sockets.stream().anyMatch(s -> s.overlaps(spot, kind.size)))
+                return null; // keep the sockets clear
+        }
         BusPort part = data.addPart(pos, face, u, v, kind, mode);
         if (part != null)
             sync(level, pos);
         return part;
+    }
+
+    /** Why a part couldn't go on a computer, for telling the player. */
+    public static String refusalOnComputer(ServerLevel level, BlockPos pos, BusPort.Kind kind) {
+        if (kind != BusPort.Kind.PORT)
+            return "create_new_era.bus.no_room";
+        List<BusPort> here = BusData.get(level).portsAt(pos);
+        boolean socketsLeft = BrassComputerBlock.sockets(level.getBlockState(pos), pos).stream()
+                .anyMatch(s -> here.stream().noneMatch(s::takenBy));
+        return socketsLeft ? "create_new_era.bus.use_sockets" : "create_new_era.bus.computer_full";
     }
 
     /** Takes a part off, with the cables plugged into it. */

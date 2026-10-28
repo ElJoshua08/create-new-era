@@ -1,5 +1,7 @@
 package com.createnewera.bus;
 
+import com.createnewera.computer.BrassComputerBlock;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -28,9 +30,12 @@ public class BusPartItem extends Item {
         BusPort part = Bus.placePart(level, context.getClickedPos(), context.getClickedFace(), spot[0], spot[1], kind, PortMode.OUT);
         Player player = context.getPlayer();
         if (part == null) {
-            if (player != null)
-                player.displayClientMessage(Component.translatable(kind == BusPort.Kind.EXPANSION
-                        ? "create_new_era.bus.expansion_needs_computer" : "create_new_era.bus.no_room"), true);
+            if (player != null) {
+                boolean computer = level.getBlockState(context.getClickedPos()).getBlock() instanceof BrassComputerBlock;
+                String why = computer ? Bus.refusalOnComputer(level, context.getClickedPos(), kind)
+                        : kind == BusPort.Kind.EXPANSION ? "create_new_era.bus.expansion_needs_computer" : "create_new_era.bus.no_room";
+                player.displayClientMessage(Component.translatable(why), true);
+            }
             return InteractionResult.FAIL;
         }
         level.playSound(null, context.getClickedPos(), SoundEvents.COPPER_PLACE, SoundSource.BLOCKS, 0.6f, 1.4f);

@@ -180,5 +180,7 @@
   "create_new_era.cable.same_part": "Elige otra pieza",
   "create_new_era.cable.too_far": "Demasiado lejos para colgar un cable (24 bloques como mucho)",
   "create_new_era.cable.no_route": "No hay camino por las caras entre los dos",
-  "create_new_era.cable.already_joined": "Esos dos ya están unidos"
+  "create_new_era.cable.already_joined": "Esos dos ya están unidos",
+  "create_new_era.bus.use_sockets": "Los puertos propios del ordenador van en los huecos de sus lados",
+  "create_new_era.bus.computer_full": "No le quedan puertos: una ampliación de puertos añade 4 más"
 }
