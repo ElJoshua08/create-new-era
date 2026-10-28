@@ -1,0 +1,36 @@
+name: Feature request
+description: "Suggest something for Create: New Era"
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the [planned features](https://create-new-era.tryberyl.dev/docs/planned.html) first: the data bus, drawing on screens, panel controls and drones are already on the roadmap.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you want to do?
+      description: The build or program you're trying to make, and what's stopping you today.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How it could work in game. For Lua API ideas, show the code you'd like to write.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Other ways you've tried or considered, including other mods.
+    validations:
+      required: false
+  - type: checkboxes
+    id: help
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to open a pull request for this myself (see CONTRIBUTING.md)
+          required: false

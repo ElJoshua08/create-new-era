@@ -1,0 +1,61 @@
+name: Bug report
+description: "Something in Create: New Era doesn't work as it should"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please check the [docs](https://create-new-era.tryberyl.dev/docs/) and existing issues first.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps from a new world if you can. If it involves a computer, paste the Lua program.
+      placeholder: |
+        1. Place a Brass Computer with a creative motor behind it at 64 RPM
+        2. Run this program: ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: "Create: New Era version"
+      description: The jar's version, or the commit if you built it yourself.
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Minecraft, NeoForge and Create versions
+      placeholder: Minecraft 1.21.1, NeoForge 21.1.265, Create 6.0.10
+    validations:
+      required: true
+  - type: textarea
+    id: mods
+    attributes:
+      label: Other mods
+      description: "Your full mod list, or the modpack and its version. Mention Create: Aeronautics, Sodium/Iris and shaders if you use them."
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and crash report
+      description: Upload `logs/latest.log` and, for crashes, the file from `crash-reports/` to a paste site such as https://mclo.gs and link them here.
+    validations:
+      required: false
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots, videos, whether it happens in single player or on a server.
+    validations:
+      required: false

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://create-new-era.tryberyl.dev/docs/
+    about: Installing, the Brass Computer, the Lua API and examples.
+  - name: Development docs
+    url: https://create-new-era.tryberyl.dev/docs/dev/
+    about: Building the mod, live reloading, tests and asset tools.
