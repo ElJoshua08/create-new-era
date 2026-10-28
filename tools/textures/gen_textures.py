@@ -353,77 +353,100 @@ BUS_REGIONS = {
     "splice_top": (0, 8, 4, 4),
     "splice_side": (0, 12, 4, 1),
     "splice_boss": (4, 8, 2, 2),
-    "socket": (8, 8, 6, 6),
-    "socket_rim": (8, 14, 6, 1),
 }
 
 
-def draw_bus_parts():
-    """The parts as they sit on a machine, with the same Create ramps as their item sprites:
-    a copper plate with a socket whose near lip catches the light, a circuit board with a chip."""
-    c = Canvas(16, 16)
-    hx = lambda col: "#%02x%02x%02x" % col[:3]
-    cu, pcb, br, sl = [[hx(v) for v in r] for r in (iso.COPPER, iso.PCB, iso.BRASS, iso.SLATE)]
-    x, y = BUS_REGIONS["port_top"][:2]
-    rows = [[cu[5], cu[6], cu[5], cu[4]],
-            [cu[5], sl[0], sl[0], cu[3]],
-            [cu[4], sl[1], sl[0], cu[3]],
-            [cu[3], cu[5], cu[5], cu[1]]]
+# an opening seen with the light from the top-left: far walls in shadow, near lip catching light
+HOLE = [["#16171b", "#1d1f24"], ["#1d1f24", "#33373d"]]
+
+
+def port_face(c, x, y):
+    """A data port from above: an andesite-alloy rim round a dark opening."""
+    g = ["#%02x%02x%02x" % v[:3] for v in iso.ANDESITE]
+    rows = [[g[7], g[7], g[7], g[6]],
+            [g[7], None, None, g[5]],
+            [g[6], None, None, g[4]],
+            [g[6], g[5], g[4], g[3]]]
     for j, row in enumerate(rows):
         for i, col in enumerate(row):
-            c.px(x + i, y + j, col)
+            c.px(x + i, y + j, col or HOLE[j - 1][i - 1])
+
+
+def draw_port_panel():
+    """The computer's own two ports on each side, in one low brass panel like a patch bay, so
+    they read as connections rather than a pair of eyes. Face at (0, 0), its edge below it."""
+    c = Canvas(16, 16)
+    br = ["#%02x%02x%02x" % v[:3] for v in iso.BRASS]
+    c.rect(0, 0, 12, 6, br[4])
+    c.rect(0, 0, 12, 1, br[6])
+    c.rect(0, 0, 1, 6, br[5])
+    c.rect(11, 1, 1, 5, br[2])
+    c.rect(1, 5, 11, 1, br[2])
+    for x in (1, 7):
+        port_face(c, x, 1)
+    # a rivet between them
+    c.px(5, 2, br[6])
+    c.px(6, 2, br[5])
+    c.px(5, 3, br[3])
+    c.px(6, 3, br[2])
+    for i in range(12):
+        c.px(i, 6, br[4] if i < 2 else br[3] if i < 10 else br[2])
+    c.img.save(OUT / "port_panel.png")
+
+
+def draw_bus_parts():
+    """The parts as they sit on a machine, in the language of Create's own small fittings (the
+    redstone link, the portable interfaces): a light andesite-alloy rim with a bevel, dark
+    openings, brass where something is mounted, and no bare copper."""
+    c = Canvas(16, 16)
+    hx = lambda col: "#%02x%02x%02x" % col[:3]
+    g, br = [[hx(v) for v in r] for r in (iso.ANDESITE, iso.BRASS)]
+    # a hole seen from above with the light from the top-left: the far walls in shadow, the
+    # near lip catching a little light
+    hole = HOLE
+    port_face(c, *BUS_REGIONS["port_top"][:2])
     x, y = BUS_REGIONS["port_side"][:2]
-    for i, col in enumerate([cu[3], cu[3], cu[2], cu[1]]):
+    for i, col in enumerate([g[5], g[4], g[4], g[3]]):
         c.px(x + i, y, col)
     c.px(*BUS_REGIONS["light_out"][:2], hx(iso.AMBER[2]))
     c.px(*BUS_REGIONS["light_in"][:2], hx(iso.GREEN[2]))
+
+    # the expansion: a brass module in an andesite frame, with the four sockets it adds
     x, y = BUS_REGIONS["expansion_top"][:2]
-    c.rect(x, y, 6, 6, pcb[3])
-    c.rect(x, y, 6, 1, pcb[5])
-    c.rect(x, y, 1, 6, pcb[4])
-    c.rect(x + 5, y, 1, 6, pcb[1])
-    c.rect(x + 2, y + 2, 2, 2, sl[1])
-    c.px(x + 2, y + 2, sl[3])
-    c.px(x + 1, y + 1, cu[4])
-    c.px(x + 4, y + 1, cu[4])
-    for i in (1, 3, 5):
-        c.px(x + i - 1, y + 5, br[5])
+    c.rect(x, y, 6, 6, g[5])
+    c.rect(x, y, 6, 1, g[7])
+    c.rect(x, y, 1, 6, g[6])
+    c.rect(x + 5, y + 1, 1, 5, g[3])
+    c.rect(x + 1, y + 5, 5, 1, g[3])
+    c.rect(x + 1, y + 1, 4, 4, br[4])
+    c.rect(x + 1, y + 1, 4, 1, br[5])
+    for i, j in ((1, 1), (3, 1), (1, 3), (3, 3)):
+        c.px(x + i, y + j, hole[0][0])
+        c.px(x + i + 1, y + j + 1, br[3])
     x, y = BUS_REGIONS["expansion_side"][:2]
-    for i in range(6):
-        c.px(x + i, y, br[5] if i % 2 == 0 else pcb[1])
-    # the splice: a brass plate with a copper boss the cables are clamped under
+    for i, col in enumerate([g[5], g[4], g[4], g[4], g[3], g[3]]):
+        c.px(x + i, y, col)
+
+    # the splice: the same andesite rim, with the brass clamp the cables meet under
     x, y = BUS_REGIONS["splice_top"][:2]
-    rows = [[br[5], br[6], br[5], br[4]],
-            [br[5], br[4], br[4], br[3]],
-            [br[4], br[4], br[3], br[3]],
-            [br[3], br[3], br[3], br[1]]]
+    rows = [[g[7], g[7], g[7], g[6]],
+            [g[7], br[5], br[4], g[5]],
+            [g[6], br[4], br[3], g[4]],
+            [g[6], g[5], g[4], g[3]]]
     for j, row in enumerate(rows):
         for i, col in enumerate(row):
             c.px(x + i, y + j, col)
     x, y = BUS_REGIONS["splice_side"][:2]
-    for i, col in enumerate([br[3], br[3], br[2], br[1]]):
+    for i, col in enumerate([g[5], g[4], g[4], g[3]]):
         c.px(x + i, y, col)
     x, y = BUS_REGIONS["splice_boss"][:2]
-    c.px(x, y, cu[6])
-    c.px(x + 1, y, cu[4])
-    c.px(x, y + 1, cu[4])
-    c.px(x + 1, y + 1, cu[2])
-    # a socket on the computer's side for one of its four own ports: a brass rim round a dark
-    # slot with two copper contacts, so an empty one reads as "a port goes here"
-    x, y = BUS_REGIONS["socket"][:2]
-    c.rect(x, y, 6, 6, br[4])
-    c.rect(x, y, 6, 1, br[6])
-    c.rect(x, y, 1, 6, br[5])
-    c.rect(x + 5, y, 1, 6, br[2])
-    c.rect(x, y + 5, 6, 1, br[1])
-    c.rect(x + 1, y + 1, 4, 4, sl[0])
-    c.rect(x + 1, y + 1, 4, 1, sl[1])
-    c.px(x + 2, y + 3, cu[4])
-    c.px(x + 3, y + 3, cu[3])
-    x, y = BUS_REGIONS["socket_rim"][:2]
-    for i, col in enumerate([br[4], br[3], br[3], br[3], br[2], br[1]]):
-        c.px(x + i, y, col)
+    c.px(x, y, br[6])
+    c.px(x + 1, y, br[5])
+    c.px(x, y + 1, br[5])
+    c.px(x + 1, y + 1, br[3])
+
     c.img.save(OUT / "bus_parts.png")
+
 
 def draw_bus_items():
     iso_data_port().img.save(ITEM_OUT / "bus_port.png")
@@ -490,67 +513,59 @@ def iso_control_plate():
 
 def iso_data_port():
     s = iso.Sprite()
-    # the port as it sits on a machine: a thick copper plate, seen from above at 3/4
-    iso.box(s, 8, 3, 4, 4, 3, iso.COPPER, iso.COPPER, "port", top_index=4)
-    iso.shade_top_edges(s, "port", iso.COPPER)
-    iso.speckle(s, "port", iso.COPPER, 7, 0.12)
-    # the socket: an iso diamond hole; its back walls in shade, contacts in the bottom
-    tl = iso.on_top(8, 3, 1, 1)
-    hole_poly = [tl, iso.on_top(8, 3, 3, 1), iso.on_top(8, 3, 3, 3), iso.on_top(8, 3, 1, 3)]
-    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(hole_poly, x + 0.5, y + 0.5)}
+    g = iso.ANDESITE
+    # the port as it sits on a machine: an andesite-alloy block, seen from above at 3/4
+    iso.box(s, 8, 4, 4, 4, 4, g, g, "port", top_index=6)
+    iso.shade_top_edges(s, "port", g)
+    # the opening in the middle: its far walls in shadow, its near lip catching the light
+    poly = [iso.on_top(8, 4, 1.4, 1.4), iso.on_top(8, 4, 2.6, 1.4), iso.on_top(8, 4, 2.6, 2.6), iso.on_top(8, 4, 1.4, 2.6)]
+    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(poly, x + 0.5, y + 0.5)}
     for x, y in hole:
-        wall = (x, y - 1) not in hole
-        s.set(x, y, iso.COPPER[1] if wall else (15, 24, 48, 255))
+        s.set(x, y, (29, 31, 36, 255) if (x, y - 1) in hole else (22, 23, 27, 255))
     for x, y in hole:
         if (x, y + 1) not in hole:
-            s.set(x, y + 1, iso.COPPER[6])
-    cx, cy = iso.on_top(8, 3, 2, 2)
-    s.set(cx - 1, cy, iso.BRASS[5])
-    s.set(cx, cy, iso.BRASS[6])
-    # the amber lamp on the front corner
-    x, y = iso.on_top(8, 3, 3.6, 3.6)
-    s.set(x, y - 1, iso.AMBER[3])
-    s.set(x - 1, y - 1, iso.AMBER[2])
-    iso.outline(s, iso.COPPER)
-    return s
-
-
-def iso_cable_splice():
-    s = iso.Sprite()
-    # a brass plate with a copper boss in the middle, and the two cables it joins running off
-    # towards the near corners
-    iso.box(s, 8, 4, 4, 4, 2, iso.BRASS, iso.BRASS, "plate", top_index=4)
-    iso.shade_top_edges(s, "plate", iso.BRASS)
-    for c in (3.0, 3.5):
-        for x, y in (iso.on_top(8, 4, c, 2), iso.on_top(8, 4, 2, c)):
-            s.set(x, y, iso.COPPER[3])
-            s.set(x, y - 1, iso.COPPER[5])
-    iso.box(s, 8, 4, 2, 2, 2, iso.COPPER, iso.COPPER, "boss", top_index=5)
-    iso.shade_top_edges(s, "boss", iso.COPPER)
-    iso.outline(s, iso.BRASS)
+            s.set(x, y + 1, g[7])
+    # the lamp on the near corner: amber, as a new port sends data out
+    x, y = iso.on_top(8, 4, 3.4, 3.4)
+    s.set(x, y, iso.AMBER[3])
+    s.set(x - 1, y, iso.AMBER[2])
+    s.set(x, y + 1, iso.AMBER[1])
+    iso.outline(s, g)
     return s
 
 
 def iso_port_expansion():
     s = iso.Sprite()
-    iso.box(s, 6, 4, 5, 3, 2, iso.PCB, iso.PCB, "board", top_index=4)
-    iso.shade_top_edges(s, "board", iso.PCB)
-    # copper traces running to the edge
-    for cs in (0.5, 1.5, 2.5, 3.5, 4.5):
-        x, y = iso.on_top(6, 4, cs, 2.6)
-        s.set(x, y, iso.COPPER[4])
-    for ct in (0.5, 1, 1.5):
-        x, y = iso.on_top(6, 4, 4, ct)
-        s.set(x, y, iso.COPPER[4])
-    # gold fingers along the front-left edge
-    for (x, y), f in list(s.face.items()):
-        if f == "board:left" and x % 2 == 0:
-            s.set(x, y, iso.BRASS[5], f)
-    # the chip: a small slate box on top
-    iso.box(s, 7, 4, 2, 1, 1, iso.SLATE, iso.SLATE, "chip", top_index=3)
-    x, y = iso.on_top(7, 4, 1, 0.5)
-    s.set(x, y, iso.SLATE[4])
-    iso.outline(s, iso.PCB)
+    g, br = iso.ANDESITE, iso.BRASS
+    # an andesite frame with a brass plate set into its top, carrying the four sockets it adds
+    iso.box(s, 8, 4, 4, 4, 3, g, g, "frame", top_index=6)
+    iso.shade_top_edges(s, "frame", g)
+    plate = [iso.on_top(8, 4, 0.7, 0.7), iso.on_top(8, 4, 3.3, 0.7), iso.on_top(8, 4, 3.3, 3.3), iso.on_top(8, 4, 0.7, 3.3)]
+    inner = {(x, y) for x in range(16) for y in range(16) if iso.inside(plate, x + 0.5, y + 0.5)}
+    for x, y in inner:
+        s.set(x, y, br[4] if (x, y - 1) in inner else br[5])
+    for cs, ct in ((1.3, 1.3), (2.7, 1.3), (1.3, 2.7), (2.7, 2.7)):
+        x, y = iso.on_top(8, 4, cs, ct)
+        s.set(x, y, (22, 23, 27, 255))
+        s.set(x - 1, y, (40, 43, 49, 255))
+    iso.outline(s, g)
+    return s
+
+
+def iso_cable_splice():
+    s = iso.Sprite()
+    g, br = iso.ANDESITE, iso.BRASS
+    # an andesite plate with the brass clamp in the middle, and the two cables it joins running
+    # off towards the near corners
+    iso.box(s, 8, 4, 4, 4, 2, g, g, "plate", top_index=6)
+    iso.shade_top_edges(s, "plate", g)
+    for c_ in (3.0, 3.5):
+        for x, y in (iso.on_top(8, 4, c_, 2), iso.on_top(8, 4, 2, c_)):
+            s.set(x, y, iso.COPPER[3])
+            s.set(x, y - 1, iso.COPPER[5])
+    iso.box(s, 8, 4, 2, 2, 2, br, br, "clamp", top_index=5)
+    iso.shade_top_edges(s, "clamp", br)
+    iso.outline(s, g)
     return s
 
 
@@ -586,6 +601,7 @@ def main():
     draw_screen_glass()
     draw_editor_checker()
     draw_bus_parts()
+    draw_port_panel()
     draw_control_plate_item()
     draw_bus_items()
     draw_cables()

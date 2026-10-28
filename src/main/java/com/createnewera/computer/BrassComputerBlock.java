@@ -44,10 +44,10 @@ public class BrassComputerBlock extends HorizontalKineticBlock implements IBE<Br
     public static final double STRESS_IMPACT = 2.0;
 
     /**
-     * The sockets for its own four ports, two on each side, as the model draws them facing
-     * north: the middle of each, in pixels.
+     * The sockets for its own four ports, two on each side in a low brass panel, as the model
+     * draws them facing north: the middle of each, in pixels.
      */
-    private static final int[][] SOCKETS = {{16, 8, 4}, {16, 8, 12}, {0, 8, 4}, {0, 8, 12}};
+    private static final int[][] SOCKETS = {{16, 5, 5}, {16, 5, 11}, {0, 5, 5}, {0, 5, 11}};
 
     /** Where one of the computer's own ports goes: the face, and the spot on its grid. */
     public record Socket(Direction face, int u, int v) {

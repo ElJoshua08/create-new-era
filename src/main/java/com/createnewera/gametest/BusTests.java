@@ -244,6 +244,25 @@ public class BusTests {
         helper.succeed();
     }
 
+    // a port left half over a socket (where the sockets used to be) is moved into it, not doubled
+    @GameTest(template = ROOM)
+    public static void strayPortsMoveIntoSockets(GameTestHelper helper) {
+        computer(helper);
+        var level = helper.getLevel();
+        BlockPos pc = helper.absolutePos(COMPUTER);
+        BusData data = BusData.get(level);
+        BusPort own = data.portsAt(pc).get(0);
+        data.removePort(own.id());
+        BusPort stray = data.addPort(pc, own.face(), own.u() + 1, own.v() + 2, PortMode.IN);
+        Bus.fillSockets(level, pc, level.getBlockState(pc));
+        var here = data.portsAt(pc);
+        if (here.size() != Bus.COMPUTER_PORTS || !here.stream().allMatch(p -> Bus.builtIn(level.getBlockState(pc), p)))
+            helper.fail("expected four ports in the sockets, got " + here);
+        if (data.port(stray.id()) == null)
+            helper.fail("the stray port was replaced instead of moved");
+        helper.succeed();
+    }
+
     // a click anywhere on any face lands inside the part it places, so what you see is what you clicked
     @GameTest(template = ROOM)
     public static void partsLandWhereYouClick(GameTestHelper helper) {

@@ -97,18 +97,19 @@ def bus(name, sub=None):
     return [x, y, x + w, y + h]
 
 
-def socket(name, x, z):
-    """A 6x6 socket plate standing a quarter pixel off a side face, centred on (y 8, z)."""
+def port_panel(name, x):
+    """The brass panel holding the computer's two own ports on one side, a quarter pixel proud
+    of the face; BrassComputerBlock.SOCKETS puts the ports on it."""
     lo, hi = (x, x + 0.25) if x == 16 else (x - 0.25, x)
     face = "east" if x == 16 else "west"
-    return box(name, [lo, 5, z - 3], [hi, 11, z + 3], {
-        face: ("parts", bus("socket")), "sides": ("parts", bus("socket_rim")), "caps": ("parts", bus("socket_rim")),
+    return box(name, [lo, 2, 2], [hi, 8, 14], {
+        face: ("panel", [0, 0, 12, 6]), "sides": ("panel", [0, 6, 12, 7]), "caps": ("panel", [0, 6, 12, 7]),
     })
 
 
 MODELS = {
     "brass_computer": model(
-        {"casing": "create:block/brass_casing", "details": DETAILS, "parts": "create_new_era:block/bus_parts",
+        {"casing": "create:block/brass_casing", "details": DETAILS, "panel": "create_new_era:block/port_panel",
          "particle": "create:block/brass_casing"},
         [
             # frame pieces keep default uv so the casing texture lines up across them
@@ -125,10 +126,8 @@ MODELS = {
             box("screen", [2, 4, 1], [14, 13, 2], {"north": ("details", region("screen"))}),
             box("led_power", [3, 1.5, -0.5], [5, 2.5, 0], {"all": ("details", region("led_green", (0, 0, 2, 1)))}),
             box("led_bus", [6, 1.5, -0.5], [8, 2.5, 0], {"all": ("details", region("led_amber", (0, 0, 2, 1)))}),
-            # the sockets for its four own ports, two on each side; BrassComputerBlock.SOCKETS
-            # puts the ports on them
-            *[socket(name, x, z) for name, x, z in
-              (("socket_east_front", 16, 4), ("socket_east_back", 16, 12), ("socket_west_front", 0, 4), ("socket_west_back", 0, 12))],
+            port_panel("ports_east", 16),
+            port_panel("ports_west", 0),
         ],
     ),
     "bearing_servo": model(

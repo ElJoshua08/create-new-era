@@ -92,16 +92,38 @@ public final class Bus {
                         .anyMatch(s -> s.face() == part.face() && s.u() == part.u() && s.v() == part.v());
     }
 
-    /** Puts a computer's own ports in whichever of its sockets are missing one. */
+    /**
+     * Puts a computer's own ports in whichever of its sockets are missing one. A port already
+     * overlapping an empty socket (left where the sockets used to be) is moved into it, cables
+     * and all, rather than doubled up.
+     */
     public static void fillSockets(ServerLevel level, BlockPos pos, BlockState state) {
         BusData data = BusData.get(level);
-        List<BusPort> here = data.portsAt(pos);
-        boolean added = false;
-        for (BrassComputerBlock.Socket socket : BrassComputerBlock.sockets(state, pos))
-            if (here.stream().noneMatch(socket::takenBy))
-                added |= data.addPart(pos, socket.face(), socket.u(), socket.v(), BusPort.Kind.PORT, PortMode.IN) != null;
-        if (added)
-            sync(level, pos);
+        boolean changed = false;
+        List<BusSpan> moved = new ArrayList<>();
+        for (BrassComputerBlock.Socket socket : BrassComputerBlock.sockets(state, pos)) {
+            List<BusPort> here = data.portsAt(pos);
+            if (here.stream().anyMatch(p -> p.kind() == BusPort.Kind.PORT && p.face() == socket.face()
+                    && p.u() == socket.u() && p.v() == socket.v()))
+                continue;
+            BusPort stray = here.stream().filter(socket::takenBy).findFirst().orElse(null);
+            if (stray != null && stray.kind() == BusPort.Kind.PORT
+                    && here.stream().filter(p -> p != stray).noneMatch(socket::takenBy)) {
+                BusPort into = data.movePart(stray.id(), socket.face(), socket.u(), socket.v());
+                for (BusSpan span : data.spansAt(stray.id())) {
+                    if (span.aerial())
+                        data.moveSpanEnd(span.id(), stray.id(), PartGeometry.anchor(into));
+                    else
+                        data.disconnect(span.id());
+                    moved.add(span);
+                }
+                changed = true;
+            } else if (stray == null) {
+                changed |= data.addPart(pos, socket.face(), socket.u(), socket.v(), BusPort.Kind.PORT, PortMode.IN) != null;
+            }
+        }
+        if (changed)
+            syncCut(level, pos, moved);
     }
 
     /**
