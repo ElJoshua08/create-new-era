@@ -30,6 +30,11 @@ def baseline = tasks.register('hotswapBaseline', Exec) {
 }
 tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
     dependsOn baseline
+    // ModDevGradle launches with the default toolchain; enhanced redefinition needs the JetBrains Runtime
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(21)
+        vendor = JvmVendorSpec.JETBRAINS
+    }
 }
 
 tasks.register('hotswap', Exec) {
