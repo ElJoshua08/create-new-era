@@ -37,8 +37,9 @@ public final class ModBlocks {
     public static final BlockEntry<BrassComputerBlock> BRASS_COMPUTER = REGISTRATE
             .block("brass_computer", BrassComputerBlock::new)
             .initialProperties(SharedProperties::softMetal)
+            // not occluding: light has to reach inside it, or the shaft turning in its back is drawn black
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops()
-                    .lightLevel(s -> s.getValue(BrassComputerBlock.RUNNING) ? 4 : 0))
+                    .noOcclusion().lightLevel(s -> s.getValue(BrassComputerBlock.RUNNING) ? 4 : 0))
             .transform(TagGen.pickaxeOnly())
             .onRegister(b -> BlockStressValues.IMPACTS.register(b, () -> BrassComputerBlock.STRESS_IMPACT))
             // the screen is lit only while a program runs
