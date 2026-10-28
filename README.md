@@ -47,6 +47,7 @@ end
 | `print(...)` | Writes a line to the console under the editor |
 | `sleep(seconds)`, `os.sleep` | Waits in game time (20 ticks a second) |
 | `os.clock()` | Seconds since the program started |
+| `os.speed()` | RPM the computer turns at (negative when it turns the other way) |
 | `require(name)` | Runs another file on the computer once and returns what it returned (`require("lib.pid")` finds `lib/pid.lua`) |
 | `redstone.getInput(side)`, `getAnalogInput(side)` | Signal coming in, as on/off or 0–15 |
 | `redstone.setOutput(side, on)`, `setAnalogOutput(side, 0–15)` | Signal going out |
@@ -70,7 +71,7 @@ The editor works like a small VS Code: files open in tabs, the side panel switch
 | Tab / Shift+Tab | Indent / unindent |
 | Esc | Save and close |
 
-Each program gets a slice of time every tick. A program that loops without sleeping is paused and picked up again next tick, so it slows itself down instead of the server. A program that was running when the world was saved starts again when it loads.
+**Computers run on rotational force.** Put a shaft into the back: the faster it spins, the bigger the slice of each tick the program gets (up to 2 ms at 256 RPM, half that at 128). It costs 2 SU per RPM, like any Create machine. Without rotation, or when the network is overstressed, the program pauses exactly where it is and carries on when the shaft turns again. A program that loops without sleeping is paused at the end of its slice and picked up next tick, so it slows itself down instead of the server. A program that was running when the world was saved starts again when it loads.
 
 ### Blocks and recipes
 

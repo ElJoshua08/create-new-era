@@ -31,8 +31,10 @@ def casing():
 
 
 SCENES = {
-    # computer faces the camera (south); its left is west, its right is east
+    # computer faces the camera (south); its left is west, its right is east; driven from behind
     "computer/intro": ((5, 3, 5), {
+        (2, 1, 0): ("create:creative_motor", {"facing": "south"}),
+        (2, 1, 1): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
         (2, 1, 2): (M + "brass_computer", {"facing": "south", "running": "false"}),
         (1, 1, 2): ("minecraft:redstone_lamp", {"lit": "false"}),
         (3, 1, 2): ("minecraft:lever", {"face": "floor", "facing": "east", "powered": "false"}),

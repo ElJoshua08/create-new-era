@@ -10,6 +10,8 @@ import com.createnewera.registry.ModLang;
 import com.mojang.logging.LogUtils;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
+import com.simibubi.create.foundation.item.KineticStats;
+import com.simibubi.create.foundation.item.TooltipModifier;
 
 import net.createmod.catnip.lang.FontHelper;
 import net.minecraft.resources.ResourceKey;
@@ -26,12 +28,14 @@ public class CreateNewEra {
     public static final String MOD_ID = "create_new_era";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    // Create-style "hold Shift" tooltips, read from <key>.tooltip.summary lang entries.
+    // Create-style "hold Shift" tooltips, read from <key>.tooltip.summary lang entries, plus the
+    // stress line Create shows for kinetic blocks.
     // No default tab: Registrate would also push every item into the search tab, which already
     // collects them from our own tab, and the duplicates crash the creative inventory.
     public static final CreateRegistrate REGISTRATE = CreateRegistrate.create(MOD_ID)
             .defaultCreativeTab((ResourceKey<CreativeModeTab>) null)
-            .setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE));
+            .setTooltipModifierFactory(item -> new ItemDescription.Modifier(item, FontHelper.Palette.STANDARD_CREATE)
+                    .andThen(TooltipModifier.mapNull(KineticStats.create(item))));
 
     public CreateNewEra(IEventBus modEventBus, ModContainer modContainer) {
         ModCreativeTabs.register(modEventBus);

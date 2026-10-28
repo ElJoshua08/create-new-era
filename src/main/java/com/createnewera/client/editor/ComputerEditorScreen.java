@@ -1075,11 +1075,17 @@ public class ComputerEditorScreen extends Screen {
         g.fill(stop.x + 3, stop.y + 3, stop.x + 9, stop.y + 9, 0xFFD8402A);
 
         boolean running = snapshot.running();
+        // a running program with no rotation is paused, not stopped: amber, with the reason
+        boolean paused = running && (snapshot.rpm() == 0 || snapshot.overstressed());
         int x = stop.right() + 6;
-        g.fill(x, toolbar.y + 6, x + 4, toolbar.y + 10, running ? 0xFF4FB33A : 0xFF7A7A7A);
-        String state = I18n.get(running ? "create_new_era.editor.running" : "create_new_era.editor.stopped");
-        if (running)
-            state += ": " + entry;
+        g.fill(x, toolbar.y + 6, x + 4, toolbar.y + 10, paused ? 0xFFE0A030 : running ? 0xFF4FB33A : 0xFF7A7A7A);
+        String state;
+        if (paused)
+            state = I18n.get(snapshot.overstressed() ? "create_new_era.editor.paused_stress" : "create_new_era.editor.paused_rotation");
+        else if (running)
+            state = I18n.get("create_new_era.editor.running") + ": " + entry + " · " + I18n.get("create_new_era.editor.rpm", Math.abs(snapshot.rpm()));
+        else
+            state = I18n.get("create_new_era.editor.stopped");
         if (status != null && Util.getMillis() - statusAt < 1500 && panel() != Panel.FILES)
             state = status;
         g.drawString(font, state, x + 7, toolbar.y + 4, 0xFF2A2A2A, false);

@@ -10,6 +10,7 @@ import com.createnewera.block.DirectionalPartBlock.Placement;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.HorizontalMachineBlock;
 import com.createnewera.computer.BrassComputerBlock;
+import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.simibubi.create.foundation.data.TagGen;
 import com.tterrag.registrate.providers.DataGenContext;
@@ -39,6 +40,7 @@ public final class ModBlocks {
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops()
                     .lightLevel(s -> s.getValue(BrassComputerBlock.RUNNING) ? 4 : 0))
             .transform(TagGen.pickaxeOnly())
+            .onRegister(b -> BlockStressValues.IMPACTS.register(b, () -> BrassComputerBlock.STRESS_IMPACT))
             // the screen is lit only while a program runs
             .blockstate((c, p) -> p.horizontalBlock(c.get(),
                     s -> existing(p, s.getValue(BrassComputerBlock.RUNNING) ? "brass_computer" : "brass_computer_off")))

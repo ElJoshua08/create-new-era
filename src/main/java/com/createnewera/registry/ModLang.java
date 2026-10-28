@@ -45,10 +45,13 @@ public final class ModLang {
         lang("create_new_era.editor.panel.files", "Files (Ctrl+B)");
         lang("create_new_era.editor.panel.redstone", "Redstone");
         lang("create_new_era.editor.panel.flows", "Flows");
+        lang("create_new_era.editor.paused_rotation", "Paused: needs rotation");
+        lang("create_new_era.editor.paused_stress", "Paused: overstressed");
+        lang("create_new_era.editor.rpm", "%s RPM");
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
         lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. For now they work with _redstone_; the _data bus_ comes next.");
-        lang("block.create_new_era.brass_computer.tooltip.condition1", "When running");
-        lang("block.create_new_era.brass_computer.tooltip.behaviour1", "The screen lights up. The program gets a _slice of time_ every tick and keeps going while nobody watches.");
+        lang("block.create_new_era.brass_computer.tooltip.condition1", "When rotated");
+        lang("block.create_new_era.brass_computer.tooltip.behaviour1", "Takes a _shaft_ in its back. The _faster_ it spins, the faster programs run. Without rotation they _pause_ and carry on when it turns again.");
         lang("block.create_new_era.brass_computer.tooltip.condition2", "Redstone");
         lang("block.create_new_era.brass_computer.tooltip.behaviour2", "Every face is a _side_: front, back, left, right, top and bottom. Read signals with _redstone.getInput_, send them with _redstone.setOutput_.");
         lang("block.create_new_era.brass_computer.tooltip.condition3", "When the world loads");

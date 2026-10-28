@@ -1,11 +1,9 @@
 package com.createnewera.computer;
 
-import org.jetbrains.annotations.Nullable;
-
-import com.createnewera.block.HorizontalMachineBlock;
 import com.createnewera.registry.ModBlockEntities;
-import com.mojang.serialization.MapCodec;
 import com.simibubi.create.AllItems;
+import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
+import com.simibubi.create.foundation.block.IBE;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,13 +13,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -29,19 +25,19 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.common.Tags;
 
-public class BrassComputerBlock extends HorizontalMachineBlock implements EntityBlock {
-    public static final MapCodec<BrassComputerBlock> CODEC = simpleCodec(BrassComputerBlock::new);
+/**
+ * Runs on rotational force like any other Create machine: a shaft goes into its back, and the
+ * faster it spins, the more of each tick its program gets.
+ */
+public class BrassComputerBlock extends HorizontalKineticBlock implements IBE<BrassComputerBlockEntity> {
     /** Lights the screen up; mirrors whether a program is loaded. */
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");
+    /** Stress per RPM, as Create counts it. */
+    public static final double STRESS_IMPACT = 2.0;
 
     public BrassComputerBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(RUNNING, false));
-    }
-
-    @Override
-    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-        return CODEC;
     }
 
     @Override
@@ -51,15 +47,31 @@ public class BrassComputerBlock extends HorizontalMachineBlock implements Entity
     }
 
     @Override
-    public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return ModBlockEntities.BRASS_COMPUTER.create(pos, state);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        // like Create's cuckoo clock: back towards a neighbouring shaft if there is one, else face the player
+        Direction preferred = getPreferredHorizontalFacing(context);
+        Direction facing = preferred != null ? preferred.getOpposite() : context.getHorizontalDirection().getOpposite();
+        return defaultBlockState().setValue(HORIZONTAL_FACING, facing);
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide || type != ModBlockEntities.BRASS_COMPUTER.get())
-            return null;
-        return (l, pos, s, be) -> BrassComputerBlockEntity.serverTick(l, pos, s, (BrassComputerBlockEntity) be);
+    public boolean hasShaftTowards(LevelReader level, BlockPos pos, BlockState state, Direction face) {
+        return face == state.getValue(HORIZONTAL_FACING).getOpposite();
+    }
+
+    @Override
+    public Direction.Axis getRotationAxis(BlockState state) {
+        return state.getValue(HORIZONTAL_FACING).getAxis();
+    }
+
+    @Override
+    public Class<BrassComputerBlockEntity> getBlockEntityClass() {
+        return BrassComputerBlockEntity.class;
+    }
+
+    @Override
+    public BlockEntityType<? extends BrassComputerBlockEntity> getBlockEntityType() {
+        return ModBlockEntities.BRASS_COMPUTER.get();
     }
 
     @Override
@@ -75,8 +87,8 @@ public class BrassComputerBlock extends HorizontalMachineBlock implements Entity
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide)
             return InteractionResult.SUCCESS;
-        if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof BrassComputerBlockEntity computer)
-            computer.openEditor(serverPlayer);
+        if (player instanceof ServerPlayer serverPlayer)
+            withBlockEntityDo(level, pos, computer -> computer.openEditor(serverPlayer));
         return InteractionResult.CONSUME;
     }
 

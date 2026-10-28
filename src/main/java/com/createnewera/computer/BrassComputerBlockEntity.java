@@ -12,6 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import org.squiddev.cobalt.LuaError;
 
 import com.createnewera.network.ComputerSnapshot;
+import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
+import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.createnewera.network.ComputerStatePayload;
 import com.createnewera.network.EditorActionPayload;
 import com.createnewera.network.OpenEditorPayload;
@@ -26,16 +28,22 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-/** Holds the program, runs it, and keeps whoever has the editor open up to date. */
-public class BrassComputerBlockEntity extends BlockEntity {
+/**
+ * Holds the files, runs the program, and keeps whoever has the editor open up to date. The
+ * program only runs while the computer turns: its slice of each tick grows with the speed.
+ */
+public class BrassComputerBlockEntity extends KineticBlockEntity {
     public static final int MAX_SOURCE = ComputerFiles.MAX_FILE;
-    /** Per computer per tick. Generous for real work, small enough that runaway loops don't lag the server. */
-    static final long BUDGET_NANOS = 1_000_000;
+    /**
+     * Time per tick at full speed (256 RPM); half the speed gets half the time. Small enough
+     * that a room of busy computers doesn't lag the server.
+     */
+    public static final long MAX_BUDGET_NANOS = 2_000_000;
+    static final float FULL_SPEED = 256;
 
     public static final String DEFAULT_PROGRAM = """
             -- Blinks a redstone signal out of the back.
@@ -65,11 +73,14 @@ public class BrassComputerBlockEntity extends BlockEntity {
         super(type, pos, state);
     }
 
-    public static void serverTick(Level level, BlockPos pos, BlockState state, BrassComputerBlockEntity computer) {
-        computer.tick();
-    }
+    @Override
+    public void addBehaviours(List<BlockEntityBehaviour> behaviours) {}
 
-    private void tick() {
+    @Override
+    public void tick() {
+        super.tick();
+        if (level.isClientSide)
+            return;
         if (running && vm == null)
             start("create_new_era.console.restarted");
         if (vm != null)
@@ -77,9 +88,19 @@ public class BrassComputerBlockEntity extends BlockEntity {
         syncViewers();
     }
 
+    /** How much of this tick the program gets; zero without rotation or when overstressed. */
+    public long budgetNanos() {
+        float speed = Math.min(Math.abs(getSpeed()), FULL_SPEED);
+        return overStressed ? 0 : (long) (MAX_BUDGET_NANOS * speed / FULL_SPEED);
+    }
+
     private void runSlice() {
+        long budget = budgetNanos();
+        // no rotation: the program waits where it is and picks up when power comes back
+        if (budget <= 0)
+            return;
         try {
-            LuaComputer.Status status = vm.tick(level.getGameTime(), BUDGET_NANOS);
+            LuaComputer.Status status = vm.tick(level.getGameTime(), budget);
             if (status == LuaComputer.Status.FINISHED) {
                 log(ConsoleLine.Kind.SYSTEM, "create_new_era.console.finished");
                 halt();
@@ -160,8 +181,9 @@ public class BrassComputerBlockEntity extends BlockEntity {
     private void setRunning(boolean value) {
         running = value;
         BlockState state = getBlockState();
+        // Create's way of changing a kinetic block's state without dropping it off its network
         if (state.getValue(BrassComputerBlock.RUNNING) != value)
-            level.setBlock(worldPosition, state.setValue(BrassComputerBlock.RUNNING, value), Block.UPDATE_ALL);
+            KineticBlockEntity.switchToBlockState(level, worldPosition, state.setValue(BrassComputerBlock.RUNNING, value));
         setChanged();
     }
 
@@ -221,7 +243,7 @@ public class BrassComputerBlockEntity extends BlockEntity {
     }
 
     private Direction facing() {
-        return getBlockState().getValue(BrassComputerBlock.FACING);
+        return getBlockState().getValue(BrassComputerBlock.HORIZONTAL_FACING);
     }
 
     private ComputerSnapshot snapshot() {
@@ -230,7 +252,7 @@ public class BrassComputerBlockEntity extends BlockEntity {
             in.add(getInput(side));
             out.add(outputs[side.ordinal()]);
         }
-        return new ComputerSnapshot(running, getConsole(), in, out);
+        return new ComputerSnapshot(running, getConsole(), in, out, Math.round(getSpeed()), overStressed);
     }
 
     private void syncViewers() {
@@ -246,15 +268,19 @@ public class BrassComputerBlockEntity extends BlockEntity {
             PacketDistributor.sendToPlayer(player, payload);
     }
 
+    /** Broken or unloaded: the program goes with it (a saved running flag restarts it on load). */
     @Override
-    public void setRemoved() {
-        super.setRemoved();
+    public void invalidate() {
+        super.invalidate();
         vm = null;
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(tag, registries, clientPacket);
+        // the disk and console reach editors through their own packets, not chunk updates
+        if (clientPacket)
+            return;
         tag.put("Disk", files.save());
         tag.putString("Entry", entry);
         tag.putBoolean("Running", running);
@@ -265,8 +291,10 @@ public class BrassComputerBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(tag, registries, clientPacket);
+        if (clientPacket)
+            return;
         if (tag.contains("Disk"))
             files.load(tag.getCompound("Disk"));
         else if (tag.contains("Source")) // single-program computers from before files existed
@@ -306,6 +334,11 @@ public class BrassComputerBlockEntity extends BlockEntity {
         public @Nullable String[] readFile(String module) {
             String name = files.resolve(module);
             return name == null ? null : new String[] {name, files.read(name)};
+        }
+
+        @Override
+        public float speed() {
+            return getSpeed();
         }
 
         @Override

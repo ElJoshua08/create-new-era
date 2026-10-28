@@ -7,6 +7,9 @@ import com.createnewera.computer.ComputerFiles;
 import com.createnewera.computer.ConsoleLine;
 import com.createnewera.network.EditorActionPayload;
 import com.createnewera.registry.ModBlocks;
+import com.simibubi.create.AllBlocks;
+import com.simibubi.create.content.kinetics.motor.CreativeMotorBlock;
+import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,13 +25,26 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public class ComputerTests {
     private static final String EMPTY = "empty3";
-    // facing north: back is south (+z), left is east (+x)
+    // facing north: front is north (-z), back is south (+z) where the motor drives it, left is east (+x)
     private static final BlockPos COMPUTER = new BlockPos(1, 1, 1);
-    private static final BlockPos BACK = new BlockPos(1, 1, 2);
+    private static final BlockPos FRONT = new BlockPos(1, 1, 0);
+    private static final BlockPos MOTOR = new BlockPos(1, 1, 2);
     private static final BlockPos LEFT = new BlockPos(2, 1, 1);
 
+    private static void placeComputer(GameTestHelper helper) {
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+    }
+
+    /** A creative motor behind the computer, turning at the given speed. */
+    private static void power(GameTestHelper helper, int rpm) {
+        helper.setBlock(MOTOR, AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(MOTOR);
+        motor.generatedSpeed.setValue(rpm);
+    }
+
     private static BrassComputerBlockEntity run(GameTestHelper helper, String source) {
-        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.FACING, Direction.NORTH));
+        placeComputer(helper);
+        power(helper, 256);
         BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
         computer.setProgram(ComputerFiles.STARTUP, source);
         computer.start("create_new_era.console.running");
@@ -56,10 +72,10 @@ public class ComputerTests {
 
     @GameTest(template = EMPTY)
     public static void drivesRedstoneOut(GameTestHelper helper) {
-        helper.setBlock(BACK, Blocks.REDSTONE_LAMP);
-        var computer = run(helper, "redstone.setOutput('back', true) sleep(100)");
+        helper.setBlock(FRONT, Blocks.REDSTONE_LAMP);
+        var computer = run(helper, "redstone.setOutput('front', true) sleep(100)");
         helper.succeedWhen(() -> {
-            helper.assertBlockProperty(BACK, RedstoneLampBlock.LIT, true);
+            helper.assertBlockProperty(FRONT, RedstoneLampBlock.LIT, true);
             if (!computer.isRunning())
                 helper.fail("program should still be sleeping");
         });
@@ -67,15 +83,15 @@ public class ComputerTests {
 
     @GameTest(template = EMPTY)
     public static void stoppingClearsOutputs(GameTestHelper helper) {
-        helper.setBlock(BACK, Blocks.REDSTONE_LAMP);
-        var computer = run(helper, "rs.setAnalogOutput('back', 9) while true do end");
+        helper.setBlock(FRONT, Blocks.REDSTONE_LAMP);
+        var computer = run(helper, "rs.setAnalogOutput('front', 9) while true do end");
         helper.runAfterDelay(10, () -> {
-            helper.assertBlockProperty(BACK, RedstoneLampBlock.LIT, true);
+            helper.assertBlockProperty(FRONT, RedstoneLampBlock.LIT, true);
             helper.assertBlockProperty(COMPUTER, BrassComputerBlock.RUNNING, true);
             computer.handleAction(null, EditorActionPayload.Action.STOP, "", "");
             // the lamp turns off a few ticks after losing power
             helper.runAfterDelay(6, () -> {
-                helper.assertBlockProperty(BACK, RedstoneLampBlock.LIT, false);
+                helper.assertBlockProperty(FRONT, RedstoneLampBlock.LIT, false);
                 helper.succeed();
             });
         });
@@ -128,7 +144,8 @@ public class ComputerTests {
     // modules load from other files on the same computer, once, and errors name the file they came from
     @GameTest(template = EMPTY)
     public static void requireLoadsOtherFiles(GameTestHelper helper) {
-        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.FACING, Direction.NORTH));
+        placeComputer(helper);
+        power(helper, 256);
         BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
         computer.handleAction(null, EditorActionPayload.Action.SAVE, "lib/greet.lua",
                 "print('loading') return { hi = function(n) return 'hi ' .. n end }");
@@ -141,6 +158,36 @@ public class ComputerTests {
             long loads = computer.getConsole().stream().filter(l -> l.text().equals("loading")).count();
             if (loads != 1)
                 helper.fail("module ran " + loads + " times");
+        });
+    }
+
+    // no rotation, no progress: the program waits where it is and carries on once the shaft turns
+    @GameTest(template = EMPTY, timeoutTicks = 200)
+    public static void pausesWithoutRotation(GameTestHelper helper) {
+        placeComputer(helper);
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        computer.setProgram(ComputerFiles.STARTUP, "print('speed', math.abs(os.speed()))");
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(20, () -> {
+            if (printed(computer, ConsoleLine.Kind.OUTPUT, "speed"))
+                helper.fail("ran without any rotation");
+            if (!computer.isRunning())
+                helper.fail("a paused program should stay loaded");
+            power(helper, 64);
+            helper.succeedWhen(() -> expectPrinted(helper, computer, ConsoleLine.Kind.OUTPUT, "speed\t64"));
+        });
+    }
+
+    // the slice of each tick follows the speed: 256 RPM gets the most, half speed half as much
+    @GameTest(template = EMPTY)
+    public static void speedSetsTheTimeSlice(GameTestHelper helper) {
+        placeComputer(helper);
+        power(helper, 128);
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        helper.succeedWhen(() -> {
+            long budget = computer.budgetNanos();
+            if (budget != BrassComputerBlockEntity.MAX_BUDGET_NANOS / 2)
+                helper.fail("128 RPM should get half the time, got " + budget + " ns");
         });
     }
 }

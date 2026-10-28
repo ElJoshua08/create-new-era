@@ -43,6 +43,8 @@ end
 
 os = {
     clock = native.clock,
+    -- RPM the computer turns at; the faster it turns, the faster programs run
+    speed = native.speed,
     sleep = sleep,
 }
 

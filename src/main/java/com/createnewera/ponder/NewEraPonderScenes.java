@@ -3,6 +3,7 @@ package com.createnewera.ponder;
 import com.createnewera.block.BrassScreenBlock;
 import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.AllItems;
+import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
 
 import net.createmod.catnip.math.Pointing;
 import net.createmod.ponder.api.PonderPalette;
@@ -18,7 +19,8 @@ import net.minecraft.world.phys.Vec3;
 
 /** Positions match the structures written by tools/ponder/gen_ponder.py. */
 public final class NewEraPonderScenes {
-    public static void computer(SceneBuilder scene, SceneBuildingUtil util) {
+    public static void computer(SceneBuilder builder, SceneBuildingUtil util) {
+        CreateSceneBuilder scene = new CreateSceneBuilder(builder);
         scene.title("brass_computer", "Programming with the Brass Computer");
         scene.configureBasePlate(0, 0, 5);
         scene.showBasePlate();
@@ -34,6 +36,23 @@ public final class NewEraPonderScenes {
         scene.overlay().showText(70)
                 .attachKeyFrame()
                 .text("The Brass Computer runs programs written in Lua")
+                .placeNearTarget()
+                .pointAt(front);
+        scene.idle(80);
+
+        scene.world().showSection(util.select().fromTo(2, 1, 0, 2, 1, 1), Direction.SOUTH);
+        scene.idle(10);
+        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 0, 2, 1, 2), 64);
+        scene.effects().rotationSpeedIndicator(computer);
+        scene.overlay().showText(90)
+                .attachKeyFrame()
+                .text("It runs on rotational force through its back. The faster it spins, the faster programs run")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.UP));
+        scene.idle(100);
+        scene.overlay().showText(70)
+                .colored(PonderPalette.RED)
+                .text("Without rotation, or when overstressed, the program pauses and carries on later")
                 .placeNearTarget()
                 .pointAt(front);
         scene.idle(80);

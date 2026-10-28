@@ -41,6 +41,9 @@ public final class LuaComputer {
         /** For require: the file a module name resolves to, as {name, contents}, or null. */
         @Nullable String[] readFile(String module);
 
+        /** Rotation speed in RPM, negative when turning the other way. */
+        float speed();
+
         /** Seconds since the program started, in game time. */
         double clock();
     }
@@ -157,6 +160,7 @@ public final class LuaComputer {
                     return Constants.NIL;
                 }),
                 RegisteredFunction.of("clock", state -> ValueFactory.valueOf(host.clock())),
+                RegisteredFunction.of("speed", state -> ValueFactory.valueOf(host.speed())),
                 RegisteredFunction.ofV("read", (state, args) -> {
                     String[] file = host.readFile(args.arg(1).checkString());
                     return file == null ? Constants.NIL
