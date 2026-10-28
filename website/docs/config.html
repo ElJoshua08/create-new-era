@@ -5,83 +5,79 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Client config · Create: New Era docs</title>
 <meta name="description" content="Create: New Era's client config: the flip-pixel shape option.">
-<meta name="theme-color" content="#15110d">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0d0b" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem('cne-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" type="image/png" href="../img/blocks/brass_computer.png">
-<link rel="preload" href="../fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap">
-<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/docs.css">
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
-<symbol id="i-bang" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M3 0h2v5h-2z M3 6h2v2h-2z"/></symbol>
-<symbol id="i-clock" viewBox="0 0 8 8"><path fill="currentColor" fill-rule="evenodd" shape-rendering="crispEdges" d="M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1z M2 1v1h-1v4h1v1h4v-1h1v-4h-1v-1z M3.5 2h1v2h1.5v1h-2.5z"/></symbol>
-</defs></svg>
-<header class="site-header">
-  <div class="wrap">
-    <a class="brand" href="../"><img class="pixelated" src="../img/blocks/brass_computer.png" alt="" width="30" height="33"><span>Create: New Era</span></a>
-    <nav class="nav" aria-label="Main">
-      <a class="hide-sm" href="../#blocks">Blocks</a>
-      <a class="hide-sm" href="../#roadmap">Roadmap</a>
-      <a href="./" aria-current="page">Docs</a>
-      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="Source on GitHub"><svg aria-hidden="true"><use href="#i-github"/></svg><span class="hide-sm">GitHub</span></a>
+<a class="skip" href="#content">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="logo" href="./"><img src="../img/blocks/brass_computer.png" alt="" width="24" height="27"><span class="word">Create: New Era</span><span class="badge">Docs</span></a>
+    <button class="search-btn" type="button" aria-label="Search docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search docs…</span><kbd>Ctrl K</kbd></button>
+    <nav class="top-links" aria-label="Site">
+      <a class="hide-sm" href="../">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="GitHub repository"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle light and dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
     </nav>
   </div>
 </header>
-<div class="wrap docs">
-  <aside class="side" aria-label="Documentation">
-    <details id="side-nav" open><summary>Contents</summary><div class="groups">
-    <h2>Start</h2><ul><li><a href="index.html">Getting started</a></li></ul><h2>Reference</h2><ul><li><a href="lua.html">Lua API</a></li><li><a href="blocks.html">Blocks and recipes</a></li><li><a href="config.html" aria-current="page">Client config</a></li></ul><h2>Development</h2><ul><li><a href="building.html">Building from source</a></li></ul><h2>Planned</h2><ul><li><a href="planned.html">Data bus, screens, drones</a></li></ul>
-    </div></details>
+<div class="scrim"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Documentation">
+    <div class="drawer-head"><a class="logo" href="./"><span class="word">Create: New Era</span></a><button class="icon-btn drawer-close" type="button" aria-label="Close navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <nav><h2>Start</h2><ul><li><a href="index.html">Getting started</a></li></ul><h2>Reference</h2><ul><li><a href="lua.html">Lua API</a></li><li><a href="blocks.html">Blocks and recipes</a></li><li><a href="config.html" aria-current="page">Client config</a></li></ul><h2>Development</h2><ul><li><a href="building.html">Building from source</a></li></ul><h2>Planned</h2><ul><li><a href="planned.html">Data bus, screens, drones</a></li></ul></nav>
+    <div class="side-foot">
+      <a href="../"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home page</a>
+      <a href="https://github.com/ElJoshua08/create-new-era"><svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
   </aside>
-  <main id="main" class="doc">
+  <main class="content" id="content">
+    <p class="crumb">Reference</p>
     <header>
       <h1>Client config</h1>
       <p class="intro">Create: New Era has one client-side option today. Client options are per player: changing them on your machine doesn't affect anyone else on a server.</p>
     </header>
 
-    <h2 id="pixel-shape">Pixel shape</h2>
+    <h2 id="pixel-shape">Pixel shape<a class="heading-anchor" href="#pixel-shape" aria-label="Link to this section">#</a></h2>
     <p>Brass Screens are made of physical flip pixels. This option picks what each pixel looks like: a <strong>square plate</strong> or a <strong>round disc</strong>. It's purely visual, so each player picks their own.</p>
     <div class="table-scroll"><table class="t">
       <thead><tr><th>Key</th><th>Values</th><th>Default</th></tr></thead>
       <tbody><tr><td><code>screen.pixelShape</code></td><td><code>SQUARE</code>, <code>DISC</code></td><td><code>SQUARE</code></td></tr></tbody>
     </table></div>
-    <div class="callout "><svg aria-hidden="true"><use href="#i-clock"/></svg><p>Screens don't draw their pixels in game yet (that's <a href='../#roadmap'>phase 4</a>), so the option is already saved but has no visible effect. You can try both shapes on the <a href='../#screen'>home page</a>.</p></div>
+    <div class="callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>Screens don't draw their pixels in game yet (that's <a href='../#roadmap'>phase 4</a>), so the option is already saved but has no visible effect. You can try both shapes on the <a href='../#screen'>home page</a>.</p></div>
 
-    <h3>In game</h3>
+    <h3 id="in-game">In game<a class="heading-anchor" href="#in-game" aria-label="Link to this section">#</a></h3>
     <p>Open <strong>Mods</strong>, select <strong>Create: New Era</strong> and press <strong>Config</strong>. The option is under <strong>Screens → Pixel shape</strong>.</p>
 
-    <h3>In the file</h3>
+    <h3 id="in-the-file">In the file<a class="heading-anchor" href="#in-the-file" aria-label="Link to this section">#</a></h3>
     <p>NeoForge names a mod's client config <code>&lt;modid&gt;-client.toml</code>, so the file is <code>config/create_new_era-client.toml</code> inside your game folder:</p>
-<pre><code><span class="k">[screen]</span>
+<div class="codeblock"><div class="code-head"><span>TOML</span><button class="copy-btn" type="button" aria-label="Copy code"><svg class="cp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span class="label">Copy</span></button></div><pre><code><span class="k">[screen]</span>
 	<span class="c">#Shape of each flip pixel on brass screens. Purely visual, so each player picks their own.</span>
 	<span class="c">#Allowed Values: SQUARE, DISC</span>
-	pixelShape = <span class="s">"SQUARE"</span></code></pre>
+	pixelShape = <span class="s">"SQUARE"</span></code></pre></div>
 
     <nav class="pager" aria-label="Pages"><a class="prev" href="blocks.html"><span>Previous</span><b>Blocks and recipes</b></a><a class="next" href="building.html"><span>Next</span><b>Building from source</b></a></nav>
+    <footer class="page-foot">
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT). Unofficial add-on, not affiliated with the Create team.</p>
+      <p>Found a mistake? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+    </footer>
   </main>
+  <aside class="toc" aria-label="On this page">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h14M11 18h10"/></svg>On this page</h2><ul><li><a class="l2" href="#pixel-shape">Pixel shape</a></li><li><a class="l3" href="#in-game">In game</a></li><li><a class="l3" href="#in-the-file">In the file</a></li></ul>
+  </aside>
 </div>
-<footer class="site-footer">
-  <div class="wrap">
-    <div>
-      <p>Create: New Era is an unofficial add-on. It isn't affiliated with the Create team.</p>
-      <p>Pixel type: <a href="https://github.com/IdreesInc/Monocraft">Monocraft</a> (<a href="../fonts/Monocraft-OFL.txt">SIL Open Font License</a>). Found a mistake in these docs? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
-      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT), bundled in the jar.</p>
-    </div>
-    <nav class="foot-links" aria-label="Footer">
-      <a href="../">Home</a>
-      <a href="https://github.com/ElJoshua08/create-new-era">GitHub</a>
-      <a href="https://github.com/ElJoshua08/create-new-era/releases">Releases</a>
-    </nav>
-  </div>
-</footer>
-<script>
-  // the contents disclosure starts closed on narrow screens, where it sits above the article
-  if (window.matchMedia('(max-width: 959px)').matches) document.getElementById('side-nav').removeAttribute('open');
-</script>
+<dialog class="search-dialog" id="search" aria-label="Search docs">
+  <div class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search-input" type="search" placeholder="Search pages and sections" autocomplete="off" aria-controls="search-results"></div>
+  <ul class="search-results" id="search-results" role="listbox"></ul>
+</dialog>
+<script src="search-index.js"></script>
+<script src="../assets/docs.js"></script>
 </body>
 </html>

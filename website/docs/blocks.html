@@ -5,190 +5,147 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Blocks and recipes · Create: New Era docs</title>
 <meta name="description" content="Every block and item in Create: New Era with its tooltip and recipe.">
-<meta name="theme-color" content="#15110d">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0d0b" media="(prefers-color-scheme: dark)">
+<script>try{var t=localStorage.getItem('cne-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="icon" type="image/png" href="../img/blocks/brass_computer.png">
-<link rel="preload" href="../fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&display=swap">
-<link rel="stylesheet" href="../assets/site.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="../assets/docs.css">
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="i-github" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
-<symbol id="i-bang" viewBox="0 0 8 8"><path fill="currentColor" shape-rendering="crispEdges" d="M3 0h2v5h-2z M3 6h2v2h-2z"/></symbol>
-<symbol id="i-clock" viewBox="0 0 8 8"><path fill="currentColor" fill-rule="evenodd" shape-rendering="crispEdges" d="M2 0h4v1h1v1h1v4h-1v1h-1v1h-4v-1h-1v-1h-1v-4h1v-1h1z M2 1v1h-1v4h1v1h4v-1h1v-4h-1v-1z M3.5 2h1v2h1.5v1h-2.5z"/></symbol>
-</defs></svg>
-<header class="site-header">
-  <div class="wrap">
-    <a class="brand" href="../"><img class="pixelated" src="../img/blocks/brass_computer.png" alt="" width="30" height="33"><span>Create: New Era</span></a>
-    <nav class="nav" aria-label="Main">
-      <a class="hide-sm" href="../#blocks">Blocks</a>
-      <a class="hide-sm" href="../#roadmap">Roadmap</a>
-      <a href="./" aria-current="page">Docs</a>
-      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="Source on GitHub"><svg aria-hidden="true"><use href="#i-github"/></svg><span class="hide-sm">GitHub</span></a>
+<a class="skip" href="#content">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <button class="icon-btn menu-btn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <a class="logo" href="./"><img src="../img/blocks/brass_computer.png" alt="" width="24" height="27"><span class="word">Create: New Era</span><span class="badge">Docs</span></a>
+    <button class="search-btn" type="button" aria-label="Search docs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span>Search docs…</span><kbd>Ctrl K</kbd></button>
+    <nav class="top-links" aria-label="Site">
+      <a class="hide-sm" href="../">Home</a>
+      <a href="https://github.com/ElJoshua08/create-new-era" aria-label="GitHub repository"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Toggle light and dark theme"><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
     </nav>
   </div>
 </header>
-<div class="wrap docs">
-  <aside class="side" aria-label="Documentation">
-    <details id="side-nav" open><summary>Contents</summary><div class="groups">
-    <h2>Start</h2><ul><li><a href="index.html">Getting started</a></li></ul><h2>Reference</h2><ul><li><a href="lua.html">Lua API</a></li><li><a href="blocks.html" aria-current="page">Blocks and recipes</a><ul><li><a href="blocks.html#machines">Machines</a></li><li><a href="blocks.html#panel">Panel controls</a></li></ul></li><li><a href="config.html">Client config</a></li></ul><h2>Development</h2><ul><li><a href="building.html">Building from source</a></li></ul><h2>Planned</h2><ul><li><a href="planned.html">Data bus, screens, drones</a></li></ul>
-    </div></details>
+<div class="scrim"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar" aria-label="Documentation">
+    <div class="drawer-head"><a class="logo" href="./"><span class="word">Create: New Era</span></a><button class="icon-btn drawer-close" type="button" aria-label="Close navigation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+    <nav><h2>Start</h2><ul><li><a href="index.html">Getting started</a></li></ul><h2>Reference</h2><ul><li><a href="lua.html">Lua API</a></li><li><a href="blocks.html" aria-current="page">Blocks and recipes</a></li><li><a href="config.html">Client config</a></li></ul><h2>Development</h2><ul><li><a href="building.html">Building from source</a></li></ul><h2>Planned</h2><ul><li><a href="planned.html">Data bus, screens, drones</a></li></ul></nav>
+    <div class="side-foot">
+      <a href="../"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home page</a>
+      <a href="https://github.com/ElJoshua08/create-new-era"><svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+    </div>
   </aside>
-  <main id="main" class="doc">
+  <main class="content" id="content">
+    <p class="crumb">Reference</p>
     <header>
       <h1>Blocks and recipes</h1>
       <p class="intro">Every block and item in the mod, with its tooltip and its recipe as defined in the mod's data files. All of them sit in the Create: New Era creative tab, and each has a Ponder scene: hold <kbd>W</kbd> over the item in game.</p>
     </header>
-    <div class="callout "><svg aria-hidden="true"><use href="#i-bang"/></svg><p>Recipe slots show a letter; the key under each grid names the item and which mod it comes from. Item textures from Minecraft and Create aren't reproduced here.</p></div>
-    <h2 id="machines">Machines</h2>
+    <div class="callout info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><p>Shaped recipes show the grid with a letter per slot and a key beside it. Each ingredient lists the mod it comes from.</p></div>
+    <h2 id="machines">Machines<a class="heading-anchor" href="#machines" aria-label="Link to this section">#</a></h2>
     <p>Four full blocks built around Create's casings. They rotate with the wrench and are mined with a pickaxe.</p>
     <section class="entry" id="brass-computer" aria-labelledby="h-brass_computer">
-      <div class="pic"><img src="../img/blocks/brass_computer.png" alt="Brass Computer" class="pixelated"></div>
-      <div>
-        <h2 id="h-brass_computer">Brass Computer</h2>
-        <span class="id">Block · create_new_era:<wbr>brass_computer</span>
-        <div class="tip"><span class="name">Brass Computer</span><p>Runs <em>Lua</em> programs you write in its built-in <em>editor</em>. For now they work with <em>redstone</em>; the <em>data bus</em> comes next.</p><dl class="beh"><dt>When running</dt><dd>The screen lights up. The program gets a <em>slice of time</em> every tick and keeps going while nobody watches.</dd><dt>Redstone</dt><dd>Every face is a <em>side</em>: front, back, left, right, top and bottom. Read signals with <em>redstone.getInput</em>, send them with <em>redstone.setOutput</em>.</dd><dt>When the world loads</dt><dd>A program that was running <em>starts again</em> from the top.</dd></dl><span class="sub">Controls</span><dl class="beh"><dt>When R-Clicked</dt><dd>Opens the <em>editor</em>. <em>Ctrl+R</em> runs, <em>Ctrl+T</em> stops.</dd><dt>When Wrenched</dt><dd>Turns the computer. The sides turn with its <em>front</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Mechanical Crafting: Glass Pane Glass Pane Glass Pane / Electron Tube Brass Casing Electron Tube / Brass Sheet Precision Mechanism Brass Sheet makes 1 Brass Computer"><span class="rtype">Mechanical Crafting</span><div class="row" aria-hidden="true"><div class="grid"><span class="rslot">G</span><span class="rslot">G</span><span class="rslot">G</span><span class="rslot">T</span><span class="rslot">B</span><span class="rslot">T</span><span class="rslot">S</span><span class="rslot">P</span><span class="rslot">S</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/brass_computer.png" alt="" width="48"></span></div><dl><dt>G</dt><dd>Glass Pane <small>Minecraft</small></dd><dt>T</dt><dd>Electron Tube <small>Create</small></dd><dt>B</dt><dd>Brass Casing <small>Create</small></dd><dt>S</dt><dd>Brass Sheet <small>Create</small></dd><dt>P</dt><dd>Precision Mechanism <small>Create</small></dd></dl><p class="how">Built on Create's Mechanical Crafters in this exact 3 × 3 layout, not mirrored.</p></figure>
-        <p class="future"><strong>Works today.</strong> Right-click to open the editor; see the <a href='lua.html'>Lua API</a>. The screen lights up while a program runs. Data bus access arrives with <a href='../#roadmap'>phase 3</a>.</p>
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/brass_computer.png" alt="" width="56" height="56">
+        <div><h3 id="h-brass_computer">Brass Computer<a class="heading-anchor" href="#h-brass_computer" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:brass_computer</code></span></div></div>
+      <div class="tip"><span class="name">Brass Computer</span><p>Runs <em>Lua</em> programs you write in its built-in <em>editor</em>. For now they work with <em>redstone</em>; the <em>data bus</em> comes next.</p><dl class="beh"><dt>When running</dt><dd>The screen lights up. The program gets a <em>slice of time</em> every tick and keeps going while nobody watches.</dd><dt>Redstone</dt><dd>Every face is a <em>side</em>: front, back, left, right, top and bottom. Read signals with <em>redstone.getInput</em>, send them with <em>redstone.setOutput</em>.</dd><dt>When the world loads</dt><dd>A program that was running <em>starts again</em> from the top.</dd></dl><span class="sub">Controls</span><dl class="beh"><dt>When R-Clicked</dt><dd>Opens the <em>editor</em>. <em>Ctrl+R</em> runs, <em>Ctrl+T</em> stops.</dd><dt>When Wrenched</dt><dd>Turns the computer. The sides turn with its <em>front</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Mechanical Crafting</span><span class="makes">Makes 1 × Brass Computer</span></div><div class="recipe-body"><div class="grid" role="img" aria-label="Mechanical Crafting: Glass Pane Glass Pane Glass Pane / Electron Tube Brass Casing Electron Tube / Brass Sheet Precision Mechanism Brass Sheet"><span class="cell">G</span><span class="cell">G</span><span class="cell">G</span><span class="cell">T</span><span class="cell">B</span><span class="cell">T</span><span class="cell">S</span><span class="cell">P</span><span class="cell">S</span></div><ul class="legend"><li><b>G</b>Glass Pane <small>Minecraft</small></li><li><b>T</b>Electron Tube <small>Create</small></li><li><b>B</b>Brass Casing <small>Create</small></li><li><b>S</b>Brass Sheet <small>Create</small></li><li><b>P</b>Precision Mechanism <small>Create</small></li></ul></div><p class="how">Built on Create's Mechanical Crafters in this exact layout, not mirrored.</p></div>
+      <p class="future"><strong>Works today.</strong> Right-click to open the editor; see the <a href='lua.html'>Lua API</a>. The screen lights up while a program runs. Data bus access arrives with <a href='../#roadmap'>phase 3</a>.</p>
     </section>    <section class="entry" id="brass-screen" aria-labelledby="h-brass_screen">
-      <div class="pic"><img src="../img/blocks/brass_screen.png" alt="Brass Screen" class="pixelated"></div>
-      <div>
-        <h2 id="h-brass_screen">Brass Screen</h2>
-        <span class="id">Block · create_new_era:<wbr>brass_screen</span>
-        <div class="tip"><span class="name">Brass Screen</span><p>Joins with its neighbours into one big display made of <em>flip pixels</em> that turn when they change.</p><dl class="beh"><dt>Next to another screen</dt><dd>Screens facing the <em>same way</em> merge into <em>one pane</em> and the brass frame between them disappears.</dd><dt>Pixels</dt><dd><em>48 by 48</em> flip pixels per block. Pick <em>square plates</em> or <em>round discs</em> in the client config.</dd></dl><span class="sub">Controls</span><dl class="beh"><dt>When Wrenched</dt><dd>Turns the screen. It joins whatever screens it now lines up with.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting Table, shaped: Glass Pane Glass Pane Glass Pane / Electron Tube Brass Casing Electron Tube makes 2 Brass Screen"><span class="rtype">Crafting Table, shaped</span><div class="row" aria-hidden="true"><div class="grid"><span class="rslot">G</span><span class="rslot">G</span><span class="rslot">G</span><span class="rslot">T</span><span class="rslot">B</span><span class="rslot">T</span><span class="rslot empty">·</span><span class="rslot empty">·</span><span class="rslot empty">·</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/brass_screen.png" alt="" width="48"><span class="count">2</span></span></div><dl><dt>G</dt><dd>Glass Pane <small>Minecraft</small></dd><dt>T</dt><dd>Electron Tube <small>Create</small></dd><dt>B</dt><dd>Brass Casing <small>Create</small></dd></dl><p class="how">Any 3 × 3 crafting grid; the pattern can sit in the top or bottom two rows.</p></figure>
-        <p class="future"><strong>Joins today:</strong> screens facing the same way merge into one pane. Drawing on them arrives with <a href='../#roadmap'>phase 4, Flip-pixel screens</a>.</p>
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/brass_screen.png" alt="" width="56" height="56">
+        <div><h3 id="h-brass_screen">Brass Screen<a class="heading-anchor" href="#h-brass_screen" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:brass_screen</code></span></div></div>
+      <div class="tip"><span class="name">Brass Screen</span><p>Joins with its neighbours into one big display made of <em>flip pixels</em> that turn when they change.</p><dl class="beh"><dt>Next to another screen</dt><dd>Screens facing the <em>same way</em> merge into <em>one pane</em> and the brass frame between them disappears.</dd><dt>Pixels</dt><dd><em>48 by 48</em> flip pixels per block. Pick <em>square plates</em> or <em>round discs</em> in the client config.</dd></dl><span class="sub">Controls</span><dl class="beh"><dt>When Wrenched</dt><dd>Turns the screen. It joins whatever screens it now lines up with.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shaped</span><span class="makes">Makes 2 × Brass Screen</span></div><div class="recipe-body"><div class="grid" role="img" aria-label="Crafting, shaped: Glass Pane Glass Pane Glass Pane / Electron Tube Brass Casing Electron Tube"><span class="cell">G</span><span class="cell">G</span><span class="cell">G</span><span class="cell">T</span><span class="cell">B</span><span class="cell">T</span></div><ul class="legend"><li><b>G</b>Glass Pane <small>Minecraft</small></li><li><b>T</b>Electron Tube <small>Create</small></li><li><b>B</b>Brass Casing <small>Create</small></li></ul></div><p class="how">Any crafting grid; the two rows can sit at the top or bottom.</p></div>
+      <p class="future"><strong>Joins today:</strong> screens facing the same way merge into one pane. Drawing on them arrives with <a href='../#roadmap'>phase 4, Flip-pixel screens</a>.</p>
     </section>    <section class="entry" id="universal-adapter" aria-labelledby="h-universal_adapter">
-      <div class="pic"><img src="../img/blocks/universal_adapter.png" alt="Universal Adapter" class="pixelated"></div>
-      <div>
-        <h2 id="h-universal_adapter">Universal Adapter</h2>
-        <span class="id">Block · create_new_era:<wbr>universal_adapter</span>
-        <div class="tip"><span class="name">Universal Adapter</span><p>Attach to any block to expose what it can do, <em>kinetics</em>, <em>items</em> or <em>fluids</em>, on the data bus.</p><dl class="beh"><dt>When placed</dt><dd>Sticks to the face you click, so it fits on <em>any side</em> of a machine.</dd><dt>Coming soon</dt><dd>Arrives with the <em>data bus</em>. Until then it doesn't do anything.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Item Application: Electron Tube applied to Andesite Casing makes Universal Adapter"><span class="rtype">Item Application</span><div class="row" aria-hidden="true"><span class="rslot">K</span><span class="plus" aria-hidden="true">+</span><span class="rslot">T</span><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/universal_adapter.png" alt="" width="48"></span></div><dl><dt>K</dt><dd>Andesite Casing <small>Create</small></dd><dt>T</dt><dd>Electron Tube <small>Create</small></dd></dl><p class="how">Right-click a placed Andesite Casing while holding an Electron Tube, or let a Deployer do it.</p></figure>
-        <p class="future">What it does arrives with <a href="../#roadmap">phase 3, Data bus</a>. Today it can be placed, rotated with the wrench and mined.</p>
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/universal_adapter.png" alt="" width="56" height="56">
+        <div><h3 id="h-universal_adapter">Universal Adapter<a class="heading-anchor" href="#h-universal_adapter" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:universal_adapter</code></span></div></div>
+      <div class="tip"><span class="name">Universal Adapter</span><p>Attach to any block to expose what it can do, <em>kinetics</em>, <em>items</em> or <em>fluids</em>, on the data bus.</p><dl class="beh"><dt>When placed</dt><dd>Sticks to the face you click, so it fits on <em>any side</em> of a machine.</dd><dt>Coming soon</dt><dd>Arrives with the <em>data bus</em>. Until then it doesn't do anything.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Item Application</span><span class="makes">Makes 1 × Universal Adapter</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">on</span>Andesite Casing <small>Create, placed</small></li><li><span class="qty">use</span>Electron Tube <small>Create, in hand</small></li></ul></div><p class="how">Right-click a placed Andesite Casing while holding an Electron Tube, or let a Deployer do it.</p></div>
+      <p class="future">What it does arrives with <a href="../#roadmap">phase 3, Data bus</a>. Today it can be placed, rotated with the wrench and mined.</p>
     </section>    <section class="entry" id="bearing-servo" aria-labelledby="h-bearing_servo">
-      <div class="pic"><img src="../img/blocks/bearing_servo.png" alt="Bearing Servo" class="pixelated"></div>
-      <div>
-        <h2 id="h-bearing_servo">Bearing Servo</h2>
-        <span class="id">Block · create_new_era:<wbr>bearing_servo</span>
-        <div class="tip"><span class="name">Bearing Servo</span><p>Turns an attached <em>contraption</em> to an exact angle on command.</p><dl class="beh"><dt>When placed</dt><dd>Faces you, like Create's <em>bearings</em>.</dd><dt>Coming soon</dt><dd>Programs will set its <em>angle</em> in degrees, for gimbals, turrets and flaps.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Item Application: Precision Mechanism applied to Mechanical Bearing makes Bearing Servo"><span class="rtype">Item Application</span><div class="row" aria-hidden="true"><span class="rslot">W</span><span class="plus" aria-hidden="true">+</span><span class="rslot">P</span><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/bearing_servo.png" alt="" width="48"></span></div><dl><dt>W</dt><dd>Mechanical Bearing <small>Create</small></dd><dt>P</dt><dd>Precision Mechanism <small>Create</small></dd></dl><p class="how">Right-click a placed Mechanical Bearing while holding a Precision Mechanism, or let a Deployer do it.</p></figure>
-        <p class="future">What it does arrives with <a href="../#roadmap">phase 6, Aeronautics</a>. Today it can be placed, rotated with the wrench and mined.</p>
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/bearing_servo.png" alt="" width="56" height="56">
+        <div><h3 id="h-bearing_servo">Bearing Servo<a class="heading-anchor" href="#h-bearing_servo" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:bearing_servo</code></span></div></div>
+      <div class="tip"><span class="name">Bearing Servo</span><p>Turns an attached <em>contraption</em> to an exact angle on command.</p><dl class="beh"><dt>When placed</dt><dd>Faces you, like Create's <em>bearings</em>.</dd><dt>Coming soon</dt><dd>Programs will set its <em>angle</em> in degrees, for gimbals, turrets and flaps.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Item Application</span><span class="makes">Makes 1 × Bearing Servo</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">on</span>Mechanical Bearing <small>Create, placed</small></li><li><span class="qty">use</span>Precision Mechanism <small>Create, in hand</small></li></ul></div><p class="how">Right-click a placed Mechanical Bearing while holding a Precision Mechanism, or let a Deployer do it.</p></div>
+      <p class="future">What it does arrives with <a href="../#roadmap">phase 6, Aeronautics</a>. Today it can be placed, rotated with the wrench and mined.</p>
     </section>
-    <h2 id="panel" style="margin-top:108px">Panel controls</h2>
+    <h2 id="panel">Panel controls<a class="heading-anchor" href="#panel" aria-label="Link to this section">#</a></h2>
     <p>Small blocks you place on any face to build control desks. Each is a Control Plate plus one part. Wiring them to programs is <a href="../#roadmap">phase 5</a>; today they can be placed, rotated and mined.</p>
     <section class="entry" id="control-plate" aria-labelledby="h-control_plate">
-      <div class="pic flat"><img src="../img/blocks/control_plate.png" alt="Control Plate"></div>
-      <div>
-        <h2 id="h-control_plate">Control Plate</h2>
-        <span class="id">Item · create_new_era:<wbr>control_plate</span>
-        <div class="tip"><span class="name">Control Plate</span><p>Andesite base for every <em>panel control</em>.</p><dl class="beh"><dt>Crafting</dt><dd>Combine with a part, like a <em>lever</em> or a <em>nixie tube</em>, to make a control.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Andesite Alloy, Andesite Alloy, Brass Sheet makes 4 Control Plate"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">A</span><span class="rslot">A</span><span class="rslot">S</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/control_plate.png" alt="" width="48"><span class="count">4</span></span></div><dl><dt>A</dt><dd>Andesite Alloy <small>Create</small></dd><dt>S</dt><dd>Brass Sheet <small>Create</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon flat" src="../img/blocks/control_plate.png" alt="" width="56" height="56">
+        <div><h3 id="h-control_plate">Control Plate<a class="heading-anchor" href="#h-control_plate" aria-label="Link to this section">#</a></h3><span class="id">Item · <code>create_new_era:control_plate</code></span></div></div>
+      <div class="tip"><span class="name">Control Plate</span><p>Andesite base for every <em>panel control</em>.</p><dl class="beh"><dt>Crafting</dt><dd>Combine with a part, like a <em>lever</em> or a <em>nixie tube</em>, to make a control.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 4 × Control Plate</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">2×</span>Andesite Alloy <small>Create</small></li><li><span class="qty">1×</span>Brass Sheet <small>Create</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>
     <section class="entry" id="panel-button" aria-labelledby="h-panel_button">
-      <div class="pic"><img src="../img/blocks/panel_button.png" alt="Panel Button" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_button">Panel Button</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_button</span>
-        <div class="tip"><span class="name">Panel Button</span><p>A momentary <em>push button</em> for programs to react to.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will see each <em>press</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Stone Button, Red Dye makes 1 Panel Button"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">B</span><span class="rslot">R</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_button.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>B</dt><dd>Stone Button <small>Minecraft</small></dd><dt>R</dt><dd>Red Dye <small>Minecraft</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_button.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_button">Panel Button<a class="heading-anchor" href="#h-panel_button" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_button</code></span></div></div>
+      <div class="tip"><span class="name">Panel Button</span><p>A momentary <em>push button</em> for programs to react to.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will see each <em>press</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Button</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Stone Button <small>Minecraft</small></li><li><span class="qty">1×</span>Red Dye <small>Minecraft</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-switch" aria-labelledby="h-panel_switch">
-      <div class="pic"><img src="../img/blocks/panel_switch.png" alt="Panel Switch" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_switch">Panel Switch</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_switch</span>
-        <div class="tip"><span class="name">Panel Switch</span><p>An <em>on/off</em> lever a program can read.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Lever makes 1 Panel Switch"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">L</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_switch.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>L</dt><dd>Lever <small>Minecraft</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_switch.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_switch">Panel Switch<a class="heading-anchor" href="#h-panel_switch" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_switch</code></span></div></div>
+      <div class="tip"><span class="name">Panel Switch</span><p>An <em>on/off</em> lever a program can read.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Switch</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Lever <small>Minecraft</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-knob" aria-labelledby="h-panel_knob">
-      <div class="pic"><img src="../img/blocks/panel_knob.png" alt="Panel Knob" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_knob">Panel Knob</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_knob</span>
-        <div class="tip"><span class="name">Panel Knob</span><p>A rotary knob that dials in a <em>value</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>value</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Hand Crank makes 1 Panel Knob"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">H</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_knob.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>H</dt><dd>Hand Crank <small>Create</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_knob.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_knob">Panel Knob<a class="heading-anchor" href="#h-panel_knob" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_knob</code></span></div></div>
+      <div class="tip"><span class="name">Panel Knob</span><p>A rotary knob that dials in a <em>value</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>value</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Knob</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Hand Crank <small>Create</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-slider" aria-labelledby="h-panel_slider">
-      <div class="pic"><img src="../img/blocks/panel_slider.png" alt="Panel Slider" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_slider">Panel Slider</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_slider</span>
-        <div class="tip"><span class="name">Panel Slider</span><p>A fader for a smooth <em>0 to 100%</em> value.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Brass Sheet, Iron Nugget makes 1 Panel Slider"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">S</span><span class="rslot">N</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_slider.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>S</dt><dd>Brass Sheet <small>Create</small></dd><dt>N</dt><dd>Iron Nugget <small>Minecraft</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_slider.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_slider">Panel Slider<a class="heading-anchor" href="#h-panel_slider" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_slider</code></span></div></div>
+      <div class="tip"><span class="name">Panel Slider</span><p>A fader for a smooth <em>0 to 100%</em> value.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will read its <em>position</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Slider</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Brass Sheet <small>Create</small></li><li><span class="qty">1×</span>Iron Nugget <small>Minecraft</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-lamp" aria-labelledby="h-panel_lamp">
-      <div class="pic"><img src="../img/blocks/panel_lamp.png" alt="Panel Lamp" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_lamp">Panel Lamp</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_lamp</span>
-        <div class="tip"><span class="name">Panel Lamp</span><p>An indicator light a program can switch and <em>colour</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will switch it and pick its <em>colour</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Glowstone Dust, Glass Pane makes 1 Panel Lamp"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">D</span><span class="rslot">G</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_lamp.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>D</dt><dd>Glowstone Dust <small>Minecraft</small></dd><dt>G</dt><dd>Glass Pane <small>Minecraft</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_lamp.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_lamp">Panel Lamp<a class="heading-anchor" href="#h-panel_lamp" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_lamp</code></span></div></div>
+      <div class="tip"><span class="name">Panel Lamp</span><p>An indicator light a program can switch and <em>colour</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will switch it and pick its <em>colour</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Lamp</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Glowstone Dust <small>Minecraft</small></li><li><span class="qty">1×</span>Glass Pane <small>Minecraft</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="nixie-digit" aria-labelledby="h-nixie_digit">
-      <div class="pic"><img src="../img/blocks/nixie_digit.png" alt="Nixie Digit" class="pixelated"></div>
-      <div>
-        <h2 id="h-nixie_digit">Nixie Digit</h2>
-        <span class="id">Block · create_new_era:<wbr>nixie_digit</span>
-        <div class="tip"><span class="name">Nixie Digit</span><p>One glowing <em>digit</em>; place several in a row to show whole numbers.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will show <em>digits</em> on it.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Nixie Tube makes 1 Nixie Digit"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">X</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/nixie_digit.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>X</dt><dd>Nixie Tube <small>Create</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/nixie_digit.png" alt="" width="56" height="56">
+        <div><h3 id="h-nixie_digit">Nixie Digit<a class="heading-anchor" href="#h-nixie_digit" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:nixie_digit</code></span></div></div>
+      <div class="tip"><span class="name">Nixie Digit</span><p>One glowing <em>digit</em>; place several in a row to show whole numbers.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will show <em>digits</em> on it.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Nixie Digit</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Nixie Tube <small>Create</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-gauge" aria-labelledby="h-panel_gauge">
-      <div class="pic"><img src="../img/blocks/panel_gauge.png" alt="Panel Gauge" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_gauge">Panel Gauge</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_gauge</span>
-        <div class="tip"><span class="name">Panel Gauge</span><p>A needle dial that shows any <em>value</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will move its <em>needle</em>.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Speedometer makes 1 Panel Gauge"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">M</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_gauge.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>M</dt><dd>Speedometer <small>Create</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_gauge.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_gauge">Panel Gauge<a class="heading-anchor" href="#h-panel_gauge" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_gauge</code></span></div></div>
+      <div class="tip"><span class="name">Panel Gauge</span><p>A needle dial that shows any <em>value</em>.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will move its <em>needle</em>.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Gauge</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">1×</span>Speedometer <small>Create</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>    <section class="entry" id="panel-keypad" aria-labelledby="h-panel_keypad">
-      <div class="pic"><img src="../img/blocks/panel_keypad.png" alt="Panel Keypad" class="pixelated"></div>
-      <div>
-        <h2 id="h-panel_keypad">Panel Keypad</h2>
-        <span class="id">Block · create_new_era:<wbr>panel_keypad</span>
-        <div class="tip"><span class="name">Panel Keypad</span><p>Twelve keys to <em>type numbers</em> into a program.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will get the <em>numbers</em> typed in.</dd></dl></div>
-        <figure class="recipe" role="group" aria-label="Crafting, shapeless: Control Plate, Stone Button, Stone Button, Stone Button makes 1 Panel Keypad"><span class="rtype">Crafting, shapeless</span><div class="row" aria-hidden="true"><div class="list"><span class="rslot">C</span><span class="rslot">B</span><span class="rslot">B</span><span class="rslot">B</span></div><svg class="arrow" viewBox="0 0 11 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M0 3h6v-3h1v1h1v1h1v1h1v1h1v1h-1v1h-1v1h-1v1h-1v1h-1v-3h-6z"/></svg><span class="rslot out"><img src="../img/blocks/panel_keypad.png" alt="" width="48"></span></div><dl><dt>C</dt><dd>Control Plate <small>Create: New Era</small></dd><dt>B</dt><dd>Stone Button <small>Minecraft</small></dd></dl><p class="how">Any crafting grid, in any arrangement.</p></figure>
-        
-      </div>
+      <div class="entry-head"><img class="entry-icon" src="../img/blocks/panel_keypad.png" alt="" width="56" height="56">
+        <div><h3 id="h-panel_keypad">Panel Keypad<a class="heading-anchor" href="#h-panel_keypad" aria-label="Link to this section">#</a></h3><span class="id">Block · <code>create_new_era:panel_keypad</code></span></div></div>
+      <div class="tip"><span class="name">Panel Keypad</span><p>Twelve keys to <em>type numbers</em> into a program.</p><dl class="beh"><dt>When placed</dt><dd>Sits on the face you click: <em>floors, walls or ceilings</em>. Put several together to build a <em>control desk</em>.</dd><dt>Coming soon</dt><dd>Programs will get the <em>numbers</em> typed in.</dd></dl></div>
+      <div class="recipe"><div class="recipe-head"><span class="type">Crafting, shapeless</span><span class="makes">Makes 1 × Panel Keypad</span></div><div class="recipe-body"><ul class="ings"><li><span class="qty">1×</span>Control Plate <small>Create: New Era</small></li><li><span class="qty">3×</span>Stone Button <small>Minecraft</small></li></ul></div><p class="how">Any crafting grid, in any arrangement.</p></div>
+      
     </section>
 
     <nav class="pager" aria-label="Pages"><a class="prev" href="lua.html"><span>Previous</span><b>Lua API</b></a><a class="next" href="config.html"><span>Next</span><b>Client config</b></a></nav>
+    <footer class="page-foot">
+      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT). Unofficial add-on, not affiliated with the Create team.</p>
+      <p>Found a mistake? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
+    </footer>
   </main>
+  <aside class="toc" aria-label="On this page">
+    <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M7 12h14M11 18h10"/></svg>On this page</h2><ul><li><a class="l2" href="#machines">Machines</a></li><li><a class="l3" href="#h-brass_computer">Brass Computer</a></li><li><a class="l3" href="#h-brass_screen">Brass Screen</a></li><li><a class="l3" href="#h-universal_adapter">Universal Adapter</a></li><li><a class="l3" href="#h-bearing_servo">Bearing Servo</a></li><li><a class="l2" href="#panel">Panel controls</a></li><li><a class="l3" href="#h-control_plate">Control Plate</a></li><li><a class="l3" href="#h-panel_button">Panel Button</a></li><li><a class="l3" href="#h-panel_switch">Panel Switch</a></li><li><a class="l3" href="#h-panel_knob">Panel Knob</a></li><li><a class="l3" href="#h-panel_slider">Panel Slider</a></li><li><a class="l3" href="#h-panel_lamp">Panel Lamp</a></li><li><a class="l3" href="#h-nixie_digit">Nixie Digit</a></li><li><a class="l3" href="#h-panel_gauge">Panel Gauge</a></li><li><a class="l3" href="#h-panel_keypad">Panel Keypad</a></li></ul>
+  </aside>
 </div>
-<footer class="site-footer">
-  <div class="wrap">
-    <div>
-      <p>Create: New Era is an unofficial add-on. It isn't affiliated with the Create team.</p>
-      <p>Pixel type: <a href="https://github.com/IdreesInc/Monocraft">Monocraft</a> (<a href="../fonts/Monocraft-OFL.txt">SIL Open Font License</a>). Found a mistake in these docs? <a href="https://github.com/ElJoshua08/create-new-era/issues">Open an issue</a>.</p>
-      <p>Create: New Era is public domain under <a href="https://github.com/ElJoshua08/create-new-era/blob/main/LICENSE">The Unlicense</a>. Lua runs on <a href="https://github.com/cc-tweaked/Cobalt">Cobalt</a> (MIT), bundled in the jar.</p>
-    </div>
-    <nav class="foot-links" aria-label="Footer">
-      <a href="../">Home</a>
-      <a href="https://github.com/ElJoshua08/create-new-era">GitHub</a>
-      <a href="https://github.com/ElJoshua08/create-new-era/releases">Releases</a>
-    </nav>
-  </div>
-</footer>
-<script>
-  // the contents disclosure starts closed on narrow screens, where it sits above the article
-  if (window.matchMedia('(max-width: 959px)').matches) document.getElementById('side-nav').removeAttribute('open');
-</script>
+<dialog class="search-dialog" id="search" aria-label="Search docs">
+  <div class="search-field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="search-input" type="search" placeholder="Search pages and sections" autocomplete="off" aria-controls="search-results"></div>
+  <ul class="search-results" id="search-results" role="listbox"></ul>
+</dialog>
+<script src="search-index.js"></script>
+<script src="../assets/docs.js"></script>
 </body>
 </html>
