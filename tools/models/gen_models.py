@@ -94,7 +94,12 @@ MODELS = {
         {"casing": "create:block/brass_casing", "details": DETAILS, "particle": "create:block/brass_casing"},
         [
             # frame pieces keep default uv so the casing texture lines up across them
-            box("back", [0, 0, 2], [16, 16, 16], {"all": ("casing", None)}),
+            # body, then a back plate framing a 6x6 hole: the shaft driving the computer turns inside it
+            box("body", [0, 0, 2], [16, 16, 12], {"all": ("casing", None)}),
+            box("back_top", [0, 11, 12], [16, 16, 16], {"all": ("casing", None)}),
+            box("back_bottom", [0, 0, 12], [16, 5, 16], {"all": ("casing", None)}),
+            box("back_left", [0, 5, 12], [5, 11, 16], {"all": ("casing", None)}),
+            box("back_right", [11, 5, 12], [16, 11, 16], {"all": ("casing", None)}),
             box("frame_top", [0, 13, 0], [16, 16, 2], {"all": ("casing", None)}),
             box("frame_bottom", [0, 0, 0], [16, 4, 2], {"all": ("casing", None)}),
             box("frame_left", [14, 4, 0], [16, 13, 2], {"all": ("casing", None)}),
