@@ -23,13 +23,13 @@ def launcher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersio
 }
 
 // remember what the game started with, so hotswap only sends what changed since
+def baseline = tasks.register('hotswapBaseline', Exec) {
+    dependsOn 'classes'
+    executable = launcher.map { it.executablePath.asFile.absolutePath }.get()
+    args hotswapTool, 'baseline', classesDir.get().asFile, stateFile.get().asFile
+}
 tasks.matching { it.name == 'runClient' || it.name == 'runServer' }.configureEach {
-    doFirst {
-        providers.exec {
-            commandLine launcher.get().executablePath.asFile, hotswapTool, 'baseline',
-                    classesDir.get().asFile, stateFile.get().asFile
-        }.result.get()
-    }
+    dependsOn baseline
 }
 
 tasks.register('hotswap', Exec) {
