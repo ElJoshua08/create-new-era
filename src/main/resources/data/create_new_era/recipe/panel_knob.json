@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "create_new_era:control_plate"
+    },
+    {
+      "item": "create:hand_crank"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_new_era:panel_knob"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "create:item_application",
+  "ingredients": [
+    {
+      "item": "create:mechanical_bearing"
+    },
+    {
+      "item": "create:precision_mechanism"
+    }
+  ],
+  "results": [
+    {
+      "id": "create_new_era:bearing_servo"
+    }
+  ]
+}

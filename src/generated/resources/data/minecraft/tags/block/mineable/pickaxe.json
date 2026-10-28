@@ -1,0 +1,16 @@
+{
+  "values": [
+    "create_new_era:brass_computer",
+    "create_new_era:brass_screen",
+    "create_new_era:universal_adapter",
+    "create_new_era:bearing_servo",
+    "create_new_era:panel_button",
+    "create_new_era:panel_switch",
+    "create_new_era:panel_knob",
+    "create_new_era:panel_slider",
+    "create_new_era:panel_lamp",
+    "create_new_era:nixie_digit",
+    "create_new_era:panel_gauge",
+    "create_new_era:panel_keypad"
+  ]
+}

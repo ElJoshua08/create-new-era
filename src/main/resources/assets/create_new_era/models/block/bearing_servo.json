@@ -1,0 +1,197 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/andesite_casing",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/andesite_casing"
+  },
+  "elements": [
+    {
+      "name": "casing",
+      "from": [
+        0,
+        0,
+        0.5
+      ],
+      "to": [
+        16,
+        14,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            2,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            2,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "name": "rotor",
+      "from": [
+        2,
+        14,
+        2
+      ],
+      "to": [
+        14,
+        16,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            14.0,
+            2.0
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            14.0,
+            2.0
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            14.0,
+            2.0
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            14.0,
+            2.0
+          ]
+        },
+        "up": {
+          "texture": "#details",
+          "uv": [
+            0.0,
+            6.0,
+            6.0,
+            12.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "dial",
+      "from": [
+        4,
+        4,
+        0
+      ],
+      "to": [
+        12,
+        12,
+        0.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            12.0,
+            3.0,
+            16.0,
+            7.0
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            0.5
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            0.5
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            0.5
+          ]
+        },
+        "up": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            0.5
+          ]
+        },
+        "down": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            0.5
+          ]
+        }
+      }
+    }
+  ]
+}

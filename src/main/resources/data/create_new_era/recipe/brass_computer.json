@@ -1,0 +1,32 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "minecraft:glass_pane"
+    },
+    "T": {
+      "item": "create:electron_tube"
+    },
+    "B": {
+      "item": "create:brass_casing"
+    },
+    "S": {
+      "item": "create:brass_sheet"
+    },
+    "P": {
+      "item": "create:precision_mechanism"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "TBT",
+    "SPS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_new_era:brass_computer"
+  },
+  "show_notification": false
+}

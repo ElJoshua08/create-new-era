@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "redstone",
+  "ingredients": [
+    {
+      "item": "create_new_era:control_plate"
+    },
+    {
+      "item": "create:nixie_tube"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "create_new_era:nixie_digit"
+  }
+}

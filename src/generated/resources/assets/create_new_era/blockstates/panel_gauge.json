@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "create_new_era:block/panel_gauge",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "create_new_era:block/panel_gauge",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "create_new_era:block/panel_gauge",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "create_new_era:block/panel_gauge",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "create_new_era:block/panel_gauge"
+    },
+    "facing=west": {
+      "model": "create_new_era:block/panel_gauge",
+      "x": 90,
+      "y": 270
+    }
+  }
+}
