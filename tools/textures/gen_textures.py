@@ -513,59 +513,67 @@ def iso_control_plate():
 
 def iso_data_port():
     s = iso.Sprite()
-    g = iso.ANDESITE
-    # the port as it sits on a machine: an andesite-alloy block, seen from above at 3/4
-    iso.box(s, 8, 4, 4, 4, 4, g, g, "port", top_index=6)
-    iso.shade_top_edges(s, "port", g)
-    # the opening in the middle: its far walls in shadow, its near lip catching the light
-    poly = [iso.on_top(8, 4, 1.4, 1.4), iso.on_top(8, 4, 2.6, 1.4), iso.on_top(8, 4, 2.6, 2.6), iso.on_top(8, 4, 1.4, 2.6)]
-    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(poly, x + 0.5, y + 0.5)}
+    # the port as it sits on a machine: a thick copper plate, seen from above at 3/4
+    iso.box(s, 8, 3, 4, 4, 3, iso.COPPER, iso.COPPER, "port", top_index=4)
+    iso.shade_top_edges(s, "port", iso.COPPER)
+    iso.speckle(s, "port", iso.COPPER, 7, 0.12)
+    # the socket: an iso diamond hole; its back walls in shade, contacts in the bottom
+    tl = iso.on_top(8, 3, 1, 1)
+    hole_poly = [tl, iso.on_top(8, 3, 3, 1), iso.on_top(8, 3, 3, 3), iso.on_top(8, 3, 1, 3)]
+    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(hole_poly, x + 0.5, y + 0.5)}
     for x, y in hole:
-        s.set(x, y, (29, 31, 36, 255) if (x, y - 1) in hole else (22, 23, 27, 255))
+        wall = (x, y - 1) not in hole
+        s.set(x, y, iso.COPPER[1] if wall else (15, 24, 48, 255))
     for x, y in hole:
         if (x, y + 1) not in hole:
-            s.set(x, y + 1, g[7])
-    # the lamp on the near corner: amber, as a new port sends data out
-    x, y = iso.on_top(8, 4, 3.4, 3.4)
-    s.set(x, y, iso.AMBER[3])
-    s.set(x - 1, y, iso.AMBER[2])
-    s.set(x, y + 1, iso.AMBER[1])
-    iso.outline(s, g)
+            s.set(x, y + 1, iso.COPPER[6])
+    cx, cy = iso.on_top(8, 3, 2, 2)
+    s.set(cx - 1, cy, iso.BRASS[5])
+    s.set(cx, cy, iso.BRASS[6])
+    # the amber lamp on the front corner
+    x, y = iso.on_top(8, 3, 3.6, 3.6)
+    s.set(x, y - 1, iso.AMBER[3])
+    s.set(x - 1, y - 1, iso.AMBER[2])
+    iso.outline(s, iso.COPPER)
     return s
 
 
 def iso_port_expansion():
     s = iso.Sprite()
-    g, br = iso.ANDESITE, iso.BRASS
-    # an andesite frame with a brass plate set into its top, carrying the four sockets it adds
-    iso.box(s, 8, 4, 4, 4, 3, g, g, "frame", top_index=6)
-    iso.shade_top_edges(s, "frame", g)
-    plate = [iso.on_top(8, 4, 0.7, 0.7), iso.on_top(8, 4, 3.3, 0.7), iso.on_top(8, 4, 3.3, 3.3), iso.on_top(8, 4, 0.7, 3.3)]
-    inner = {(x, y) for x in range(16) for y in range(16) if iso.inside(plate, x + 0.5, y + 0.5)}
-    for x, y in inner:
-        s.set(x, y, br[4] if (x, y - 1) in inner else br[5])
-    for cs, ct in ((1.3, 1.3), (2.7, 1.3), (1.3, 2.7), (2.7, 2.7)):
-        x, y = iso.on_top(8, 4, cs, ct)
-        s.set(x, y, (22, 23, 27, 255))
-        s.set(x - 1, y, (40, 43, 49, 255))
-    iso.outline(s, g)
+    iso.box(s, 6, 4, 5, 3, 2, iso.PCB, iso.PCB, "board", top_index=4)
+    iso.shade_top_edges(s, "board", iso.PCB)
+    # copper traces running to the edge
+    for cs in (0.5, 1.5, 2.5, 3.5, 4.5):
+        x, y = iso.on_top(6, 4, cs, 2.6)
+        s.set(x, y, iso.COPPER[4])
+    for ct in (0.5, 1, 1.5):
+        x, y = iso.on_top(6, 4, 4, ct)
+        s.set(x, y, iso.COPPER[4])
+    # gold fingers along the front-left edge
+    for (x, y), f in list(s.face.items()):
+        if f == "board:left" and x % 2 == 0:
+            s.set(x, y, iso.BRASS[5], f)
+    # the chip: a small slate box on top
+    iso.box(s, 7, 4, 2, 1, 1, iso.SLATE, iso.SLATE, "chip", top_index=3)
+    x, y = iso.on_top(7, 4, 1, 0.5)
+    s.set(x, y, iso.SLATE[4])
+    iso.outline(s, iso.PCB)
     return s
 
 
 def iso_cable_splice():
     s = iso.Sprite()
-    g, br = iso.ANDESITE, iso.BRASS
-    # an andesite plate with the brass clamp in the middle, and the two cables it joins running
-    # off towards the near corners
-    iso.box(s, 8, 4, 4, 4, 2, g, g, "plate", top_index=6)
-    iso.shade_top_edges(s, "plate", g)
-    for c_ in (3.0, 3.5):
-        for x, y in (iso.on_top(8, 4, c_, 2), iso.on_top(8, 4, 2, c_)):
+    # a brass plate with a copper boss in the middle, and the two cables it joins running off
+    # towards the near corners
+    iso.box(s, 8, 4, 4, 4, 2, iso.BRASS, iso.BRASS, "plate", top_index=4)
+    iso.shade_top_edges(s, "plate", iso.BRASS)
+    for c in (3.0, 3.5):
+        for x, y in (iso.on_top(8, 4, c, 2), iso.on_top(8, 4, 2, c)):
             s.set(x, y, iso.COPPER[3])
             s.set(x, y - 1, iso.COPPER[5])
-    iso.box(s, 8, 4, 2, 2, 2, br, br, "clamp", top_index=5)
-    iso.shade_top_edges(s, "clamp", br)
-    iso.outline(s, g)
+    iso.box(s, 8, 4, 2, 2, 2, iso.COPPER, iso.COPPER, "boss", top_index=5)
+    iso.shade_top_edges(s, "boss", iso.COPPER)
+    iso.outline(s, iso.BRASS)
     return s
 
 
