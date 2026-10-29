@@ -182,5 +182,7 @@
   "create_new_era.cable.no_route": "No hay camino por las caras entre los dos",
   "create_new_era.cable.already_joined": "Esos dos ya están unidos",
   "create_new_era.bus.use_sockets": "Los puertos propios del ordenador van en los huecos de sus lados",
-  "create_new_era.bus.computer_full": "No le quedan puertos: una ampliación de puertos añade 4 más"
+  "create_new_era.bus.computer_full": "No le quedan puertos: una ampliación de puertos añade 4 más",
+  "create_new_era.bus.port_now_out": "Puerto en salida: los programas pueden leer este bloque",
+  "create_new_era.bus.port_now_in": "Puerto en entrada: los programas pueden darle órdenes a este bloque"
 }

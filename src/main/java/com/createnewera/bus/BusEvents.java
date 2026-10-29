@@ -7,6 +7,7 @@ import com.createnewera.registry.ModItems;
 import com.simibubi.create.AllItems;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -34,7 +35,11 @@ public final class BusEvents {
         gameBus.addListener(BusEvents::chunkSent);
     }
 
-    /** Wrench on a port turns it around; sneaking takes the part off and hands it back. */
+    /**
+     * Wrench on a port turns it between input and output; sneaking takes the part off and hands
+     * it back. A computer's own ports turn too, but stay on: sneaking there picks up the computer,
+     * as Create does.
+     */
     private static void wrench(PlayerInteractEvent.RightClickBlock event) {
         if (!AllItems.WRENCH.isIn(event.getItemStack()) || event.getHitVec() == null)
             return;
@@ -43,8 +48,8 @@ public final class BusEvents {
                 ? BusData.get(server).portsAt(pos)
                 : clientParts.apply(pos);
         BusPort part = PartGeometry.partAt(parts, event.getFace(), event.getHitVec().getLocation());
-        // a computer's own ports stay put: the wrench turns the computer instead
-        if (part == null || Bus.builtIn(event.getLevel().getBlockState(pos), part))
+        boolean builtIn = part != null && Bus.builtIn(event.getLevel().getBlockState(pos), part);
+        if (part == null || (builtIn && event.getEntity().isShiftKeyDown()))
             return;
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.SUCCESS);
@@ -57,7 +62,10 @@ public final class BusEvents {
             server.playSound(null, pos, SoundEvents.COPPER_BREAK, SoundSource.BLOCKS, 0.6f, 1.4f);
         } else if (part.kind() == BusPort.Kind.PORT) {
             Bus.flip(server, part);
-            server.playSound(null, pos, SoundEvents.COPPER_BULB_TURN_ON, SoundSource.BLOCKS, 0.5f, part.mode() == PortMode.IN ? 1.6f : 1.2f);
+            PortMode now = part.mode().flipped();
+            server.playSound(null, pos, SoundEvents.COPPER_BULB_TURN_ON, SoundSource.BLOCKS, 0.5f, now == PortMode.OUT ? 1.6f : 1.2f);
+            event.getEntity().displayClientMessage(Component.translatable(now == PortMode.OUT
+                    ? "create_new_era.bus.port_now_out" : "create_new_era.bus.port_now_in"), true);
         }
     }
 

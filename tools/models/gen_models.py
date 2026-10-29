@@ -284,6 +284,15 @@ def port(light):
 
 MODELS["bus_port_in"] = port("light_in")
 MODELS["bus_port_out"] = port("light_out")
+
+
+def port_lamp(light):
+    """Just the lamp, for a computer's own ports: the port itself is drawn by its side panel."""
+    return model(BUS_TEX, [box("light", [0.5, 0.25, 0.5], [1.5, 0.75, 1.5], {"all": ("parts", bus(light))})])
+
+
+MODELS["bus_port_lamp_in"] = port_lamp("light_in")
+MODELS["bus_port_lamp_out"] = port_lamp("light_out")
 MODELS["port_expansion"] = model(BUS_TEX, [
     box("board", [0, 0, 0], [6, 1, 6], {"up": ("parts", bus("expansion_top")), "down": ("parts", bus("expansion_top")),
                                         "sides": ("parts", bus("expansion_side"))}),

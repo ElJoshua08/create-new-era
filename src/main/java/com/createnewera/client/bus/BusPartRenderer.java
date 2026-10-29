@@ -41,6 +41,8 @@ public final class BusPartRenderer {
     private static final ModelResourceLocation PORT_OUT = model("bus_port_out");
     private static final ModelResourceLocation EXPANSION = model("port_expansion");
     private static final ModelResourceLocation SPLICE = model("cable_splice");
+    private static final ModelResourceLocation LAMP_IN = model("bus_port_lamp_in");
+    private static final ModelResourceLocation LAMP_OUT = model("bus_port_lamp_out");
     /** Parts further than this aren't worth drawing: they're a few pixels across. */
     private static final double RANGE = 48;
 
@@ -51,6 +53,8 @@ public final class BusPartRenderer {
             event.register(PORT_OUT);
             event.register(EXPANSION);
             event.register(SPLICE);
+            event.register(LAMP_IN);
+            event.register(LAMP_OUT);
         });
         gameBus.addListener(BusPartRenderer::render);
         gameBus.addListener(BusPartRenderer::outline);
@@ -82,11 +86,11 @@ public final class BusPartRenderer {
             for (BusPort part : chunk) {
                 if (part.pos().distToCenterSqr(camera) > RANGE * RANGE)
                     continue;
-                // a computer's own ports are its sockets, drawn by its model
-                if (Bus.builtIn(mc.level.getBlockState(part.pos()), part))
-                    continue;
+                // a computer's own ports are drawn by its side panels: only their lamp goes on top
+                boolean builtIn = Bus.builtIn(mc.level.getBlockState(part.pos()), part);
                 BakedModel model = models.getModel(switch (part.kind()) {
-                    case PORT -> part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
+                    case PORT -> builtIn ? (part.mode() == PortMode.IN ? LAMP_IN : LAMP_OUT)
+                            : part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
                     case EXPANSION -> EXPANSION;
                     case SPLICE -> SPLICE;
                 });

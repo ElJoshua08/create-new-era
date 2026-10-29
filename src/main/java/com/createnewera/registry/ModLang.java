@@ -65,6 +65,8 @@ public final class ModLang {
         lang("create_new_era.bus.expansion_needs_computer", "Port expansions go on a Brass Computer, up to 3");
         lang("create_new_era.bus.use_sockets", "The computer's own ports go in the sockets on its sides");
         lang("create_new_era.bus.computer_full", "No ports left: a Port Expansion adds 4 more");
+        lang("create_new_era.bus.port_now_out", "Port set to output: programs can read this block");
+        lang("create_new_era.bus.port_now_in", "Port set to input: programs can give this block orders");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

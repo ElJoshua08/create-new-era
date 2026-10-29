@@ -12,6 +12,7 @@ import com.createnewera.computer.ComputerFiles;
 import com.createnewera.computer.ConsoleLine;
 import com.createnewera.registry.ModBlocks;
 import com.simibubi.create.AllBlocks;
+import com.simibubi.create.AllItems;
 import com.simibubi.create.content.kinetics.motor.CreativeMotorBlock;
 import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
 
@@ -332,6 +333,29 @@ public class BusTests {
         Bus.removePart(level, BusData.get(level).port(port.id()));
         if (!BusData.get(level).portsAt(helper.absolutePos(CHEST)).isEmpty())
             helper.fail("the port didn't come off");
+        helper.succeed();
+    }
+
+    // a real wrench click, through the event bus: on a port it turns the port, not the Create
+    // block under it, and that includes the computer's own ports
+    @GameTest(template = ROOM)
+    public static void wrenchClicksReachPortsOnCreateBlocks(GameTestHelper helper) {
+        computer(helper);
+        motor(helper);
+        var level = helper.getLevel();
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, AllItems.WRENCH.asStack());
+        BusPort onMotor = port(helper, MOTOR, PortMode.OUT);
+        BusPort own = socketPort(helper, PortMode.IN);
+        for (BusPort port : java.util.List.of(onMotor, own)) {
+            PortMode before = BusData.get(level).port(port.id()).mode();
+            var hit = new net.minecraft.world.phys.BlockHitResult(PartGeometry.anchor(port), port.face(), port.pos(), false);
+            net.neoforged.neoforge.common.CommonHooks.onRightClickBlock(player, net.minecraft.world.InteractionHand.MAIN_HAND, port.pos(), hit);
+            if (BusData.get(level).port(port.id()).mode() == before)
+                helper.fail("a wrench click didn't turn the port on " + level.getBlockState(port.pos()).getBlock());
+        }
+        if (level.getBlockState(helper.absolutePos(COMPUTER)).getValue(BrassComputerBlock.HORIZONTAL_FACING) != Direction.NORTH)
+            helper.fail("the wrench turned the computer instead of its port");
         helper.succeed();
     }
 }
