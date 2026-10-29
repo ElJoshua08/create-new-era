@@ -27,7 +27,13 @@ public final class ModItems {
             .lang("Data Port")
             .register();
 
-    /** More ports for a computer, stuck onto it like a port. */
+    /** A data port in brass: read and given orders at once, so no mode to pick. */
+    public static final ItemEntry<BusPartItem> BRASS_PORT = REGISTRATE
+            .item("brass_port", p -> new BusPartItem(p, BusPort.Kind.BRASS_PORT))
+            .lang("Brass Data Port")
+            .register();
+
+    /** More ports for a computer, stuck onto it like a port. Retired for the port hub; kept so placed ones still load. */
     public static final ItemEntry<BusPartItem> PORT_EXPANSION = REGISTRATE
             .item("port_expansion", p -> new BusPartItem(p, BusPort.Kind.EXPANSION))
             .lang("Port Expansion")

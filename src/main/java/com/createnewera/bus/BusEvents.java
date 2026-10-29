@@ -117,7 +117,8 @@ public final class BusEvents {
             case PORT -> ModItems.BUS_PORT.asStack();
             case EXPANSION -> ModItems.PORT_EXPANSION.asStack();
             case SPLICE -> ModItems.CABLE_SPLICE.asStack();
-            case CONTROL -> ItemStack.EMPTY;
+            case BRASS_PORT -> ModItems.BRASS_PORT.asStack();
+            case CONTROL, HUB -> ItemStack.EMPTY;
         };
     }
 

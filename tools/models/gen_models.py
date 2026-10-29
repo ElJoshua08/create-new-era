@@ -371,6 +371,30 @@ MODELS["port_expansion"] = model(BUS_TEX, [
 ])
 
 
+MODELS["bus_port_brass"] = model(BUS_TEX, [
+    box("plate", [0, 0, 0], [4, 1, 4], {"up": ("parts", bus("brass_port_top")), "down": ("parts", bus("brass_port_top")),
+                                        "sides": ("parts", bus("brass_port_side"))}),
+    # both lamps: it reads and takes orders
+    box("light_in", [0.5, 1, 0.5], [1.5, 1.5, 1.5], {"all": ("parts", bus("light_in"))}),
+    box("light_out", [2.5, 1, 2.5], [3.5, 1.5, 3.5], {"all": ("parts", bus("light_out"))}),
+])
+
+
+def hub_panel(name, face):
+    """One face's panel of a port hub: 12x12 in the middle of the face, a quarter pixel proud."""
+    lo, hi = 2, 14
+    frm, to = {"north": ([lo, lo, -0.25], [hi, hi, 0]), "south": ([lo, lo, 16], [hi, hi, 16.25]),
+               "west": ([-0.25, lo, lo], [0, hi, hi]), "east": ([16, lo, lo], [16.25, hi, hi]),
+               "down": ([lo, -0.25, lo], [hi, 0, hi]), "up": ([lo, 16, lo], [hi, 16.25, hi])}[face]
+    return box(name, frm, to, {"all": ("panel", [0, 12, 12, 13]), face: ("panel", [0, 0, 12, 12])})
+
+
+MODELS["port_hub"] = model(
+    {"casing": "create:block/brass_casing", "panel": "create_new_era:block/hub_panel", "particle": "create:block/brass_casing"},
+    [box("casing", [0, 0, 0], [16, 16, 16], {"all": ("casing", None)})]
+    + [hub_panel("panel_" + f, f) for f in ("north", "south", "east", "west", "up", "down")])
+
+
 MODELS["cable_splice"] = model(BUS_TEX, [
     box("plate", [0, 0, 0], [4, 1, 4], {"up": ("parts", bus("splice_top")), "down": ("parts", bus("splice_top")),
                                         "sides": ("parts", bus("splice_side"))}),

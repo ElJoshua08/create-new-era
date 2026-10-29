@@ -41,6 +41,7 @@ public final class BusPartRenderer {
     private static final ModelResourceLocation PORT_OUT = model("bus_port_out");
     private static final ModelResourceLocation EXPANSION = model("port_expansion");
     private static final ModelResourceLocation SPLICE = model("cable_splice");
+    private static final ModelResourceLocation BRASS_PORT = model("bus_port_brass");
     private static final ModelResourceLocation LAMP_IN = model("bus_port_lamp_in");
     private static final ModelResourceLocation LAMP_OUT = model("bus_port_lamp_out");
     /** Parts further than this aren't worth drawing: they're a few pixels across. */
@@ -53,6 +54,7 @@ public final class BusPartRenderer {
             event.register(PORT_OUT);
             event.register(EXPANSION);
             event.register(SPLICE);
+            event.register(BRASS_PORT);
             event.register(LAMP_IN);
             event.register(LAMP_OUT);
         });
@@ -86,8 +88,8 @@ public final class BusPartRenderer {
             for (BusPort part : chunk) {
                 if (part.pos().distToCenterSqr(camera) > RANGE * RANGE)
                     continue;
-                if (part.kind() == BusPort.Kind.CONTROL)
-                    continue; // built into the control's plate
+                if (part.kind() == BusPort.Kind.CONTROL || part.kind() == BusPort.Kind.HUB)
+                    continue; // built into the control's plate, or drawn by the hub's own model
                 // a computer's own ports are drawn by its side panels: only their lamp goes on top
                 boolean builtIn = Bus.builtIn(mc.level.getBlockState(part.pos()), part);
                 BakedModel model = models.getModel(switch (part.kind()) {
@@ -95,7 +97,8 @@ public final class BusPartRenderer {
                             : part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
                     case EXPANSION -> EXPANSION;
                     case SPLICE -> SPLICE;
-                    case CONTROL -> SPLICE; // never reached: skipped above
+                    case BRASS_PORT -> BRASS_PORT;
+                    case CONTROL, HUB -> SPLICE; // never reached: skipped above
                 });
                 BlockPos outside = part.pos().relative(part.face());
                 pose.pushPose();

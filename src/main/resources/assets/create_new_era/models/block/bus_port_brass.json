@@ -1,0 +1,217 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "parts": "create_new_era:block/bus_parts",
+    "particle": "create_new_era:block/bus_parts"
+  },
+  "elements": [
+    {
+      "name": "plate",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        4,
+        1,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            12,
+            12,
+            13
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            12,
+            12,
+            13
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            12,
+            12,
+            13
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            12,
+            12,
+            13
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            8,
+            12,
+            12
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            8,
+            8,
+            12,
+            12
+          ]
+        }
+      }
+    },
+    {
+      "name": "light_in",
+      "from": [
+        0.5,
+        1,
+        0.5
+      ],
+      "to": [
+        1.5,
+        1.5,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            5,
+            0,
+            6,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "name": "light_out",
+      "from": [
+        2.5,
+        1,
+        2.5
+      ],
+      "to": [
+        3.5,
+        1.5,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

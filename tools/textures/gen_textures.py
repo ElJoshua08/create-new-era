@@ -429,6 +429,8 @@ BUS_REGIONS = {
     "splice_top": (0, 8, 4, 4),
     "splice_side": (0, 12, 4, 1),
     "splice_boss": (4, 8, 2, 2),
+    "brass_port_top": (8, 8, 4, 4),
+    "brass_port_side": (8, 12, 4, 1),
 }
 
 
@@ -470,6 +472,23 @@ def draw_port_panel():
     c.img.save(OUT / "port_panel.png")
 
 
+def draw_hub_panel():
+    """A port hub's face: a brass panel the size of the face's middle (12x12 at 0,0) with four
+    data sockets in a 2 by 2 grid, where Bus.HUB_SOCKETS puts them; its edge below (12x1 at 0,12)."""
+    c = Canvas(16, 16)
+    br = ["#%02x%02x%02x" % v[:3] for v in iso.BRASS]
+    c.rect(0, 0, 12, 12, br[4])
+    c.rect(0, 0, 12, 1, br[6])
+    c.rect(0, 0, 1, 12, br[5])
+    c.rect(11, 1, 1, 11, br[2])
+    c.rect(1, 11, 11, 1, br[2])
+    for x, y in ((1, 1), (7, 1), (1, 7), (7, 7)):
+        port_face(c, x, y)
+    for i in range(12):
+        c.px(i, 12, br[4] if i < 2 else br[3] if i < 10 else br[2])
+    c.img.save(OUT / "hub_panel.png")
+
+
 def draw_bus_parts():
     """The parts as they sit on a machine, in the language of Create's own small fittings (the
     redstone link, the portable interfaces): a light andesite-alloy rim with a bevel, dark
@@ -481,6 +500,18 @@ def draw_bus_parts():
     # near lip catching a little light
     hole = HOLE
     port_face(c, *BUS_REGIONS["port_top"][:2])
+    # the brass port: the same opening in a brass rim
+    x, y = BUS_REGIONS["brass_port_top"][:2]
+    rows = [[br[6], br[6], br[6], br[5]],
+            [br[6], None, None, br[4]],
+            [br[5], None, None, br[3]],
+            [br[5], br[4], br[3], br[2]]]
+    for j, row in enumerate(rows):
+        for i, col in enumerate(row):
+            c.px(x + i, y + j, col or hole[j - 1][i - 1])
+    x, y = BUS_REGIONS["brass_port_side"][:2]
+    for i, col in enumerate([br[4], br[3], br[3], br[2]]):
+        c.px(x + i, y, col)
     x, y = BUS_REGIONS["port_side"][:2]
     for i, col in enumerate([g[5], g[4], g[4], g[3]]):
         c.px(x + i, y, col)
@@ -528,6 +559,7 @@ def draw_bus_items():
     iso_data_port().img.save(ITEM_OUT / "bus_port.png")
     iso_port_expansion().img.save(ITEM_OUT / "port_expansion.png")
     iso_cable_splice().img.save(ITEM_OUT / "cable_splice.png")
+    iso_brass_port().img.save(ITEM_OUT / "brass_port.png")
 
 
 DYES = {"white": "#f9fffe", "orange": "#f9801d", "magenta": "#c74ebd", "light_blue": "#3ab3da",
@@ -584,6 +616,30 @@ def iso_control_plate():
     x, y = iso.on_top(8, 3, 2, 2.4)
     s.set(x, y + 1, iso.ANDESITE[6])
     iso.outline(s, iso.ANDESITE)
+    return s
+
+
+def iso_brass_port():
+    s = iso.Sprite()
+    br = iso.BRASS
+    iso.box(s, 8, 3, 4, 4, 3, br, br, "port", top_index=5)
+    iso.shade_top_edges(s, "port", br)
+    iso.speckle(s, "port", br, 7, 0.12)
+    poly = [iso.on_top(8, 3, 1, 1), iso.on_top(8, 3, 3, 1), iso.on_top(8, 3, 3, 3), iso.on_top(8, 3, 1, 3)]
+    hole = {(x, y) for x in range(16) for y in range(16) if iso.inside(poly, x + 0.5, y + 0.5)}
+    for x, y in hole:
+        s.set(x, y, br[1] if (x, y - 1) not in hole else (15, 24, 48, 255))
+    for x, y in hole:
+        if (x, y + 1) not in hole:
+            s.set(x, y + 1, br[7])
+    # both lamps: it reads and takes orders
+    x, y = iso.on_top(8, 3, 3.6, 3.6)
+    s.set(x, y - 1, iso.AMBER[3])
+    s.set(x - 1, y - 1, iso.AMBER[2])
+    x, y = iso.on_top(8, 3, 3.6, 0.6)
+    s.set(x, y - 1, iso.GREEN[2])
+    s.set(x - 1, y - 1, iso.GREEN[1])
+    iso.outline(s, br)
     return s
 
 
@@ -686,6 +742,7 @@ def main():
     draw_editor_checker()
     draw_bus_parts()
     draw_port_panel()
+    draw_hub_panel()
     draw_control_states()
     draw_control_plate_item()
     draw_bus_items()

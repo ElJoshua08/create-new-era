@@ -91,6 +91,20 @@ public final class Bus {
             sync(level, pos);
     }
 
+    /** Where a port hub's sockets sit on each of its faces: a 2 by 2 grid. */
+    public static final int[][] HUB_SOCKETS = {{3, 3}, {9, 3}, {3, 9}, {9, 9}};
+
+    /** Gives a port hub its 24 sockets, four on every face, once. */
+    public static void fitHub(ServerLevel level, BlockPos pos) {
+        BusData data = BusData.get(level);
+        if (data.portsAt(pos).stream().anyMatch(p -> p.kind() == BusPort.Kind.HUB))
+            return;
+        for (Direction face : Direction.values())
+            for (int[] at : HUB_SOCKETS)
+                data.addPart(pos, face, at[0], at[1], BusPort.Kind.HUB, PortMode.IN);
+        sync(level, pos);
+    }
+
     /** A panel control's connection, if the block has one. */
     public static @Nullable BusPort controlAt(List<BusPort> parts) {
         for (BusPort part : parts)
@@ -104,7 +118,7 @@ public final class Bus {
      * with the computer and can't be taken off.
      */
     public static boolean builtIn(BlockState state, BusPort part) {
-        if (part.kind() == BusPort.Kind.CONTROL)
+        if (part.kind() == BusPort.Kind.CONTROL || part.kind() == BusPort.Kind.HUB)
             return true;
         return part.kind() == BusPort.Kind.PORT && state.getBlock() instanceof BrassComputerBlock
                 && BrassComputerBlock.sockets(state, part.pos()).stream()
@@ -311,10 +325,11 @@ public final class Bus {
         Map<BlockPos, boolean[]> modes = new LinkedHashMap<>(); // pos → {readable, writable}
         for (long id : reachable) {
             BusPort port = data.port(id);
-            if (port == null || port.pos().equals(computer) || (port.kind() != BusPort.Kind.PORT && port.kind() != BusPort.Kind.CONTROL))
+            if (port == null || port.pos().equals(computer)
+                    || (port.kind() != BusPort.Kind.PORT && port.kind() != BusPort.Kind.CONTROL && port.kind() != BusPort.Kind.BRASS_PORT))
                 continue;
             boolean[] m = modes.computeIfAbsent(port.pos(), p -> new boolean[2]);
-            if (port.kind() == BusPort.Kind.CONTROL) {
+            if (port.kind() == BusPort.Kind.CONTROL || port.kind() == BusPort.Kind.BRASS_PORT) {
                 m[0] = m[1] = true; // read and given orders through the same connection
             } else if (port.mode() == PortMode.OUT)
                 m[0] = true;

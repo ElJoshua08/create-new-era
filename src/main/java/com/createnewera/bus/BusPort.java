@@ -20,7 +20,11 @@ public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind 
         /** Joins cables in the middle of a run; it isn't a device. */
         SPLICE(4),
         /** A panel control's own connection, built into its plate: placed with it, never drawn. */
-        CONTROL(4);
+        CONTROL(4),
+        /** A brass data port: read and given orders at once, no mode to pick. */
+        BRASS_PORT(4),
+        /** One of a port hub's sockets: joined to the hub's others inside it; not a device. */
+        HUB(4);
 
         /** Footprint on the face, in pixels. */
         public final int size;

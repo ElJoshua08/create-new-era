@@ -38,7 +38,7 @@ public class RegistrationTests {
     private static final List<String> RECIPES = List.of(
             "brass_computer", "brass_screen", "universal_adapter", "bearing_servo", "control_plate",
             "panel_button", "panel_switch", "panel_knob", "panel_slider", "panel_lamp",
-            "nixie_digit", "panel_gauge", "panel_keypad", "bus_port", "port_expansion");
+            "nixie_digit", "panel_gauge", "panel_keypad", "bus_port", "brass_port", "port_hub");
 
     @GameTest(template = EMPTY)
     public static void everyBlockPlacesInEveryFacing(GameTestHelper helper) {
@@ -82,8 +82,8 @@ public class RegistrationTests {
         var level = helper.getLevel();
         CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
         int count = ModCreativeTabs.MAIN.get().getDisplayItems().size();
-        if (count != 17)
-            helper.fail("main tab has " + count + " items, expected 17");
+        if (count != 18)
+            helper.fail("main tab has " + count + " items, expected 18");
         helper.succeed();
     }
 

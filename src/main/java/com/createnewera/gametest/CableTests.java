@@ -178,6 +178,32 @@ public class CableTests {
         helper.succeed();
     }
 
+    // a hub joins whatever is cabled to its sockets, keeping colours apart; brass ports are read and ordered
+    @GameTest(template = ROOM)
+    public static void hubsJoinTheirSockets(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BusData data = BusData.get(level);
+        helper.setBlock(new BlockPos(2, 1, 2), ModBlocks.PORT_HUB.get());
+        List<BusPort> sockets = data.portsAt(helper.absolutePos(new BlockPos(2, 1, 2)));
+        if (sockets.size() != 24 || sockets.stream().anyMatch(p -> p.kind() != BusPort.Kind.HUB))
+            helper.fail("expected 24 hub sockets, got " + sockets);
+        helper.setBlock(new BlockPos(0, 1, 0), Blocks.STONE);
+        helper.setBlock(new BlockPos(4, 1, 4), Blocks.STONE);
+        helper.setBlock(new BlockPos(0, 1, 4), Blocks.STONE);
+        BusPort a = Bus.placePart(level, helper.absolutePos(new BlockPos(0, 1, 0)), Direction.UP, 6, 6, BusPort.Kind.BRASS_PORT, PortMode.OUT);
+        BusPort b = Bus.placePort(level, helper.absolutePos(new BlockPos(4, 1, 4)), Direction.UP, 6, 6, PortMode.OUT);
+        BusPort c = Bus.placePort(level, helper.absolutePos(new BlockPos(0, 1, 4)), Direction.UP, 6, 6, PortMode.OUT);
+        lay(helper, a, sockets.get(0), DyeColor.RED);
+        lay(helper, b, sockets.get(5), DyeColor.RED);
+        lay(helper, c, sockets.get(9), DyeColor.BLUE);
+        var reached = data.network(List.of(a.id()));
+        if (!reached.contains(b.id()))
+            helper.fail("the hub didn't join two red cables");
+        if (reached.contains(c.id()))
+            helper.fail("the hub joined red to blue");
+        helper.succeed();
+    }
+
     private static void click(GameTestHelper helper, Player player, ItemStack spool, BusPort part) {
         player.setItemInHand(InteractionHand.MAIN_HAND, spool);
         Vec3 at = PartGeometry.anchor(part);

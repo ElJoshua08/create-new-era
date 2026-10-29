@@ -26,7 +26,8 @@ public final class ModCreativeTabs {
                         output.accept(ModBlocks.UNIVERSAL_ADAPTER);
                         output.accept(ModBlocks.BEARING_SERVO);
                         output.accept(ModItems.BUS_PORT);
-                        output.accept(ModItems.PORT_EXPANSION);
+                        output.accept(ModItems.BRASS_PORT);
+                        output.accept(ModBlocks.PORT_HUB);
                         output.accept(ModItems.CABLE_SPOOL);
                         output.accept(ModItems.CABLE_SPLICE);
                         output.accept(ModItems.CONTROL_PLATE);

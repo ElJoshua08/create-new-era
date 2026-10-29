@@ -118,6 +118,12 @@ public final class ModLang {
         lang("create_new_era.api.panel_gauge.getMaxValue", "The needle's highest position: 1, full.");
         lang("create_new_era.api.nixie_digit.getMinValue", "The lowest digit it shows: 0.");
         lang("create_new_era.api.nixie_digit.getMaxValue", "The highest digit it shows: 9.");
+        lang("item.create_new_era.brass_port.tooltip.summary", "A _data port_ in brass that does both jobs: programs can _read_ the block and _give it orders_ through the same port.");
+        lang("item.create_new_era.brass_port.tooltip.control1", "When R-Clicked on a face");
+        lang("item.create_new_era.brass_port.tooltip.action1", "Sticks a port where you click. No mode to pick with the wrench.");
+        lang("block.create_new_era.port_hub.tooltip.summary", "Twenty-four data sockets, _four on every face_, all joined inside: where a network's cables meet.");
+        lang("block.create_new_era.port_hub.tooltip.condition1", "With a Cable Spool");
+        lang("block.create_new_era.port_hub.tooltip.behaviour1", "Click any of its sockets. Cables of _different colours_ still don't join through it; bare copper joins any.");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

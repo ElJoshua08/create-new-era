@@ -252,9 +252,9 @@ public class BusData extends SavedData {
     }
 
     /**
-     * Every part reachable from the given ones through spans, the given ones included. Colours
-     * never need checking here: a part can't hold two clashing colours, so whatever a span
-     * reaches is on its network.
+     * Every part reachable from the given ones through spans and through port hubs, the given
+     * ones included. Spans need no colour check: a part can't hold two clashing colours, so
+     * whatever a span reaches is on its network. A hub only joins sockets that get along.
      */
     public Set<Long> network(Collection<Long> from) {
         Map<Long, List<Long>> links = new HashMap<>();
@@ -262,6 +262,17 @@ public class BusData extends SavedData {
             links.computeIfAbsent(s.a(), k -> new ArrayList<>()).add(s.b());
             links.computeIfAbsent(s.b(), k -> new ArrayList<>()).add(s.a());
         }
+        // a hub joins its sockets inside it, as a splice would: those whose colours get along.
+        // Only sockets with a cable count: an empty one has no colour and would join any two.
+        Map<BlockPos, List<BusPort>> hubs = new HashMap<>();
+        for (BusPort p : ports.values())
+            if (p.kind() == BusPort.Kind.HUB && links.containsKey(p.id()))
+                hubs.computeIfAbsent(p.pos(), k -> new ArrayList<>()).add(p);
+        for (List<BusPort> sockets : hubs.values())
+            for (BusPort a : sockets)
+                for (BusPort b : sockets)
+                    if (a != b && BusSpan.compatible(colorAt(a.id(), -1), colorAt(b.id(), -1)))
+                        links.computeIfAbsent(a.id(), k -> new ArrayList<>()).add(b.id());
         Set<Long> seen = new HashSet<>();
         Deque<Long> todo = new ArrayDeque<>();
         for (long id : from)

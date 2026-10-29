@@ -11,6 +11,7 @@ import com.createnewera.block.DirectionalPartBlock;
 import com.createnewera.block.DirectionalPartBlock.Placement;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.HorizontalMachineBlock;
+import com.createnewera.block.PortHubBlock;
 import com.createnewera.block.control.NixieDigitBlock;
 import com.createnewera.block.control.PanelButtonBlock;
 import com.createnewera.block.control.PanelControlBlock;
@@ -59,6 +60,17 @@ public final class ModBlocks {
             .blockstate((c, p) -> p.horizontalBlock(c.get(),
                     s -> existing(p, s.getValue(BrassComputerBlock.RUNNING) ? "brass_computer" : "brass_computer_off")))
             .lang("Brass Computer")
+            .item().model(ModBlocks::blockItemModel).build()
+            .register();
+
+    /** Twenty-four data sockets, four a face, joined inside: where a network's cables meet. */
+    public static final BlockEntry<PortHubBlock> PORT_HUB = REGISTRATE
+            .block("port_hub", PortHubBlock::new)
+            .initialProperties(SharedProperties::softMetal)
+            .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops())
+            .transform(TagGen.pickaxeOnly())
+            .blockstate((c, p) -> p.simpleBlock(c.get(), existing(p, "port_hub")))
+            .lang("Port Hub")
             .item().model(ModBlocks::blockItemModel).build()
             .register();
 
