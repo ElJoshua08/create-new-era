@@ -158,7 +158,12 @@
             0,
             6,
             10
-          ]
+          ],
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          }
         },
         "south": {
           "texture": "#digit",
@@ -167,7 +172,12 @@
             0,
             6,
             10
-          ]
+          ],
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          }
         },
         "east": {
           "texture": "#parts",

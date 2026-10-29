@@ -257,14 +257,24 @@ for value in range(16):
     gauge = control_state("panel_gauge", {"gauge": lambda e: {**e, "faces": {**e["faces"], "up": {"texture": "#dial", "uv": [0, 0, 10, 10]}}}})
     MODELS[f"panel_gauge_{value}"] = with_texture(gauge, "dial", f"create_new_era:block/controls/gauge_{value}")
 
+# lit faces drawn at full brightness whatever light reaches them, so a lamp or a nixie glows
+# in the dark and under shaders rather than being shaded like the plate around it
+GLOW = {"block_light": 15, "sky_light": 15, "ambient_occlusion": False}
+
+
+def glowing(face, lit):
+    return {**face, "neoforge_data": GLOW} if lit else face
+
+
 for light in ("off", "amber", "green", "red"):
-    lamp = control_state("panel_lamp", {"lamp": lambda e: {**e, "faces": {
-        f: {"texture": "#light", "uv": [0, 0, 4, 4] if f == "up" else [0, 4, 4, 7]} for f in e["faces"]}}})
+    lamp = control_state("panel_lamp", {"lamp": lambda e, lit=light != "off": {**e, "faces": {
+        f: glowing({"texture": "#light", "uv": [0, 0, 4, 4] if f == "up" else [0, 4, 4, 7]}, lit) for f in e["faces"]}}})
     MODELS[f"panel_lamp_{light}"] = with_texture(lamp, "light", f"create_new_era:block/controls/lamp_{light}")
 
 for digit in [str(d) for d in range(10)] + ["off"]:
-    nixie = control_state("nixie_digit", {"tube": lambda e: {**e, "faces": {**e["faces"],
-        "north": {"texture": "#digit", "uv": [0, 0, 6, 10]}, "south": {"texture": "#digit", "uv": [0, 0, 6, 10]}}}})
+    nixie = control_state("nixie_digit", {"tube": lambda e, lit=digit != "off": {**e, "faces": {**e["faces"],
+        "north": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit),
+        "south": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit)}}})
     MODELS[f"nixie_digit_{digit}"] = with_texture(nixie, "digit", f"create_new_era:block/controls/nixie_{digit}")
 
 
