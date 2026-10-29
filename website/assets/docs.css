@@ -294,19 +294,42 @@ pre .c { color: var(--tok-c); font-style: italic; } pre .b { color: var(--tok-b)
 @media (max-width: 480px) { .logo .word { font-size: 13.5px; } .topbar-in { gap: 6px; padding: 0 12px; } }
 
 /* doc-set tabs (Guide / Development) */
-.set-tabs { display: flex; gap: 2px; margin-left: 12px; }
-.set-tabs a, .drawer-tabs a {
-  display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px;
-  color: var(--fg-3); text-decoration: none; font-size: 14px; font-weight: 500;
+/* Guide / Development: a segmented control. One recessed track, the current set as a raised
+   thumb catching the light on its top edge; no accent bar. Feedback on press, not release. */
+:root { --seg-track: #ece8e1; --seg-thumb: #ffffff; --seg-thumb-shadow: 0 1px 2px rgba(28, 26, 23, 0.12), 0 0 0 0.5px rgba(28, 26, 23, 0.1); }
+:root[data-theme="dark"] { --seg-track: #1b1915; --seg-thumb: #2c2924; --seg-thumb-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --seg-track: #1b1915; --seg-thumb: #2c2924; --seg-thumb-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.07); }
 }
-.set-tabs a:hover, .drawer-tabs a:hover { color: var(--fg); background: var(--muted-bg); }
-.set-tabs a[aria-current], .drawer-tabs a[aria-current] { color: var(--fg); background: var(--muted-bg); box-shadow: inset 0 -2px 0 var(--accent); }
+.set-tabs, .drawer-tabs {
+  display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px;
+  padding: 2px; border-radius: 9px; background: var(--seg-track);
+}
+.set-tabs { margin-left: 14px; }
+.set-tabs a, .drawer-tabs a {
+  display: inline-flex; align-items: center; justify-content: center; height: 28px; padding: 0 14px;
+  border-radius: 7px; color: var(--fg-3); text-decoration: none; font-size: 13px; font-weight: 500;
+  letter-spacing: 0.005em; -webkit-tap-highlight-color: transparent;
+  transition: color 150ms ease, transform 100ms ease-out;
+}
+.set-tabs a:hover, .drawer-tabs a:hover { color: var(--fg); }
+.set-tabs a:active, .drawer-tabs a:active { transform: scale(0.97); }
+.set-tabs a[aria-current], .drawer-tabs a[aria-current] {
+  color: var(--fg); font-weight: 600; background: var(--seg-thumb); box-shadow: var(--seg-thumb-shadow);
+}
+.set-tabs a:focus-visible, .drawer-tabs a:focus-visible { outline: 2px solid var(--accent-ring); outline-offset: 1px; }
+@media (prefers-contrast: more) {
+  .set-tabs a[aria-current], .drawer-tabs a[aria-current] { box-shadow: 0 0 0 1px var(--fg-3); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .set-tabs a:active, .drawer-tabs a:active { transform: none; }
+}
 .drawer-tabs { display: none; }
 .drawer-head .word { font-family: 'Monocraft', var(--mono); font-size: 18px; color: var(--accent); }
 @media (max-width: 1023px) {
   .set-tabs { display: none; }
-  .drawer-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 18px; border: 1px solid var(--border); border-radius: 10px; }
-  .drawer-tabs a { justify-content: center; }
+  .drawer-tabs { display: grid; margin-bottom: 18px; }
+  .drawer-tabs a { height: 32px; }
 }
 
 /* link cards */
