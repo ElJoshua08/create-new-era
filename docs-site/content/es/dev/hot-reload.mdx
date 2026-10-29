@@ -16,6 +16,19 @@ Con `dev_hotswap=true` (lo normal), la mayoría de cambios llegan a una partida 
 
 Solo se envían las clases que han cambiado desde que arrancó el juego. El cambio en sí lo hace `tools/hotswap/HotSwap.java`, hablando JDWP con el juego.
 
+## El juego siempre abierto: `tools/dev/game.sh`
+
+Un script arranca el cliente, lo mantiene al día con tu código y lo reinicia cuando hace falta:
+
+```sh title="Terminal"
+tools/dev/game.sh start     # lo arranca (si ya está abierto, no hace nada), directo a dev_world
+tools/dev/game.sh reload    # hotswap; reinicia el juego si un cambio no entra en caliente
+tools/dev/game.sh restart   # para bloques, objetos, block entities o payloads nuevos
+tools/dev/game.sh stop      # lo cierra; el mundo se guarda al salir
+```
+
+Si el código no compila, `reload` se para ahí y no toca el juego. En Hyprland, pon `dev_monitor` en `gradle.properties` (por ejemplo `DP-1`) y el cliente se abre a pantalla completa en ese monitor; déjalo vacío para no hacerlo.
+
 ## Qué necesita cada cosa
 
 | Has cambiado | Para verlo |

@@ -21,7 +21,8 @@ import com.sun.jdi.connect.Connector;
  * <pre>java HotSwap.java baseline CLASSES STATE        record what the game started with
  * java HotSwap.java swap CLASSES STATE PORT        redefine every class that changed since</pre>
  *
- * Run through Gradle: runClient records the baseline, ./gradlew hotswap swaps.
+ * Run through Gradle: runClient records the baseline, ./gradlew hotswap swaps. Exits with 3
+ * when a class changed in a way the running game can't take.
  */
 public class HotSwap {
     public static void main(String[] args) throws Exception {
@@ -87,7 +88,12 @@ public class HotSwap {
             failed.keySet().forEach(name -> now.put(name, before.getOrDefault(name, "")));
         }
         save(state, now);
+        if (!failed.isEmpty())
+            System.exit(RESTART_NEEDED);
     }
+
+    /** Exit code when some classes need a restart, so a script can restart the game for them. */
+    private static final int RESTART_NEEDED = 3;
 
     private static VirtualMachine attach(int port) throws Exception {
         AttachingConnector socket = Bootstrap.virtualMachineManager().attachingConnectors().stream()

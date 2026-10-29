@@ -16,6 +16,19 @@ With `dev_hotswap=true` (the default), most changes reach a running game without
 
 Only classes that changed since the game started are sent. The swap itself is `tools/hotswap/HotSwap.java`, talking JDWP to the game.
 
+## Keeping the game open: `tools/dev/game.sh`
+
+One script starts the client, keeps it in sync with your code and restarts it when it has to:
+
+```sh title="Terminal"
+tools/dev/game.sh start     # start it (skipped if it's already up), straight into dev_world
+tools/dev/game.sh reload    # hotswap; restarts the game when a change can't go in live
+tools/dev/game.sh restart   # for new blocks, items, block entities or payloads
+tools/dev/game.sh stop      # closes it; the world is saved on the way out
+```
+
+A compile error stops at `reload` and leaves the game alone. On Hyprland, set `dev_monitor` in `gradle.properties` (for example `DP-1`) and the client opens fullscreen on that monitor; leave it empty to skip that.
+
 ## What needs what
 
 | You changed | To see it |
