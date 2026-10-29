@@ -7,12 +7,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.createnewera.client.editor.LuaApi.Entry;
 import com.createnewera.client.editor.LuaApi.Kind;
 import com.createnewera.network.NetworkDevice;
+
+import net.minecraft.core.BlockPos;
 
 /** Works out what to suggest at the cursor. Pure text in, ranked suggestions out. */
 public final class Completions {
@@ -42,17 +45,18 @@ public final class Completions {
      * @param document     the whole file, for names it defines
      * @param files        files on the computer, for require("...")
      * @param devices      the computer's network, nearest first, for device names and their methods
+     * @param computer     where the computer is, to say which way each device lies
      * @param explicit     Ctrl+Space: suggest even with nothing typed
      */
     public static Result complete(String beforeCursor, String document, List<String> files, List<NetworkDevice> devices,
-                                  boolean explicit) {
+                                  BlockPos computer, boolean explicit) {
         int lineStart = beforeCursor.lastIndexOf('\n') + 1;
         String line = beforeCursor.substring(lineStart);
         Matcher m;
         if ((m = SIDE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(LuaApi.SIDES, "side"));
         if ((m = DEVICE_ARG.matcher(line)).find())
-            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices));
+            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices, computer));
         if ((m = REQUIRE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(modules(files), "file on this computer"));
 
@@ -94,16 +98,42 @@ public final class Completions {
         return names.stream().map(n -> new Entry(n, Kind.VALUE, n, detail, "")).toList();
     }
 
+    /** Turns lang keys into text; the editor plugs in I18n, tests can leave it as is. */
+    public static Function<String, String> translate = key -> key;
+
     /** Device names in distance order: rank keeps that order among equally good matches. */
-    private static List<Entry> deviceNames(List<NetworkDevice> devices) {
-        return devices.stream().map(d -> new Entry(d.name(), Kind.VALUE, d.name(),
-                d.type() + " · " + d.distance() + " m", access(d))).toList();
+    private static List<Entry> deviceNames(List<NetworkDevice> devices, BlockPos computer) {
+        return devices.stream().map(d -> {
+            String compass = compass(d.pos(), computer);
+            String where = d.pos().getX() + " " + d.pos().getY() + " " + d.pos().getZ()
+                    + (compass.isEmpty() ? "" : " · " + translate.apply("create_new_era.editor.dir.long." + compass))
+                    + height(d.pos().getY() - computer.getY()) + ". ";
+            return new Entry(d.name(), Kind.VALUE, d.name(),
+                    d.distance() + " m " + (compass.isEmpty() ? "" : translate.apply("create_new_era.editor.dir." + compass)) + " · " + d.type(),
+                    where + access(d));
+        }).toList();
+    }
+
+    /** Which way the device lies from the computer, on the compass: "n", "ne"... or "" if straight above or below. */
+    static String compass(BlockPos device, BlockPos computer) {
+        int dx = device.getX() - computer.getX(), dz = device.getZ() - computer.getZ();
+        if (dx == 0 && dz == 0)
+            return "";
+        // north is -z; eight 45° sectors starting at north, clockwise
+        double angle = Math.toDegrees(Math.atan2(dx, -dz));
+        int sector = (int) Math.round(((angle % 360) + 360) % 360 / 45) % 8;
+        return new String[] {"n", "ne", "e", "se", "s", "sw", "w", "nw"}[sector];
+    }
+
+    private static String height(int dy) {
+        if (dy == 0)
+            return "";
+        return ", " + String.format(translate.apply(dy > 0 ? "create_new_era.editor.dir.above" : "create_new_era.editor.dir.below"), Math.abs(dy));
     }
 
     private static String access(NetworkDevice d) {
-        String can = d.readable() && d.writable() ? "Read it and give it orders."
-                : d.readable() ? "Read it (it has an output port; an input port would let you give it orders)."
-                : "Give it orders (it has an input port; an output port would let you read it).";
+        String can = translate.apply(d.readable() && d.writable() ? "create_new_era.editor.device.read_write"
+                : d.readable() ? "create_new_era.editor.device.read" : "create_new_era.editor.device.write");
         return can + (d.methods().isEmpty() ? "" : " " + String.join(", ", d.methods()));
     }
 

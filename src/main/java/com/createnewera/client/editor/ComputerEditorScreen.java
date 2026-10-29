@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import com.createnewera.CreateNewEra;
+import com.createnewera.client.bus.DeviceHighlight;
 import com.createnewera.computer.ComputerFiles;
 import com.createnewera.computer.ComputerSide;
 import com.createnewera.computer.ConsoleLine;
@@ -276,6 +277,7 @@ public class ComputerEditorScreen extends Screen {
 
     @Override
     public void removed() {
+        DeviceHighlight.startCountdown();
         layout.save();
         setCursorShape(0);
         super.removed();
@@ -283,6 +285,7 @@ public class ComputerEditorScreen extends Screen {
 
     @Override
     protected void init() {
+        Completions.translate = I18n::get;
         code = Rect.EMPTY;
         computeLayout();
     }
@@ -570,7 +573,7 @@ public class ComputerEditorScreen extends Screen {
 
     private void refreshCompletion(boolean explicit) {
         CodeEditor editor = editor();
-        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), explicit);
+        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), pos, explicit);
         selected = 0;
         listTop = 0;
     }
@@ -588,6 +591,10 @@ public class ComputerEditorScreen extends Screen {
         var item = completion.items().get(selected).entry();
         editor().applyCompletion(completion.from(), item.insert());
         closeCompletion();
+        // a device picked by name: show where it is once the editor closes
+        if (item.kind() == LuaApi.Kind.VALUE)
+            snapshot.devices().stream().filter(d -> d.name().equals(item.label())).findFirst()
+                    .ifPresent(d -> DeviceHighlight.show(d.pos()));
         // straight into the next level: "redstone" + "." shows its functions
         if (item.kind() == LuaApi.Kind.MODULE)
             refreshCompletion(false);

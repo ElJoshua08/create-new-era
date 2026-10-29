@@ -48,6 +48,28 @@ public final class ModLang {
         lang("create_new_era.editor.paused_rotation", "Paused: needs rotation");
         lang("create_new_era.editor.paused_stress", "Paused: overstressed");
         lang("create_new_era.editor.rpm", "%s RPM");
+        lang("create_new_era.editor.device.read_write", "Read it and give it orders.");
+        lang("create_new_era.editor.device.read", "Read it (output port). An input port would let you give it orders.");
+        lang("create_new_era.editor.device.write", "Give it orders (input port). An output port would let you read it.");
+        // which way a device lies from the computer, in the editor's suggestions
+        lang("create_new_era.editor.dir.n", "N");
+        lang("create_new_era.editor.dir.ne", "NE");
+        lang("create_new_era.editor.dir.e", "E");
+        lang("create_new_era.editor.dir.se", "SE");
+        lang("create_new_era.editor.dir.s", "S");
+        lang("create_new_era.editor.dir.sw", "SW");
+        lang("create_new_era.editor.dir.w", "W");
+        lang("create_new_era.editor.dir.nw", "NW");
+        lang("create_new_era.editor.dir.long.n", "north");
+        lang("create_new_era.editor.dir.long.ne", "north-east");
+        lang("create_new_era.editor.dir.long.e", "east");
+        lang("create_new_era.editor.dir.long.se", "south-east");
+        lang("create_new_era.editor.dir.long.s", "south");
+        lang("create_new_era.editor.dir.long.sw", "south-west");
+        lang("create_new_era.editor.dir.long.w", "west");
+        lang("create_new_era.editor.dir.long.nw", "north-west");
+        lang("create_new_era.editor.dir.above", "%s above");
+        lang("create_new_era.editor.dir.below", "%s below");
         // data bus
         lang("item.create_new_era.bus_port.tooltip.summary", "A _data port_ for the bus. Sticks to _any face_ of _any block_, Create machines included, without changing how the block works.");
         lang("item.create_new_era.bus_port.tooltip.condition1", "Output (amber light)");

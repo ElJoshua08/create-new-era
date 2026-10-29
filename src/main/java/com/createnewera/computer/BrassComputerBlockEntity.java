@@ -314,7 +314,7 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
             if (out.size() == ComputerSnapshot.MAX_DEVICES)
                 break;
             List<String> methods = new ArrayList<>(DeviceDrivers.methods(server, device.pos(), device.readable(), device.writable()).keySet());
-            out.add(new NetworkDevice(device.name(), device.type(), (int) Math.round(device.distance()),
+            out.add(new NetworkDevice(device.name(), device.type(), device.pos(), (int) Math.round(device.distance()),
                     device.readable(), device.writable(), methods));
         }
         devicesForEditor = List.copyOf(out);

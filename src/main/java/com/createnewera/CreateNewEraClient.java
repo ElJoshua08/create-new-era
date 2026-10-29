@@ -2,6 +2,7 @@ package com.createnewera;
 
 import com.createnewera.client.bus.BusPartRenderer;
 import com.createnewera.client.bus.CableRenderer;
+import com.createnewera.client.bus.DeviceHighlight;
 import com.createnewera.ponder.NewEraPonderPlugin;
 
 import net.createmod.ponder.foundation.PonderIndex;
@@ -21,5 +22,6 @@ public class CreateNewEraClient {
         modEventBus.addListener(FMLClientSetupEvent.class, event -> PonderIndex.addPlugin(new NewEraPonderPlugin()));
         BusPartRenderer.register(modEventBus, NeoForge.EVENT_BUS);
         CableRenderer.register(modEventBus, NeoForge.EVENT_BUS);
+        DeviceHighlight.register(NeoForge.EVENT_BUS);
     }
 }
