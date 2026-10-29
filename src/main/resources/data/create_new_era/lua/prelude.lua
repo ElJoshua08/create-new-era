@@ -150,6 +150,49 @@ function bus.get(name)
             end)
         end
     end
+    -- a typewriter: runs fn(key, device) as each key goes down, or comes up
+    if device.getPressedKeys then
+        local function watchKeys(fn, down)
+            local before = {}
+            for _, k in ipairs(device.getPressedKeys()) do before[k] = true end
+            device.onChange(function(_, d)
+                local now = {}
+                for _, k in ipairs(d.getPressedKeys()) do now[k] = true end
+                local was, is = down and before or now, down and now or before
+                for k in next, is do
+                    if not was[k] then fn(k, d) end
+                end
+                before = now
+            end)
+        end
+        function device.onKeyDown(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onKeyDown' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            watchKeys(fn, true)
+        end
+        function device.onKeyUp(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onKeyUp' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            watchKeys(fn, false)
+        end
+    end
+    -- a chat log: runs fn(message, device) for every message it hears: {player, text, time}
+    if device.getLast then
+        function device.onMessage(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onMessage' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            device.onChange(function(_, d)
+                local message = d.getLast()
+                if message then fn(message, d) end
+            end)
+        end
+    end
     return device
 end
 

@@ -3,6 +3,7 @@ package com.createnewera.registry;
 import static com.createnewera.CreateNewEra.REGISTRATE;
 
 import com.createnewera.block.control.PanelControlBlockEntity;
+import com.createnewera.chat.ChatLogBlockEntity;
 import com.createnewera.client.control.PanelControlRenderer;
 import com.createnewera.client.render.BrassComputerRenderer;
 import com.createnewera.computer.BrassComputerBlockEntity;
@@ -25,6 +26,11 @@ public final class ModBlockEntities {
             .validBlocks(ModBlocks.PANEL_BUTTON, ModBlocks.PANEL_SWITCH, ModBlocks.PANEL_KNOB, ModBlocks.PANEL_SLIDER,
                     ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD, ModBlocks.PANEL_SPEAKER)
             .renderer(() -> PanelControlRenderer::new)
+            .register();
+
+    public static final BlockEntityEntry<ChatLogBlockEntity> CHAT_LOG = REGISTRATE
+            .blockEntity("chat_log", ChatLogBlockEntity::new)
+            .validBlocks(ModBlocks.CHAT_LOG)
             .register();
 
     public static void register() {}

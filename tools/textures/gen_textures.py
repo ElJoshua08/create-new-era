@@ -254,6 +254,23 @@ def draw_speaker():
     c.img.save(OUT / "controls" / "speaker.png")
 
 
+def draw_chat_log():
+    """The chat log's front (14x12 at 0,0): a roll of paper behind a brass frame, lines of
+    typed text on it, the newest at the bottom in darker ink."""
+    c = Canvas(16, 16)
+    c.rect(0, 0, 14, 12, BRASS[4])
+    c.bevel(0, 0, 14, 12, BRASS[6], BRASS[1], BRASS[3])
+    c.rect(1, 1, 12, 10, PARCHMENT[3])
+    c.rect(1, 1, 12, 1, PARCHMENT[1])
+    c.rect(1, 10, 12, 1, PARCHMENT[1])
+    for row, (start, length) in enumerate([(2, 7), (2, 9), (2, 5), (2, 8)]):
+        y = 3 + row * 2
+        ink = "#4a3a2e" if row == 3 else "#8a7a5c"
+        c.rect(start, y, 1, 1, "#c4573a" if row % 2 == 0 else "#3a6ba0")
+        c.rect(start + 2, y, length, 1, ink)
+    c.img.save(OUT / "chat_log_front.png")
+
+
 def draw_control_states():
     """One small texture per state of the panel controls that move or light up: a knob's
     pointer, a gauge's needle, a nixie's digit, a lamp's colour. The models (gen_models.py)
@@ -765,6 +782,7 @@ def main():
     draw_hub_panel()
     draw_control_states()
     draw_speaker()
+    draw_chat_log()
     draw_control_plate_item()
     draw_bus_items()
     draw_cables()

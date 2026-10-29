@@ -1,0 +1,113 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/brass_casing",
+    "front": "create_new_era:block/chat_log_front",
+    "particle": "create:block/brass_casing"
+  },
+  "elements": [
+    {
+      "name": "casing",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing"
+        },
+        "south": {
+          "texture": "#casing"
+        },
+        "east": {
+          "texture": "#casing"
+        },
+        "west": {
+          "texture": "#casing"
+        },
+        "up": {
+          "texture": "#casing"
+        },
+        "down": {
+          "texture": "#casing"
+        }
+      }
+    },
+    {
+      "name": "paper",
+      "from": [
+        1,
+        2,
+        -0.25
+      ],
+      "to": [
+        15,
+        14,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            12
+          ]
+        },
+        "south": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            1
+          ]
+        },
+        "east": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            1
+          ]
+        },
+        "west": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            1
+          ]
+        },
+        "up": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#front",
+          "uv": [
+            0,
+            0,
+            14,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

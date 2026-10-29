@@ -203,6 +203,22 @@ public final class ModLang {
         lang("create_new_era.api.panel_speaker.playNote", "Plays a note like a note block: an instrument (\"harp\", \"bell\", \"bass\"...) and a pitch from 0 to 24.");
         lang("create_new_era.api.panel_speaker.speak", "Says the text aloud to players within 48 blocks, with their system's text-to-speech voice, and shows it above their hotbar.");
         lang("create_new_era.api.panel_speaker.read", "Nothing: a speaker only plays.");
+        lang("create_new_era.api.chat_log.getMessages", "The last messages it heard, oldest first: up to count (all it keeps, 50, if left out), each {player, text, time}.");
+        lang("create_new_era.api.chat_log.getLast", "The newest message it heard: {player, text, time}, or nil.");
+        lang("create_new_era.api.chat_log.say", "Says the text in chat, under the chat log's name, to everyone within 128 blocks.");
+        lang("create_new_era.api.chat_log.tell", "Whispers the text to one player by name, wherever they are. Returns whether they're online.");
+        lang("create_new_era.api.typewriter.getPressedKeys", "The keys held on it right now, by name: \"w\", \"space\", \"up\", \"left_shift\"...");
+        lang("create_new_era.api.typewriter.isPressed", "Whether that key is held on it right now.");
+        lang("create_new_era.api.typewriter.isInUse", "Whether someone is typing on it.");
+        lang("create_new_era.api.typewriter.getUser", "Who's typing on it, or nil.");
+        lang("create_new_era.api.typewriter.getTyped", "The text typed into it.");
+        lang("create_new_era.api.on_key_down", "Runs your function as each key goes down on the typewriter, with the key's name.");
+        lang("create_new_era.api.on_key_up", "Runs your function as each key comes back up on the typewriter, with the key's name.");
+        lang("create_new_era.api.on_message", "Runs your function for every chat message the chat log hears: {player, text, time}.");
+        lang("create_new_era.goggles.heard", "Messages heard: %s");
+        lang("block.create_new_era.chat_log.tooltip.summary", "Keeps the _chat_ of its dimension for programs to _read_, and _writes_ to it.");
+        lang("block.create_new_era.chat_log.tooltip.condition1", "On the bus");
+        lang("block.create_new_era.chat_log.tooltip.behaviour1", "Put a _data port_ on it: _getMessages()_, _onMessage(fn)_, _say(text)_ and _tell(player, text)_.");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

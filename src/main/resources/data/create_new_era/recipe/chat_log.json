@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " P ",
+    "TCT",
+    " B "
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "T": {
+      "item": "create:electron_tube"
+    },
+    "C": {
+      "item": "create:brass_casing"
+    },
+    "B": {
+      "item": "minecraft:book"
+    }
+  },
+  "result": {
+    "id": "create_new_era:chat_log",
+    "count": 1
+  }
+}

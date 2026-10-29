@@ -46,6 +46,56 @@ public class EndpointTests {
         return data.nameOf(abs, level.getBlockState(abs).getBlock());
     }
 
+    // the chat log hears chat, hands each message to onMessage, and keeps them
+    @GameTest(template = "empty5", timeoutTicks = 120)
+    public static void chatLogsHearAndSpeak(GameTestHelper helper) {
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        helper.setBlock(new BlockPos(2, 1, 3), AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(new BlockPos(2, 1, 3));
+        motor.generatedSpeed.setValue(256);
+        helper.setBlock(new BlockPos(0, 1, 0), ModBlocks.CHAT_LOG.get());
+        String log = device(helper, new BlockPos(0, 1, 0), 0);
+        com.createnewera.chat.ChatLogBlockEntity entity = helper.getBlockEntity(new BlockPos(0, 1, 0));
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local log = bus.get('" + log + "')",
+                "log.onMessage(function(m) print('heard', m.player, m.text, #log.getMessages()) log.say('hi ' .. m.player) end)",
+                "print('ready')"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(10, () -> entity.hear("Steve", "hola"));
+        helper.succeedWhen(() -> {
+            if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals("heard\tSteve\thola\t1")))
+                helper.fail("expected the message in " + computer.getConsole());
+        });
+    }
+
+    // Aeronautics' linked typewriter, reached by reflection: skipped when Aeronautics isn't installed
+    @GameTest(template = "empty5", timeoutTicks = 120)
+    public static void typewritersAreReadable(GameTestHelper helper) {
+        var block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("simulated", "linked_typewriter"));
+        if (block == Blocks.AIR) {
+            helper.succeed();
+            return;
+        }
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        helper.setBlock(new BlockPos(2, 1, 3), AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(new BlockPos(2, 1, 3));
+        motor.generatedSpeed.setValue(256);
+        helper.setBlock(new BlockPos(0, 1, 0), block);
+        String typewriter = device(helper, new BlockPos(0, 1, 0), 0);
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local t = bus.get('" + typewriter + "')",
+                "print('typewriter', #t.getPressedKeys(), t.isInUse(), t.isPressed('w'), t.getUser())",
+                "t.onKeyDown(function(key) print('down', key) end)"));
+        computer.start("create_new_era.console.running");
+        helper.succeedWhen(() -> {
+            if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals("typewriter\t0\tfalse\tfalse\tnil")))
+                helper.fail("expected the typewriter's state in " + computer.getConsole());
+        });
+    }
+
     @GameTest(template = "empty5", timeoutTicks = 120)
     public static void blocksDoWhatProgramsAsk(GameTestHelper helper) {
         helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));

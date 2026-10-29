@@ -10,6 +10,7 @@ import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.Varargs;
 
 import com.createnewera.bus.DeviceDrivers.Api;
+import com.createnewera.chat.ChatLogBlockEntity;
 import com.simibubi.create.content.kinetics.gauge.GaugeBlockEntity;
 import com.simibubi.create.content.kinetics.mixer.MechanicalMixerBlockEntity;
 import com.simibubi.create.content.kinetics.press.MechanicalPressBlockEntity;
@@ -263,6 +264,39 @@ final class BlockDrivers {
             });
         }
 
+        Typewriter.add(api, level, be);
+
+        // ---- this mod's own ----
+        if (be instanceof ChatLogBlockEntity log) {
+            api.family("chat_log");
+            api.read("getMessages", "count?: number", "{{player, text, time}, ...}", args -> {
+                int count = args.arg(1).isNil() ? ChatLogBlockEntity.KEPT : Mth.clamp(args.arg(1).checkInteger(), 0, ChatLogBlockEntity.KEPT);
+                return log.last(count).stream().map(ChatLogBlockEntity.Message::asTable).toList();
+            });
+            api.read("getLast", "", "{player, text, time} | nil", args -> {
+                var last = log.last(1);
+                return last.isEmpty() ? null : last.get(0).asTable();
+            });
+            api.order("say", "text: string", "", args -> {
+                String name = BusData.get(level).nameOf(pos, state.getBlock());
+                Component line = Component.literal("[" + name + "] ").withStyle(net.minecraft.ChatFormatting.GOLD)
+                        .append(Component.literal(args.arg(1).checkString()).withStyle(net.minecraft.ChatFormatting.WHITE));
+                for (var player : level.players())
+                    if (player.distanceToSqr(pos.getCenter()) <= CHAT_RANGE * CHAT_RANGE)
+                        player.sendSystemMessage(line);
+                return null;
+            });
+            api.order("tell", "player: name, text: string", "boolean", args -> {
+                var player = level.getServer().getPlayerList().getPlayerByName(args.arg(1).checkString());
+                if (player == null)
+                    return false;
+                String name = BusData.get(level).nameOf(pos, state.getBlock());
+                player.sendSystemMessage(Component.literal("[" + name + " → you] ").withStyle(net.minecraft.ChatFormatting.GOLD)
+                        .append(Component.literal(args.arg(2).checkString()).withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC)));
+                return true;
+            });
+        }
+
         // ---- Minecraft ----
         if (be instanceof AbstractFurnaceBlockEntity furnace) {
             api.family("furnace");
@@ -325,6 +359,17 @@ final class BlockDrivers {
             api.family("composter");
             api.read("getFill", "", "number 0-8", args -> level.getBlockState(pos).getValue(BlockStateProperties.LEVEL_COMPOSTER));
         }
+    }
+
+    /** How far a chat log's say() carries, in blocks */
+    static final double CHAT_RANGE = 128;
+
+    /** What changes about a block that its state and contents don't show, so onChange notices it. */
+    static @Nullable Object extra(ServerLevel level, BlockPos pos) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof ChatLogBlockEntity log)
+            return log.heard();
+        return Typewriter.snapshot(be);
     }
 
     private static @Nullable Train train(StationBlockEntity station) {

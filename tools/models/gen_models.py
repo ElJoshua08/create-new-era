@@ -414,6 +414,14 @@ MODELS["port_hub"] = model(
     + [hub_panel("panel_" + f, f) for f in ("north", "south", "east", "west", "up", "down")])
 
 
+# the chat log, front facing north: a brass box with its paper roll framed in the front
+MODELS["chat_log"] = model(
+    {"casing": "create:block/brass_casing", "front": "create_new_era:block/chat_log_front", "particle": "create:block/brass_casing"},
+    [box("casing", [0, 0, 0], [16, 16, 16], {"all": ("casing", None)}),
+     box("paper", [1, 2, -0.25], [15, 14, 0], {"north": ("front", [0, 0, 14, 12]), "sides": ("front", [0, 0, 14, 1]),
+                                               "caps": ("front", [0, 0, 14, 1])})])
+
+
 MODELS["cable_splice"] = model(BUS_TEX, [
     box("plate", [0, 0, 0], [4, 1, 4], {"up": ("parts", bus("splice_top")), "down": ("parts", bus("splice_top")),
                                         "sides": ("parts", bus("splice_side"))}),

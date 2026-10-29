@@ -2,6 +2,7 @@ package com.createnewera;
 
 import com.createnewera.config.ClientConfig;
 import com.createnewera.bus.BusEvents;
+import com.createnewera.chat.ChatLogs;
 import com.createnewera.network.ModNetwork;
 import com.createnewera.registry.ModBlockEntities;
 import com.createnewera.registry.ModBlocks;
@@ -54,6 +55,7 @@ public class CreateNewEra {
         ModLang.register();
         ModNetwork.register(modEventBus);
         BusEvents.register(NeoForge.EVENT_BUS);
+        ChatLogs.register(NeoForge.EVENT_BUS);
         modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
         LOGGER.info("Create: New Era loaded");
     }

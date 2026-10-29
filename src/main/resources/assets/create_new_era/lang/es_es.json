@@ -322,5 +322,22 @@
   "create_new_era.api.panel_speaker.playSound": "Reproduce cualquier sonido del juego por su id, p. ej. \"minecraft:block.bell.use\" o \"create:whistle\". Volumen 1 llega a 16 bloques; tono 1 es el original.",
   "create_new_era.api.panel_speaker.playNote": "Toca una nota como un bloque musical: un instrumento (\"harp\", \"bell\", \"bass\"...) y un tono de 0 a 24.",
   "create_new_era.api.panel_speaker.speak": "Dice el texto en voz alta a los jugadores a menos de 48 bloques, con la voz del sistema, y lo muestra sobre su barra de objetos.",
-  "create_new_era.api.panel_speaker.read": "Nada: un altavoz solo suena."
+  "create_new_era.api.panel_speaker.read": "Nada: un altavoz solo suena.",
+  "create_new_era.api.chat_log.getMessages": "Los últimos mensajes que oyó, del más viejo al más nuevo: hasta count (todos los que guarda, 50, si no lo pones), cada uno {player, text, time}.",
+  "create_new_era.api.chat_log.getLast": "El último mensaje que oyó: {player, text, time}, o nil.",
+  "create_new_era.api.chat_log.say": "Dice el texto en el chat, con el nombre del chat log, a todos los que estén a menos de 128 bloques.",
+  "create_new_era.api.chat_log.tell": "Susurra el texto a un jugador por su nombre, esté donde esté. Devuelve si está conectado.",
+  "create_new_era.api.typewriter.getPressedKeys": "Las teclas que tiene pulsadas ahora, por nombre: \"w\", \"space\", \"up\", \"left_shift\"...",
+  "create_new_era.api.typewriter.isPressed": "Si esa tecla está pulsada ahora mismo.",
+  "create_new_era.api.typewriter.isInUse": "Si alguien está escribiendo en ella.",
+  "create_new_era.api.typewriter.getUser": "Quién está escribiendo en ella, o nil.",
+  "create_new_era.api.typewriter.getTyped": "El texto escrito en ella.",
+  "create_new_era.api.on_key_down": "Ejecuta tu función cada vez que se pulsa una tecla en la typewriter, con el nombre de la tecla.",
+  "create_new_era.api.on_key_up": "Ejecuta tu función cada vez que se suelta una tecla en la typewriter, con el nombre de la tecla.",
+  "create_new_era.api.on_message": "Ejecuta tu función con cada mensaje del chat que oye el chat log: {player, text, time}.",
+  "create_new_era.goggles.heard": "Mensajes oídos: %s",
+  "block.create_new_era.chat_log.tooltip.summary": "Guarda el _chat_ de su dimensión para que los programas lo _lean_, y _escribe_ en él.",
+  "block.create_new_era.chat_log.tooltip.condition1": "En el bus",
+  "block.create_new_era.chat_log.tooltip.behaviour1": "Ponle un _puerto de datos_: _getMessages()_, _onMessage(fn)_, _say(texto)_ y _tell(jugador, texto)_.",
+  "block.create_new_era.chat_log": "Chat log"
 }

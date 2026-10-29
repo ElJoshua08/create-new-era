@@ -182,6 +182,9 @@ public final class DeviceDrivers {
         if (fluids != null)
             out.put("fluids", tanks(fluids));
         out.put("state", BlockDrivers.state(level.getBlockState(pos)));
+        BlockEntity be = level.getBlockEntity(pos);
+        if (Typewriter.is(be))
+            out.put("keys", Typewriter.pressed(be));
         return out;
     }
 
@@ -195,6 +198,7 @@ public final class DeviceDrivers {
             return control.snapshot(state);
         List<Object> parts = new ArrayList<>();
         parts.add(state); // a door opening, a lamp lighting, a note block's note
+        parts.add(BlockDrivers.extra(level, pos)); // a chat message, a key pressed on a typewriter
         if (level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic) {
             parts.add(kinetic.getSpeed());
             parts.add(overstressed(kinetic));

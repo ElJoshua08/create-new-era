@@ -21,6 +21,7 @@ import com.createnewera.block.control.PanelKeypadBlock;
 import com.createnewera.block.control.PanelLampBlock;
 import com.createnewera.block.control.PanelSpeakerBlock;
 import com.createnewera.block.control.PanelSwitchBlock;
+import com.createnewera.chat.ChatLogBlock;
 import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.SharedProperties;
@@ -72,6 +73,17 @@ public final class ModBlocks {
             .transform(TagGen.pickaxeOnly())
             .blockstate((c, p) -> p.simpleBlock(c.get(), existing(p, "port_hub")))
             .lang("Port Hub")
+            .item().model(ModBlocks::blockItemModel).build()
+            .register();
+
+    /** Keeps the chat for programs to read, and writes to it. */
+    public static final BlockEntry<ChatLogBlock> CHAT_LOG = REGISTRATE
+            .block("chat_log", ChatLogBlock::new)
+            .initialProperties(SharedProperties::softMetal)
+            .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops())
+            .transform(TagGen.pickaxeOnly())
+            .blockstate((c, p) -> p.horizontalBlock(c.get(), existing(p, "chat_log")))
+            .lang("Chat Log")
             .item().model(ModBlocks::blockItemModel).build()
             .register();
 
