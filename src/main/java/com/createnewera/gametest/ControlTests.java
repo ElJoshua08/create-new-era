@@ -103,7 +103,8 @@ public class ControlTests {
                 "sp.playNote('bell', 12) sp.playSound('minecraft:block.bell.use', 0.5) sp.speak('hola') print('spoke')",
                 "print('ready')"));
         computer.start("create_new_era.console.running");
-        helper.runAfterDelay(10, () -> {
+        // the program needs a few ticks to set up its handlers first
+        helper.runAfterDelay(30, () -> {
             expectPrinted(helper, computer, "ready");
             expectPrinted(helper, computer, "spoke");
             expectPrinted(helper, computer, "{2, 3}"); // print shows a table's contents
@@ -113,7 +114,7 @@ public class ControlTests {
             ModBlocks.PANEL_KNOB.get().set(helper.getLevel(), helper.absolutePos(knob), 6);
             click(helper, keypad, 8, 3, 6.5); // the middle key of the second row
         });
-        helper.runAfterDelay(30, () -> {
+        helper.runAfterDelay(60, () -> {
             expectPrinted(helper, computer, "pressed");
             expectPrinted(helper, computer, "key 5");
             var level = helper.getLevel();

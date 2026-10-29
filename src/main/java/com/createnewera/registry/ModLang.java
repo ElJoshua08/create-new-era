@@ -219,6 +219,8 @@ public final class ModLang {
         lang("block.create_new_era.chat_log.tooltip.summary", "Keeps the _chat_ of its dimension for programs to _read_, and _writes_ to it.");
         lang("block.create_new_era.chat_log.tooltip.condition1", "On the bus");
         lang("block.create_new_era.chat_log.tooltip.behaviour1", "Put a _data port_ on it: _getMessages()_, _onMessage(fn)_, _say(text)_ and _tell(player, text)_.");
+        lang("create_new_era.api.typewriter.getKeyEvents", "Every key that went down or up on it after event number since (all it keeps, the last 64, if left out), oldest first: {key, down, seq}. onKeyDown and friends use it, so none are missed however quick.");
+        lang("create_new_era.api.on_key_any", "Runs your function for every key on the typewriter, going down (down = true) and coming up (down = false).");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

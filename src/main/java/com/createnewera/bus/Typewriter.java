@@ -60,6 +60,8 @@ final class Typewriter {
             var player = level.getServer().getPlayerList().getPlayer(id);
             return player == null ? null : player.getGameProfile().getName();
         });
+        api.read("getKeyEvents", "since?: number", "{{key, down, seq}, ...}",
+                args -> TypewriterEvents.since(be, args.arg(1).isNil() ? 0 : (long) args.arg(1).checkDouble()));
         api.read("getTyped", "", "string", args -> {
             Object typed = call(be, "getTypedEntry");
             return typed == null ? "" : typed.toString();
@@ -76,9 +78,9 @@ final class Typewriter {
         return out;
     }
 
-    /** What onChange notices: the keys held. */
+    /** What onChange notices: every key event, and the keys held. */
     static @Nullable Object snapshot(@Nullable BlockEntity be) {
-        return is(be) ? pressed(be) : null;
+        return is(be) ? List.of(TypewriterEvents.latest(be), pressed(be)) : null;
     }
 
     private static @Nullable Object call(BlockEntity be, String method) {

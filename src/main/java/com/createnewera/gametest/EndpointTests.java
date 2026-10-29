@@ -96,11 +96,23 @@ public class EndpointTests {
         computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
                 "local t = bus.get('" + typewriter + "')",
                 "print('typewriter', #t.getPressedKeys(), t.isInUse(), t.isPressed('w'), t.getUser())",
-                "t.onKeyDown(function(key) print('down', key) end)"));
+                "t.onKeyDown(function(key) print('down', key) end)",
+                "t.onKeyUp(function(key) print('up', key) end)"));
         computer.start("create_new_era.console.running");
+        // a tap within one tick, through the typewriter's own key handling: it mustn't be missed
+        helper.runAfterDelay(10, () -> {
+            var be = helper.getLevel().getBlockEntity(abs);
+            try {
+                be.getClass().getMethod("pressKey", int.class).invoke(be, 87); // W
+                be.getClass().getMethod("releaseKey", int.class).invoke(be, 87);
+            } catch (ReflectiveOperationException e) {
+                helper.fail("couldn't press the typewriter's keys: " + e);
+            }
+        });
         helper.succeedWhen(() -> {
-            if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals("typewriter\t0\tfalse\tfalse\tnil")))
-                helper.fail("expected the typewriter's state in " + computer.getConsole());
+            for (String line : new String[] {"typewriter\t0\tfalse\tfalse\tnil", "down\tw", "up\tw"})
+                if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals(line)))
+                    helper.fail("expected '" + line + "' in " + computer.getConsole());
         });
     }
 

@@ -150,34 +150,29 @@ function bus.get(name)
             end)
         end
     end
-    -- a typewriter: runs fn(key, device) as each key goes down, or comes up
-    if device.getPressedKeys then
-        local function watchKeys(fn, down)
-            local before = {}
-            for _, k in ipairs(device.getPressedKeys()) do before[k] = true end
+    -- a typewriter: every key as it goes down and comes up, in order, however quick
+    if device.getKeyEvents then
+        local function watchKeys(name, fn, filter)
+            if type(fn) ~= "function" then
+                error("bad argument #1 to '" .. name .. "' (function expected, got " .. type(fn) .. ")", 3)
+            end
+            local events = device.getKeyEvents()
+            local last = #events > 0 and events[#events].seq or 0
             device.onChange(function(_, d)
-                local now = {}
-                for _, k in ipairs(d.getPressedKeys()) do now[k] = true end
-                local was, is = down and before or now, down and now or before
-                for k in next, is do
-                    if not was[k] then fn(k, d) end
+                for _, e in ipairs(d.getKeyEvents(last)) do
+                    last = e.seq
+                    if filter == nil or e.down == filter then fn(e.key, d, e.down) end
                 end
-                before = now
             end)
         end
-        function device.onKeyDown(a, b)
+        -- fn(key, device) each time a key goes down
+        function device.onKeyDown(a, b) watchKeys("onKeyDown", a == device and b or a, true) end
+        -- fn(key, device) each time a key comes back up
+        function device.onKeyUp(a, b) watchKeys("onKeyUp", a == device and b or a, false) end
+        -- fn(key, down, device) for both, down being true as it goes down
+        function device.onKey(a, b)
             local fn = a == device and b or a
-            if type(fn) ~= "function" then
-                error("bad argument #1 to 'onKeyDown' (function expected, got " .. type(fn) .. ")", 2)
-            end
-            watchKeys(fn, true)
-        end
-        function device.onKeyUp(a, b)
-            local fn = a == device and b or a
-            if type(fn) ~= "function" then
-                error("bad argument #1 to 'onKeyUp' (function expected, got " .. type(fn) .. ")", 2)
-            end
-            watchKeys(fn, false)
+            watchKeys("onKey", type(fn) == "function" and function(key, d, down) fn(key, down, d) end or fn)
         end
     end
     -- a chat log: runs fn(message, device) for every message it hears: {player, text, time}

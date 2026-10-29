@@ -339,5 +339,7 @@
   "block.create_new_era.chat_log.tooltip.summary": "Guarda el _chat_ de su dimensión para que los programas lo _lean_, y _escribe_ en él.",
   "block.create_new_era.chat_log.tooltip.condition1": "En el bus",
   "block.create_new_era.chat_log.tooltip.behaviour1": "Ponle un _puerto de datos_: _getMessages()_, _onMessage(fn)_, _say(texto)_ y _tell(jugador, texto)_.",
-  "block.create_new_era.chat_log": "Chat log"
+  "block.create_new_era.chat_log": "Chat log",
+  "create_new_era.api.typewriter.getKeyEvents": "Cada tecla que bajó o subió en ella después del evento número since (todos los que guarda, los últimos 64, si no lo pones), del más viejo al más nuevo: {key, down, seq}. onKeyDown y compañía lo usan, así que no se pierde ninguna por rápida que sea.",
+  "create_new_era.api.on_key_any": "Ejecuta tu función con cada tecla de la typewriter, al bajar (down = true) y al subir (down = false)."
 }
