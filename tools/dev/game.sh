@@ -16,18 +16,15 @@ client_pid() { ss -ltnp 2>/dev/null | grep "127.0.0.1:$PORT " | grep -o 'pid=[0-
 
 hyprland() { [ -n "$(prop dev_monitor)" ] && command -v hyprctl >/dev/null; }
 
-# a runtime rule, gone when Hyprland reloads: Minecraft's window opens on dev_monitor
+# once the window is up: onto dev_monitor, fullscreen (done to the window itself, since Hyprland
+# rules can't make an XWayland window fullscreen)
 place_window() {
     hyprland || return 0
-    hyprctl eval "hl.window_rule({ name = 'create-new-era-dev-client', match = { class = '^Minecraft' }, monitor = '$(prop dev_monitor)' })" >/dev/null
-}
-
-# the rule can't make an XWayland window fullscreen, so that's done to the window once it's there
-fullscreen_window() {
-    hyprland || return 0
-    local address
-    address=$(hyprctl clients -j | python3 -c "import json,sys; print(next((c['address'] for c in json.load(sys.stdin) if c['class'].startswith('Minecraft') and not c['fullscreen']), ''))")
+    local address monitor; monitor=$(prop dev_monitor)
+    address=$(hyprctl clients -j | python3 -c "import json,sys; print(next((c['address'] for c in json.load(sys.stdin) if c['class'].startswith('Minecraft')), ''))")
     [ -n "$address" ] || return 1
+    hyprctl eval "hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 0, client = 0, window = 'address:$address' }))" >/dev/null
+    hyprctl eval "hl.dispatch(hl.dsp.window.move({ monitor = '$monitor', window = 'address:$address' }))" >/dev/null
     hyprctl eval "hl.dispatch(hl.dsp.window.fullscreen_state({ internal = 2, client = 2, window = 'address:$address' }))" >/dev/null
 }
 
@@ -39,7 +36,6 @@ start() {
     if launching; then
         echo "game: already starting, waiting for it"
     else
-        place_window
         mkdir -p build
         nohup ./gradlew runClient >"$LOG" 2>&1 &
         echo "game: starting (log in $LOG)"
@@ -47,11 +43,11 @@ start() {
     fi
     local placed=0
     for _ in $(seq 1 240); do
-        [ $placed = 1 ] || { fullscreen_window && placed=1; } || true
+        [ $placed = 1 ] || { place_window && placed=1; } || true
         # up once the player is in the world (runClient opens dev_world straight away)
         if [ -f run/logs/latest.log ] && [ "$(stat -c %Y run/logs/latest.log)" -ge "$since" ] \
                 && grep -q "joined the game" run/logs/latest.log; then
-            fullscreen_window || true
+            place_window || true
             echo "game: up, in the world"; return
         fi
         if ! launching && [ -z "$(client_pid)" ]; then
@@ -66,7 +62,8 @@ stop() {
     local pid; pid=$(client_pid)
     if [ -z "$pid" ]; then echo "game: not running"; return; fi
     kill "$pid"
-    for _ in $(seq 1 60); do [ -z "$(client_pid)" ] && { echo "game: stopped"; return; }; sleep 1; done
+    # the gradle run that launched it has to finish too, or start would take it for a launch
+    for _ in $(seq 1 60); do [ -z "$(client_pid)" ] && ! launching && { echo "game: stopped"; return; }; sleep 1; done
     echo "game: didn't stop in a minute"; exit 1
 }
 
