@@ -1,0 +1,62 @@
+---
+title: Archivos y require
+description: Divide un programa en módulos en el disco del ordenador.
+---
+
+Cada ordenador guarda sus propios archivos. Uno se ejecuta; los demás se pueden cargar como módulos con `require`.
+
+## Límites
+
+| | Límite |
+| --- | --- |
+| Archivos por ordenador | 32 |
+| Un archivo | 16.384 caracteres |
+| Todos los archivos juntos | 65.536 caracteres |
+| Nombre de archivo | hasta 48 caracteres: letras, números y `_ - . /` |
+
+Una `/` en el nombre mete el archivo en una carpeta: `lib/pid.lua`. Los nombres no pueden empezar por `.` ni por `/`, llevar `..` ni acabar en `/`. Cuando un archivo no se puede guardar porque es demasiado grande, el disco está lleno o el nombre no vale, la consola lo dice en rojo.
+
+## Qué archivo se ejecuta
+
+**Ejecutar** arranca el archivo de la pestaña activa y el ordenador se lo apunta. Cuando se carga el mundo, vuelve a arrancar ese mismo archivo. Un ordenador nuevo ejecuta `startup.lua`.
+
+## Cargar un módulo
+
+`require(name)` ejecuta otro archivo del mismo ordenador y devuelve lo que ese archivo devolvió. Primero busca el nombre tal cual. Si no hay un archivo así, convierte los puntos en carpetas y añade `.lua`:
+
+| Escribes | Carga |
+| --- | --- |
+| `require("util")` | `util.lua` |
+| `require("lib.pid")` | `lib/pid.lua` |
+| `require("lib/pid.lua")` | `lib/pid.lua` |
+
+Cada archivo se ejecuta una vez por cada ejecución del programa. Las llamadas siguientes devuelven el mismo valor, así que `"lib.pid"` y `"lib/pid.lua"` te dan la misma tabla. Un archivo que no devuelve nada da `true`, y el módulo recibe como `...` el nombre con el que se pidió.
+
+Si falta el archivo, el programa se para con `module 'name' not found on this computer`. Un error dentro de un módulo indica el archivo y la línea de ese módulo.
+
+## Ejemplo
+
+Un módulo, guardado como `lib/blink.lua`:
+
+```lua title="lib/blink.lua"
+local blink = {}
+
+function blink.pulse(side, seconds)
+  rs.setOutput(side, true)
+  sleep(seconds)
+  rs.setOutput(side, false)
+  sleep(seconds)
+end
+
+return blink
+```
+
+Y `startup.lua`, que lo usa:
+
+```lua title="startup.lua"
+local blink = require("lib.blink")
+
+while true do
+  blink.pulse("left", 0.5)
+end
+```

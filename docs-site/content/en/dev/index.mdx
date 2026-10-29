@@ -1,0 +1,37 @@
+---
+title: Development
+description: Build the mod, run it with a realistic modpack, reload code without restarting, and test it.
+---
+
+This section is for people working on Create: New Era itself. If you want to play with the mod, the [Guide](../guide/index.mdx) is the place.
+
+The mod is public domain under The Unlicense, so fork it, change it and ship it however you like.
+
+## Quick start
+
+```sh title="Terminal"
+git clone https://github.com/ElJoshua08/create-new-era.git
+cd create-new-era
+./gradlew runClient     # the first run downloads the dev modpack into run/
+```
+
+You only need a JDK 17 or newer to start Gradle. It downloads the JDKs it needs on its own: JDK 21 to build, and the JetBrains Runtime for dev runs with live reloading. On Windows use `gradlew.bat`.
+
+Then, with the game still open, change some Java and run:
+
+```sh title="Terminal"
+./gradlew hotswap       # recompile and push the changed classes into the running game
+```
+
+## In this section
+
+<Cards>
+  <Card title="Building" href="./building.mdx">Gradle tasks and the versions the mod builds against.</Card>
+  <Card title="Dev runs" href="./dev-runs.mdx">The modpack runClient downloads, and how to switch parts off.</Card>
+  <Card title="Live reloading" href="./hot-reload.mdx">What reaches a running game, and what still needs a restart.</Card>
+  <Card title="Tests and datagen" href="./testing.mdx">GameTests inside a real server, and generated resources.</Card>
+  <Card title="Asset tools" href="./tools.mdx">The scripts behind the textures, models, renders and Ponder scenes.</Card>
+  <Card title="Project layout" href="./layout.mdx">Where each part of the mod lives.</Card>
+  <Card title="Contributing" href="./contributing.mdx">Pull requests, tests, assets and translations.</Card>
+  <Card title="License and credits" href="./license.mdx">The Unlicense, and the work the mod builds on.</Card>
+</Cards>

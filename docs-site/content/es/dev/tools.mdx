@@ -1,0 +1,41 @@
+---
+title: Herramientas de assets
+description: Los scripts de las texturas, modelos, renders y estructuras de Ponder.
+---
+
+Las texturas y los modelos salen de scripts, para que sigan la paleta de Create. Cambia el script y vuelve a ejecutarlo; nunca edites a mano lo que genera. Son Python 3 normal con Pillow, y el renderizador necesita además NumPy.
+
+| Script | Qué hace |
+| --- | --- |
+| `tools/textures/gen_textures.py` | Atlas de detalles, con paletas sacadas de los revestimientos de Create. Los cuerpos de los bloques usan por referencia las texturas de revestimiento de Create; el atlas solo tiene lo que Create no tiene: pantallas, diales, LEDs, puertos. También dibuja el objeto placa de control. |
+| `tools/textures/gen_spools.py` | Los sprites y modelos de objeto de la bobina de cable: uno por tinte más el cobre sin teñir, llena y a medias, y un carrete vacío. |
+| `tools/textures/pixel_iso.py` | Utilidades para sprites de objeto en pixel art isométrico al estilo de Create, que usa `gen_spools.py`. |
+| `tools/models/gen_models.py` | Modelos de bloque a partir de listas compactas de elementos. JSON normal de vanilla, así que Blockbench los abre. |
+| `tools/render/iso_render.py` | Renderiza modelos de bloque a PNG sin el juego. Las imágenes de bloques de esta documentación salen de aquí. |
+| `tools/screen/proto_screen.py` | Un prototipo del aspecto de la pantalla de píxeles giratorios, que sirvió para elegir la resolución. |
+| `tools/ponder/gen_ponder.py` | Escribe las estructuras sobre las que se reproducen las escenas de Ponder. Las escenas están en `NewEraPonderScenes.java`; las posiciones tienen que coincidir. |
+| `tools/hotswap/HotSwap.java` | Mete las clases cambiadas en una partida abierta. Se ejecuta con `./gradlew hotswap`. |
+
+```sh title="Terminal"
+python3 tools/textures/gen_textures.py
+python3 tools/textures/gen_spools.py
+python3 tools/models/gen_models.py
+python3 tools/ponder/gen_ponder.py
+
+# cada carpeta --assets contiene assets/<namespace>/{models,textures}
+python3 tools/render/iso_render.py out.png create_new_era:block/brass_computer \
+    --assets src/main/resources --assets <create assets> --assets <vanilla assets> \
+    --size 384 --yaw 270       # yaw 270 enseña el frente del ordenador
+```
+
+El renderizador necesita los assets de Create y de Minecraft para dibujar los revestimientos: apunta `--assets` a una copia extraída de cada jar. Une nombres de modelo con `+` para dibujar varios en una misma imagen.
+
+## Recetas de esta documentación
+
+Las imágenes de recetas de esta documentación se generan a partir de los archivos de recetas del mod. Cuando cambie una receta, ejecuta esto desde `docs-site/`:
+
+```sh title="Terminal"
+VANILLA_ASSETS=<minecraft jar>/assets CREATE_ASSETS=<create jar>/assets node scripts/sync-recipes.mjs
+```
+
+Reescribe `lib/recipes.json` y copia los iconos de objeto nuevos a `public/img/items/`. Las dos variables solo hacen falta para iconos que todavía no estén ahí.

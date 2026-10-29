@@ -1,0 +1,80 @@
+---
+title: Cables
+description: Tender cable de datos con una bobina, colgando o pegado a las caras, y separar redes con tinte.
+---
+
+El cable de datos viene en una **bobina de cable**. Una bobina lleva 64 metros; la barra debajo del objeto muestra lo que queda. Una bobina vacía se queda en tu inventario para volver a enrollarla más adelante.
+
+<Recipe id="cable_spool" />
+
+<Callout title="La supervivencia no está terminada" type="warn">
+  En esta versión la bobina sale llena de su receta y no hay forma de rellenarla. La bobinadora que enrollará cobre en ella llega más adelante. En creativo, tender cable no gasta nada.
+</Callout>
+
+## Tender un cable
+
+<Steps>
+<Step>
+
+Con la bobina en la mano, haz clic derecho en un puerto o un empalme. La barra de acción dice **Cable empezado**, y un cable te sigue desde esa pieza.
+
+</Step>
+<Step>
+
+Haz clic derecho en un segundo puerto o empalme. El cable queda colgando entre los dos, y la barra de acción dice cuántos metros ha gastado.
+
+</Step>
+</Steps>
+
+Para soltar un cable que has empezado, haz clic derecho otra vez en la misma pieza, o agáchate y haz clic derecho al aire.
+
+Los dos extremos tienen que estar en la misma dimensión, y puedes empezar en un puerto pegado a un cofre o a una máquina sin abrirlo.
+
+## Colgando o por las caras
+
+Un segundo clic normal cuelga el cable en línea recta por el aire, con un poco de comba. Los cables colgantes llegan hasta **24 bloques** y gastan su longitud más un 5 % por la comba.
+
+**Agáchate en el segundo clic** para llevar el cable pegado a las caras de los bloques de por medio: por el suelo, subiendo paredes, doblando esquinas. La bobina busca el camino más corto por caras sólidas, de hasta 64 bloques de recorrido.
+
+Mientras apuntas, una vista previa muestra por dónde iría el cable, colgando o pegado según vayas agachado o no. Se pone en rojo cuando el cable no puede ir ahí: demasiado lejos, sin camino, choque de colores o no queda cable suficiente. Las longitudes se redondean hacia arriba a metros enteros.
+
+## Cuando no se puede tender
+
+La barra de acción dice por qué:
+
+| Mensaje | Qué pasa |
+| --- | --- |
+| Demasiado lejos para colgar un cable (24 bloques como mucho) | Cuélgalo pasando por un empalme, o agáchate para llevarlo por las caras. |
+| No hay camino por las caras entre los dos | Las caras donde están las dos piezas no están unidas por superficie libre, o el camino pasa de 64. |
+| Esa pieza ya tiene cable de otro color | Mira [Colores](#colores). |
+| Esos dos ya están unidos | Ya hay un cable entre esas dos piezas. |
+| Elige otra pieza | Has pinchado en la pieza donde empezó el cable. |
+| Hacen falta N m, la bobina tiene M m | No queda cable suficiente en la bobina. |
+
+## Colores
+
+Los cables se pueden teñir, y los cables teñidos mantienen las redes separadas. La regla:
+
+- Una pieza (un puerto o un empalme) coge el color del primer cable teñido que se le conecta. A partir de ahí solo acepta cables de ese color, o de cobre sin teñir.
+- El cable de cobre sin teñir se conecta a cualquier cosa.
+
+Así, una red roja y una azul que comparten pared nunca se mezclan, mientras ninguna pieza lleve las dos. Un cable sin teñir entre una pieza roja y una azul sí las une, porque el cobre sin teñir conecta con cualquier color.
+
+Hay dos formas de conseguir cable de color:
+
+- **Teñir una bobina**: ponla en el centro de la mesa de crafteo con el mismo tinte a los cuatro lados y las esquinas vacías. La bobina sale de ese color con todo su cable. Puedes teñir una bobina ya teñida de otro color, pero no devolverla a cobre sin teñir.
+- **Teñir un cable tendido**: haz clic derecho en él con un tinte. No funciona, y sale un mensaje, si alguno de los dos extremos ya tiene cable de otro color.
+
+<Recipe id="spool_dyeing" />
+
+## Revestir
+
+Haz clic derecho en un cable tendido con un revestimiento de andesita, latón o cobre para revestirlo. El revestimiento se gasta (salvo en creativo), y el cable se vuelve más grueso y coge el aspecto del revestimiento. Si haces clic derecho con otro revestimiento, lo cambia y te devuelve el anterior. Haz clic derecho con la llave inglesa para quitar el revestimiento.
+
+## Cortar
+
+Golpea un cable para cortarlo. El cable vuelve a una bobina del mismo color de tu inventario, tanto como quepa; si estaba revestido, también recuperas el revestimiento.
+
+Quitar un puerto corta todos los cables conectados a él, y romper el bloque en el que está también.
+
+Cuando giras un ordenador con la llave inglesa, los cables que cuelgan de sus propios puertos siguen a los puertos. Los cables pegados a las caras ya no encajan en su recorrido, así que se cortan.

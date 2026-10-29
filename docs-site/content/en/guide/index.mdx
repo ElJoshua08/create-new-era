@@ -1,0 +1,77 @@
+---
+title: Your first program
+description: What the mod adds, and a blinking lamp in five minutes.
+---
+
+Create: New Era adds computers to Create. A Brass Computer is a kinetic block: you run a shaft into its back, and while it turns it runs the Lua program you write in its editor. Programs read and send redstone on all six sides, and through data ports and cables they can read and control the machines around them: how fast a motor spins, what's in a chest, how full a tank is.
+
+<Callout title="Pre-release" type="warn">
+  This is 0.1.0-alpha.1. Everything on these pages works in creative. Survival isn't finished: the cable spool comes full from its recipe, the spool winder isn't in yet, and some recipes will change. Worlds made with this version may need fixing up later.
+</Callout>
+
+## What you need
+
+A Brass Computer, a rotation source and a redstone lamp. In creative they're all in the inventory: the computer is in the **Create: New Era** tab, right after Create's tabs. If you haven't installed the mod yet, see [Installing](./install.mdx).
+
+## Blink a lamp
+
+<Steps>
+<Step>
+
+### Place the computer and turn it
+
+Place a Brass Computer. If there's already a shaft next to it, it turns its back towards the shaft on its own. Otherwise run a shaft into its back from any rotation source: a water wheel, a windmill, or a Creative Motor in creative. Computers only run while they turn.
+
+</Step>
+<Step>
+
+### Put a lamp on top
+
+Place a redstone lamp on top of the computer.
+
+</Step>
+<Step>
+
+### Open the editor
+
+Right-click the computer. The editor opens on `startup.lua`, which every new computer comes with:
+
+```lua title="startup.lua"
+-- Blinks a redstone signal out of the top: put a lamp on it.
+-- Edit me, then press Run (Ctrl+R).
+while true do
+  redstone.setOutput("top", true)
+  sleep(0.5)
+  redstone.setOutput("top", false)
+  sleep(0.5)
+end
+```
+
+</Step>
+<Step>
+
+### Run it
+
+Press **Run** or <kbd>Ctrl</kbd>+<kbd>R</kbd>. The computer's screen lights up and the lamp blinks once a second. The status bar under the code shows the program running and the speed the computer turns at.
+
+</Step>
+</Steps>
+
+Change `0.5` to `0.1` and press <kbd>Ctrl</kbd>+<kbd>R</kbd> again. Run saves the file and starts the program over with your change.
+
+## Where to go next
+
+<Cards>
+  <Card title="The Brass Computer" href="./computer.mdx">
+    Rotation, the disk, how programs start and stop.
+  </Card>
+  <Card title="Lua API reference" href="./lua.mdx">
+    Every function a program can call.
+  </Card>
+  <Card title="The data bus" href="./bus.mdx">
+    Ports and cables, so programs can reach your machines.
+  </Card>
+  <Card title="Examples" href="./examples.mdx">
+    Whole programs to paste and run.
+  </Card>
+</Cards>

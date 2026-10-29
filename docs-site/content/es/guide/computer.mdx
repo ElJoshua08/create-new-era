@@ -1,0 +1,68 @@
+---
+title: El ordenador de latón
+description: Rotación, el disco, los programas, los lados y el tiempo.
+---
+
+![Ordenador de latón](/img/blocks/brass_computer_shaft.png)
+
+El ordenador de latón guarda unos cuantos archivos de Lua y ejecuta uno de ellos como programa. Funciona con rotación como cualquier máquina de Create, y cuanto más rápido gira, más trabajo hace su programa en cada tick.
+
+## Rotación
+
+El ordenador recibe un eje por detrás. Si lo colocas junto a un eje, gira la espalda hacia él, como el reloj de cuco de Create. Su impacto de estrés es de 2 SU por RPM, y aparece en el tooltip de las gafas del ingeniero junto al resto de datos de estrés.
+
+La velocidad decide cuánto de cada tick recibe el programa:
+
+| Velocidad | Tiempo por tick | Estrés |
+| --- | --- | --- |
+| 256 RPM | 2 ms | 512 SU |
+| 128 RPM | 1 ms | 256 SU |
+| 64 RPM | 0,5 ms | 128 SU |
+| 16 RPM | 0,125 ms | 32 SU |
+| Sin girar | en pausa | 0 SU |
+
+El sentido de giro da igual, solo cuenta la velocidad. Por encima de 256 RPM el ordenador no recibe más tiempo.
+
+Sin rotación, o con su red sobreestresada, el programa se queda justo donde está y sigue cuando el eje vuelve a girar. No se pierde nada. Mientras tanto, la barra de estado del editor dice **En pausa: necesita rotación** o **En pausa: sobreestresado**. Un programa puede leer la velocidad de su ordenador con `os.speed()`.
+
+## El disco
+
+Cada ordenador tiene su propio disco pequeño de archivos de texto, que se guarda con el mundo. Un ordenador nuevo trae un archivo, `startup.lua`, con el programa de la lámpara que parpadea. Puedes tener hasta 32 archivos y meterlos en carpetas, como `lib/pid.lua`. Los límites están en [Archivos y require](./files.mdx).
+
+Si rompes el ordenador, pierdes sus archivos. Todavía no hay forma de llevarlos a otro ordenador, así que guarda fuera del juego una copia de lo que te importe.
+
+## Programas
+
+Un programa es un archivo que el ordenador está ejecutando. **Ejecutar** arranca el archivo de la pestaña activa del editor desde su primera línea, y para lo que estuviera en marcha antes. Un ordenador ejecuta un programa cada vez; ese programa puede cargar otros archivos con `require`.
+
+Mientras un programa funciona, la pantalla del ordenador está encendida. Sigue funcionando con el editor cerrado y sin nadie cerca, siempre que el chunk esté cargado.
+
+Un programa termina de una de tres maneras:
+
+- Llega al final de su código y no tiene handlers de `onChange` esperando. La consola dice **Programa terminado**. Sus salidas de redstone se quedan como estaban.
+- Da un error. La consola muestra el mensaje en rojo y las salidas se quedan como estaban.
+- Pulsas **Parar**. El programa termina y todas las salidas de redstone se apagan.
+
+Un programa con [handlers de `onChange`](./devices.mdx#reaccionar-a-los-cambios) no termina cuando acaba su código principal: sigue escuchando hasta que lo paras o da un error.
+
+Cuando se carga el mundo, o vuelve a cargarse el chunk, un ordenador que estaba en marcha arranca su programa otra vez desde arriba. Las variables no se guardan. Vuelve a arrancar el último archivo que ejecutaste, que no tiene por qué ser `startup.lua`.
+
+## Lados
+
+Los programas nombran las seis caras del ordenador desde su frente: `front`, `back`, `left`, `right`, `top` y `bottom`. Izquierda y derecha son como las ves de pie delante de él, mirando su pantalla. Si giras el ordenador con la llave inglesa de Create, los lados giran con él.
+
+La parte de atrás suele llevar el eje, así que la redstone va casi siempre por las otras cinco. Mira [Redstone](./redstone.mdx).
+
+## Sus propios puertos
+
+El ordenador trae cuatro puertos de datos de serie: dos en cada lado, en un panel de latón. Lo conectan al [bus de datos](./bus.mdx). No se pueden quitar; usar la llave inglesa en uno gira el ordenador, igual que en cualquier otra parte de él. Giran con el ordenador cuando lo rotas.
+
+## El tiempo
+
+En cada tick, cada ordenador en marcha recibe un trozo del tiempo del servidor según su velocidad. Un programa que da vueltas en un bucle sin esperar se pausa a mitad de instrucción cuando se le acaba el trozo, y sigue desde el mismo punto en el siguiente tick. Un bucle ocupado ralentiza su propio programa, no el servidor. A toda velocidad son 2 ms por ordenador y tick, de los 50 ms que tiene un tick.
+
+`sleep(seconds)` espera en tiempo de juego, redondeado hacia arriba a ticks enteros (20 por segundo). `sleep(0)` espera exactamente un tick. Entre despertar y despertar, un ordenador dormido no cuesta nada.
+
+## La consola
+
+Debajo del código, la consola muestra lo que escribe `print`, las líneas de estado (**Ejecutando**, **Parado**, **Programa terminado**, **Reiniciado al cargar el mundo**) y los errores en rojo. Los errores empiezan con el archivo y la línea, como `lib/pid.lua:12:`; si pinchas en uno, se abre ese archivo en esa línea. La consola guarda las últimas 100 líneas, y se guardan con el ordenador.

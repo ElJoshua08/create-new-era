@@ -1,0 +1,33 @@
+---
+title: Recarga en caliente
+description: Mete código en una partida abierta, y lo que sigue necesitando reiniciar.
+---
+
+Con `dev_hotswap=true` (lo normal), la mayoría de cambios llegan a una partida abierta sin reiniciarla.
+
+## Cómo funciona
+
+`runClient` arranca sobre el JetBrains Runtime con `-XX:+AllowEnhancedClassRedefinition`, que acepta casi cualquier cambio en una clase: métodos nuevos, campos nuevos, clases nuevas. También abre un puerto de depuración en `127.0.0.1:5005`. Antes de que arranque el juego, la build apunta un hash de cada clase compilada. Luego:
+
+```sh title="Terminal"
+./gradlew hotswap                 # recompila y mete las clases cambiadas en el cliente abierto
+./gradlew hotswap -Pport=5006     # lo mismo para runServer, que escucha en el 5006
+```
+
+Solo se envían las clases que han cambiado desde que arrancó el juego. El cambio en sí lo hace `tools/hotswap/HotSwap.java`, hablando JDWP con el juego.
+
+## Qué necesita cada cosa
+
+| Has cambiado | Para verlo |
+| --- | --- |
+| Java: lógica, renderizado, el editor, la API de Lua | `./gradlew hotswap` |
+| `prelude.lua` | Reinicia el juego: se lee una sola vez, cuando se carga `LuaComputer` |
+| Texturas, modelos, idiomas | `./gradlew hotswap` también los copia; luego <kbd>F3</kbd>+<kbd>T</kbd> en el juego |
+| Recetas, tags, loot tables y otros datos | `/reload` en el juego |
+| Registros: bloques, objetos, block entities o payloads de red nuevos | Reinicia el juego |
+
+Una clase cambiada cambia lo que se ejecuta a partir de ahora, no lo que ya pasó. Lo registrado al arrancar o guardado en campos se queda como estaba. Si algo parece viejo, reinicia.
+
+## Desactivarlo
+
+Pon `dev_hotswap=false` en `gradle.properties`. Las partidas de desarrollo usan entonces la toolchain normal de JDK 21, sin puerto de depuración.

@@ -1,0 +1,52 @@
+---
+title: Redstone
+description: Leer y enviar señales por los seis lados del ordenador.
+---
+
+Cada cara del ordenador es un lado que un programa puede leer y controlar. Lo hace la librería `redstone` (o `rs`, que es la misma tabla).
+
+## Cómo se llaman los lados
+
+Los lados se nombran desde el frente del ordenador, la cara con la pantalla: `front`, `back`, `left`, `right`, `top`, `bottom`. Izquierda y derecha son como las ves de pie delante del ordenador. Si lo giras con la llave inglesa, los nombres giran con él, así que el programa sigue funcionando después de rotarlo.
+
+La parte de atrás lleva el eje, así que en la práctica la redstone va por los otros cinco lados.
+
+## Leer
+
+`rs.getInput(side)` es `true` cuando entra alguna señal por ese lado. `rs.getAnalogInput(side)` da su fuerza, de 0 a 15, que es lo que te interesa con comparadores y con las palancas analógicas de Create.
+
+```lua
+-- una palanca a la izquierda, un comparador leyendo un cofre a la derecha
+if rs.getInput("left") then
+  print("la palanca está activada")
+end
+print("nivel del cofre: " .. rs.getAnalogInput("right"))
+```
+
+El panel **Redstone** del editor muestra en directo la señal que entra y sale por cada lado.
+
+## Enviar
+
+`rs.setOutput(side, true)` envía una señal a plena fuerza; `false` la apaga. `rs.setAnalogOutput(side, n)` envía cualquier fuerza de 0 a 15.
+
+Las salidas son señales fuertes. Además del bloque pegado a ese lado, pasan a través de él: una lámpara detrás de un bloque de piedra a la izquierda del ordenador se enciende igual.
+
+Una salida sigue encendida hasta que el programa la cambia, o hasta que pulsas **Parar**, que apaga las seis. Un programa que termina o da un error deja sus salidas como estaban.
+
+## Esperar una señal
+
+Todavía no hay eventos de redstone, así que comprueba una vez por tick:
+
+```lua
+-- espera un pulso por delante y luego haz algo
+while not rs.getInput("front") do
+  sleep(0)
+end
+print("ha llegado un pulso")
+```
+
+`sleep(0)` espera un tick, así que un bucle así casi no cuesta nada mientras espera.
+
+## Ejemplos
+
+En [Ejemplos](./examples.mdx) hay programas completos de redstone: copiar una señal de un lado a otro, contar pulsos, subir poco a poco una salida analógica.

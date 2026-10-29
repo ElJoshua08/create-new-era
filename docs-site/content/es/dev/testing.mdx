@@ -1,0 +1,66 @@
+---
+title: Tests y datagen
+description: GameTests dentro de un servidor de verdad, y los recursos que se generan en vez de escribirse a mano.
+---
+
+## GameTests
+
+```sh title="Terminal"
+./gradlew runGameTestServer   # arranca un servidor en run/server/, pasa todos los tests y sale
+```
+
+Sale con un código distinto de cero si falla algún test. Los tests están en `src/main/java/com/createnewera/gametest/`. Colocan bloques de verdad, los hacen girar con un motor creativo, ejecutan Lua de verdad y comprueban el mundo y la consola. En un mundo de `runClient` también puedes lanzarlos con el comando `/test` de Minecraft.
+
+### ComputerTests
+
+- Escribe y termina
+- Envía redstone
+- Parar apaga las salidas
+- Lee redstone
+- `sleep` espera en tiempo de juego
+- Los errores señalan la línea
+- Se informa de los errores de compilación
+- Un cálculo largo ocupa varios ticks
+- `require` carga otros archivos
+- Se pausa sin rotación
+- La velocidad marca el trozo de tiempo
+
+### BusTests
+
+- Lista los dispositivos conectados, del más cercano al más lejano
+- Lee por los puertos de salida
+- Las órdenes necesitan un puerto de entrada
+- `onChange` se ejecuta cuando cambia un dispositivo
+- Nombres y dispositivos rotos
+- Los ordenadores tienen puertos limitados
+- Los puertos sueltos pasan a los huecos
+- Las piezas quedan donde pinchas
+- Las ampliaciones añaden puertos al ordenador
+- La llave inglesa da la vuelta a los puertos
+
+### CableTests
+
+- Los colores separan las redes
+- Teñir sigue la regla de colores
+- Los recorridos por superficie siguen las caras
+- La bobina gasta lo que tiende
+- Los cables llegan a los huecos del ordenador
+- Teñir una bobina conserva su cable
+
+### RegistrationTests
+
+- Cada bloque se coloca mirando a cada lado
+- Cada receta carga
+- Las pestañas creativas se montan
+- Las pantallas se unen
+- Las estructuras de Ponder cargan
+
+## Datagen
+
+```sh title="Terminal"
+./gradlew runData   # escribe en src/generated/resources/
+```
+
+Genera blockstates, modelos de objeto, loot tables, tags y el archivo de idioma en inglés en `src/generated/resources/`. Haz commit de lo que escriba. Se ejecuta en su propia carpeta, `run/data/`, porque los mods de desarrollo solo de cliente de `run/` dejan colgado el datagen.
+
+El inglés sale del código: los nombres de bloques y objetos con el `.lang(...)` de Registrate en `ModBlocks` y `ModItems`, todo lo demás en `ModLang`, y el texto de Ponder de las escenas. El archivo en español, `src/main/resources/assets/create_new_era/lang/es_es.json`, se escribe a mano.

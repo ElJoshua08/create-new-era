@@ -1,0 +1,89 @@
+---
+title: Dispositivos
+description: Leer máquinas, darles órdenes y reaccionar cuando cambian.
+---
+
+`bus.get(name)` te da una tabla para un dispositivo. Sus funciones dependen de qué bloque sea; la lista completa está en la [referencia de la API de Lua](./lua.mdx#dispositivos). Esta página las enseña funcionando.
+
+## Leer
+
+Para leer hace falta un puerto de salida (ámbar) en el dispositivo.
+
+```lua
+local motor = bus.get("creative_motor")
+print(motor.getSpeed())          -- 64
+print(motor.isOverstressed())    -- false
+
+local stress = motor.getStress()
+print(stress.used .. " / " .. stress.capacity .. " SU")
+```
+
+Los inventarios dan cantidades por id de objeto:
+
+```lua
+local chest = bus.get("chest")
+print(chest.count("minecraft:iron_ingot"))
+
+for id, n in pairs(chest.items()) do
+  print(id, n)
+end
+```
+
+Los tanques dan una entrada por tanque:
+
+```lua
+local tank = bus.get("fluid_tank")
+for _, t in ipairs(tank.fluids()) do
+  print(t.name, t.amount .. " / " .. t.capacity .. " mB")
+end
+```
+
+## Dar órdenes
+
+Las órdenes necesitan un puerto de entrada (verde). De momento la única orden es la velocidad de un motor creativo o de un controlador de velocidad rotacional:
+
+```lua
+local controller = bus.get("rotation_speed_controller")
+controller.setSpeed(-128)  -- números enteros de -256 a 256
+```
+
+Si el puerto es de salida, el programa se para con `rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller`. Cambia el puerto a entrada con la llave inglesa, o añade un segundo puerto.
+
+## Reaccionar a los cambios
+
+`device.onChange(fn)` ejecuta `fn` cada vez que cambia algo que podrías leer del dispositivo: su velocidad, si está sobreestresado, la velocidad a la que está puesto, sus objetos o sus fluidos. Recibe el dispositivo, así que una misma función puede servir para varios.
+
+```lua
+local chest = bus.get("chest")
+
+chest.onChange(function(c)
+  local iron = c.count("minecraft:iron_ingot")
+  rs.setOutput("top", iron < 64)
+end)
+
+print("vigilando el cofre")
+```
+
+Este programa escribe una vez y luego espera. Como tiene un handler, no termina al ejecutar la última línea: sigue escuchando hasta que pulses **Parar** o dé un error. Entre cambio y cambio no cuesta nada.
+
+Algunos detalles:
+
+- Los cambios se miran una vez por tick. Si un cofre cambia tres veces en un tick, el handler se ejecuta una vez.
+- Cada cambio arranca una ejecución nueva del handler, a la vez que el código principal y los demás handlers. Un handler puede usar `sleep`.
+- Un dispositivo que sale de la red, porque se rompió su bloque o se cortó un cable, también cuenta como cambio. Llamar a sus funciones después da error, así que usa `pcall` si eso puede pasar.
+- El estrés usado y la capacidad no se vigilan. Si los necesitas, consulta `getStress()` en un bucle.
+- Un error en cualquier handler para todo el programa.
+
+## Consultar en un bucle
+
+Si prefieres mirar cuando tú quieras, usa un bucle con `sleep`:
+
+```lua
+local press = bus.get("mechanical_press")
+while true do
+  if press.isOverstressed() then
+    print("la prensa está sobreestresada")
+  end
+  sleep(1)
+end
+```

@@ -1,0 +1,86 @@
+---
+title: Preguntas frecuentes y problemas
+description: Cuando un programa no arranca, no se encuentra un dispositivo o un cable no se tiende.
+---
+
+## Programas
+
+### He pulsado Ejecutar y no pasa nada
+
+Mira la barra de estado debajo del código. **En pausa: necesita rotación** quiere decir que el ordenador no gira: llévale un eje por detrás. **En pausa: sobreestresado** quiere decir que su red cinética no aguanta la carga; el ordenador gasta 2 SU por RPM, así que 512 SU a 256 RPM. Añade capacidad de estrés o hazlo girar más despacio.
+
+### Mi programa va lento
+
+El ordenador recibe más tiempo por tick cuanto más rápido gira, hasta 2 ms a 256 RPM. Un programa a 16 RPM recibe una dieciseisava parte. Hazlo girar más rápido, o añade llamadas a `sleep` para que no esté dando vueltas en un bucle sin parar.
+
+### Mi programa ha vuelto a empezar cuando he vuelto
+
+Cuando se carga el mundo o el chunk, un ordenador que estaba en marcha arranca su programa otra vez desde arriba. Las variables no se guardan. Si necesitas conservar una cuenta entre reinicios, guárdala en el mundo: el contenido de un cofre, una señal de redstone, la velocidad a la que está puesto un motor.
+
+### La lámpara se ha quedado encendida al acabar el programa
+
+Un programa que termina o da un error deja sus salidas como estaban. **Parar** las apaga todas.
+
+### `unknown side 'north'`
+
+Los lados se nombran desde el frente del ordenador: `front`, `back`, `left`, `right`, `top`, `bottom`. Los puntos cardinales no valen.
+
+## Dispositivos
+
+### `no device named 'chest' on this computer's network`
+
+El nombre está mal, o el bloque no está conectado. Ejecuta esto para ver a qué llega el ordenador:
+
+```lua
+for _, d in ipairs(bus.list()) do print(d.name) end
+```
+
+Si el bloque no sale: comprueba que tiene un puerto, que un cable va desde ese puerto hasta uno de los puertos del ordenador (pasar por otros puertos o empalmes vale), y que los colores coinciden por el camino.
+
+### `needs an input port` o `needs an output port`
+
+Para leer hace falta un puerto de salida (luz ámbar) en el dispositivo, y para darle órdenes uno de entrada (verde). Haz clic derecho en el puerto con la llave inglesa para cambiarlo, o añade un segundo puerto para que el bloque tenga uno de cada.
+
+### ¿Puedo renombrar un dispositivo?
+
+Dentro del juego, todavía no. Los nombres son el id del bloque más un número cuando ya está cogido (`chest`, `chest_2`). Un nombre se queda con su bloque hasta que se rompe.
+
+### Mi dispositivo no tiene funciones
+
+Un bloque que no gira y no guarda objetos ni fluidos, como una lámpara de redstone, aparece en la red pero de momento no tiene nada que leer ni controlar.
+
+## Cables y puertos
+
+### «No hay sitio para un puerto ahí»
+
+Los puertos no se pueden solapar. Pincha en un hueco libre de la cara.
+
+### «No le quedan puertos: una ampliación de puertos añade 4 más»
+
+Un ordenador lleva 4 puertos, más 4 por cada ampliación de puertos, con hasta 3 ampliaciones.
+
+### «Esa pieza ya tiene cable de otro color»
+
+Un puerto o un empalme solo acepta un color de tinte, más cobre sin teñir. Usa otro puerto, o un cable sin teñir. Mira [Colores](./cables.mdx#colores).
+
+### «Demasiado lejos para colgar un cable» / «No hay camino por las caras»
+
+Los cables colgantes llegan a 24 bloques; pon un empalme a mitad de camino. Los cables pegados a las caras necesitan una fila de caras sólidas entre las dos piezas, de hasta 64 bloques.
+
+### Mis cables han desaparecido al girar el ordenador
+
+Girar un ordenador corta los cables pegados a las caras que van a sus propios puertos, porque ya no encajan en su recorrido. Los colgantes siguen a los puertos.
+
+## Otras
+
+### ¿Necesita CC: Tweaked?
+
+No. La máquina virtual de Lua va dentro del jar. Los dos mods no interactúan.
+
+### ¿Puedo usarlo en un modpack?
+
+Sí. Es de dominio público bajo The Unlicense: no hace falta pedir permiso ni dar crédito.
+
+### ¿Dónde aviso de un bug?
+
+En las [issues de GitHub](https://github.com/ElJoshua08/create-new-era/issues). Incluye tus versiones de Minecraft, NeoForge, Create y Create: New Era, tu lista de mods, los pasos y `logs/latest.log`. Un programa de Lua pequeño que muestre el fallo ayuda mucho.

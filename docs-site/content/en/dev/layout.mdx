@@ -1,0 +1,46 @@
+---
+title: Project layout
+description: Where each part of the mod lives.
+---
+
+```text
+src/main/java/com/createnewera/
+  CreateNewEra.java          mod entry point: registers content, config, network, events
+  CreateNewEraClient.java    client setup: config screen, Ponder, renderers
+  block/                     block classes: screens, panel parts, machines
+  bus/                       the data bus: ports, spans, networks, device drivers, cable routes
+  cable/                     the spool, cable actions (cut, dye, encase), spool dyeing
+  computer/                  Brass Computer: block, block entity, Lua VM, files, sides
+  client/editor/             the in-game editor: code view, suggestions, the Lua API list, layout
+  client/bus/                drawing ports and cables, the device highlight
+  client/render/             the computer's renderer
+  network/                   payloads between client and server
+  ponder/                    Ponder scenes
+  registry/                  blocks, items, block entities, components, recipes, creative tab, lang
+  config/                    client config
+  gametest/                  GameTests
+src/main/resources/
+  data/create_new_era/lua/prelude.lua   turns the Java side into the Lua API
+  data/create_new_era/recipe/           recipes
+  assets/create_new_era/                models, textures, Ponder structures, es_es.json
+src/generated/resources/      datagen output (don't edit by hand)
+gradle/
+  dev-mods.gradle             the dev modpack
+  hotswap.gradle              live code reloading
+tools/                        asset and dev scripts
+docs-site/                    these docs
+```
+
+## Where to start
+
+**Adding to the Lua API.** The Java side is the `native` table in `computer/LuaComputer.java`; `prelude.lua` turns it into the globals programs see and then drops it. Add new names to `client/editor/LuaApi.java` too, so the editor suggests them.
+
+**New device functions.** `bus/DeviceDrivers.java` decides what a block can do from what it is: kinetic, item inventory, fluid tank. Readers go behind an output port, writers behind an input port. If a reader's value can change, add it to `snapshot` so `onChange` notices.
+
+**The network.** `bus/BusData.java` stores every part, cable span and device name per dimension, outside the blocks. `bus/Bus.java` has the rules for placing parts and finding the devices a computer can reach. `bus/CableRoute.java` works out hanging and surface routes.
+
+**The editor.** `client/editor/ComputerEditorScreen.java` (window, panels, tabs), `CodeEditor.java` (text editing) and `Completions.java` (what to suggest).
+
+**A computer's disk.** `computer/ComputerFiles.java`, with the limits.
+
+**A new block.** Register it in `registry/ModBlocks.java`, generate its model with `tools/models/gen_models.py`, then `./gradlew runData`.

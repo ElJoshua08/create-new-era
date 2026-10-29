@@ -1,0 +1,37 @@
+---
+title: Desarrollo
+description: Compila el mod, pruébalo con un modpack realista, recarga código sin reiniciar y pásale los tests.
+---
+
+Esta sección es para quien trabaja en Create: New Era. Si lo que quieres es jugar con el mod, ve a la [Guía](../guide/index.mdx).
+
+El mod es de dominio público bajo The Unlicense, así que haz un fork, cámbialo y publícalo como quieras.
+
+## Empezar
+
+```sh title="Terminal"
+git clone https://github.com/ElJoshua08/create-new-era.git
+cd create-new-era
+./gradlew runClient     # la primera vez descarga el modpack de desarrollo en run/
+```
+
+Solo necesitas un JDK 17 o posterior para arrancar Gradle. Él se descarga los JDK que hacen falta: JDK 21 para compilar, y el JetBrains Runtime para las partidas de desarrollo con recarga en caliente. En Windows usa `gradlew.bat`.
+
+Luego, con el juego todavía abierto, cambia algo de Java y ejecuta:
+
+```sh title="Terminal"
+./gradlew hotswap       # recompila y mete las clases cambiadas en el juego abierto
+```
+
+## En esta sección
+
+<Cards>
+  <Card title="Compilar" href="./building.mdx">Las tareas de Gradle y las versiones contra las que se compila el mod.</Card>
+  <Card title="Partidas de desarrollo" href="./dev-runs.mdx">El modpack que descarga runClient, y cómo quitar partes.</Card>
+  <Card title="Recarga en caliente" href="./hot-reload.mdx">Qué llega a una partida abierta y qué sigue necesitando reiniciar.</Card>
+  <Card title="Tests y datagen" href="./testing.mdx">GameTests dentro de un servidor de verdad, y recursos generados.</Card>
+  <Card title="Herramientas de assets" href="./tools.mdx">Los scripts de las texturas, modelos, renders y escenas de Ponder.</Card>
+  <Card title="Estructura del proyecto" href="./layout.mdx">Dónde está cada parte del mod.</Card>
+  <Card title="Contribuir" href="./contributing.mdx">Pull requests, tests, assets y traducciones.</Card>
+  <Card title="Licencia y créditos" href="./license.mdx">The Unlicense, y el trabajo en el que se apoya el mod.</Card>
+</Cards>

@@ -1,0 +1,89 @@
+---
+title: Devices
+description: Reading machines, giving them orders and reacting when they change.
+---
+
+`bus.get(name)` gives you a table for one device. Its functions depend on what the block is; the full list is in the [Lua API reference](./lua.mdx#devices). This page shows them at work.
+
+## Reading
+
+Reading needs an output port (amber) on the device.
+
+```lua
+local motor = bus.get("creative_motor")
+print(motor.getSpeed())          -- 64
+print(motor.isOverstressed())    -- false
+
+local stress = motor.getStress()
+print(stress.used .. " / " .. stress.capacity .. " SU")
+```
+
+Inventories give counts by item id:
+
+```lua
+local chest = bus.get("chest")
+print(chest.count("minecraft:iron_ingot"))
+
+for id, n in pairs(chest.items()) do
+  print(id, n)
+end
+```
+
+Tanks give one entry per tank:
+
+```lua
+local tank = bus.get("fluid_tank")
+for _, t in ipairs(tank.fluids()) do
+  print(t.name, t.amount .. " / " .. t.capacity .. " mB")
+end
+```
+
+## Giving orders
+
+Orders need an input port (green). For now the one order is the speed of a Creative Motor or a Rotation Speed Controller:
+
+```lua
+local controller = bus.get("rotation_speed_controller")
+controller.setSpeed(-128)  -- whole numbers from -256 to 256
+```
+
+If the port is an output, this stops with `rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller`. Wrench the port to turn it into an input, or add a second port.
+
+## Reacting to changes
+
+`device.onChange(fn)` runs `fn` whenever something you could read from the device changes: its speed, whether it's overstressed, its set speed, its items or its fluids. The device is passed in, so one function can serve several devices.
+
+```lua
+local chest = bus.get("chest")
+
+chest.onChange(function(c)
+  local iron = c.count("minecraft:iron_ingot")
+  rs.setOutput("top", iron < 64)
+end)
+
+print("watching the chest")
+```
+
+This program prints once and then waits. Because it has a handler, it doesn't finish when the last line runs: it keeps listening until you press **Stop** or it errors. Between changes it costs nothing.
+
+Some details:
+
+- Changes are checked once per tick. If a chest changes three times in one tick, the handler runs once.
+- Each change starts a fresh run of the handler, alongside the main code and any other handlers. A handler can `sleep`.
+- A device that leaves the network, because its block broke or a cable was cut, counts as a change too. Calling its functions after that is an error, so check with `pcall` if that can happen.
+- Stress used and capacity aren't watched. Poll `getStress()` with a loop if you need it.
+- An error in any handler stops the whole program.
+
+## Polling instead
+
+If you'd rather check on your own schedule, loop with `sleep`:
+
+```lua
+local press = bus.get("mechanical_press")
+while true do
+  if press.isOverstressed() then
+    print("press is overstressed")
+  end
+  sleep(1)
+end
+```

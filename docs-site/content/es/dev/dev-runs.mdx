@@ -1,0 +1,61 @@
+---
+title: Partidas de desarrollo
+description: El modpack que descarga runClient, y cómo quitar partes de él.
+---
+
+`runClient` descarga un modpack realista en `run/` la primera vez, para que el mod se pruebe con lo que de verdad usan los jugadores.
+
+- Sodium, Lithium, ModernFix, FerriteCore, ImmediatelyFast y Entity Culling
+- JEI
+- Iris, con Complementary Reimagined (activado en el primer arranque) y Complementary Unbound
+- Create: Aeronautics y Sable
+
+Cada archivo está fijado a una URL de Modrinth y se comprueba contra su SHA-1; si no coincide, la build se para. Los mods van a las carpetas de la partida como en una instalación normal, no al classpath, así que los mods solo de cliente nunca llegan al servidor de desarrollo.
+
+Las partidas de servidor y de GameTest usan `run/server/` y solo llevan Aeronautics y Sable. El datagen se ejecuta en `run/data/`, porque los mods solo de cliente de `run/` lo dejan colgado.
+
+## Los archivos
+
+| Archivo | Carpeta | Interruptor |
+| --- | --- | --- |
+| `sodium-neoforge-0.8.13+mc1.21.1.jar` | `mods` | `dev_client_mods` |
+| `modernfix-neoforge-5.27.27+mc1.21.1.jar` | `mods` | `dev_client_mods` |
+| `ferritecore-7.0.3-neoforge.jar` | `mods` | `dev_client_mods` |
+| `ImmediatelyFast-NeoForge-1.6.15+1.21.1.jar` | `mods` | `dev_client_mods` |
+| `entityculling-neoforge-1.11.3-mc1.21.1.jar` | `mods` | `dev_client_mods` |
+| `lithium-neoforge-0.15.4+mc1.21.1.jar` | `mods` | `dev_client_mods` |
+| `jei-1.21.1-neoforge-19.70.0.464.jar` | `mods` | `dev_jei` |
+| `iris-neoforge-1.8.14-beta.1+mc1.21.1.jar` | `mods` | `dev_shaders` |
+| `ComplementaryReimagined_r5.9.3.zip` | `shaderpacks` | `dev_shaders` |
+| `ComplementaryUnbound_r5.9.3.zip` | `shaderpacks` | `dev_shaders` |
+| `create-aeronautics-bundled-1.21.1-1.3.2.jar` | `mods` | `dev_aeronautics` |
+| `sable-neoforge-1.21.1-2.0.6.jar` | `mods` | `dev_aeronautics` |
+
+El shaderpack se elige una vez, cuando todavía no existe `run/config/iris.properties`. A partir de ahí manda lo que elijas en el juego.
+
+## Interruptores
+
+En `gradle.properties`:
+
+```properties title="gradle.properties"
+# Sodium y los mods de optimización en runClient
+dev_client_mods=true
+# JEI en runClient
+dev_jei=true
+# Iris y los shaderpacks Complementary en runClient
+dev_shaders=true
+# Create: Aeronautics y Sable en todas las partidas
+dev_aeronautics=true
+# recarga de código en caliente, mira Recarga en caliente
+dev_hotswap=true
+# un mundo de run/saves que se abre directamente; vacío para la pantalla de título
+dev_world=
+```
+
+Deja los comentarios en su propia línea: en un archivo `.properties`, un `#` después de un valor forma parte del valor.
+
+`dev_world` recibe el nombre de una carpeta de guardado de `run/saves/`. Si la carpeta existe, `runClient` se salta la pantalla de título y abre ese mundo. Déjalo vacío para ir a la pantalla de título.
+
+Apagar un interruptor evita nuevas descargas, pero los archivos que ya están en `run/mods` se quedan ahí. Bórralos a mano si no los quieres.
+
+Para subir una versión, cambia su URL y su SHA-1 en `gradle/dev-mods.gradle`. Las descargas se hacen en las tareas `setupDevClient` y `setupDevServer`, antes de las tareas de partida correspondientes.

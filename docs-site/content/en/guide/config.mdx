@@ -1,0 +1,35 @@
+---
+title: Config
+description: The client option for screen pixels, and where the editor keeps its layout.
+---
+
+The mod has one option, on the client. Client options belong to each player: changing yours doesn't change anyone else's on a server. There's no server or common config.
+
+## Pixel shape
+
+Brass Screens are made of flip pixels. This option picks what each pixel looks like: a square plate or a round disc.
+
+| Key | Values | Default |
+| --- | --- | --- |
+| `screen.pixelShape` | `SQUARE`, `DISC` | `SQUARE` |
+
+Screens don't draw anything yet, so for now the option is saved but changes nothing you can see.
+
+### In game
+
+Open **Mods**, pick **Create: New Era** and press **Config**. The option is under **Screens → Pixel shape**.
+
+### In the file
+
+NeoForge names a mod's client config `<modid>-client.toml`, so it's `config/create_new_era-client.toml` in your game folder:
+
+```toml title="config/create_new_era-client.toml"
+[screen]
+	#Shape of each flip pixel on brass screens. Purely visual, so each player picks their own.
+	#Allowed Values: SQUARE, DISC
+	pixelShape = "SQUARE"
+```
+
+## Editor layout
+
+The editor remembers its window position and size, the console and side panel sizes and the open panel in `config/create_new_era-editor.properties`. Delete the file to reset the layout.

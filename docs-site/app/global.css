@@ -1,0 +1,216 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/neutral.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* Create's palette: brass for what you act on, copper for warnings, andesite for structure.
+   Values sampled from Create's casings, the same ones the old site and the mod's textures use. */
+:root {
+  --brass-0: #3a2411;
+  --brass-1: #724731;
+  --brass-2: #9e6947;
+  --brass-3: #cea05a;
+  --brass-4: #e4b763;
+  --brass-5: #f7cb6c;
+  --copper-1: #904931;
+  --copper-3: #b26247;
+  --copper-5: #d67b5b;
+  --andesite-1: #505351;
+  --andesite-3: #707570;
+  --andesite-5: #9aa49d;
+  --phosphor: #7fd06a;
+  --amber: #f0b03a;
+
+  --font-pixel: var(--font-monocraft), ui-monospace, monospace;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@theme {
+  --color-fd-background: #faf7f1;
+  --color-fd-foreground: #241c13;
+  --color-fd-muted: #f1ece2;
+  --color-fd-muted-foreground: #6b5f50;
+  --color-fd-popover: #fffdf9;
+  --color-fd-popover-foreground: #241c13;
+  --color-fd-card: #f4efe5;
+  --color-fd-card-foreground: #241c13;
+  --color-fd-border: #e2d9c8;
+  --color-fd-primary: #8a5617;
+  --color-fd-primary-foreground: #fffaf0;
+  --color-fd-secondary: #efe8da;
+  --color-fd-secondary-foreground: #241c13;
+  --color-fd-accent: #ece2cd;
+  --color-fd-accent-foreground: #3a2411;
+  --color-fd-ring: #cea05a;
+  --color-fd-overlay: rgb(36 28 19 / 0.25);
+
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", monospace;
+}
+
+.dark {
+  --color-fd-background: #14110d;
+  --color-fd-foreground: #efe4cc;
+  --color-fd-muted: #1e1913;
+  --color-fd-muted-foreground: #b1a38a;
+  --color-fd-popover: #1b1611;
+  --color-fd-popover-foreground: #efe4cc;
+  --color-fd-card: #1b1611;
+  --color-fd-card-foreground: #efe4cc;
+  --color-fd-border: #342a1e;
+  --color-fd-primary: #e4b763;
+  --color-fd-primary-foreground: #2a1a0b;
+  --color-fd-secondary: #241d15;
+  --color-fd-secondary-foreground: #efe4cc;
+  --color-fd-accent: #2c2318;
+  --color-fd-accent-foreground: #f7cb6c;
+  --color-fd-ring: #9e6947;
+  --color-fd-overlay: rgb(0 0 0 / 0.5);
+}
+
+.dark #nd-sidebar {
+  --color-fd-muted: #1e1913;
+  --color-fd-secondary: #241d15;
+  --color-fd-muted-foreground: #b1a38a;
+}
+
+html {
+  scrollbar-gutter: stable;
+  -webkit-text-size-adjust: 100%;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+body {
+  background: var(--color-fd-background);
+  font-feature-settings: "kern";
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- type: tracking and leading change with size ---- */
+
+.prose {
+  --tw-prose-body: var(--color-fd-foreground);
+  line-height: 1.7;
+}
+
+.prose :where(h1, h2, h3, h4) {
+  letter-spacing: -0.015em;
+}
+
+.prose :where(h2) {
+  line-height: 1.25;
+}
+
+h1 {
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.prose :where(a):not(:where([class~="not-prose"], [class~="not-prose"] *)) {
+  text-decoration-color: color-mix(in oklab, var(--color-fd-primary) 45%, transparent);
+  text-underline-offset: 3px;
+}
+
+.prose :where(code):not(:where(pre code)) {
+  font-size: 0.875em;
+}
+
+.prose :where(table) {
+  font-size: 0.9375em;
+}
+
+.prose :where(th) {
+  letter-spacing: 0.01em;
+}
+
+/* ---- press feedback: things respond on the press, not after it ---- */
+
+a,
+button,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):active,
+[role="button"]:active,
+.press:active {
+  transform: scale(0.97);
+  transition: transform 80ms ease-out;
+}
+
+button,
+[role="button"],
+.press {
+  transition:
+    transform 160ms var(--ease-out),
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+/* ---- the logo: the only place the pixel font appears in the chrome ---- */
+
+.pixel {
+  font-family: var(--font-pixel);
+  letter-spacing: 0;
+  font-weight: 400;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* ---- callouts: brass for notes, copper for warnings ---- */
+
+.dark [data-callout-type="warning"],
+.dark .bg-fd-warning\/10 {
+  --color-fd-warning: var(--copper-5);
+}
+
+/* ---- motion: everything settles, nothing bounces; and nothing moves when asked not to ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:active,
+  [role="button"]:active,
+  .press:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  #nd-nav,
+  header {
+    backdrop-filter: none !important;
+    background-color: var(--color-fd-background) !important;
+  }
+}
+
+/* ---- recipe slots, drawn like Minecraft's inventory ---- */
+
+.recipe-slot {
+  background: #8b8b8b;
+  border: 2px solid;
+  border-color: #373737 #ffffff #ffffff #373737;
+}
+
+.dark .recipe-slot {
+  background: #5d5d5d;
+  border-color: #262626 #9a9a9a #9a9a9a #262626;
+}
+
+/* signatures in the first column of a reference table stay on one line; the table scrolls instead */
+.prose td:first-child > code {
+  white-space: nowrap;
+}

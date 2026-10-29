@@ -1,0 +1,73 @@
+---
+title: The data bus
+description: Data ports, cables and splices, and how a computer finds what's on its network.
+---
+
+The data bus is how a computer reaches the machines around it. You stick **data ports** on the blocks you want to use, join them to the computer with **cable**, and the program can read and control those blocks by name.
+
+A port doesn't change the block it sits on. A chest with a port is still a chest, and a press with a port still presses. You don't need the Universal Adapter for any of this; in this version it does nothing yet.
+
+## Data ports
+
+<Recipe id="bus_port" />
+
+Right-click any face of any block with a data port: it sticks where you clicked, as a small mini-block on that face. Several ports fit on one face. Hit a port to knock it off and get it back; the block underneath stays.
+
+A port faces one of two ways:
+
+- **Output**, amber light. The block publishes what it's doing, so programs can **read** it: speed, stress, items, fluids. A new port starts as an output.
+- **Input**, green light. The block takes orders, so programs can **control** it: set a motor's speed.
+
+Right-click a port with Create's wrench to switch it between output and input. Sneak and wrench it to take it off.
+
+A block that needs both, like a Creative Motor you want to read and set, gets two ports: one output and one input.
+
+## The computer's own ports
+
+Every Brass Computer comes with four ports, two on each side in a brass panel. They're always there, can't be wrenched off, and turn with the computer. Cable goes straight into them.
+
+To put more ports on a computer, add a **Port Expansion**. Each one lets the computer carry four more ports, up to three expansions, so a computer can have 16 ports in all. Extra ports go anywhere on the computer that doesn't cover one of its own sockets.
+
+<Recipe id="port_expansion" />
+
+You'll want extra ports when one computer talks to networks of different colours, because each port takes only one cable colour (see [Cables](./cables.mdx#colours)). One port can take as many cables as you like.
+
+## Splices
+
+<Recipe id="cable_splice" />
+
+A cable splice joins cables in the middle of a run. It sticks to a face like a port, but it isn't a device: nothing shows up in `bus.list()` for it. Use one to branch a cable, or to pin a long run to a wall halfway.
+
+## How a network is put together
+
+A network is everything you can reach by following cables from the computer's ports. Cables run between ports and splices, and a device's port passes the network on: computer → motor's port → chest's port works, and the program sees both the motor and the chest.
+
+Each block on the network with at least one port is one **device**. What the program can do with it depends on its ports:
+
+| Ports on the network | The program can |
+| --- | --- |
+| an output | read it |
+| an input | give it orders |
+| one of each | both |
+
+The computer doesn't list itself. Two computers on the same network see each other as devices.
+
+## Device names
+
+A device's name is its block id without the namespace: a chest is `chest`, a Creative Motor is `creative_motor`. When the name is taken, it gets a number: `chest_2`, `chest_3`. The name is given the first time a computer sees the block and stays with that block until it's broken. There's no way to rename devices in game yet.
+
+The quickest way to see the names is to ask:
+
+```lua
+for _, d in ipairs(bus.list()) do
+  print(d.name, d.type, d.distance, d.readable, d.writable)
+end
+```
+
+Or type `bus.get("` in the editor: the suggestions list every device, nearest first. Picking one outlines that block in the world for ten seconds after you close the editor.
+
+Breaking a block removes its ports and drops them as items. It leaves the network, and its name is freed.
+
+## Next
+
+[Devices](./devices.mdx) shows what you can do with each kind of block. [Cables](./cables.mdx) covers laying, colouring and casing cable.

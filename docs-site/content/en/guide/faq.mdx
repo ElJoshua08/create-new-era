@@ -1,0 +1,86 @@
+---
+title: FAQ and troubleshooting
+description: When a program won't run, a device isn't found, or a cable won't lay.
+---
+
+## Programs
+
+### I pressed Run and nothing happens
+
+Look at the status bar under the code. **Paused: needs rotation** means the computer isn't turning: run a shaft into its back. **Paused: overstressed** means its kinetic network can't carry the load; the computer costs 2 SU per RPM, so 512 SU at 256 RPM. Add stress capacity or slow it down.
+
+### My program is slow
+
+The computer gets more time per tick the faster it turns, up to 2 ms at 256 RPM. A program at 16 RPM gets one sixteenth of that. Speed it up, or add `sleep` calls so it isn't busy-looping.
+
+### My program started over after I came back
+
+When the world or the chunk loads, a computer that was running starts its program again from the top. Variables aren't saved. If you need to keep a count across restarts, keep it in the world: a chest's contents, a redstone signal, a motor's set speed.
+
+### The lamp stayed on after the program ended
+
+A program that finishes or errors leaves its outputs as they were. **Stop** turns them all off.
+
+### `unknown side 'north'`
+
+Sides are named from the computer's front: `front`, `back`, `left`, `right`, `top`, `bottom`. Compass directions don't work.
+
+## Devices
+
+### `no device named 'chest' on this computer's network`
+
+The name is wrong, or the block isn't connected. Run this to see what the computer reaches:
+
+```lua
+for _, d in ipairs(bus.list()) do print(d.name) end
+```
+
+If the block isn't there: check that it has a port, that a cable runs from that port back to one of the computer's ports (through other ports or splices is fine), and that the colours along the way match.
+
+### `needs an input port` or `needs an output port`
+
+Reading needs an output port (amber light) on the device, giving orders needs an input port (green). Right-click the port with a wrench to switch it, or add a second port so the block has one of each.
+
+### Can I rename a device?
+
+Not in game yet. Names are the block id plus a number when it's taken (`chest`, `chest_2`). A name stays with its block until the block is broken.
+
+### My device has no functions
+
+A block that doesn't turn and holds no items or fluids, like a redstone lamp, shows up on the network but has nothing to read or control yet.
+
+## Cables and ports
+
+### "No room for a port there"
+
+Ports don't overlap. Click a free spot on the face.
+
+### "No ports left: a Port Expansion adds 4 more"
+
+A computer holds 4 ports, plus 4 per Port Expansion, with up to 3 expansions.
+
+### "That part already has cable of another colour"
+
+A port or splice only takes one dye colour, plus bare copper. Use another port, or a bare cable. See [Colours](./cables.mdx#colours).
+
+### "Too far to hang a cable" / "No way along the faces"
+
+Hanging cables reach 24 blocks; put a splice halfway. Flat cables need a run of solid faces between the two parts, up to 64 blocks long.
+
+### My cables disappeared when I turned the computer
+
+Turning a computer cuts the flat cables plugged into its own ports, because they no longer fit their route. Hanging ones follow the ports.
+
+## Other
+
+### Does it need CC: Tweaked?
+
+No. The Lua VM is bundled in the jar. The two mods don't interact.
+
+### Can I use it in a modpack?
+
+Yes. It's public domain under The Unlicense: no permission or credit needed.
+
+### Where do I report a bug?
+
+On [GitHub issues](https://github.com/ElJoshua08/create-new-era/issues). Include your Minecraft, NeoForge, Create and Create: New Era versions, your mod list, the steps, and `logs/latest.log`. A small Lua program that shows the bug helps a lot.

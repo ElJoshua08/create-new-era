@@ -1,0 +1,52 @@
+---
+title: Redstone
+description: Reading and sending signals on the computer's six sides.
+---
+
+Every face of the computer is a side a program can read and drive. The `redstone` library (or `rs`, which is the same table) does it.
+
+## Naming the sides
+
+Sides are named from the computer's front, the face with the screen: `front`, `back`, `left`, `right`, `top`, `bottom`. Left and right are as you see them standing in front of the computer. Turn the computer with a wrench and the names turn with it, so a program keeps working after you rotate it.
+
+The back takes the shaft, so in practice redstone goes through the other five sides.
+
+## Reading
+
+`rs.getInput(side)` is `true` when any signal comes in on that side. `rs.getAnalogInput(side)` gives its strength, 0 to 15, which is what you want for comparators and Create's analog levers.
+
+```lua
+-- a lever on the left, a comparator reading a chest on the right
+if rs.getInput("left") then
+  print("lever is on")
+end
+print("chest fill level: " .. rs.getAnalogInput("right"))
+```
+
+The **Redstone** panel in the editor shows the signal coming in and going out on every side, live.
+
+## Sending
+
+`rs.setOutput(side, true)` sends a full-strength signal; `false` turns it off. `rs.setAnalogOutput(side, n)` sends any strength from 0 to 15.
+
+Outputs are strong signals. Besides the block next to that side, they reach through it: a lamp behind a stone block on the computer's left still lights.
+
+An output stays on until the program changes it, or until you press **Stop**, which turns all six off. A program that finishes or errors leaves its outputs as they were.
+
+## Waiting for a signal
+
+There's no redstone event yet, so check once a tick:
+
+```lua
+-- wait for a pulse on the front, then do something
+while not rs.getInput("front") do
+  sleep(0)
+end
+print("got a pulse")
+```
+
+`sleep(0)` waits one tick, so a loop like this costs almost nothing while it waits.
+
+## Examples
+
+[Examples](./examples.mdx) has whole redstone programs: copying a signal from one side to another, counting pulses, fading an analog output.

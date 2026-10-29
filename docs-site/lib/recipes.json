@@ -1,0 +1,439 @@
+{
+  "items": {
+    "create:mechanical_bearing": {
+      "en": "Mechanical Bearing",
+      "es": "Rodamiento mecánico",
+      "icon": "/img/items/create_mechanical_bearing.png",
+      "mod": "create"
+    },
+    "create:precision_mechanism": {
+      "en": "Precision Mechanism",
+      "es": "Mecanismo de precisión",
+      "icon": "/img/items/create_precision_mechanism.png",
+      "mod": "create"
+    },
+    "create_new_era:bearing_servo": {
+      "en": "Bearing Servo",
+      "es": "Servo de rodamiento",
+      "icon": "/img/items/create_new_era_bearing_servo.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:glass_pane": {
+      "en": "Glass Pane",
+      "es": "Panel de cristal",
+      "icon": "/img/items/minecraft_glass_pane.png",
+      "mod": "minecraft"
+    },
+    "create:electron_tube": {
+      "en": "Electron Tube",
+      "es": "Tubo de electrones",
+      "icon": "/img/items/create_electron_tube.png",
+      "mod": "create"
+    },
+    "create:brass_casing": {
+      "en": "Brass Casing",
+      "es": "Revestimiento de latón",
+      "icon": "/img/items/create_brass_casing.png",
+      "mod": "create"
+    },
+    "create:brass_sheet": {
+      "en": "Brass Sheet",
+      "es": "Lámina de latón",
+      "icon": "/img/items/create_brass_sheet.png",
+      "mod": "create"
+    },
+    "create_new_era:brass_computer": {
+      "en": "Brass Computer",
+      "es": "Ordenador de latón",
+      "icon": "/img/items/create_new_era_brass_computer.png",
+      "mod": "create_new_era"
+    },
+    "create_new_era:brass_screen": {
+      "en": "Brass Screen",
+      "es": "Pantalla de latón",
+      "icon": "/img/items/create_new_era_brass_screen.png",
+      "mod": "create_new_era"
+    },
+    "create:copper_sheet": {
+      "en": "Copper Sheet",
+      "es": "Lámina de cobre",
+      "icon": "/img/items/create_copper_sheet.png",
+      "mod": "create"
+    },
+    "create_new_era:bus_port": {
+      "en": "Data Port",
+      "es": "Puerto de datos",
+      "icon": "/img/items/create_new_era_bus_port.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:copper_ingot": {
+      "en": "Copper Ingot",
+      "es": "Lingote de cobre",
+      "icon": "/img/items/minecraft_copper_ingot.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:cable_splice": {
+      "en": "Cable Splice",
+      "es": "Empalme de cable",
+      "icon": "/img/items/create_new_era_cable_splice.png",
+      "mod": "create_new_era"
+    },
+    "create:andesite_alloy": {
+      "en": "Andesite Alloy",
+      "es": "Aleación de andesita",
+      "icon": "/img/items/create_andesite_alloy.png",
+      "mod": "create"
+    },
+    "create_new_era:cable_spool": {
+      "en": "Cable Spool",
+      "es": "Bobina de cable",
+      "icon": "/img/items/create_new_era_cable_spool.png",
+      "mod": "create_new_era"
+    },
+    "create_new_era:control_plate": {
+      "en": "Control Plate",
+      "es": "Placa de control",
+      "icon": "/img/items/create_new_era_control_plate.png",
+      "mod": "create_new_era"
+    },
+    "create:nixie_tube": {
+      "en": "Nixie Tube",
+      "es": "Tubo Nixie",
+      "icon": "/img/items/create_nixie_tube.png",
+      "mod": "create"
+    },
+    "create_new_era:nixie_digit": {
+      "en": "Nixie Digit",
+      "es": "Dígito nixie",
+      "icon": "/img/items/create_new_era_nixie_digit.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:stone_button": {
+      "en": "Stone Button",
+      "es": "Botón de piedra",
+      "icon": "/img/items/minecraft_stone_button.png",
+      "mod": "minecraft"
+    },
+    "minecraft:red_dye": {
+      "en": "Red Dye",
+      "es": "Tinte rojo",
+      "icon": "/img/items/minecraft_red_dye.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_button": {
+      "en": "Panel Button",
+      "es": "Pulsador",
+      "icon": "/img/items/create_new_era_panel_button.png",
+      "mod": "create_new_era"
+    },
+    "create:speedometer": {
+      "en": "Speedometer",
+      "es": "Velocímetro",
+      "icon": "/img/items/create_speedometer.png",
+      "mod": "create"
+    },
+    "create_new_era:panel_gauge": {
+      "en": "Panel Gauge",
+      "es": "Indicador de aguja",
+      "icon": "/img/items/create_new_era_panel_gauge.png",
+      "mod": "create_new_era"
+    },
+    "create_new_era:panel_keypad": {
+      "en": "Panel Keypad",
+      "es": "Teclado",
+      "icon": "/img/items/create_new_era_panel_keypad.png",
+      "mod": "create_new_era"
+    },
+    "create:hand_crank": {
+      "en": "Hand Crank",
+      "es": "Manivela",
+      "icon": "/img/items/create_hand_crank.png",
+      "mod": "create"
+    },
+    "create_new_era:panel_knob": {
+      "en": "Panel Knob",
+      "es": "Mando giratorio",
+      "icon": "/img/items/create_new_era_panel_knob.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:glowstone_dust": {
+      "en": "Glowstone Dust",
+      "es": "Polvo de piedra luminosa",
+      "icon": "/img/items/minecraft_glowstone_dust.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_lamp": {
+      "en": "Panel Lamp",
+      "es": "Piloto",
+      "icon": "/img/items/create_new_era_panel_lamp.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:iron_nugget": {
+      "en": "Iron Nugget",
+      "es": "Pepita de hierro",
+      "icon": "/img/items/minecraft_iron_nugget.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_slider": {
+      "en": "Panel Slider",
+      "es": "Deslizador",
+      "icon": "/img/items/create_new_era_panel_slider.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:lever": {
+      "en": "Lever",
+      "es": "Palanca",
+      "icon": "/img/items/minecraft_lever.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_switch": {
+      "en": "Panel Switch",
+      "es": "Interruptor",
+      "icon": "/img/items/create_new_era_panel_switch.png",
+      "mod": "create_new_era"
+    },
+    "create_new_era:port_expansion": {
+      "en": "Port Expansion",
+      "es": "Ampliación de puertos",
+      "icon": "/img/items/create_new_era_port_expansion.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:blue_dye": {
+      "en": "Blue Dye",
+      "es": "Tinte azul",
+      "icon": "/img/items/minecraft_blue_dye.png",
+      "mod": "minecraft"
+    },
+    "create:andesite_casing": {
+      "en": "Andesite Casing",
+      "es": "Revestimiento de andesita",
+      "icon": "/img/items/create_andesite_casing.png",
+      "mod": "create"
+    },
+    "create_new_era:universal_adapter": {
+      "en": "Universal Adapter",
+      "es": "Adaptador universal",
+      "icon": "/img/items/create_new_era_universal_adapter.png",
+      "mod": "create_new_era"
+    }
+  },
+  "recipes": {
+    "bearing_servo": {
+      "type": "application",
+      "base": "create:mechanical_bearing",
+      "held": "create:precision_mechanism",
+      "result": "create_new_era:bearing_servo",
+      "count": 1
+    },
+    "brass_computer": {
+      "type": "mechanical",
+      "grid": [
+        [
+          "minecraft:glass_pane",
+          "minecraft:glass_pane",
+          "minecraft:glass_pane"
+        ],
+        [
+          "create:electron_tube",
+          "create:brass_casing",
+          "create:electron_tube"
+        ],
+        [
+          "create:brass_sheet",
+          "create:precision_mechanism",
+          "create:brass_sheet"
+        ]
+      ],
+      "result": "create_new_era:brass_computer",
+      "count": 1,
+      "mirrored": false
+    },
+    "brass_screen": {
+      "type": "shaped",
+      "grid": [
+        [
+          "minecraft:glass_pane",
+          "minecraft:glass_pane",
+          "minecraft:glass_pane"
+        ],
+        [
+          "create:electron_tube",
+          "create:brass_casing",
+          "create:electron_tube"
+        ]
+      ],
+      "result": "create_new_era:brass_screen",
+      "count": 2,
+      "mirrored": true
+    },
+    "bus_port": {
+      "type": "shapeless",
+      "ingredients": [
+        "create:copper_sheet",
+        "create:electron_tube"
+      ],
+      "result": "create_new_era:bus_port",
+      "count": 4
+    },
+    "cable_splice": {
+      "type": "shapeless",
+      "ingredients": [
+        "create:brass_sheet",
+        "minecraft:copper_ingot"
+      ],
+      "result": "create_new_era:cable_splice",
+      "count": 4
+    },
+    "cable_spool": {
+      "type": "shaped",
+      "grid": [
+        [
+          null,
+          "create:brass_sheet",
+          null
+        ],
+        [
+          "minecraft:copper_ingot",
+          "create:andesite_alloy",
+          "minecraft:copper_ingot"
+        ],
+        [
+          null,
+          "create:brass_sheet",
+          null
+        ]
+      ],
+      "result": "create_new_era:cable_spool",
+      "count": 1,
+      "mirrored": true
+    },
+    "control_plate": {
+      "type": "shapeless",
+      "ingredients": [
+        "create:andesite_alloy",
+        "create:andesite_alloy",
+        "create:brass_sheet"
+      ],
+      "result": "create_new_era:control_plate",
+      "count": 4
+    },
+    "nixie_digit": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:nixie_tube"
+      ],
+      "result": "create_new_era:nixie_digit",
+      "count": 1
+    },
+    "panel_button": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "minecraft:stone_button",
+        "minecraft:red_dye"
+      ],
+      "result": "create_new_era:panel_button",
+      "count": 1
+    },
+    "panel_gauge": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:speedometer"
+      ],
+      "result": "create_new_era:panel_gauge",
+      "count": 1
+    },
+    "panel_keypad": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "minecraft:stone_button",
+        "minecraft:stone_button",
+        "minecraft:stone_button"
+      ],
+      "result": "create_new_era:panel_keypad",
+      "count": 1
+    },
+    "panel_knob": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:hand_crank"
+      ],
+      "result": "create_new_era:panel_knob",
+      "count": 1
+    },
+    "panel_lamp": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "minecraft:glowstone_dust",
+        "minecraft:glass_pane"
+      ],
+      "result": "create_new_era:panel_lamp",
+      "count": 1
+    },
+    "panel_slider": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:brass_sheet",
+        "minecraft:iron_nugget"
+      ],
+      "result": "create_new_era:panel_slider",
+      "count": 1
+    },
+    "panel_switch": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "minecraft:lever"
+      ],
+      "result": "create_new_era:panel_switch",
+      "count": 1
+    },
+    "port_expansion": {
+      "type": "shapeless",
+      "ingredients": [
+        "create:brass_sheet",
+        "create:electron_tube",
+        "create:precision_mechanism"
+      ],
+      "result": "create_new_era:port_expansion",
+      "count": 1
+    },
+    "spool_dyeing": {
+      "type": "shaped",
+      "grid": [
+        [
+          null,
+          "minecraft:blue_dye",
+          null
+        ],
+        [
+          "minecraft:blue_dye",
+          "create_new_era:cable_spool",
+          "minecraft:blue_dye"
+        ],
+        [
+          null,
+          "minecraft:blue_dye",
+          null
+        ]
+      ],
+      "result": "create_new_era:cable_spool",
+      "resultIcon": "/img/items/cable_spool_blue.png",
+      "count": 1,
+      "mirrored": true
+    },
+    "universal_adapter": {
+      "type": "application",
+      "base": "create:andesite_casing",
+      "held": "create:electron_tube",
+      "result": "create_new_era:universal_adapter",
+      "count": 1
+    }
+  }
+}

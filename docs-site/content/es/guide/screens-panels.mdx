@@ -1,0 +1,47 @@
+---
+title: Pantallas y paneles
+description: Pantallas de latón, controles de panel, el adaptador universal y el servo de rodamiento, y lo que hacen hoy.
+---
+
+Estos bloques están en el mod, tienen receta y escena de Ponder, y se pueden colocar, girar con la llave inglesa y picar. Los programas todavía no pueden usarlos. Esta página cuenta lo que hace cada uno ahora, para que construyas con ellos mientras llega lo demás.
+
+## Pantalla de latón
+
+![Pantalla de latón](/img/blocks/brass_screen.png)
+
+Las pantallas de latón colocadas una junto a otra y mirando al mismo lado se unen en una sola pantalla: el marco de latón entre ellas desaparece. Vale cualquier rectángulo. Si giras una con la llave inglesa, se une a las pantallas con las que quede alineada después del giro.
+
+Cada bloque mostrará 48 por 48 píxeles giratorios, plaquitas que se dan la vuelta cuando cambian. Dibujar en las pantallas desde un programa llegará más adelante; de momento una pantalla es un panel en blanco. La [configuración del cliente](./config.mdx) ya tiene la opción para la forma de los píxeles.
+
+<Recipe id="brass_screen" />
+
+## Controles de panel
+
+![Controles de panel](/img/controls.png)
+
+Bloques pequeños para montar pupitres de mando. Cada uno se pone en la cara que pinchas: suelos, paredes o techos. Todos se hacen con una placa de control y una pieza.
+
+| Control | Qué hará |
+| --- | --- |
+| Pulsador | Un botón; los programas verán cada pulsación. |
+| Interruptor | Una palanca de encendido y apagado que los programas pueden leer. |
+| Mando giratorio | Un mando que marca un valor. |
+| Deslizador | Un deslizador de 0 a 100 %. |
+| Piloto | Una luz que los programas pueden encender y colorear. |
+| Dígito nixie | Un dígito luminoso; una fila de ellos muestra un número. |
+| Indicador de aguja | Un dial con aguja que muestra un valor. |
+| Teclado | Doce teclas para escribir números en un programa. |
+
+Las recetas están en la página de [Recetas](./recipes.mdx#controles-de-panel).
+
+## Adaptador universal
+
+![Adaptador universal](/img/blocks/universal_adapter.png)
+
+Se pega a la cara que pinchas. Se pensó como la forma de meter máquinas en el bus de datos; ahora eso lo hacen los [puertos de datos](./bus.mdx), en cualquier bloque. El adaptador no hace nada en esta versión.
+
+## Servo de rodamiento
+
+![Servo de rodamiento](/img/blocks/bearing_servo.png)
+
+Al colocarlo mira hacia ti, como los rodamientos de Create. Está pensado para girar una contraption hasta un ángulo exacto cuando se le ordena, para cardanes, torretas y alerones en barcos de Create: Aeronautics. Los programas todavía no pueden manejarlo.

@@ -1,0 +1,174 @@
+---
+title: Ejemplos
+description: Programas completos para pegar en un archivo y ejecutar.
+---
+
+Cada uno es un programa completo. Pégalo en un archivo y pulsa **Ejecutar**.
+
+## Redstone
+
+### Parpadeo
+
+El programa con el que empieza todo ordenador nuevo. Enciende y apaga la parte de arriba cada medio segundo: pon una lámpara encima del ordenador.
+
+```lua
+while true do
+  redstone.setOutput("top", true)
+  sleep(0.5)
+  redstone.setOutput("top", false)
+  sleep(0.5)
+end
+```
+
+### Repetir una señal
+
+Copia lo que entra por la izquierda a la derecha, una vez por tick. Pon una palanca a la izquierda del ordenador y una lámpara a su derecha.
+
+```lua
+while true do
+  rs.setOutput("right", rs.getInput("left"))
+  sleep(0)
+end
+```
+
+### Contar pulsos
+
+Cuenta cada vez que se enciende el lado izquierdo y escribe el total.
+
+```lua
+local count, was = 0, false
+while true do
+  local on = rs.getInput("left")
+  if on and not was then
+    count = count + 1
+    print("pulsos: " .. count)
+  end
+  was = on
+  sleep(0)
+end
+```
+
+### Subida gradual
+
+Sube la señal de arriba de 0 a 15 y termina. La salida se queda en 15 cuando acaba el programa.
+
+```lua
+for strength = 0, 15 do
+  rs.setAnalogOutput("top", strength)
+  sleep(0.25)
+end
+print("terminado tras " .. os.clock() .. " s")
+```
+
+### Leer todos los lados
+
+Escribe una vez la señal que entra por cada lado.
+
+```lua
+for _, side in ipairs(rs.getSides()) do
+  print(side, rs.getAnalogInput(side))
+end
+```
+
+### Aviso de poca velocidad
+
+Enciende una lámpara encima mientras el ordenador gira a menos de 64 RPM. A 0 RPM el propio programa se pausa, así que la lámpara se queda como estaba.
+
+```lua
+while true do
+  rs.setOutput("top", math.abs(os.speed()) < 64)
+  sleep(0.5)
+end
+```
+
+## Bus de datos
+
+Estos necesitan una [red](./bus.mdx). Cambia los nombres de los dispositivos por los que te salgan con `bus.list()`.
+
+### Qué hay en la red
+
+```lua
+for _, d in ipairs(bus.list()) do
+  local can = (d.readable and "leer " or "") .. (d.writable and "controlar" or "")
+  print(d.name, d.type, d.distance .. " m", can)
+end
+```
+
+### Una palanca pone la velocidad de un motor
+
+Un motor creativo con un puerto de **entrada**, cableado al ordenador, y una palanca a la izquierda del ordenador. Solo manda la orden cuando se mueve la palanca.
+
+```lua
+local motor = bus.get("creative_motor")
+local was = nil
+
+while true do
+  local on = rs.getInput("left")
+  if on ~= was then
+    motor.setSpeed(on and 128 or 0)
+    was = on
+  end
+  sleep(0)
+end
+```
+
+### Queda poco hierro
+
+Un cofre con un puerto de **salida**. Una lámpara encima del ordenador se enciende mientras el cofre tenga menos de 64 lingotes de hierro. Entre cambio y cambio no se ejecuta nada.
+
+```lua
+local chest = bus.get("chest")
+
+local function check(c)
+  rs.setOutput("top", c.count("minecraft:iron_ingot") < 64)
+end
+
+check(chest)
+chest.onChange(check)
+```
+
+### Medidor de estrés
+
+Cualquier bloque cinético de la red con un puerto de **salida**. Envía por delante la parte del estrés en uso como una señal de 0 a 15, para un tubo Nixie o una fila de lámparas.
+
+```lua
+local shaft = bus.get("shaft")
+
+while true do
+  local s = shaft.getStress()
+  local level = 0
+  if s.capacity > 0 then
+    level = math.floor(s.used / s.capacity * 15 + 0.5)
+  end
+  rs.setAnalogOutput("front", math.min(level, 15))
+  sleep(1)
+end
+```
+
+### Informe del tanque
+
+Un tanque de fluidos con un puerto de **salida**. Escribe lo lleno que está cada uno de sus tanques cada vez que cambia.
+
+```lua
+local tank = bus.get("fluid_tank")
+
+tank.onChange(function(t)
+  for _, f in ipairs(t.fluids()) do
+    local pct = f.capacity > 0 and math.floor(f.amount / f.capacity * 100) or 0
+    print((f.name ~= "" and f.name or "vacío") .. ": " .. pct .. "%")
+  end
+end)
+```
+
+### Dos motores al mismo paso
+
+Dos motores creativos, cada uno con un puerto de salida y otro de entrada. Cuando cambias a mano la velocidad del primero, el segundo le sigue.
+
+```lua
+local leader = bus.get("creative_motor")
+local follower = bus.get("creative_motor_2")
+
+leader.onChange(function(m)
+  follower.setSpeed(m.getTargetSpeed())
+end)
+```

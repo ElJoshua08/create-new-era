@@ -1,0 +1,80 @@
+---
+title: Cables
+description: Laying data cable with a spool, hanging or along faces, and keeping networks apart with dye.
+---
+
+Data cable comes on a **Cable Spool**. A spool holds 64 metres; the bar under the item shows what's left. An empty spool stays in your inventory so it can be wound again later.
+
+<Recipe id="cable_spool" />
+
+<Callout title="Survival isn't done" type="warn">
+  In this version the spool comes full from its recipe and there's no way to refill it. The spool winder that will wind copper onto it comes later. In creative, laying cable doesn't use any up.
+</Callout>
+
+## Laying a cable
+
+<Steps>
+<Step>
+
+Hold the spool and right-click a port or a splice. The action bar says **Cable started**, and a cable follows you from that part.
+
+</Step>
+<Step>
+
+Right-click a second port or splice. The cable hangs between the two, and the action bar says how many metres it used.
+
+</Step>
+</Steps>
+
+To let go of a cable you've started, right-click the same part again, or sneak and right-click the air.
+
+Both ends have to be in the same dimension, and you can start on a port stuck to a chest or a machine without opening it.
+
+## Hanging or along faces
+
+A normal second click hangs the cable straight through the air, sagging a little. Hanging cables reach up to **24 blocks** and use their length plus 5% for the sag.
+
+**Sneak on the second click** to run the cable flat along the faces of the blocks in between instead: along the floor, up walls, round corners. The spool finds the shortest way over solid faces, up to 64 blocks of route.
+
+While you aim, a preview shows the cable as it would run, hanging or flat depending on whether you're sneaking. It turns red when the cable can't go there: too far, no route, a colour clash, or not enough cable left. Lengths are rounded up to whole metres.
+
+## When it won't lay
+
+The action bar says why:
+
+| Message | What's wrong |
+| --- | --- |
+| Too far to hang a cable (24 blocks at most) | Hang it via a splice, or sneak to run it along faces. |
+| No way along the faces between them | The faces the two parts sit on aren't joined by open surface, or the route is longer than 64. |
+| That part already has cable of another colour | See [Colours](#colours). |
+| Those two are already joined | There's already a cable between these two parts. |
+| Pick a different part | You clicked the part the cable started on. |
+| Needs N m, the spool has M m | Not enough cable left on the spool. |
+
+## Colours
+
+Cables can be dyed, and dyed cables keep networks apart. The rule:
+
+- A part (a port or splice) takes the colour of the first dyed cable plugged into it. After that it only accepts cables of that colour, or bare copper.
+- Bare copper cable plugs into anything.
+
+So a red network and a blue network sharing a wall never mix, as long as no part carries both. A bare cable between a red part and a blue part does join them, because bare copper connects to any colour.
+
+There are two ways to get coloured cable:
+
+- **Dye a spool**: put it in the middle of a crafting grid with the same dye on all four sides and the corners empty. The spool comes out that colour with all its cable. You can dye a dyed spool another colour, but not back to bare copper.
+- **Dye a laid cable**: right-click it with a dye. This fails, with a message, if either end already has cable of a different colour.
+
+<Recipe id="spool_dyeing" />
+
+## Casing
+
+Right-click a laid cable with an Andesite, Brass or Copper Casing to encase it. The casing is used up (except in creative), and the cable gets thicker and takes the casing's look. Right-clicking with a different casing swaps it and gives the old one back. Right-click with a wrench to take the casing off.
+
+## Cutting
+
+Hit a cable to cut it. The cable goes back onto a spool of the same colour in your inventory, as much as fits; if it was encased you get the casing back too.
+
+Taking a port off cuts every cable plugged into it, and so does breaking the block it's on.
+
+When you rotate a computer with a wrench, cables hanging from its own ports follow the ports. Cables laid flat along faces no longer fit their route, so they're cut.

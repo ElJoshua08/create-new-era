@@ -1,0 +1,129 @@
+---
+title: Lua API reference
+description: Every global, library and function a program can use.
+---
+
+Programs run on [Cobalt](https://github.com/cc-tweaked/Cobalt), the Lua 5.2 VM from CC: Tweaked. This page lists everything a program can reach. The editor's suggestions show the same list with a line about each entry.
+
+## Globals
+
+| Function | What it does |
+| --- | --- |
+| `print(...)` | Writes its arguments to the console as one line, each turned to text with `tostring` and separated by tabs. |
+| `sleep(seconds)` | Waits that long in game time, rounded up to whole ticks. `sleep()` and `sleep(0)` wait one tick. Anything but a number is an error. |
+| `require(name)` | Runs another file on this computer once and returns what it returned. See [Files and require](./files.mdx). |
+
+## os
+
+There are only these three. No `os.time`, `os.date` or file access.
+
+| Function | What it does |
+| --- | --- |
+| `os.clock()` | Seconds of game time since the program started. |
+| `os.sleep(seconds)` | Same as `sleep`. |
+| `os.speed()` | The computer's speed in RPM, negative when the shaft turns the other way. At 0 the program is paused, so it rarely sees 0. |
+
+## redstone
+
+Also available as `rs`. Each function takes a side first: `"front"`, `"back"`, `"left"`, `"right"`, `"top"` or `"bottom"`, named from the computer's front. Any other name stops the program with an error like `unknown side 'north'`.
+
+| Function | Returns | What it does |
+| --- | --- | --- |
+| `getInput(side)` | boolean | Whether any signal comes in on that side. |
+| `getAnalogInput(side)` | 0 to 15 | The strength of the signal coming in. |
+| `setOutput(side, on)` | | Sends a full signal (15) out of that side, or turns it off. `on` must be a boolean. |
+| `setAnalogOutput(side, strength)` | | Sends a signal of 0 to 15. Other numbers are an error. |
+| `getOutput(side)` | boolean | Whether this computer sends anything out of that side. |
+| `getAnalogOutput(side)` | 0 to 15 | The strength this computer sends out of that side. |
+| `getSides()` | table | The six side names: front, back, left, right, top, bottom. |
+
+More in [Redstone](./redstone.mdx).
+
+## bus
+
+The devices on this computer's data network. See [The data bus](./bus.mdx) for how to build one.
+
+| Function | Returns | What it does |
+| --- | --- | --- |
+| `bus.list()` | table | Every device the computer can reach, nearest first. Each entry is a table with `name`, `type`, `distance`, `readable` and `writable`. |
+| `bus.get(name)` | device | One device by name. Errors with `no device named '…' on this computer's network` if it can't be reached. |
+
+The fields of a `bus.list()` entry:
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| `name` | `"creative_motor"` | What you pass to `bus.get`. |
+| `type` | `"create:creative_motor"` | The block's id. |
+| `distance` | `2.8` | Straight-line distance from the computer in blocks, to one decimal. Not the cable length. |
+| `readable` | `true` | It has an output port on the network, so you can read it. |
+| `writable` | `false` | It has an input port on the network, so you can give it orders. |
+
+## Devices
+
+`bus.get` returns a table with `name`, `type`, and a function for everything that kind of block can do. Call them with a dot or a colon; `motor.getSpeed()` and `motor:getSpeed()` both work.
+
+Reading needs an **output** port on the device, giving orders needs an **input** port. Calling a function the ports don't allow stops the program with a message that says which port is missing, for example `creative_motor.setSpeed needs an input port on creative_motor`.
+
+### Anything that turns
+
+Every Create kinetic block: shafts, gearboxes, motors, presses, fans, and other Brass Computers.
+
+| Function | Port | Returns |
+| --- | --- | --- |
+| `getSpeed()` | output | Speed in RPM, negative for the other direction. 0 when overstressed. |
+| `isOverstressed()` | output | `true` when its network is overstressed. |
+| `getStress()` | output | A table `{ used = …, capacity = … }` for its whole kinetic network, in SU. Both 0 if it isn't on a network. |
+
+A Creative Motor or a Rotation Speed Controller also has:
+
+| Function | Port | What it does |
+| --- | --- | --- |
+| `getTargetSpeed()` | output | The speed it's set to, in RPM. |
+| `setSpeed(rpm)` | input | Sets that speed, as if you'd changed its value box by hand. A whole number, clamped to -256 to 256. |
+
+### Anything that holds items
+
+Chests, barrels, Create's vaults and depots, and any other block with an item inventory.
+
+| Function | Port | Returns |
+| --- | --- | --- |
+| `items()` | output | A table from item id to the total count: `{ ["minecraft:iron_ingot"] = 5 }`. |
+| `count(id)` | output | How many of that item it holds, 0 if none. |
+| `getSlots()` | output | How many slots it has. |
+
+### Anything that holds fluids
+
+Create's fluid tanks, basins and any other block with a fluid tank.
+
+| Function | Port | Returns |
+| --- | --- | --- |
+| `fluids()` | output | A list with one table per tank: `{ name = "minecraft:water", amount = 1000, capacity = 8000 }`. Amounts are in millibuckets; an empty tank has `name = ""`. |
+
+A block can be more than one kind. A basin holds items and fluids, so it has both sets.
+
+### onChange
+
+| Function | What it does |
+| --- | --- |
+| `device.onChange(fn)` | Runs `fn(device)` every time something readable about the device changes, until the program stops. |
+
+See [Reacting to changes](./devices.mdx#reacting-to-changes).
+
+## Standard libraries
+
+`string`, `table`, `math`, `coroutine`, `utf8` and `bit32` are there, with the usual functions. So are the base functions: `pairs`, `ipairs`, `next`, `select`, `type`, `tostring`, `tonumber`, `error`, `assert`, `pcall`, `xpcall`, `setmetatable`, `getmetatable`, `rawget`, `rawset`, `rawequal`, `rawlen` and `load`.
+
+Strings have their methods: `("hello"):upper()`.
+
+## Errors
+
+An error stops the program and the console shows it in red, starting with the file and line: `startup.lua:4: attempt to call a nil value`. Click it to jump there. Use `pcall` for errors you expect:
+
+```lua
+local ok, err = pcall(function()
+  return bus.get("chest").count("minecraft:coal")
+end)
+if not ok then
+  print("chest not reachable: " .. err)
+end
+```

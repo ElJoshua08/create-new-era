@@ -1,0 +1,47 @@
+---
+title: Screens and panels
+description: Brass Screens, panel controls, the Universal Adapter and the Bearing Servo, and what they do today.
+---
+
+These blocks are in the mod, have recipes and Ponder scenes, and can be placed, rotated with the wrench and mined. Programs can't use them yet. This page says what each one does now, so you can build with them while the rest arrives.
+
+## Brass Screen
+
+![Brass Screen](/img/blocks/brass_screen.png)
+
+Brass Screens placed next to each other and facing the same way join into one display: the brass frame between them disappears. Any rectangle works. Turn one with a wrench and it joins whatever screens it lines up with after the turn.
+
+Each block will show 48 by 48 flip pixels, small plates that turn over when they change. Drawing on screens from a program is coming; for now a screen is a blank panel. The [client config](./config.mdx) already has the option for the pixel shape.
+
+<Recipe id="brass_screen" />
+
+## Panel controls
+
+![Panel controls](/img/controls.png)
+
+Small blocks for building control desks. Each one sits on the face you click: floors, walls or ceilings. They're all made from a Control Plate and one part.
+
+| Control | What it will do |
+| --- | --- |
+| Panel Button | A push button; programs will see each press. |
+| Panel Switch | An on/off lever programs can read. |
+| Panel Knob | A dial that sets a value. |
+| Panel Slider | A fader from 0 to 100%. |
+| Panel Lamp | A light programs can switch and colour. |
+| Nixie Digit | One glowing digit; a row of them shows a number. |
+| Panel Gauge | A needle dial that shows a value. |
+| Panel Keypad | Twelve keys to type numbers into a program. |
+
+Recipes are on the [Recipes](./recipes.mdx#panel-controls) page.
+
+## Universal Adapter
+
+![Universal Adapter](/img/blocks/universal_adapter.png)
+
+Sticks to the face you click. It was planned as the way to put machines on the data bus; [data ports](./bus.mdx) do that now, on any block. The adapter does nothing in this version.
+
+## Bearing Servo
+
+![Bearing Servo](/img/blocks/bearing_servo.png)
+
+Faces you when placed, like Create's bearings. It's meant to turn a contraption to an exact angle on command, for gimbals, turrets and flaps on Create: Aeronautics ships. Programs can't drive it yet.

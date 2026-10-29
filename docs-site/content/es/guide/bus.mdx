@@ -1,0 +1,73 @@
+---
+title: El bus de datos
+description: Puertos de datos, cables y empalmes, y cómo encuentra un ordenador lo que hay en su red.
+---
+
+El bus de datos es la forma que tiene un ordenador de llegar a las máquinas de su alrededor. Pegas **puertos de datos** en los bloques que quieras usar, los unes al ordenador con **cable**, y el programa puede leer y controlar esos bloques por su nombre.
+
+Un puerto no cambia el bloque en el que está. Un cofre con un puerto sigue siendo un cofre, y una prensa con un puerto sigue prensando. Para nada de esto hace falta el adaptador universal; en esta versión todavía no hace nada.
+
+## Puertos de datos
+
+<Recipe id="bus_port" />
+
+Haz clic derecho en cualquier cara de cualquier bloque con un puerto de datos: se pega donde pinchaste, como un minibloque pequeño en esa cara. En una cara caben varios puertos. Si golpeas un puerto, lo quitas y lo recuperas; el bloque de debajo se queda.
+
+Un puerto puede ir en uno de dos sentidos:
+
+- **Salida**, luz ámbar. El bloque publica lo que hace, así que los programas pueden **leerlo**: velocidad, estrés, objetos, fluidos. Un puerto nuevo empieza como salida.
+- **Entrada**, luz verde. El bloque acepta órdenes, así que los programas pueden **controlarlo**: cambiar la velocidad de un motor.
+
+Haz clic derecho en un puerto con la llave inglesa de Create para cambiarlo entre salida y entrada. Agachado, la llave lo quita.
+
+Un bloque que necesita las dos cosas, como un motor creativo que quieres leer y ajustar, lleva dos puertos: uno de salida y otro de entrada.
+
+## Los puertos del propio ordenador
+
+Todos los ordenadores de latón traen cuatro puertos, dos en cada lado, en un panel de latón. Siempre están ahí, la llave no los quita y giran con el ordenador. El cable va directo a ellos.
+
+Para poner más puertos en un ordenador, añade una **ampliación de puertos**. Cada una deja al ordenador llevar cuatro puertos más, hasta tres ampliaciones, así que un ordenador puede tener 16 puertos en total. Los puertos extra van en cualquier parte del ordenador que no tape uno de sus huecos.
+
+<Recipe id="port_expansion" />
+
+Te harán falta puertos extra cuando un ordenador hable con redes de colores distintos, porque cada puerto acepta un solo color de cable (mira [Cables](./cables.mdx#colores)). Un mismo puerto acepta todos los cables que quieras.
+
+## Empalmes
+
+<Recipe id="cable_splice" />
+
+Un empalme de cable une cables a mitad de recorrido. Se pega a una cara como un puerto, pero no es un dispositivo: no sale nada en `bus.list()` por él. Úsalo para sacar una rama de un cable, o para sujetar a una pared un tramo largo a mitad de camino.
+
+## Cómo se forma una red
+
+Una red es todo lo que alcanzas siguiendo los cables desde los puertos del ordenador. Los cables van entre puertos y empalmes, y el puerto de un dispositivo deja pasar la red: ordenador → puerto del motor → puerto del cofre funciona, y el programa ve tanto el motor como el cofre.
+
+Cada bloque de la red con al menos un puerto es un **dispositivo**. Lo que el programa puede hacer con él depende de sus puertos:
+
+| Puertos en la red | El programa puede |
+| --- | --- |
+| uno de salida | leerlo |
+| uno de entrada | darle órdenes |
+| uno de cada | las dos cosas |
+
+El ordenador no se lista a sí mismo. Dos ordenadores en la misma red se ven el uno al otro como dispositivos.
+
+## Nombres de los dispositivos
+
+El nombre de un dispositivo es el id de su bloque sin el espacio de nombres: un cofre es `chest`, un motor creativo es `creative_motor`. Si el nombre ya está cogido, se le añade un número: `chest_2`, `chest_3`. El nombre se asigna la primera vez que un ordenador ve el bloque y se queda con ese bloque hasta que se rompe. Todavía no se pueden renombrar dispositivos dentro del juego.
+
+La forma más rápida de ver los nombres es preguntar:
+
+```lua
+for _, d in ipairs(bus.list()) do
+  print(d.name, d.type, d.distance, d.readable, d.writable)
+end
+```
+
+O escribe `bus.get("` en el editor: las sugerencias listan todos los dispositivos, del más cercano al más lejano. Al elegir uno, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor.
+
+Romper un bloque quita sus puertos y los suelta como objetos. El bloque sale de la red y su nombre queda libre.
+
+## Siguiente
+
+[Dispositivos](./devices.mdx) enseña qué puedes hacer con cada tipo de bloque. [Cables](./cables.mdx) explica cómo tender, teñir y revestir cable.

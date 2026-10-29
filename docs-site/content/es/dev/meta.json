@@ -1,0 +1,19 @@
+{
+  "title": "Desarrollo",
+  "description": "Trabajar en el mod",
+  "root": true,
+  "pages": [
+    "---Empezar---",
+    "index",
+    "building",
+    "---Trabajar en el mod---",
+    "dev-runs",
+    "hot-reload",
+    "testing",
+    "tools",
+    "---Proyecto---",
+    "layout",
+    "contributing",
+    "license"
+  ]
+}

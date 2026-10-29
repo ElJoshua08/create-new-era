@@ -1,0 +1,77 @@
+---
+title: Tu primer programa
+description: Qué añade el mod, y una lámpara parpadeando en cinco minutos.
+---
+
+Create: New Era añade ordenadores a Create. El ordenador de latón es un bloque cinético: le metes un eje por detrás y, mientras gira, ejecuta el programa en Lua que escribas en su editor. Los programas leen y envían redstone por sus seis lados, y con puertos y cables de datos pueden leer y controlar las máquinas de alrededor: lo rápido que gira un motor, lo que hay en un cofre, lo lleno que está un tanque.
+
+<Callout title="Versión previa" type="warn">
+  Esta es la 0.1.0-alpha.1. Todo lo que cuentan estas páginas funciona en creativo. La supervivencia no está terminada: la bobina de cable sale llena de su receta, la bobinadora aún no existe y algunas recetas van a cambiar. Puede que los mundos hechos con esta versión necesiten arreglos más adelante.
+</Callout>
+
+## Qué necesitas
+
+Un ordenador de latón, una fuente de rotación y una lámpara de redstone. En creativo está todo en el inventario: el ordenador está en la pestaña **Create: New Era**, justo después de las de Create. Si aún no has instalado el mod, mira [Instalación](./install.mdx).
+
+## Haz parpadear una lámpara
+
+<Steps>
+<Step>
+
+### Coloca el ordenador y hazlo girar
+
+Coloca un ordenador de latón. Si ya hay un eje al lado, gira la espalda hacia él solo. Si no, llévale un eje por detrás desde cualquier fuente de rotación: una rueda hidráulica, un molino o un motor creativo en creativo. Los ordenadores solo funcionan mientras giran.
+
+</Step>
+<Step>
+
+### Pon una lámpara encima
+
+Coloca una lámpara de redstone encima del ordenador.
+
+</Step>
+<Step>
+
+### Abre el editor
+
+Haz clic derecho en el ordenador. El editor se abre con `startup.lua`, que viene en todos los ordenadores nuevos:
+
+```lua title="startup.lua"
+-- Blinks a redstone signal out of the top: put a lamp on it.
+-- Edit me, then press Run (Ctrl+R).
+while true do
+  redstone.setOutput("top", true)
+  sleep(0.5)
+  redstone.setOutput("top", false)
+  sleep(0.5)
+end
+```
+
+</Step>
+<Step>
+
+### Ejecútalo
+
+Pulsa **Ejecutar** o <kbd>Ctrl</kbd>+<kbd>R</kbd>. La pantalla del ordenador se enciende y la lámpara parpadea una vez por segundo. La barra de estado, debajo del código, muestra que el programa está en marcha y a qué velocidad gira el ordenador.
+
+</Step>
+</Steps>
+
+Cambia `0.5` por `0.1` y vuelve a pulsar <kbd>Ctrl</kbd>+<kbd>R</kbd>. Ejecutar guarda el archivo y arranca el programa de nuevo con tu cambio.
+
+## Por dónde seguir
+
+<Cards>
+  <Card title="El ordenador de latón" href="./computer.mdx">
+    Rotación, el disco, cómo empiezan y terminan los programas.
+  </Card>
+  <Card title="Referencia de la API de Lua" href="./lua.mdx">
+    Todas las funciones que puede llamar un programa.
+  </Card>
+  <Card title="El bus de datos" href="./bus.mdx">
+    Puertos y cables, para que los programas lleguen a tus máquinas.
+  </Card>
+  <Card title="Ejemplos" href="./examples.mdx">
+    Programas completos para pegar y ejecutar.
+  </Card>
+</Cards>

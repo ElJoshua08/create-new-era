@@ -1,0 +1,35 @@
+---
+title: Configuración
+description: La opción del cliente para los píxeles de las pantallas, y dónde guarda el editor su disposición.
+---
+
+El mod tiene una sola opción, en el cliente. Las opciones del cliente son de cada jugador: cambiar las tuyas no cambia las de nadie más en un servidor. No hay configuración de servidor ni común.
+
+## Forma del píxel
+
+Las pantallas de latón están hechas de píxeles giratorios. Esta opción elige cómo se ve cada píxel: una plaquita cuadrada o un disco.
+
+| Clave | Valores | Por defecto |
+| --- | --- | --- |
+| `screen.pixelShape` | `SQUARE`, `DISC` | `SQUARE` |
+
+Las pantallas todavía no dibujan nada, así que de momento la opción se guarda pero no cambia nada que se vea.
+
+### En el juego
+
+Abre **Mods**, elige **Create: New Era** y pulsa **Configuración**. La opción está en **Pantallas → Forma del píxel**.
+
+### En el archivo
+
+NeoForge llama `<modid>-client.toml` a la configuración de cliente de un mod, así que es `config/create_new_era-client.toml` en la carpeta del juego:
+
+```toml title="config/create_new_era-client.toml"
+[screen]
+	#Shape of each flip pixel on brass screens. Purely visual, so each player picks their own.
+	#Allowed Values: SQUARE, DISC
+	pixelShape = "SQUARE"
+```
+
+## Disposición del editor
+
+El editor recuerda la posición y el tamaño de su ventana, los tamaños de la consola y del panel lateral, y el panel abierto, en `config/create_new_era-editor.properties`. Borra el archivo para volver a la disposición de siempre.

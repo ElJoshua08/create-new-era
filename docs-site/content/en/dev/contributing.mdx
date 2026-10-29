@@ -1,0 +1,58 @@
+---
+title: Contributing
+description: Pull requests, tests, assets, translations and bug reports.
+---
+
+Pull requests are welcome: fixes, features from the roadmap, translations, docs. This page sums up [CONTRIBUTING.md](https://github.com/ElJoshua08/create-new-era/blob/main/CONTRIBUTING.md), which has the details. For anything big, open an issue first so you agree on the approach before spending a weekend on it.
+
+## Making a change
+
+- Branch from `main`. One focused change per pull request; a bug fix and a refactor are two.
+- Keep the diff to what the change needs. Don't reformat code you didn't otherwise touch.
+- When behaviour changes, update the README, these docs, and the in-game tooltip and Ponder text that describe it.
+- Commit subjects in the imperative, saying what the change does: `Show the shaft turning in a hole in the computer's back`. Add a body when the why isn't obvious, wrapped at about 72 columns.
+
+## Before you open the PR
+
+All of these must pass:
+
+```sh title="Terminal"
+./gradlew build                # compiles and builds the jar
+./gradlew runGameTestServer    # in-game tests, non-zero exit on failure
+./gradlew runData              # regenerates src/generated/resources
+```
+
+Commit whatever `runData` changes. A PR with stale generated files fails review.
+
+Behaviour changes need a GameTest in `src/main/java/com/createnewera/gametest/`. `ComputerTests` shows the pattern: place the block, drive it (a Creative Motor for rotation, a redstone block for input), run real Lua, then check the world or the console. A bug fix comes with a test that fails without the fix. See [Tests and datagen](./testing.mdx).
+
+## Assets
+
+Models, textures and Ponder structures come from the scripts in `tools/`. Change the script and run it again; never edit the output by hand. See [Asset tools](./tools.mdx).
+
+Keep Create's look. Study Create's own assets before drawing anything, reuse its casings by reference instead of copying them, and take colours from the palettes in `gen_textures.py`. Render your block with `iso_render.py` next to Create's blocks, check it fits, and include the render in the PR.
+
+## Code
+
+- Match the code around you: naming, structure, how existing classes solve the same problem.
+- Comments explain why, not what. If a comment restates the next line, delete it.
+- Keep the Lua API simple for players.
+- New Lua functions go in `LuaComputer` (the `native` table) and `prelude.lua`, and in `client/editor/LuaApi.java` so the editor suggests them.
+
+## Translations
+
+- English is generated. Block and item names come from Registrate's `.lang(...)` in `ModBlocks` and `ModItems`, everything else from `ModLang`. Never edit the generated `en_us.json` by hand.
+- Spanish, `src/main/resources/assets/create_new_era/lang/es_es.json`, is hand-written and gets every new key. Both files have the same keys; keep it that way.
+- New languages are welcome as hand-written files next to `es_es.json`.
+- These docs are in `docs-site/content/en/` and `docs-site/content/es/`. A page changed in one language should change in the other.
+
+## Reporting bugs
+
+Open an issue with the bug report form and include:
+
+- Minecraft, NeoForge, Create and Create: New Era versions, and Aeronautics if you have it.
+- Your full mod list, or the modpack and its version.
+- What you did, what you expected, what happened. A Lua program that shows the bug is ideal.
+- `logs/latest.log`, and for crashes the file from `crash-reports/`, uploaded to a paste site such as [mclo.gs](https://mclo.gs).
+
+By contributing, you agree that your work is released under The Unlicense, like the rest of the mod.

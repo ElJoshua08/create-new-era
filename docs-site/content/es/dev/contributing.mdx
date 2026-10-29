@@ -1,0 +1,58 @@
+---
+title: Contribuir
+description: Pull requests, tests, assets, traducciones y avisos de bugs.
+---
+
+Las pull requests son bienvenidas: arreglos, cosas del roadmap, traducciones, documentación. Esta página resume [CONTRIBUTING.md](https://github.com/ElJoshua08/create-new-era/blob/main/CONTRIBUTING.md), que tiene los detalles. Para algo grande, abre antes una issue y así os ponéis de acuerdo en cómo hacerlo antes de que le eches un fin de semana.
+
+## Hacer un cambio
+
+- Sal de una rama desde `main`. Un cambio concreto por pull request; un arreglo y una refactorización son dos.
+- Deja el diff en lo que necesita el cambio. No reformatees código que no tocabas por otra razón.
+- Cuando cambie el comportamiento, actualiza el README, esta documentación, y el tooltip y el texto de Ponder del juego que lo describen.
+- Los asuntos de los commits van en imperativo, en inglés como el resto del historial, y dicen lo que hace el cambio: `Show the shaft turning in a hole in the computer's back`. Añade un cuerpo cuando el porqué no sea obvio, cortado a unas 72 columnas.
+
+## Antes de abrir la PR
+
+Todo esto tiene que pasar:
+
+```sh title="Terminal"
+./gradlew build                # compila y genera el jar
+./gradlew runGameTestServer    # tests dentro del juego, sale con código distinto de cero si fallan
+./gradlew runData              # regenera src/generated/resources
+```
+
+Haz commit de lo que cambie `runData`. Una PR con archivos generados desactualizados no pasa la revisión.
+
+Los cambios de comportamiento necesitan un GameTest en `src/main/java/com/createnewera/gametest/`. `ComputerTests` enseña el patrón: coloca el bloque, muévelo (un motor creativo para la rotación, un bloque de redstone para la entrada), ejecuta Lua de verdad y comprueba el mundo o la consola. Un arreglo de bug viene con un test que falla sin el arreglo. Mira [Tests y datagen](./testing.mdx).
+
+## Assets
+
+Los modelos, las texturas y las estructuras de Ponder salen de los scripts de `tools/`. Cambia el script y vuelve a ejecutarlo; nunca edites a mano lo que genera. Mira [Herramientas de assets](./tools.mdx).
+
+Mantén el estilo de Create. Estudia los assets de Create antes de dibujar nada, usa sus revestimientos por referencia en vez de copiarlos, y saca los colores de las paletas de `gen_textures.py`. Renderiza tu bloque con `iso_render.py` junto a bloques de Create, comprueba que encaja e incluye el render en la PR.
+
+## Código
+
+- Sigue el código de alrededor: nombres, estructura, cómo resuelven el mismo problema las clases que ya hay.
+- Los comentarios explican el porqué, no el qué. Si un comentario repite la línea de abajo, bórralo.
+- Mantén la API de Lua sencilla para los jugadores.
+- Las funciones nuevas de Lua van en `LuaComputer` (la tabla `native`) y en `prelude.lua`, y en `client/editor/LuaApi.java` para que el editor las sugiera.
+
+## Traducciones
+
+- El inglés se genera. Los nombres de bloques y objetos salen del `.lang(...)` de Registrate en `ModBlocks` y `ModItems`, y todo lo demás de `ModLang`. Nunca edites a mano el `en_us.json` generado.
+- El español, `src/main/resources/assets/create_new_era/lang/es_es.json`, se escribe a mano y recibe cada clave nueva. Los dos archivos tienen las mismas claves; que siga así.
+- Otros idiomas son bienvenidos como archivos escritos a mano junto a `es_es.json`.
+- Esta documentación está en `docs-site/content/en/` y `docs-site/content/es/`. Una página que cambie en un idioma tiene que cambiar en el otro.
+
+## Avisar de un bug
+
+Abre una issue con el formulario de bugs e incluye:
+
+- Las versiones de Minecraft, NeoForge, Create y Create: New Era, y de Aeronautics si lo tienes.
+- Tu lista completa de mods, o el modpack y su versión.
+- Qué hiciste, qué esperabas y qué pasó. Un programa de Lua que muestre el fallo es lo ideal.
+- `logs/latest.log` y, si crashea, el archivo de `crash-reports/`, subidos a una web de pegado como [mclo.gs](https://mclo.gs).
+
+Al contribuir, aceptas que tu trabajo se publique bajo The Unlicense, como el resto del mod.

@@ -1,0 +1,84 @@
+---
+title: El editor
+description: Archivos, pestañas, sugerencias, la consola y los atajos.
+---
+
+Haz clic derecho en un ordenador de latón para abrir su editor: una ventanita con pestañas de archivos, una consola y sugerencias mientras escribes.
+
+Con la llave inglesa de Create en la mano, el clic derecho gira el ordenador en vez de abrirlo. El juego no se pausa mientras el editor está abierto, y el editor se cierra si te alejas más de 8 bloques.
+
+## Disposición
+
+- La **barra de título** tiene **Ejecutar** y **Parar**. Arrástrala para mover la ventana; haz doble clic en ella, o usa su botón, para maximizarla.
+- Las **pestañas** de los archivos abiertos están encima del código.
+- El **código** tiene resaltado de sintaxis de Lua y números de línea.
+- La **barra de estado** muestra el estado del programa (en marcha con el archivo y las RPM, parado, o en ámbar **En pausa: necesita rotación** / **En pausa: sobreestresado**) y la línea y columna del cursor.
+- La **consola** está debajo del código. Arrastra el separador de encima para cambiar su altura.
+- El **panel lateral** se elige en la barra del borde derecho de la ventana: **Archivos**, **Redstone** (lo que entra y sale por cada lado, en directo) y **Flujos**, que de momento es un hueco reservado. Pincha en el icono activo o pulsa <kbd>Ctrl</kbd>+<kbd>B</kbd> para ocultarlo, y arrastra su borde para cambiar su tamaño.
+
+Arrastra cualquier borde de la ventana para cambiar su tamaño. La posición y el tamaño de la ventana, los dos separadores y el panel abierto se recuerdan en `config/create_new_era-editor.properties`.
+
+## Archivos y pestañas
+
+- **Archivo nuevo**: el **+** del panel Archivos, o <kbd>Ctrl</kbd>+<kbd>N</kbd>. Escribe un nombre y pulsa <kbd>Enter</kbd> (<kbd>Esc</kbd> cancela). Si no pones extensión, se añade `.lua`. Los nombres pueden llevar letras, números y `_ - . /`.
+- **Abrir**: pincha en un archivo del panel. Se abre en una pestaña.
+- **Renombrar**: el botón de renombrar junto al archivo. Si renombras el último archivo que ejecutaste, sigue siendo el que arranca al cargar el mundo.
+- **Borrar**: pincha en la **×** junto al archivo y vuelve a pincharla antes de tres segundos. Si borras el último archivo, te queda un `startup.lua` nuevo y vacío.
+- **Pestañas**: pincha para cambiar. Cierra una con su **×**, con clic central o con <kbd>Ctrl</kbd>+<kbd>W</kbd>. <kbd>Ctrl</kbd>+<kbd>Tab</kbd> pasa a la siguiente.
+
+Los archivos se guardan solos 1,5 segundos después de que dejes de escribir, cuando cierras su pestaña o el editor, y cuando pulsas Ejecutar. <kbd>Ctrl</kbd>+<kbd>S</kbd> guarda en el momento.
+
+## Ejecutar
+
+**Ejecutar** (<kbd>Ctrl</kbd>+<kbd>R</kbd>) guarda todos los archivos abiertos y ejecuta el de la pestaña activa. **Parar** (<kbd>Ctrl</kbd>+<kbd>T</kbd>) termina el programa y apaga sus salidas de redstone. Si pinchas en un error de la consola, se abre el archivo que nombra en esa línea.
+
+## Sugerencias
+
+Al escribir un nombre o un `.` se abre una lista de sugerencias, y <kbd>Ctrl</kbd>+<kbd>Espacio</kbd> la abre en cualquier sitio. Muévete con las flechas o <kbd>RePág</kbd>/<kbd>AvPág</kbd>, acepta con <kbd>Tab</kbd> o <kbd>Enter</kbd> y cierra con <kbd>Esc</kbd>. El recuadro junto a la lista muestra la firma y una línea sobre lo que hace. La búsqueda es difusa: `gai` encuentra `getAnalogInput`.
+
+Lo que te sugiere depende de dónde está el cursor:
+
+- Globales y librerías (`print`, `redstone`, `bus`, `math`…), y después de `redstone.`, `string.` y las demás librerías, sus funciones.
+- Nombres de lados dentro de las comillas de una llamada de redstone: `rs.getInput("` ofrece `front`, `back`, etc.
+- Nombres de dispositivos dentro de `bus.get("`, del más cercano al más lejano, con el tipo, la distancia y lo que puedes hacer con cada uno. Al elegir uno, además, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor, para que lo encuentres.
+- Después de una variable que guarda un dispositivo (`local press = bus.get("mechanical_press")`, y luego `press.`), las funciones de ese dispositivo y `onChange`.
+- Nombres de archivo dentro de `require("`.
+- Variables y funciones del archivo que estás editando, y campos que hayas usado en tus propias tablas.
+- Palabras clave, y snippets que escriben un bloque entero:
+
+| Snippet | Escribe |
+| --- | --- |
+| `for` | `for i = 1, … do … end` |
+| `forp` | `for k, v in pairs(…) do … end` |
+| `fori` | `for i, v in ipairs(…) do … end` |
+| `while` | `while … do … end` |
+| `loop` | `while true do … sleep(0) end` |
+| `if` | `if … then … end` |
+| `ife` | `if … then … else … end` |
+| `fn` | `function …() … end` |
+| `lfn` | `local function …() … end` |
+
+Dentro de comentarios y de cadenas normales no sale nada.
+
+## Atajos de teclado
+
+| Teclas | Qué hace |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>R</kbd> | Ejecuta el archivo abierto (antes lo guarda todo) |
+| <kbd>Ctrl</kbd>+<kbd>T</kbd> | Para el programa |
+| <kbd>Ctrl</kbd>+<kbd>S</kbd> | Guarda todos los archivos abiertos |
+| <kbd>Ctrl</kbd>+<kbd>Espacio</kbd> | Muestra sugerencias |
+| <kbd>Ctrl</kbd>+<kbd>N</kbd> | Archivo nuevo |
+| <kbd>Ctrl</kbd>+<kbd>W</kbd> | Cierra la pestaña |
+| <kbd>Ctrl</kbd>+<kbd>Tab</kbd> | Pestaña siguiente (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd>: anterior) |
+| <kbd>Ctrl</kbd>+<kbd>B</kbd> | Muestra u oculta el panel lateral |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Deshacer |
+| <kbd>Ctrl</kbd>+<kbd>Y</kbd> o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Rehacer |
+| <kbd>Ctrl</kbd>+<kbd>D</kbd> | Duplica la línea |
+| <kbd>Ctrl</kbd>+<kbd>/</kbd> | Comenta o descomenta líneas |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Sangrar / quitar sangría |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>C</kbd>, <kbd>X</kbd>, <kbd>V</kbd> | Seleccionar todo, copiar, cortar, pegar |
+| <kbd>Ctrl</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | Moverse por palabras |
+| <kbd>Inicio</kbd> | Al principio del código de la línea; otra vez, al principio del todo |
+| <kbd>Ctrl</kbd>+<kbd>Inicio</kbd> / <kbd>Fin</kbd> | Principio / final del archivo |
+| <kbd>Esc</kbd> | Cierra las sugerencias; si no hay, guarda y cierra el editor |

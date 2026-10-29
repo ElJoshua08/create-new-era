@@ -1,0 +1,66 @@
+---
+title: Tests and datagen
+description: GameTests inside a real server, and the resources generated instead of written by hand.
+---
+
+## GameTests
+
+```sh title="Terminal"
+./gradlew runGameTestServer   # starts a server in run/server/, runs every test, exits
+```
+
+It exits non-zero when a test fails. The tests are in `src/main/java/com/createnewera/gametest/`. They place real blocks, turn them with a Creative Motor, run real Lua and check the world and the console. In a `runClient` world you can also run them with Minecraft's `/test` command.
+
+### ComputerTests
+
+- Prints and finishes
+- Drives redstone out
+- Stopping clears outputs
+- Reads redstone in
+- Sleep waits in game time
+- Errors point at the line
+- Compile errors are reported
+- Long computation spans ticks
+- Require loads other files
+- Pauses without rotation
+- Speed sets the time slice
+
+### BusTests
+
+- Lists connected devices nearest first
+- Reads through output ports
+- Orders need an input port
+- onChange runs when a device changes
+- Names and broken devices
+- Computers have limited ports
+- Stray ports move into sockets
+- Parts land where you click
+- Expansions add computer ports
+- The wrench flips ports
+
+### CableTests
+
+- Colours keep networks apart
+- Dyeing follows the colour rule
+- Surface routes follow faces
+- The spool spends what it lays
+- Cables reach the computer's sockets
+- Dyeing a spool keeps its cable
+
+### RegistrationTests
+
+- Every block places in every facing
+- Every recipe loads
+- Creative tabs build
+- Screens join
+- Ponder structures load
+
+## Datagen
+
+```sh title="Terminal"
+./gradlew runData   # writes src/generated/resources/
+```
+
+Generates blockstates, item models, loot tables, tags and the English lang file into `src/generated/resources/`. Commit what it writes. It runs in its own folder, `run/data/`, because the client-only dev mods in `run/` make datagen hang.
+
+English comes from code: block and item names through Registrate's `.lang(...)` in `ModBlocks` and `ModItems`, everything else in `ModLang`, and Ponder text from the scenes. The Spanish file, `src/main/resources/assets/create_new_era/lang/es_es.json`, is written by hand.

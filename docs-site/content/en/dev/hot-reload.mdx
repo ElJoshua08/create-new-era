@@ -1,0 +1,33 @@
+---
+title: Live reloading
+description: Push code into a running game, and what still needs a restart.
+---
+
+With `dev_hotswap=true` (the default), most changes reach a running game without restarting it.
+
+## How it works
+
+`runClient` starts on the JetBrains Runtime with `-XX:+AllowEnhancedClassRedefinition`, which accepts almost any class change: new methods, new fields, new classes. It also opens a debug port on `127.0.0.1:5005`. Before the game starts, the build records a hash of every compiled class. Then:
+
+```sh title="Terminal"
+./gradlew hotswap                 # recompile, push changed classes into the running client
+./gradlew hotswap -Pport=5006     # the same for runServer, which listens on 5006
+```
+
+Only classes that changed since the game started are sent. The swap itself is `tools/hotswap/HotSwap.java`, talking JDWP to the game.
+
+## What needs what
+
+| You changed | To see it |
+| --- | --- |
+| Java: logic, rendering, the editor, the Lua API | `./gradlew hotswap` |
+| `prelude.lua` | Restart the game: it's read once, when `LuaComputer` first loads |
+| Textures, models, lang | `./gradlew hotswap` copies them too; then <kbd>F3</kbd>+<kbd>T</kbd> in game |
+| Recipes, tags, loot tables and other data | `/reload` in game |
+| Registration: new blocks, items, block entities, network payloads | Restart the game |
+
+A swapped class changes what runs next, not what already happened. Things registered at start-up or stored in fields stay as they were. If something looks stale, restart.
+
+## Turning it off
+
+Set `dev_hotswap=false` in `gradle.properties`. Dev runs then use the default JDK 21 toolchain, without the debug port.

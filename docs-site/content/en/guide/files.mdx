@@ -1,0 +1,62 @@
+---
+title: Files and require
+description: Split a program into modules on the computer's disk.
+---
+
+Each computer keeps its own files. One of them runs; the others can be loaded as modules with `require`.
+
+## Limits
+
+| | Limit |
+| --- | --- |
+| Files per computer | 32 |
+| One file | 16,384 characters |
+| All files together | 65,536 characters |
+| File name | up to 48 characters: letters, numbers and `_ - . /` |
+
+A `/` in a name puts the file in a folder: `lib/pid.lua`. Names can't start with `.` or `/`, contain `..`, or end with `/`. When a file can't be saved because it's too big, the disk is full or the name is bad, the console says so in red.
+
+## Which file runs
+
+**Run** starts the file in the active tab and the computer remembers it. When the world loads, that same file restarts. A new computer runs `startup.lua`.
+
+## Loading a module
+
+`require(name)` runs another file on the same computer and returns whatever that file returned. It looks for the name exactly as written first. If there's no such file, it turns dots into folders and adds `.lua`:
+
+| You write | It loads |
+| --- | --- |
+| `require("util")` | `util.lua` |
+| `require("lib.pid")` | `lib/pid.lua` |
+| `require("lib/pid.lua")` | `lib/pid.lua` |
+
+Each file runs once per program run. Later calls return the same value, so `"lib.pid"` and `"lib/pid.lua"` give you the same table. A file that returns nothing gives `true`, and the module receives the name it was required with as `...`.
+
+A missing file stops the program with `module 'name' not found on this computer`. An error inside a module names that module's file and line.
+
+## Example
+
+A module, saved as `lib/blink.lua`:
+
+```lua title="lib/blink.lua"
+local blink = {}
+
+function blink.pulse(side, seconds)
+  rs.setOutput(side, true)
+  sleep(seconds)
+  rs.setOutput(side, false)
+  sleep(seconds)
+end
+
+return blink
+```
+
+And `startup.lua`, which uses it:
+
+```lua title="startup.lua"
+local blink = require("lib.blink")
+
+while true do
+  blink.pulse("left", 0.5)
+end
+```

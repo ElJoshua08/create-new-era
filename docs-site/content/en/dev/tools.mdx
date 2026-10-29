@@ -1,0 +1,41 @@
+---
+title: Asset tools
+description: The scripts behind the textures, models, renders and Ponder structures.
+---
+
+Textures and models come from scripts, so they stay consistent with Create's palette. Change the script and run it again; never edit its output by hand. They're plain Python 3 with Pillow, and the renderer also needs NumPy.
+
+| Script | What it does |
+| --- | --- |
+| `tools/textures/gen_textures.py` | Detail atlases, with palettes sampled from Create's casings. Block bodies reuse Create's casing textures by reference; the atlas only holds what Create doesn't have: screens, dials, LEDs, ports. Also draws the Control Plate item. |
+| `tools/textures/gen_spools.py` | The cable spool's item sprites and models: one per dye plus bare copper, full and half wound, and an empty reel. |
+| `tools/textures/pixel_iso.py` | Helpers for isometric pixel-art item sprites in Create's style, used by `gen_spools.py`. |
+| `tools/models/gen_models.py` | Block models from compact element lists. Plain vanilla JSON, so Blockbench opens them. |
+| `tools/render/iso_render.py` | Renders block models to PNG without the game. The block pictures in these docs come from it. |
+| `tools/screen/proto_screen.py` | A prototype of the flip-pixel screen look, used to pick the resolution. |
+| `tools/ponder/gen_ponder.py` | Writes the structures the Ponder scenes play out on. The scenes are in `NewEraPonderScenes.java`; positions must match. |
+| `tools/hotswap/HotSwap.java` | Pushes changed classes into a running game. Run it through `./gradlew hotswap`. |
+
+```sh title="Terminal"
+python3 tools/textures/gen_textures.py
+python3 tools/textures/gen_spools.py
+python3 tools/models/gen_models.py
+python3 tools/ponder/gen_ponder.py
+
+# each --assets folder holds assets/<namespace>/{models,textures}
+python3 tools/render/iso_render.py out.png create_new_era:block/brass_computer \
+    --assets src/main/resources --assets <create assets> --assets <vanilla assets> \
+    --size 384 --yaw 270       # yaw 270 shows the computer's front
+```
+
+The renderer needs Create's and Minecraft's assets to draw the casings: point `--assets` at an extracted copy of each jar. Join model names with `+` to draw several models into one picture.
+
+## Recipes in these docs
+
+The recipe pictures in these docs are generated from the mod's recipe files. After a recipe changes, run this from `docs-site/`:
+
+```sh title="Terminal"
+VANILLA_ASSETS=<minecraft jar>/assets CREATE_ASSETS=<create jar>/assets node scripts/sync-recipes.mjs
+```
+
+It rewrites `lib/recipes.json` and copies any new item icons into `public/img/items/`. The two variables are only needed for icons that aren't there yet.

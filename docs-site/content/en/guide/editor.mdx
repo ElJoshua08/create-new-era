@@ -1,0 +1,84 @@
+---
+title: The editor
+description: Files, tabs, suggestions, the console and shortcuts.
+---
+
+Right-click a Brass Computer to open its editor: a small window with file tabs, a console and suggestions as you type.
+
+With Create's wrench in your hand, right-clicking turns the computer instead. The game doesn't pause while the editor is open, and it closes if you walk more than 8 blocks away.
+
+## Layout
+
+- The **title bar** has **Run** and **Stop**. Drag it to move the window; double-click it, or use its button, to maximise.
+- **Tabs** for the open files sit above the code.
+- The **code** has Lua syntax highlighting and line numbers.
+- The **status bar** shows the program's state (running with the file and RPM, stopped, or in amber **Paused: needs rotation** / **Paused: overstressed**) and the cursor's line and column.
+- The **console** is under the code. Drag the divider above it to change its height.
+- The **side panel** is picked from the bar on the window's right edge: **Files**, **Redstone** (what comes in and goes out on each side, live) and **Flows**, which is a placeholder for now. Click the active icon or press <kbd>Ctrl</kbd>+<kbd>B</kbd> to hide it, and drag its edge to resize it.
+
+Drag any edge of the window to resize it. The window's position and size, both dividers and the open panel are remembered in `config/create_new_era-editor.properties`.
+
+## Files and tabs
+
+- **New file**: the **+** in the Files panel, or <kbd>Ctrl</kbd>+<kbd>N</kbd>. Type a name and press <kbd>Enter</kbd> (<kbd>Esc</kbd> cancels). Without an extension, `.lua` is added. Names can use letters, numbers and `_ - . /`.
+- **Open**: click a file in the panel. It opens in a tab.
+- **Rename**: the rename button next to the file. Renaming the file you last ran keeps it as the one that restarts when the world loads.
+- **Delete**: click the **×** next to the file, then click it again within three seconds. Deleting the last file leaves you with a fresh, empty `startup.lua`.
+- **Tabs**: click to switch. Close one with its **×**, a middle-click or <kbd>Ctrl</kbd>+<kbd>W</kbd>. <kbd>Ctrl</kbd>+<kbd>Tab</kbd> goes to the next tab.
+
+Files save by themselves 1.5 seconds after you stop typing, when you close their tab or the editor, and when you press Run. <kbd>Ctrl</kbd>+<kbd>S</kbd> saves right away.
+
+## Running
+
+**Run** (<kbd>Ctrl</kbd>+<kbd>R</kbd>) saves every open file and runs the file in the active tab. **Stop** (<kbd>Ctrl</kbd>+<kbd>T</kbd>) ends the program and turns its redstone outputs off. Clicking an error in the console opens the file it names at that line.
+
+## Suggestions
+
+A list of suggestions opens as you type a name or a `.`, and <kbd>Ctrl</kbd>+<kbd>Space</kbd> opens it anywhere. Move with the arrow keys or <kbd>PgUp</kbd>/<kbd>PgDn</kbd>, accept with <kbd>Tab</kbd> or <kbd>Enter</kbd>, close with <kbd>Esc</kbd>. The pane beside the list shows the signature and a line about what it does. Matching is fuzzy: `gai` finds `getAnalogInput`.
+
+What you get depends on where the cursor is:
+
+- Globals and libraries (`print`, `redstone`, `bus`, `math`…), and after `redstone.`, `string.` and the other libraries, their functions.
+- Side names inside the quotes of a redstone call: `rs.getInput("` offers `front`, `back` and so on.
+- Device names inside `bus.get("`, nearest first, with each device's type, distance and what you can do with it. Picking one also outlines that block in the world for ten seconds after you close the editor, so you can find it.
+- After a variable that holds a device (`local press = bus.get("mechanical_press")`, then `press.`), that device's functions and `onChange`.
+- File names inside `require("`.
+- Variables and functions from the file you're editing, and fields you've used on your own tables.
+- Keywords, and snippets that write a whole block:
+
+| Snippet | Writes |
+| --- | --- |
+| `for` | `for i = 1, … do … end` |
+| `forp` | `for k, v in pairs(…) do … end` |
+| `fori` | `for i, v in ipairs(…) do … end` |
+| `while` | `while … do … end` |
+| `loop` | `while true do … sleep(0) end` |
+| `if` | `if … then … end` |
+| `ife` | `if … then … else … end` |
+| `fn` | `function …() … end` |
+| `lfn` | `local function …() … end` |
+
+Nothing pops up inside comments or ordinary strings.
+
+## Keyboard shortcuts
+
+| Keys | What it does |
+| --- | --- |
+| <kbd>Ctrl</kbd>+<kbd>R</kbd> | Run the open file (saves everything first) |
+| <kbd>Ctrl</kbd>+<kbd>T</kbd> | Stop the program |
+| <kbd>Ctrl</kbd>+<kbd>S</kbd> | Save all open files |
+| <kbd>Ctrl</kbd>+<kbd>Space</kbd> | Show suggestions |
+| <kbd>Ctrl</kbd>+<kbd>N</kbd> | New file |
+| <kbd>Ctrl</kbd>+<kbd>W</kbd> | Close the tab |
+| <kbd>Ctrl</kbd>+<kbd>Tab</kbd> | Next tab (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd>: previous) |
+| <kbd>Ctrl</kbd>+<kbd>B</kbd> | Show or hide the side panel |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Undo |
+| <kbd>Ctrl</kbd>+<kbd>Y</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Redo |
+| <kbd>Ctrl</kbd>+<kbd>D</kbd> | Duplicate the line |
+| <kbd>Ctrl</kbd>+<kbd>/</kbd> | Comment lines in or out |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Indent / unindent |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>C</kbd>, <kbd>X</kbd>, <kbd>V</kbd> | Select all, copy, cut, paste |
+| <kbd>Ctrl</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | Move by word |
+| <kbd>Home</kbd> | Start of the code on the line; press again for the very start |
+| <kbd>Ctrl</kbd>+<kbd>Home</kbd> / <kbd>End</kbd> | Start / end of the file |
+| <kbd>Esc</kbd> | Close suggestions; otherwise save and close the editor |

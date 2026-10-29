@@ -1,0 +1,174 @@
+---
+title: Examples
+description: Whole programs to paste into a file and run.
+---
+
+Each of these is a whole program. Paste it into a file and press **Run**.
+
+## Redstone
+
+### Blink
+
+The program every new computer starts with. It turns the top on and off every half second: put a lamp on the computer.
+
+```lua
+while true do
+  redstone.setOutput("top", true)
+  sleep(0.5)
+  redstone.setOutput("top", false)
+  sleep(0.5)
+end
+```
+
+### Repeat a signal
+
+Copies whatever comes in on the left to the right, once a tick. Put a lever on the computer's left and a lamp on its right.
+
+```lua
+while true do
+  rs.setOutput("right", rs.getInput("left"))
+  sleep(0)
+end
+```
+
+### Count pulses
+
+Counts each time the left side turns on, and prints the total.
+
+```lua
+local count, was = 0, false
+while true do
+  local on = rs.getInput("left")
+  if on and not was then
+    count = count + 1
+    print("pulses: " .. count)
+  end
+  was = on
+  sleep(0)
+end
+```
+
+### Fade up
+
+Raises the signal on top from 0 to 15, then stops. The output stays at 15 after the program finishes.
+
+```lua
+for strength = 0, 15 do
+  rs.setAnalogOutput("top", strength)
+  sleep(0.25)
+end
+print("done after " .. os.clock() .. " s")
+```
+
+### Read every side
+
+Prints the signal coming into each side once.
+
+```lua
+for _, side in ipairs(rs.getSides()) do
+  print(side, rs.getAnalogInput(side))
+end
+```
+
+### Slow-down warning
+
+Lights a lamp on top while the computer turns slower than 64 RPM. At 0 RPM the program itself pauses, so the lamp keeps whatever it showed last.
+
+```lua
+while true do
+  rs.setOutput("top", math.abs(os.speed()) < 64)
+  sleep(0.5)
+end
+```
+
+## Data bus
+
+These need a [network](./bus.mdx). Change the device names to the ones `bus.list()` prints for you.
+
+### What's on the network
+
+```lua
+for _, d in ipairs(bus.list()) do
+  local can = (d.readable and "read " or "") .. (d.writable and "control" or "")
+  print(d.name, d.type, d.distance .. " m", can)
+end
+```
+
+### A lever sets a motor's speed
+
+A Creative Motor with an **input** port, cabled to the computer, and a lever on the computer's left. Only sends an order when the lever moves.
+
+```lua
+local motor = bus.get("creative_motor")
+local was = nil
+
+while true do
+  local on = rs.getInput("left")
+  if on ~= was then
+    motor.setSpeed(on and 128 or 0)
+    was = on
+  end
+  sleep(0)
+end
+```
+
+### Low on iron
+
+A chest with an **output** port. A lamp on top of the computer lights while the chest has fewer than 64 iron ingots. Nothing runs between changes.
+
+```lua
+local chest = bus.get("chest")
+
+local function check(c)
+  rs.setOutput("top", c.count("minecraft:iron_ingot") < 64)
+end
+
+check(chest)
+chest.onChange(check)
+```
+
+### Stress meter
+
+Any kinetic block on the network with an **output** port. Sends the share of stress in use as a 0 to 15 signal out of the front, for a Nixie Tube or a lamp row.
+
+```lua
+local shaft = bus.get("shaft")
+
+while true do
+  local s = shaft.getStress()
+  local level = 0
+  if s.capacity > 0 then
+    level = math.floor(s.used / s.capacity * 15 + 0.5)
+  end
+  rs.setAnalogOutput("front", math.min(level, 15))
+  sleep(1)
+end
+```
+
+### Tank report
+
+A fluid tank with an **output** port. Prints how full each of its tanks is whenever it changes.
+
+```lua
+local tank = bus.get("fluid_tank")
+
+tank.onChange(function(t)
+  for _, f in ipairs(t.fluids()) do
+    local pct = f.capacity > 0 and math.floor(f.amount / f.capacity * 100) or 0
+    print((f.name ~= "" and f.name or "empty") .. ": " .. pct .. "%")
+  end
+end)
+```
+
+### Keep two motors in step
+
+Two Creative Motors, each with an output and an input port. Whenever you change the first one's speed by hand, the second follows.
+
+```lua
+local leader = bus.get("creative_motor")
+local follower = bus.get("creative_motor_2")
+
+leader.onChange(function(m)
+  follower.setSpeed(m.getTargetSpeed())
+end)
+```

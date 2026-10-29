@@ -1,0 +1,129 @@
+---
+title: Referencia de la API de Lua
+description: Todas las globales, librerías y funciones que puede usar un programa.
+---
+
+Los programas funcionan sobre [Cobalt](https://github.com/cc-tweaked/Cobalt), la máquina virtual de Lua 5.2 de CC: Tweaked. Esta página lista todo lo que tiene a mano un programa. Las sugerencias del editor muestran la misma lista con una línea sobre cada cosa.
+
+## Globales
+
+| Función | Qué hace |
+| --- | --- |
+| `print(...)` | Escribe sus argumentos en la consola en una línea, cada uno pasado a texto con `tostring` y separados por tabuladores. |
+| `sleep(seconds)` | Espera ese tiempo en tiempo de juego, redondeado hacia arriba a ticks enteros. `sleep()` y `sleep(0)` esperan un tick. Cualquier cosa que no sea un número da error. |
+| `require(name)` | Ejecuta una vez otro archivo de este ordenador y devuelve lo que devolvió. Mira [Archivos y require](./files.mdx). |
+
+## os
+
+Solo estas tres. No hay `os.time`, `os.date` ni acceso a archivos.
+
+| Función | Qué hace |
+| --- | --- |
+| `os.clock()` | Segundos de tiempo de juego desde que arrancó el programa. |
+| `os.sleep(seconds)` | Igual que `sleep`. |
+| `os.speed()` | La velocidad del ordenador en RPM, negativa cuando el eje gira al revés. A 0 el programa está en pausa, así que casi nunca ve un 0. |
+
+## redstone
+
+También está como `rs`. Cada función recibe primero un lado: `"front"`, `"back"`, `"left"`, `"right"`, `"top"` o `"bottom"`, contados desde el frente del ordenador. Cualquier otro nombre para el programa con un error como `unknown side 'north'`.
+
+| Función | Devuelve | Qué hace |
+| --- | --- | --- |
+| `getInput(side)` | booleano | Si entra alguna señal por ese lado. |
+| `getAnalogInput(side)` | de 0 a 15 | La fuerza de la señal que entra. |
+| `setOutput(side, on)` | | Envía una señal completa (15) por ese lado, o la apaga. `on` tiene que ser un booleano. |
+| `setAnalogOutput(side, strength)` | | Envía una señal de 0 a 15. Otros números dan error. |
+| `getOutput(side)` | booleano | Si este ordenador envía algo por ese lado. |
+| `getAnalogOutput(side)` | de 0 a 15 | La fuerza que envía este ordenador por ese lado. |
+| `getSides()` | tabla | Los seis nombres de lado: front, back, left, right, top, bottom. |
+
+Más en [Redstone](./redstone.mdx).
+
+## bus
+
+Los dispositivos de la red de datos de este ordenador. Cómo montar una está en [El bus de datos](./bus.mdx).
+
+| Función | Devuelve | Qué hace |
+| --- | --- | --- |
+| `bus.list()` | tabla | Todos los dispositivos a los que llega el ordenador, del más cercano al más lejano. Cada entrada es una tabla con `name`, `type`, `distance`, `readable` y `writable`. |
+| `bus.get(name)` | dispositivo | Un dispositivo por su nombre. Da el error `no device named '…' on this computer's network` si no se llega a él. |
+
+Los campos de una entrada de `bus.list()`:
+
+| Campo | Ejemplo | Significado |
+| --- | --- | --- |
+| `name` | `"creative_motor"` | Lo que le pasas a `bus.get`. |
+| `type` | `"create:creative_motor"` | El id del bloque. |
+| `distance` | `2.8` | Distancia en línea recta desde el ordenador, en bloques, con un decimal. No es la longitud del cable. |
+| `readable` | `true` | Tiene un puerto de salida en la red, así que puedes leerlo. |
+| `writable` | `false` | Tiene un puerto de entrada en la red, así que puedes darle órdenes. |
+
+## Dispositivos
+
+`bus.get` devuelve una tabla con `name`, `type` y una función para cada cosa que sabe hacer ese tipo de bloque. Puedes llamarlas con punto o con dos puntos; `motor.getSpeed()` y `motor:getSpeed()` funcionan igual.
+
+Para leer hace falta un puerto de **salida** en el dispositivo, y para darle órdenes uno de **entrada**. Si llamas a una función que los puertos no permiten, el programa se para con un mensaje que dice qué puerto falta, por ejemplo `creative_motor.setSpeed needs an input port on creative_motor`.
+
+### Todo lo que gira
+
+Cualquier bloque cinético de Create: ejes, cajas de engranajes, motores, prensas, ventiladores y otros ordenadores de latón.
+
+| Función | Puerto | Devuelve |
+| --- | --- | --- |
+| `getSpeed()` | salida | Velocidad en RPM, negativa en el otro sentido. 0 si está sobreestresado. |
+| `isOverstressed()` | salida | `true` cuando su red está sobreestresada. |
+| `getStress()` | salida | Una tabla `{ used = …, capacity = … }` de toda su red cinética, en SU. Las dos a 0 si no está en ninguna red. |
+
+Un motor creativo o un controlador de velocidad rotacional tienen además:
+
+| Función | Puerto | Qué hace |
+| --- | --- | --- |
+| `getTargetSpeed()` | salida | La velocidad a la que está puesto, en RPM. |
+| `setSpeed(rpm)` | entrada | Cambia esa velocidad, como si tocaras su valor a mano. Un número entero, limitado entre -256 y 256. |
+
+### Todo lo que guarda objetos
+
+Cofres, barriles, los almacenes y depósitos de Create, y cualquier otro bloque con inventario de objetos.
+
+| Función | Puerto | Devuelve |
+| --- | --- | --- |
+| `items()` | salida | Una tabla de id de objeto a cantidad total: `{ ["minecraft:iron_ingot"] = 5 }`. |
+| `count(id)` | salida | Cuántos tiene de ese objeto, 0 si ninguno. |
+| `getSlots()` | salida | Cuántas ranuras tiene. |
+
+### Todo lo que guarda fluidos
+
+Los tanques de fluidos de Create, las cubetas y cualquier otro bloque con un tanque de fluido.
+
+| Función | Puerto | Devuelve |
+| --- | --- | --- |
+| `fluids()` | salida | Una lista con una tabla por tanque: `{ name = "minecraft:water", amount = 1000, capacity = 8000 }`. Las cantidades van en milicubos; un tanque vacío tiene `name = ""`. |
+
+Un bloque puede ser de más de un tipo. Una cubeta guarda objetos y fluidos, así que tiene los dos grupos de funciones.
+
+### onChange
+
+| Función | Qué hace |
+| --- | --- |
+| `device.onChange(fn)` | Ejecuta `fn(device)` cada vez que cambia algo legible del dispositivo, hasta que el programa termine. |
+
+Mira [Reaccionar a los cambios](./devices.mdx#reaccionar-a-los-cambios).
+
+## Librerías estándar
+
+Están `string`, `table`, `math`, `coroutine`, `utf8` y `bit32`, con sus funciones de siempre. También las funciones básicas: `pairs`, `ipairs`, `next`, `select`, `type`, `tostring`, `tonumber`, `error`, `assert`, `pcall`, `xpcall`, `setmetatable`, `getmetatable`, `rawget`, `rawset`, `rawequal`, `rawlen` y `load`.
+
+Las cadenas tienen sus métodos: `("hola"):upper()`.
+
+## Errores
+
+Un error para el programa y la consola lo muestra en rojo, empezando por el archivo y la línea: `startup.lua:4: attempt to call a nil value`. Pincha en él para ir ahí. Usa `pcall` para los errores que te esperas:
+
+```lua
+local ok, err = pcall(function()
+  return bus.get("chest").count("minecraft:coal")
+end)
+if not ok then
+  print("no se llega al cofre: " .. err)
+end
+```

@@ -1,0 +1,68 @@
+---
+title: The Brass Computer
+description: Rotation, the disk, programs, sides and time.
+---
+
+![Brass Computer](/img/blocks/brass_computer_shaft.png)
+
+The Brass Computer stores a few Lua files and runs one of them as a program. It runs on rotation like any Create machine, and the faster it turns, the more work its program gets done each tick.
+
+## Rotation
+
+The computer takes a shaft in its back. When you place it next to a shaft, it turns its back towards it, like Create's cuckoo clock. Its stress impact is 2 SU per RPM, which shows in the Engineer's Goggles tooltip with the rest of the stress figures.
+
+Speed decides how much of each game tick the program gets:
+
+| Speed | Time per tick | Stress |
+| --- | --- | --- |
+| 256 RPM | 2 ms | 512 SU |
+| 128 RPM | 1 ms | 256 SU |
+| 64 RPM | 0.5 ms | 128 SU |
+| 16 RPM | 0.125 ms | 32 SU |
+| Not turning | paused | 0 SU |
+
+Direction doesn't matter, only speed. Above 256 RPM the computer gets no extra time.
+
+Without rotation, or when its network is overstressed, the program stops exactly where it is and carries on when the shaft turns again. Nothing is lost. The editor's status bar says **Paused: needs rotation** or **Paused: overstressed** while that happens. A program can read the computer's own speed with `os.speed()`.
+
+## The disk
+
+Each computer has its own small disk of text files, saved with the world. A new computer has one file, `startup.lua`, with the blinking-lamp program. You can make up to 32 files and put them in folders, like `lib/pid.lua`. [Files and require](./files.mdx) has the limits.
+
+Breaking the computer loses its files. There's no way to carry them to another computer yet, so keep a copy of anything you care about outside the game.
+
+## Programs
+
+A program is a file the computer is running. **Run** starts the file in the editor's active tab from its first line, stopping whatever was running before. A computer runs one program at a time; that program can load other files with `require`.
+
+While a program runs, the computer's screen is lit. It keeps running with the editor closed and with nobody nearby, as long as the chunk is loaded.
+
+A program ends in one of three ways:
+
+- It reaches the end of its code, and it has no `onChange` handlers waiting. The console says **Program finished**. Its redstone outputs stay as they were.
+- It hits an error. The console shows the message in red, and the outputs stay as they were.
+- You press **Stop**. The program ends and every redstone output turns off.
+
+A program with [`onChange` handlers](./devices.mdx#reacting-to-changes) doesn't finish when its main code ends: it keeps listening until you stop it or it errors.
+
+When the world loads, or the chunk loads again, a computer that was running starts its program over from the top. Variables are not kept. It restarts the file you last ran, which isn't always `startup.lua`.
+
+## Sides
+
+Programs name the six faces of the computer from its own front: `front`, `back`, `left`, `right`, `top` and `bottom`. Left and right are as you see them standing in front of it, looking at its screen. Turning the computer with Create's wrench turns the sides with it.
+
+The back usually holds the shaft, so redstone mostly goes through the other five. See [Redstone](./redstone.mdx).
+
+## Its own ports
+
+The computer has four data ports built in: two on each side, set into a brass panel. They connect it to the [data bus](./bus.mdx). You can't remove them; wrenching one turns the computer, like wrenching anywhere else on it. They turn with the computer when you rotate it.
+
+## Time
+
+Every tick, each running computer gets a slice of server time sized by its speed. A program that loops without waiting is paused mid-instruction when its slice runs out, and picks up from the same spot next tick. A busy loop slows its own program down, not the server. At full speed that's 2 ms per computer per tick, out of the 50 ms a tick has.
+
+`sleep(seconds)` waits in game time, rounded up to whole ticks (20 a second). `sleep(0)` waits exactly one tick. Between wake-ups a sleeping computer costs nothing.
+
+## The console
+
+Under the code, the console shows what `print` writes, status lines (**Running**, **Stopped**, **Program finished**, **Restarted after the world loaded**) and errors in red. Errors start with the file and line, like `lib/pid.lua:12:`; clicking one opens that file at that line. The console keeps the last 100 lines, and they're saved with the computer.

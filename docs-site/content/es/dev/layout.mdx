@@ -1,0 +1,46 @@
+---
+title: Estructura del proyecto
+description: Dónde está cada parte del mod.
+---
+
+```text
+src/main/java/com/createnewera/
+  CreateNewEra.java          punto de entrada: registra contenido, config, red y eventos
+  CreateNewEraClient.java    arranque del cliente: pantalla de config, Ponder, renderers
+  block/                     clases de bloques: pantallas, piezas de panel, máquinas
+  bus/                       el bus de datos: puertos, tramos, redes, drivers de dispositivos, recorridos de cable
+  cable/                     la bobina, acciones sobre el cable (cortar, teñir, revestir), teñir bobinas
+  computer/                  ordenador de latón: bloque, block entity, VM de Lua, archivos, lados
+  client/editor/             el editor del juego: vista de código, sugerencias, la lista de la API de Lua, disposición
+  client/bus/                dibujo de puertos y cables, el resaltado de dispositivos
+  client/render/             el renderer del ordenador
+  network/                   payloads entre cliente y servidor
+  ponder/                    escenas de Ponder
+  registry/                  bloques, objetos, block entities, componentes, recetas, pestaña creativa, idiomas
+  config/                    configuración del cliente
+  gametest/                  GameTests
+src/main/resources/
+  data/create_new_era/lua/prelude.lua   convierte la parte de Java en la API de Lua
+  data/create_new_era/recipe/           recetas
+  assets/create_new_era/                modelos, texturas, estructuras de Ponder, es_es.json
+src/generated/resources/      salida del datagen (no se edita a mano)
+gradle/
+  dev-mods.gradle             el modpack de desarrollo
+  hotswap.gradle              recarga de código en caliente
+tools/                        scripts de assets y de desarrollo
+docs-site/                    esta documentación
+```
+
+## Por dónde empezar
+
+**Añadir cosas a la API de Lua.** La parte de Java es la tabla `native` de `computer/LuaComputer.java`; `prelude.lua` la convierte en las globales que ven los programas y luego la suelta. Añade también los nombres nuevos a `client/editor/LuaApi.java` para que el editor los sugiera.
+
+**Funciones nuevas de dispositivos.** `bus/DeviceDrivers.java` decide qué puede hacer un bloque según lo que es: cinético, inventario de objetos, tanque de fluidos. Las lecturas van detrás de un puerto de salida y las escrituras detrás de uno de entrada. Si el valor de una lectura puede cambiar, añádelo a `snapshot` para que `onChange` se entere.
+
+**La red.** `bus/BusData.java` guarda cada pieza, tramo de cable y nombre de dispositivo por dimensión, fuera de los bloques. `bus/Bus.java` tiene las reglas para colocar piezas y encontrar los dispositivos a los que llega un ordenador. `bus/CableRoute.java` calcula los recorridos colgantes y por superficie.
+
+**El editor.** `client/editor/ComputerEditorScreen.java` (ventana, paneles, pestañas), `CodeEditor.java` (edición de texto) y `Completions.java` (qué sugerir).
+
+**El disco de un ordenador.** `computer/ComputerFiles.java`, con los límites.
+
+**Un bloque nuevo.** Regístralo en `registry/ModBlocks.java`, genera su modelo con `tools/models/gen_models.py` y luego `./gradlew runData`.

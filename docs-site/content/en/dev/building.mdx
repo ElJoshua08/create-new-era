@@ -1,0 +1,43 @@
+---
+title: Building
+description: Gradle tasks, and the versions the mod builds against.
+---
+
+Create: New Era builds with Gradle and NeoForge's [ModDevGradle](https://github.com/neoforged/ModDevGradle).
+
+## Gradle tasks
+
+```sh title="Terminal"
+./gradlew build              # the jar, in build/libs/
+./gradlew runClient          # play with the mod
+./gradlew runServer          # a dedicated server, in run/server/
+./gradlew runGameTestServer  # every GameTest, then exits
+./gradlew runData            # regenerate blockstates, item models, loot tables, tags and en_us
+./gradlew hotswap            # push changed classes into a running game
+```
+
+`build` writes `build/libs/create_new_era-<version>.jar`. The Lua VM, Cobalt, goes inside it as a jar-in-jar, so players don't need anything else.
+
+## Versions
+
+From `gradle.properties`:
+
+| Property | Value |
+| --- | --- |
+| `minecraft_version` | 1.21.1 |
+| `neo_version` | 21.1.265 |
+| `create_version` | 6.0.10-280 |
+| `ponder_version` | 1.0.87+mc1.21.1 |
+| `flywheel_version` | 1.0.6 |
+| `registrate_version` | MC1.21-1.3.0+67 |
+| `cobalt_version` | 0.9.9 |
+| `parchment_mappings_version` | 2024.11.17 |
+| `mod_version` | 0.1.0-alpha.1 |
+
+Create 6.0.10-280 is the build Create: Aeronautics 1.3.2 is built against, and it needs Ponder 1.0.82 or newer.
+
+The jar declares these dependencies to players: NeoForge 21.1.265 or newer, Create 6.0.10 or newer, and optionally Aeronautics 1.3+ and Sable 2.0+ (only to load after them).
+
+## Java
+
+The mod targets Java 21, the version Minecraft 1.21.1 ships. With `dev_hotswap=true` (the default) the toolchain is the JetBrains Runtime 21, which is what makes [live reloading](./hot-reload.mdx) possible. Gradle downloads it through the Foojay toolchain resolver.

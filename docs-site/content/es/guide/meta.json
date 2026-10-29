@@ -1,0 +1,28 @@
+{
+  "title": "Guía",
+  "description": "Jugar con el mod",
+  "root": true,
+  "pages": [
+    "---Primeros pasos---",
+    "index",
+    "install",
+    "---Programar---",
+    "computer",
+    "editor",
+    "files",
+    "lua",
+    "redstone",
+    "examples",
+    "---Bus de datos---",
+    "bus",
+    "devices",
+    "cables",
+    "---Bloques---",
+    "screens-panels",
+    "recipes",
+    "---Referencia---",
+    "config",
+    "faq",
+    "roadmap"
+  ]
+}
