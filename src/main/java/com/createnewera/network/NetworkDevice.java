@@ -20,6 +20,9 @@ public record NetworkDevice(String name, String type, String typeKey, BlockPos p
      * @param reads   reads the device rather than giving it an order
      * @param choices what a string first argument can be, for the editor to offer
      */
+    /** The most functions a device sends, and the most choices a function sends: the computer trims to these */
+    public static final int MAX_FUNCTIONS = 128, MAX_CHOICES = 256;
+
     public record Fn(String name, String params, String returns, String doc, boolean reads, List<String> choices) {
         public String signature() {
             return name + "(" + params + ")" + (returns.isEmpty() ? "" : " → " + returns);
@@ -31,11 +34,11 @@ public record NetworkDevice(String name, String type, String typeKey, BlockPos p
                 ByteBufCodecs.STRING_UTF8, Fn::returns,
                 ByteBufCodecs.STRING_UTF8, Fn::doc,
                 ByteBufCodecs.BOOL, Fn::reads,
-                ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(64)), Fn::choices,
+                ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(MAX_CHOICES)), Fn::choices,
                 Fn::new);
     }
 
-    private static final StreamCodec<ByteBuf, List<Fn>> FUNCTIONS = Fn.CODEC.apply(ByteBufCodecs.list(64));
+    private static final StreamCodec<ByteBuf, List<Fn>> FUNCTIONS = Fn.CODEC.apply(ByteBufCodecs.list(MAX_FUNCTIONS));
 
     /** Every function's name. */
     public List<String> methods() {

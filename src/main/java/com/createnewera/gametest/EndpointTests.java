@@ -85,6 +85,14 @@ public class EndpointTests {
         helper.setBlock(new BlockPos(0, 1, 0), block);
         String typewriter = device(helper, new BlockPos(0, 1, 0), 0);
         BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        // what the editor is sent about it has to fit its packet: a too-long list dropped players' connections
+        BlockPos abs = helper.absolutePos(new BlockPos(0, 1, 0));
+        var functions = new java.util.ArrayList<com.createnewera.network.NetworkDevice.Fn>();
+        for (var fn : com.createnewera.bus.DeviceDrivers.describe(helper.getLevel(), abs, true, true))
+            functions.add(new com.createnewera.network.NetworkDevice.Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads(), fn.choices()));
+        var sent = new com.createnewera.network.NetworkDevice(typewriter, "simulated:linked_typewriter", "", abs, 2, true, true, functions);
+        com.createnewera.network.NetworkDevice.STREAM_CODEC.encode(io.netty.buffer.Unpooled.buffer(), sent);
+
         computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
                 "local t = bus.get('" + typewriter + "')",
                 "print('typewriter', #t.getPressedKeys(), t.isInUse(), t.isPressed('w'), t.getUser())",
