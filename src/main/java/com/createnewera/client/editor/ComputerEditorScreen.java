@@ -661,7 +661,7 @@ public class ComputerEditorScreen extends Screen {
             int tx = r.x + 11;
             String label = entry.label();
             for (int c = 0; c < label.length(); c++) {
-                String ch = String.valueOf(label.charAt(c));
+                Component ch = Component.literal(String.valueOf(label.charAt(c))).withStyle(CodeEditor.MONO);
                 g.drawString(font, ch, tx, rowY + 1, match.matched()[c] ? 0xFF2AAAFF : 0xFFD4D4D4, false);
                 tx += font.width(ch);
             }

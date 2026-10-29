@@ -11,6 +11,8 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
@@ -21,6 +23,8 @@ import net.minecraft.util.StringUtil;
  */
 public class CodeEditor {
     public static final int CELL = 6;
+    /** The code's font: Monocraft (assets/create_new_era/font/editor.json), 6 px a character like CELL */
+    public static final Style MONO = Style.EMPTY.withFont(com.createnewera.CreateNewEra.asResource("editor"));
     public static final int LINE = 10;
     private static final int GUTTER = 22;
     private static final int PAD = 4;
@@ -140,11 +144,11 @@ public class CodeEditor {
                 char ch = line.charAt(c);
                 if (ch == ' ')
                     continue;
-                String s = String.valueOf(ch);
                 int cellX = textX + (c - scrollCol) * CELL;
-                // centre narrow glyphs in their cell; the font's 1 px trailing gap is part of its width
-                g.drawString(font, s, cellX + (CELL - font.width(s)) / 2 + 1 - (font.width(s) >= CELL ? 1 : 0),
-                        lineY, colors[c], false);
+                // Monocraft: monospaced and drawn like Minecraft's own font, so an i fills its cell
+                // as an m does, instead of a 1 px stroke floating in a 6 px gap
+                Component glyph = Component.literal(String.valueOf(ch)).withStyle(MONO);
+                g.drawString(font, glyph, cellX + (CELL - font.width(glyph)) / 2, lineY, colors[c], false);
             }
         }
 
