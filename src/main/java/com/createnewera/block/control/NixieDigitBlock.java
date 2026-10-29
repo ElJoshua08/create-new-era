@@ -20,7 +20,7 @@ public class NixieDigitBlock extends PanelControlBlock {
     public static final int DARK = 10;
 
     public NixieDigitBlock(Properties properties, DirectionalShape shape) {
-        super(properties.lightLevel(s -> s.getValue(DIGIT) == DARK ? 0 : 6), shape);
+        super(properties.lightLevel(s -> s.getValue(DIGIT) == DARK ? 0 : 11), shape);
         registerDefaultState(defaultBlockState().setValue(DIGIT, DARK));
     }
 

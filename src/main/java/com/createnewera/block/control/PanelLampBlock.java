@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 /** An indicator a program lights: amber, green or red, or dark. */
 public class PanelLampBlock extends PanelControlBlock {
@@ -29,16 +30,18 @@ public class PanelLampBlock extends PanelControlBlock {
     }
 
     public static final EnumProperty<Light> LIGHT = EnumProperty.create("light", Light.class);
+    /** How much light it gives off while lit, like a light block's level */
+    public static final IntegerProperty BRIGHTNESS = IntegerProperty.create("brightness", 0, 15);
 
     public PanelLampBlock(Properties properties, DirectionalShape shape) {
-        super(properties.lightLevel(s -> s.getValue(LIGHT) == Light.OFF ? 0 : 9), shape);
-        registerDefaultState(defaultBlockState().setValue(LIGHT, Light.OFF));
+        super(properties.lightLevel(s -> s.getValue(LIGHT) == Light.OFF ? 0 : s.getValue(BRIGHTNESS)), shape);
+        registerDefaultState(defaultBlockState().setValue(LIGHT, Light.OFF).setValue(BRIGHTNESS, 15));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(LIGHT);
+        builder.add(LIGHT, BRIGHTNESS);
     }
 
     @Override
@@ -49,6 +52,15 @@ public class PanelLampBlock extends PanelControlBlock {
             BlockState state = level.getBlockState(pos);
             if (state.getValue(LIGHT) != light)
                 level.setBlock(pos, state.setValue(LIGHT, light), Block.UPDATE_ALL);
+            return null;
+        });
+        api.choices("set", java.util.List.of("amber", "green", "red", "off"));
+        api.read("getBrightness", "", "number 0-15", args -> level.getBlockState(pos).getValue(BRIGHTNESS));
+        api.order("setBrightness", "level: 0-15", "", args -> {
+            BlockState state = level.getBlockState(pos);
+            int brightness = net.minecraft.util.Mth.clamp(args.arg(1).checkInteger(), 0, 15);
+            if (state.getValue(BRIGHTNESS) != brightness)
+                level.setBlock(pos, state.setValue(BRIGHTNESS, brightness), Block.UPDATE_ALL);
             return null;
         });
     }
@@ -78,6 +90,8 @@ public class PanelLampBlock extends PanelControlBlock {
 
     @Override
     public Component goggleValue(BlockState state) {
-        return Component.translatable("create_new_era.goggles.light." + state.getValue(LIGHT).getSerializedName());
+        Component light = Component.translatable("create_new_era.goggles.light." + state.getValue(LIGHT).getSerializedName());
+        return state.getValue(LIGHT) == Light.OFF ? light
+                : light.copy().append(Component.translatable("create_new_era.goggles.brightness", state.getValue(BRIGHTNESS)));
     }
 }

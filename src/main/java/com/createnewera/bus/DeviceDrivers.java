@@ -49,7 +49,14 @@ public final class DeviceDrivers {
      * @param doc     lang key of what it does: create_new_era.api.(family).(name)
      * @param reads   reads the device (needs an output port) rather than giving it an order
      */
-    public record Fn(String name, String params, String returns, String doc, boolean reads, Method call) {}
+    public record Fn(String name, String params, String returns, String doc, boolean reads, Method call, List<String> choices) {
+        Fn(String name, String params, String returns, String doc, boolean reads, Method call) {
+            this(name, params, returns, doc, reads, call, List.of());
+        }
+    }
+
+    /** In choices: the names of the devices the computer reaches, filled in by the editor */
+    public static final String DEVICES = "@devices";
 
     /** Collects a device's functions, keeping only those its ports allow. */
     public static final class Api {
@@ -76,6 +83,13 @@ public final class DeviceDrivers {
         public void order(String name, String params, String returns, Method call) {
             if (writable)
                 fns.put(name, new Fn(name, params, returns, docKey(family, name), false, call));
+        }
+
+        /** The values a function's first argument takes when it's a string, for the editor to offer. */
+        public void choices(String name, List<String> values) {
+            Fn fn = fns.get(name);
+            if (fn != null)
+                fns.put(name, new Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads(), fn.call(), List.copyOf(values)));
         }
     }
 

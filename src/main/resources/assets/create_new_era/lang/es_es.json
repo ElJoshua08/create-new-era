@@ -308,5 +308,8 @@
   "create_new_era.api.lectern.getPage": "En qué página está abierto el libro, contando desde 1.",
   "create_new_era.api.beehive.getHoney": "Cuánta miel tiene, de 0 a 5.",
   "create_new_era.api.beehive.getBees": "Cuántas abejas hay dentro.",
-  "create_new_era.api.composter.getFill": "Cuánto está lleno, de 0 a 8 (8: harina de hueso lista)."
+  "create_new_era.api.composter.getFill": "Cuánto está lleno, de 0 a 8 (8: harina de hueso lista).",
+  "create_new_era.goggles.brightness": " · brillo %s",
+  "create_new_era.api.panel_lamp.getBrightness": "Cuánta luz da mientras está encendido, de 0 a 15.",
+  "create_new_era.api.panel_lamp.setBrightness": "Ajusta cuánta luz da mientras está encendido, de 0 (nada) a 15 (lo máximo); empieza en 15."
 }

@@ -1,105 +1,1665 @@
 {
   "variants": {
-    "facing=down,light=amber": {
+    "brightness=0,facing=down,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber",
       "x": 180
     },
-    "facing=down,light=green": {
+    "brightness=0,facing=down,light=green": {
       "model": "create_new_era:block/panel_lamp_green",
       "x": 180
     },
-    "facing=down,light=off": {
+    "brightness=0,facing=down,light=off": {
       "model": "create_new_era:block/panel_lamp_off",
       "x": 180
     },
-    "facing=down,light=red": {
+    "brightness=0,facing=down,light=red": {
       "model": "create_new_era:block/panel_lamp_red",
       "x": 180
     },
-    "facing=east,light=amber": {
+    "brightness=0,facing=east,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber",
       "x": 90,
       "y": 90
     },
-    "facing=east,light=green": {
+    "brightness=0,facing=east,light=green": {
       "model": "create_new_era:block/panel_lamp_green",
       "x": 90,
       "y": 90
     },
-    "facing=east,light=off": {
+    "brightness=0,facing=east,light=off": {
       "model": "create_new_era:block/panel_lamp_off",
       "x": 90,
       "y": 90
     },
-    "facing=east,light=red": {
+    "brightness=0,facing=east,light=red": {
       "model": "create_new_era:block/panel_lamp_red",
       "x": 90,
       "y": 90
     },
-    "facing=north,light=amber": {
+    "brightness=0,facing=north,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber",
       "x": 90
     },
-    "facing=north,light=green": {
+    "brightness=0,facing=north,light=green": {
       "model": "create_new_era:block/panel_lamp_green",
       "x": 90
     },
-    "facing=north,light=off": {
+    "brightness=0,facing=north,light=off": {
       "model": "create_new_era:block/panel_lamp_off",
       "x": 90
     },
-    "facing=north,light=red": {
+    "brightness=0,facing=north,light=red": {
       "model": "create_new_era:block/panel_lamp_red",
       "x": 90
     },
-    "facing=south,light=amber": {
+    "brightness=0,facing=south,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber",
       "x": 90,
       "y": 180
     },
-    "facing=south,light=green": {
+    "brightness=0,facing=south,light=green": {
       "model": "create_new_era:block/panel_lamp_green",
       "x": 90,
       "y": 180
     },
-    "facing=south,light=off": {
+    "brightness=0,facing=south,light=off": {
       "model": "create_new_era:block/panel_lamp_off",
       "x": 90,
       "y": 180
     },
-    "facing=south,light=red": {
+    "brightness=0,facing=south,light=red": {
       "model": "create_new_era:block/panel_lamp_red",
       "x": 90,
       "y": 180
     },
-    "facing=up,light=amber": {
+    "brightness=0,facing=up,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber"
     },
-    "facing=up,light=green": {
+    "brightness=0,facing=up,light=green": {
       "model": "create_new_era:block/panel_lamp_green"
     },
-    "facing=up,light=off": {
+    "brightness=0,facing=up,light=off": {
       "model": "create_new_era:block/panel_lamp_off"
     },
-    "facing=up,light=red": {
+    "brightness=0,facing=up,light=red": {
       "model": "create_new_era:block/panel_lamp_red"
     },
-    "facing=west,light=amber": {
+    "brightness=0,facing=west,light=amber": {
       "model": "create_new_era:block/panel_lamp_amber",
       "x": 90,
       "y": 270
     },
-    "facing=west,light=green": {
+    "brightness=0,facing=west,light=green": {
       "model": "create_new_era:block/panel_lamp_green",
       "x": 90,
       "y": 270
     },
-    "facing=west,light=off": {
+    "brightness=0,facing=west,light=off": {
       "model": "create_new_era:block/panel_lamp_off",
       "x": 90,
       "y": 270
     },
-    "facing=west,light=red": {
+    "brightness=0,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=1,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=1,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=1,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=1,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=1,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=1,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=1,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=1,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=1,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=1,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=1,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=1,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=1,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=1,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=1,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=1,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=1,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=1,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=1,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=1,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=1,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=1,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=1,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=1,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=10,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=10,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=10,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=10,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=10,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=10,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=10,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=10,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=10,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=10,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=10,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=10,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=10,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=10,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=10,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=10,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=10,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=10,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=10,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=10,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=10,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=10,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=10,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=10,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=11,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=11,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=11,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=11,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=11,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=11,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=11,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=11,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=11,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=11,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=11,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=11,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=11,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=11,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=11,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=11,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=11,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=11,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=11,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=11,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=11,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=11,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=11,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=11,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=12,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=12,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=12,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=12,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=12,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=12,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=12,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=12,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=12,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=12,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=12,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=12,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=12,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=12,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=12,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=12,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=12,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=12,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=12,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=12,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=12,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=12,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=12,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=12,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=13,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=13,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=13,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=13,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=13,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=13,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=13,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=13,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=13,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=13,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=13,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=13,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=13,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=13,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=13,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=13,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=13,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=13,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=13,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=13,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=13,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=13,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=13,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=13,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=14,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=14,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=14,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=14,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=14,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=14,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=14,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=14,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=14,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=14,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=14,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=14,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=14,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=14,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=14,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=14,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=14,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=14,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=14,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=14,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=14,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=14,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=14,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=14,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=15,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=15,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=15,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=15,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=15,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=15,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=15,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=15,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=15,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=15,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=15,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=15,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=15,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=15,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=15,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=15,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=15,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=15,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=15,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=15,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=15,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=15,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=15,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=15,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=2,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=2,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=2,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=2,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=2,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=2,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=2,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=2,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=2,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=2,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=2,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=2,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=2,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=2,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=2,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=2,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=2,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=2,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=2,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=2,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=2,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=2,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=2,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=2,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=3,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=3,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=3,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=3,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=3,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=3,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=3,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=3,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=3,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=3,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=3,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=3,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=3,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=3,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=3,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=3,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=3,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=3,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=3,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=3,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=3,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=3,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=3,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=3,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=4,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=4,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=4,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=4,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=4,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=4,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=4,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=4,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=4,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=4,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=4,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=4,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=4,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=4,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=4,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=4,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=4,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=4,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=4,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=4,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=4,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=4,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=4,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=4,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=5,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=5,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=5,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=5,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=5,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=5,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=5,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=5,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=5,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=5,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=5,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=5,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=5,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=5,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=5,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=5,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=5,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=5,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=5,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=5,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=5,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=5,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=5,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=5,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=6,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=6,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=6,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=6,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=6,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=6,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=6,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=6,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=6,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=6,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=6,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=6,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=6,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=6,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=6,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=6,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=6,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=6,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=6,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=6,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=6,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=6,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=6,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=6,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=7,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=7,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=7,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=7,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=7,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=7,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=7,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=7,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=7,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=7,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=7,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=7,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=7,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=7,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=7,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=7,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=7,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=7,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=7,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=7,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=7,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=7,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=7,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=7,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=8,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=8,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=8,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=8,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=8,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=8,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=8,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=8,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=8,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=8,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=8,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=8,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=8,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=8,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=8,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=8,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=8,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=8,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=8,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=8,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=8,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=8,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=8,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=8,facing=west,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=9,facing=down,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 180
+    },
+    "brightness=9,facing=down,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 180
+    },
+    "brightness=9,facing=down,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 180
+    },
+    "brightness=9,facing=down,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 180
+    },
+    "brightness=9,facing=east,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=9,facing=east,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=9,facing=east,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=9,facing=east,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 90
+    },
+    "brightness=9,facing=north,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90
+    },
+    "brightness=9,facing=north,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90
+    },
+    "brightness=9,facing=north,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90
+    },
+    "brightness=9,facing=north,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90
+    },
+    "brightness=9,facing=south,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=9,facing=south,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=9,facing=south,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=9,facing=south,light=red": {
+      "model": "create_new_era:block/panel_lamp_red",
+      "x": 90,
+      "y": 180
+    },
+    "brightness=9,facing=up,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber"
+    },
+    "brightness=9,facing=up,light=green": {
+      "model": "create_new_era:block/panel_lamp_green"
+    },
+    "brightness=9,facing=up,light=off": {
+      "model": "create_new_era:block/panel_lamp_off"
+    },
+    "brightness=9,facing=up,light=red": {
+      "model": "create_new_era:block/panel_lamp_red"
+    },
+    "brightness=9,facing=west,light=amber": {
+      "model": "create_new_era:block/panel_lamp_amber",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=9,facing=west,light=green": {
+      "model": "create_new_era:block/panel_lamp_green",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=9,facing=west,light=off": {
+      "model": "create_new_era:block/panel_lamp_off",
+      "x": 90,
+      "y": 270
+    },
+    "brightness=9,facing=west,light=red": {
       "model": "create_new_era:block/panel_lamp_red",
       "x": 90,
       "y": 270

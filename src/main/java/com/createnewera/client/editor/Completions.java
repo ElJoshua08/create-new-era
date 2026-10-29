@@ -24,6 +24,8 @@ public final class Completions {
     private static final Pattern DEVICE_ARG = Pattern.compile("\\bbus\\s*[.:]\\s*(?:get|info)\\s*\\(\\s*([\"'])(\\w*)$");
     /** {@code local press = bus.get("press")}: the variable holds that device */
     private static final Pattern DEVICE_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*bus\\s*[.:]\\s*get\\s*\\(\\s*[\"'](\\w+)[\"']\\s*\\)");
+    /** {@code lamp.set("am}: a string as a device function's first argument */
+    private static final Pattern STRING_ARG = Pattern.compile("([A-Za-z_]\\w*)\\s*[.:]\\s*([A-Za-z_]\\w*)\\s*\\(\\s*([\"'])([\\w:.\\-]*)$");
     private static final Pattern REQUIRE_ARG = Pattern.compile("\\brequire\\s*\\(?\\s*([\"'])([\\w./\\-]*)$");
     private static final Pattern MEMBER = Pattern.compile("([A-Za-z_]\\w*)\\s*([.:])\\s*(\\w*)$");
     private static final Pattern WORD = Pattern.compile("([A-Za-z_]\\w*)$");
@@ -58,6 +60,11 @@ public final class Completions {
             return rank(line.length() - m.group(2).length(), m.group(2), values(LuaApi.SIDES, "side"));
         if ((m = DEVICE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices, viewer));
+        if ((m = STRING_ARG.matcher(line)).find()) {
+            List<Entry> values = argumentChoices(document, m.group(1), m.group(2), devices, viewer);
+            if (values != null)
+                return rank(line.length() - m.group(4).length(), m.group(4), values);
+        }
         if ((m = REQUIRE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(modules(files), "file on this computer"));
 
@@ -136,6 +143,8 @@ public final class Completions {
      * ahead, → to their right, and so on round; ⇡ or ⇣ when it's mostly straight up or down.
      */
     static String arrow(BlockPos device, Viewer viewer) {
+        if (viewer == null)
+            return "";
         Vec3 to = Vec3.atCenterOf(device).subtract(viewer.eye());
         double flat = Math.hypot(to.x, to.z);
         if (flat < 1 && Math.abs(to.y) >= 1)
@@ -159,6 +168,18 @@ public final class Completions {
         for (NetworkDevice d : devices)
             if (d.name().equals(name))
                 return d;
+        return null;
+    }
+
+    /** What a string first argument of a device's function can be: its choices, or the devices on the network. */
+    private static List<Entry> argumentChoices(String document, String variable, String function, List<NetworkDevice> devices,
+                                               Viewer viewer) {
+        NetworkDevice d = deviceIn(document, variable, devices);
+        if (d == null)
+            return null;
+        for (NetworkDevice.Fn fn : d.functions())
+            if (fn.name().equals(function) && !fn.choices().isEmpty())
+                return fn.choices().contains(com.createnewera.bus.DeviceDrivers.DEVICES) ? deviceNames(devices, viewer) : values(fn.choices(), fn.name());
         return null;
     }
 

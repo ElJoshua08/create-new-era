@@ -318,7 +318,7 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
             // what its ports let a program do, with what the editor shows for each
             List<NetworkDevice.Fn> functions = new ArrayList<>();
             for (DeviceDrivers.Fn fn : DeviceDrivers.describe(server, device.pos(), device.readable(), device.writable()))
-                functions.add(new NetworkDevice.Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads()));
+                functions.add(new NetworkDevice.Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads(), fn.choices()));
             String typeKey = level.getBlockState(device.pos()).getBlock().getDescriptionId();
             out.add(new NetworkDevice(device.name(), device.type(), typeKey, device.pos(), (int) Math.round(device.distance()),
                     device.readable(), device.writable(), functions));

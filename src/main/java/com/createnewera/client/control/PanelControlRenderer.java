@@ -100,7 +100,10 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
             case RED -> 0xF06A4A;
             case OFF -> 0;
         };
-        halo(pose, buffers, 5.25f, 2.75f, 5.25f, 10.75f, 6.75f, 10.75f, rgb, 0.35f);
+        // the halo follows how bright it's set: a bigger, stronger glow at full brightness
+        float glow = state.getValue(PanelLampBlock.BRIGHTNESS) / 15f;
+        float grow = 1.5f * glow;
+        halo(pose, buffers, 5.25f - grow, 2.75f - grow / 2, 5.25f - grow, 10.75f + grow, 6.75f + grow, 10.75f + grow, rgb, 0.15f + 0.35f * glow);
     }
 
     private static void renderNixie(BlockState state, PoseStack pose, MultiBufferSource buffers, int overlay) {

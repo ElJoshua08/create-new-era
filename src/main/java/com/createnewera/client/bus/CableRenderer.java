@@ -5,6 +5,8 @@ import java.util.List;
 import org.jetbrains.annotations.Nullable;
 
 import com.createnewera.CreateNewEra;
+import com.createnewera.bus.Bus;
+import com.createnewera.bus.BusEvents;
 import com.createnewera.bus.BusPort;
 import com.createnewera.bus.BusSpan;
 import com.createnewera.bus.CableRoute;
@@ -243,6 +245,14 @@ public final class CableRenderer {
 
     private static void click(InputEvent.InteractionKeyMappingTriggered event) {
         Minecraft mc = Minecraft.getInstance();
+        if (event.isPickBlock() && mc.player != null) {
+            ItemStack picked = picked(mc);
+            if (picked != null && !picked.isEmpty()) {
+                pick(mc, picked);
+                event.setCanceled(true);
+            }
+            return;
+        }
         if (mc.player == null || event.getHand() != InteractionHand.MAIN_HAND || !(event.isAttack() || event.isUseItem()))
             return;
         if (event.isUseItem() && !CableActions.usesCable(mc.player.getMainHandItem()))
@@ -253,6 +263,49 @@ public final class CableRenderer {
         PacketDistributor.sendToServer(new CableActionPayload(span.id(), event.isAttack()));
         event.setSwingHand(true);
         event.setCanceled(true);
+    }
+
+    /**
+     * What middle click should pick: the cable under the crosshair (a spool of its colour), or
+     * the part on the block face there; null to leave it to the game.
+     */
+    private static @Nullable ItemStack picked(Minecraft mc) {
+        BusSpan span = hovered(mc, mc.player.blockInteractionRange());
+        if (span != null) {
+            ItemStack spool = ModItems.CABLE_SPOOL.asStack();
+            if (span.color() != null)
+                spool.set(ModComponents.CABLE_COLOR.get(), span.color());
+            return spool;
+        }
+        if (!(mc.hitResult instanceof BlockHitResult hit) || hit.getType() == HitResult.Type.MISS)
+            return null;
+        BusPort part = PartGeometry.partAt(ClientBusParts.at(hit.getBlockPos()), hit.getDirection(), hit.getLocation());
+        if (part == null || Bus.builtIn(mc.level.getBlockState(part.pos()), part))
+            return null;
+        return BusEvents.item(part);
+    }
+
+    /** Picks an item as the game's own middle click does: conjured in creative, found in the inventory otherwise. */
+    private static void pick(Minecraft mc, ItemStack stack) {
+        var player = mc.player;
+        var inventory = player.getInventory();
+        if (player.getAbilities().instabuild) {
+            inventory.setPickedItem(stack);
+            mc.gameMode.handleCreativeModeItemAdd(player.getItemInHand(InteractionHand.MAIN_HAND), 36 + inventory.selected);
+            return;
+        }
+        for (int slot = 0; slot < inventory.items.size(); slot++) {
+            ItemStack held = inventory.items.get(slot);
+            boolean same = held.is(stack.getItem()) && (!stack.is(ModItems.CABLE_SPOOL.get())
+                    || CableSpoolItem.color(held) == CableSpoolItem.color(stack));
+            if (!same)
+                continue;
+            if (net.minecraft.world.entity.player.Inventory.isHotbarSlot(slot))
+                inventory.selected = slot;
+            else
+                mc.gameMode.handlePickItem(slot);
+            return;
+        }
     }
 
     private CableRenderer() {}

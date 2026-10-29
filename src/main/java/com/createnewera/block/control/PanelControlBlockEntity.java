@@ -38,7 +38,8 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
     @Override
     public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
         BlockState state = getBlockState();
-        if (!(state.getBlock() instanceof PanelControlBlock control))
+        // knobs and sliders show their value their own way while dragged, like the throttle lever
+        if (!(state.getBlock() instanceof PanelControlBlock control) || control instanceof PanelDialBlock)
             return false;
         tooltip.add(Component.literal("    ").append(state.getBlock().getName()));
         tooltip.add(Component.literal("    ").append(control.goggleValue(state)).withStyle(ChatFormatting.GRAY));

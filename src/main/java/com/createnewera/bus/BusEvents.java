@@ -114,7 +114,8 @@ public final class BusEvents {
         Bus.sendChunk(event.getPlayer(), event.getLevel(), event.getPos());
     }
 
-    private static ItemStack item(BusPort part) {
+    /** The item a part comes off as: what breaking it drops, and what middle click picks. */
+    public static ItemStack item(BusPort part) {
         return switch (part.kind()) {
             case PORT -> ModItems.BUS_PORT.asStack();
             case EXPANSION -> ModItems.PORT_EXPANSION.asStack();

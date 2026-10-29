@@ -190,6 +190,9 @@ public final class ModLang {
         lang("create_new_era.api.beehive.getHoney", "How full of honey it is, from 0 to 5.");
         lang("create_new_era.api.beehive.getBees", "How many bees are inside.");
         lang("create_new_era.api.composter.getFill", "How full it is, from 0 to 8 (8: bone meal ready).");
+        lang("create_new_era.goggles.brightness", " · brightness %s");
+        lang("create_new_era.api.panel_lamp.getBrightness", "How much light it gives off while lit, from 0 to 15.");
+        lang("create_new_era.api.panel_lamp.setBrightness", "Sets how much light it gives off while lit, from 0 (none) to 15 (as bright as a lantern and more); 15 to start with.");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

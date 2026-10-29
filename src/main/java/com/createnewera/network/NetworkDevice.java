@@ -17,9 +17,10 @@ public record NetworkDevice(String name, String type, String typeKey, BlockPos p
      * One function as the editor shows it.
      *
      * @param doc   lang key of what it does
-     * @param reads reads the device rather than giving it an order
+     * @param reads   reads the device rather than giving it an order
+     * @param choices what a string first argument can be, for the editor to offer
      */
-    public record Fn(String name, String params, String returns, String doc, boolean reads) {
+    public record Fn(String name, String params, String returns, String doc, boolean reads, List<String> choices) {
         public String signature() {
             return name + "(" + params + ")" + (returns.isEmpty() ? "" : " → " + returns);
         }
@@ -30,6 +31,7 @@ public record NetworkDevice(String name, String type, String typeKey, BlockPos p
                 ByteBufCodecs.STRING_UTF8, Fn::returns,
                 ByteBufCodecs.STRING_UTF8, Fn::doc,
                 ByteBufCodecs.BOOL, Fn::reads,
+                ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(64)), Fn::choices,
                 Fn::new);
     }
 

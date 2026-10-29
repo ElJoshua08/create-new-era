@@ -120,6 +120,8 @@ final class BlockDrivers {
                     args -> moveItems(level, pos, other(level, pos, args, "pushItems"), args, true));
             api.order("pullItems", "from: device, count?: number, item?: id", "number moved",
                     args -> moveItems(level, pos, other(level, pos, args, "pullItems"), args, false));
+            api.choices("pushItems", List.of(DeviceDrivers.DEVICES));
+            api.choices("pullItems", List.of(DeviceDrivers.DEVICES));
         }
         IFluidHandler fluids = DeviceDrivers.fluidHandler(level, pos);
         if (fluids != null) {
@@ -128,6 +130,8 @@ final class BlockDrivers {
                     args -> moveFluid(level, pos, other(level, pos, args, "pushFluid"), args, true));
             api.order("pullFluid", "from: device, amount?: mB, fluid?: id", "number moved",
                     args -> moveFluid(level, pos, other(level, pos, args, "pullFluid"), args, false));
+            api.choices("pushFluid", List.of(DeviceDrivers.DEVICES));
+            api.choices("pullFluid", List.of(DeviceDrivers.DEVICES));
         }
     }
 

@@ -81,7 +81,14 @@ public final class CableRoute {
                 break;
         }
         Vec3 a = PartGeometry.anchor(from, PartGeometry.anchor(to)), b = PartGeometry.anchor(to, a);
-        return pull(level, cells, onFace(a, from.face()), onFace(b, to.face()));
+        List<Vec3> route = pull(level, cells, onFace(a, from.face()), onFace(b, to.face()));
+        if (route.size() < 3)
+            return route;
+        // a control's cable leaves its plate towards where the route goes next, not the far end
+        List<Vec3> faced = new ArrayList<>(route);
+        faced.set(0, onFace(PartGeometry.anchor(from, route.get(1)), from.face()));
+        faced.set(faced.size() - 1, onFace(PartGeometry.anchor(to, route.get(route.size() - 2)), to.face()));
+        return faced;
     }
 
     /**
