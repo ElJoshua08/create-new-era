@@ -486,7 +486,12 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
                         ? name + "." + method + " needs " + (device.readable() ? "an input" : "an output") + " port on " + name
                         : name + " has no " + method);
             }
-            return LuaValues.of(call.call(args));
+            DeviceDrivers.CALLER.set(worldPosition);
+            try {
+                return LuaValues.of(call.call(args));
+            } finally {
+                DeviceDrivers.CALLER.remove();
+            }
         }
 
         private BusDevice reach(String name) throws LuaError {

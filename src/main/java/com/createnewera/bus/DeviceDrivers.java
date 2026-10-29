@@ -79,6 +79,9 @@ public final class DeviceDrivers {
         }
     }
 
+    /** The computer whose program is calling, while a call runs: whom "another device" is relative to. */
+    public static final ThreadLocal<BlockPos> CALLER = new ThreadLocal<>();
+
     public static String docKey(String family, String name) {
         return "create_new_era.api." + family + "." + name;
     }
@@ -136,9 +139,13 @@ public final class DeviceDrivers {
             api.read("fluids", "", "{{name, amount, capacity}, ...}", args -> tanks(fluids));
         }
 
+        BlockDrivers.transfer(api, level, pos);
+        BlockDrivers.special(api, level, pos);
+        BlockDrivers.common(api, level, pos);
+
         if (!api.fns.isEmpty()) {
             api.family("machine");
-            api.read("read", "", "{speed, overstressed, stress, items, fluids...}", args -> state(level, pos));
+            api.read("read", "", "{speed, stress, items, fluids, state...}", args -> state(level, pos));
         }
         return List.copyOf(api.fns.values());
     }
@@ -160,6 +167,7 @@ public final class DeviceDrivers {
         IFluidHandler fluids = fluidHandler(level, pos);
         if (fluids != null)
             out.put("fluids", tanks(fluids));
+        out.put("state", BlockDrivers.state(level.getBlockState(pos)));
         return out;
     }
 
@@ -172,6 +180,7 @@ public final class DeviceDrivers {
         if (state.getBlock() instanceof PanelControlBlock control)
             return control.snapshot(state);
         List<Object> parts = new ArrayList<>();
+        parts.add(state); // a door opening, a lamp lighting, a note block's note
         if (level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic) {
             parts.add(kinetic.getSpeed());
             parts.add(overstressed(kinetic));
@@ -215,7 +224,7 @@ public final class DeviceDrivers {
         return null;
     }
 
-    private static @Nullable IItemHandler itemHandler(ServerLevel level, BlockPos pos) {
+    static @Nullable IItemHandler itemHandler(ServerLevel level, BlockPos pos) {
         IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
         if (handler != null)
             return handler;
@@ -226,7 +235,7 @@ public final class DeviceDrivers {
         return null;
     }
 
-    private static @Nullable IFluidHandler fluidHandler(ServerLevel level, BlockPos pos) {
+    static @Nullable IFluidHandler fluidHandler(ServerLevel level, BlockPos pos) {
         IFluidHandler handler = level.getCapability(Capabilities.FluidHandler.BLOCK, pos, null);
         if (handler != null)
             return handler;
