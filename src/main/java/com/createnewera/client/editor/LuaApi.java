@@ -88,6 +88,7 @@ public final class LuaApi {
         current = "os";
         member("clock", "clock() → seconds", "Seconds of game time since the program started.");
         member("sleep", "sleep(seconds)", "Same as sleep.");
+        member("speed", "speed() → RPM", "How fast the computer turns, negative the other way round. At 0 the program is paused.");
         current = "string";
         for (String[] f : new String[][] {
                 {"byte", "byte(s, i, j)", "Character codes of s from i to j."}, {"char", "char(...)", "Text from character codes."},

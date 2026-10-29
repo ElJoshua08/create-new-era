@@ -40,7 +40,7 @@ public final class ModLang {
         lang("create_new_era.editor.bad_name", "Names can use letters, numbers, _ - . and /");
         lang("create_new_era.editor.file_exists", "%s already exists");
         lang("create_new_era.editor.flows", "Flows");
-        lang("create_new_era.editor.flows_soon", "Once the data bus arrives, this shows what moves between your machines and programs, live.");
+        lang("create_new_era.editor.flows_soon", "Coming soon: what moves between your machines and programs, live.");
         lang("create_new_era.editor.line_col", "Ln %s, Col %s");
         lang("create_new_era.editor.panel.files", "Files (Ctrl+B)");
         lang("create_new_era.editor.panel.redstone", "Redstone");
@@ -113,7 +113,7 @@ public final class ModLang {
         lang("create_new_era.cable.already_joined", "Those two are already joined");
 
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
-        lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. For now they work with _redstone_; the _data bus_ comes next.");
+        lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. They drive _redstone_ and, through _data ports_ and _cables_, the machines on the _data bus_.");
         lang("block.create_new_era.brass_computer.tooltip.condition1", "When rotated");
         lang("block.create_new_era.brass_computer.tooltip.behaviour1", "Takes a _shaft_ in its back. The _faster_ it spins, the faster programs run. Without rotation they _pause_ and carry on when it turns again.");
         lang("block.create_new_era.brass_computer.tooltip.condition2", "Redstone");
@@ -135,7 +135,7 @@ public final class ModLang {
         lang("block.create_new_era.universal_adapter.tooltip.condition1", "When placed");
         lang("block.create_new_era.universal_adapter.tooltip.behaviour1", "Sticks to the face you click, so it fits on _any side_ of a machine.");
         lang("block.create_new_era.universal_adapter.tooltip.condition2", "Coming soon");
-        lang("block.create_new_era.universal_adapter.tooltip.behaviour2", "Arrives with the _data bus_. Until then it doesn't do anything.");
+        lang("block.create_new_era.universal_adapter.tooltip.behaviour2", "Not wired up yet: put a _Data Port_ on a block to bring it onto the bus.");
         lang("block.create_new_era.bearing_servo.tooltip.summary", "Turns an attached _contraption_ to an exact angle on command.");
         lang("block.create_new_era.bearing_servo.tooltip.condition1", "When placed");
         lang("block.create_new_era.bearing_servo.tooltip.behaviour1", "Faces you, like Create's _bearings_.");
