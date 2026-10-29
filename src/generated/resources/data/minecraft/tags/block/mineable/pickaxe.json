@@ -12,6 +12,7 @@
     "create_new_era:panel_lamp",
     "create_new_era:nixie_digit",
     "create_new_era:panel_gauge",
+    "create_new_era:panel_speaker",
     "create_new_era:panel_keypad"
   ]
 }

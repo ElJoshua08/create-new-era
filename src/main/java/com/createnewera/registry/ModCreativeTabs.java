@@ -39,6 +39,7 @@ public final class ModCreativeTabs {
                         output.accept(ModBlocks.NIXIE_DIGIT);
                         output.accept(ModBlocks.PANEL_GAUGE);
                         output.accept(ModBlocks.PANEL_KEYPAD);
+                        output.accept(ModBlocks.PANEL_SPEAKER);
                     })
                     .build());
 

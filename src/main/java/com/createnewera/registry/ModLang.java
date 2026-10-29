@@ -193,6 +193,16 @@ public final class ModLang {
         lang("create_new_era.goggles.brightness", " · brightness %s");
         lang("create_new_era.api.panel_lamp.getBrightness", "How much light it gives off while lit, from 0 to 15.");
         lang("create_new_era.api.panel_lamp.setBrightness", "Sets how much light it gives off while lit, from 0 (none) to 15 (as bright as a lantern and more); 15 to start with.");
+        lang("block.create_new_era.panel_speaker.tooltip.summary", "A _speaker_ a program plays through: any _sound_ in the game, _notes_ like a note block, or _text spoken aloud_.");
+        lang("block.create_new_era.panel_speaker.tooltip.condition1", "When placed");
+        lang("block.create_new_era.panel_speaker.tooltip.behaviour1", "Sits on the face you click: _floors, walls or ceilings_.");
+        lang("block.create_new_era.panel_speaker.tooltip.condition2", "On the bus");
+        lang("block.create_new_era.panel_speaker.tooltip.behaviour2", "_playSound(id)_, _playNote(instrument, note)_ and _speak(text)_, spoken with the system's text-to-speech voice to players within 48 blocks.");
+        lang("create_new_era.goggles.speaker", "Ready to play");
+        lang("create_new_era.api.panel_speaker.playSound", "Plays any sound in the game by its id, e.g. \"minecraft:block.bell.use\" or \"create:whistle\". Volume 1 carries 16 blocks; pitch 1 is as recorded.");
+        lang("create_new_era.api.panel_speaker.playNote", "Plays a note like a note block: an instrument (\"harp\", \"bell\", \"bass\"...) and a pitch from 0 to 24.");
+        lang("create_new_era.api.panel_speaker.speak", "Says the text aloud to players within 48 blocks, with their system's text-to-speech voice, and shows it above their hotbar.");
+        lang("create_new_era.api.panel_speaker.read", "Nothing: a speaker only plays.");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

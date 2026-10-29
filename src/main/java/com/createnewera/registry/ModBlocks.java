@@ -19,6 +19,7 @@ import com.createnewera.block.control.PanelDialBlock;
 import com.createnewera.block.control.PanelGaugeBlock;
 import com.createnewera.block.control.PanelKeypadBlock;
 import com.createnewera.block.control.PanelLampBlock;
+import com.createnewera.block.control.PanelSpeakerBlock;
 import com.createnewera.block.control.PanelSwitchBlock;
 import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.api.stress.BlockStressValues;
@@ -114,6 +115,8 @@ public final class ModBlocks {
     public static final BlockEntry<PanelGaugeBlock> PANEL_GAUGE = control("panel_gauge", "Panel Gauge",
             box(3, 2, 3, 13, 4, 13), PanelGaugeBlock::new,
             s -> "panel_gauge_" + s.getValue(PanelGaugeBlock.NEEDLE));
+    public static final BlockEntry<PanelSpeakerBlock> PANEL_SPEAKER = control("panel_speaker", "Panel Speaker",
+            box(4, 2, 4, 12, 6, 12), PanelSpeakerBlock::new, s -> "panel_speaker");
     public static final BlockEntry<PanelKeypadBlock> PANEL_KEYPAD = control("panel_keypad", "Panel Keypad",
             box(3, 2, 2, 13, 3, 14), PanelKeypadBlock::new, s -> "panel_keypad");
 

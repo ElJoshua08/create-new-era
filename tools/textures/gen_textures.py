@@ -234,6 +234,26 @@ NIXIE_GLYPHS = {
 LAMP_OFF = ["#1a1310", "#2a1f19", "#3a2d24", "#4a3a2e"]
 
 
+def draw_speaker():
+    """The speaker's grille from above (8x8 at 0,0): a dark slate grille with rows of holes in a
+    brass rim; its side below (8x3 at 0,8)."""
+    c = Canvas(16, 16)
+    c.rect(0, 0, 8, 8, BRASS[4])
+    c.bevel(0, 0, 8, 8, BRASS[6], BRASS[1], BRASS[3])
+    c.rect(1, 1, 6, 6, SLATE[2])
+    for y in range(1, 7):
+        for x in range(1, 7):
+            if (x + y) % 2 == 0:
+                c.px(x, y, SLATE[0])
+    c.rect(1, 1, 6, 1, SLATE[3])
+    c.rect(0, 8, 8, 1, BRASS[5])
+    c.rect(0, 9, 8, 1, BRASS[3])
+    c.rect(0, 10, 8, 1, BRASS[2])
+    for x in range(1, 7, 2):
+        c.px(x, 9, BRASS[1])
+    c.img.save(OUT / "controls" / "speaker.png")
+
+
 def draw_control_states():
     """One small texture per state of the panel controls that move or light up: a knob's
     pointer, a gauge's needle, a nixie's digit, a lamp's colour. The models (gen_models.py)
@@ -744,6 +764,7 @@ def main():
     draw_port_panel()
     draw_hub_panel()
     draw_control_states()
+    draw_speaker()
     draw_control_plate_item()
     draw_bus_items()
     draw_cables()

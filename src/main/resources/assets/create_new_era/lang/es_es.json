@@ -311,5 +311,16 @@
   "create_new_era.api.composter.getFill": "Cuánto está lleno, de 0 a 8 (8: harina de hueso lista).",
   "create_new_era.goggles.brightness": " · brillo %s",
   "create_new_era.api.panel_lamp.getBrightness": "Cuánta luz da mientras está encendido, de 0 a 15.",
-  "create_new_era.api.panel_lamp.setBrightness": "Ajusta cuánta luz da mientras está encendido, de 0 (nada) a 15 (lo máximo); empieza en 15."
+  "create_new_era.api.panel_lamp.setBrightness": "Ajusta cuánta luz da mientras está encendido, de 0 (nada) a 15 (lo máximo); empieza en 15.",
+  "block.create_new_era.panel_speaker": "Altavoz de panel",
+  "block.create_new_era.panel_speaker.tooltip.summary": "Un _altavoz_ por el que suena un programa: cualquier _sonido_ del juego, _notas_ como un bloque musical o _texto en voz alta_.",
+  "block.create_new_era.panel_speaker.tooltip.condition1": "Al colocarlo",
+  "block.create_new_era.panel_speaker.tooltip.behaviour1": "Se pone en la cara que pinchas: _suelos, paredes o techos_.",
+  "block.create_new_era.panel_speaker.tooltip.condition2": "En el bus",
+  "block.create_new_era.panel_speaker.tooltip.behaviour2": "_playSound(id)_, _playNote(instrumento, nota)_ y _speak(texto)_, dicho con la voz del sistema a los jugadores a menos de 48 bloques.",
+  "create_new_era.goggles.speaker": "Listo para sonar",
+  "create_new_era.api.panel_speaker.playSound": "Reproduce cualquier sonido del juego por su id, p. ej. \"minecraft:block.bell.use\" o \"create:whistle\". Volumen 1 llega a 16 bloques; tono 1 es el original.",
+  "create_new_era.api.panel_speaker.playNote": "Toca una nota como un bloque musical: un instrumento (\"harp\", \"bell\", \"bass\"...) y un tono de 0 a 24.",
+  "create_new_era.api.panel_speaker.speak": "Dice el texto en voz alta a los jugadores a menos de 48 bloques, con la voz del sistema, y lo muestra sobre su barra de objetos.",
+  "create_new_era.api.panel_speaker.read": "Nada: un altavoz solo suena."
 }

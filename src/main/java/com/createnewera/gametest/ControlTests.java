@@ -90,6 +90,7 @@ public class ControlTests {
         BlockPos knob = control(helper, 4, 0, ModBlocks.PANEL_KNOB.get());
         BlockPos gauge = control(helper, 4, 4, ModBlocks.PANEL_GAUGE.get());
         BlockPos keypad = control(helper, 0, 4, ModBlocks.PANEL_KEYPAD.get());
+        BlockPos speaker = control(helper, 2, 4, ModBlocks.PANEL_SPEAKER.get());
         computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
                 "local button, lamp = bus.get('" + name(helper, button) + "'), bus.get('" + name(helper, lamp) + "')",
                 "local nixie, knob = bus.get('" + name(helper, nixie) + "'), bus.get('" + name(helper, knob) + "')",
@@ -98,10 +99,13 @@ public class ControlTests {
                 "knob.onChange(function(value) gauge.set(value / 15) end)",
                 "print({b = {2, 3}, a = 1, name = 'x'})",
                 "bus.get('" + name(helper, keypad) + "').onKey(function(key) print('key ' .. key) end)",
+                "local sp = bus.get('" + name(helper, speaker) + "')",
+                "sp.playNote('bell', 12) sp.playSound('minecraft:block.bell.use', 0.5) sp.speak('hola') print('spoke')",
                 "print('ready')"));
         computer.start("create_new_era.console.running");
         helper.runAfterDelay(10, () -> {
             expectPrinted(helper, computer, "ready");
+            expectPrinted(helper, computer, "spoke");
             expectPrinted(helper, computer, "{2, 3}"); // print shows a table's contents
             expectPrinted(helper, computer, "{a = 1, b = {2, 3}, name = \"x\"}");
             click(helper, button, 8, 4, 8);

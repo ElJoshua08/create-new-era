@@ -23,7 +23,7 @@ public final class ModBlockEntities {
     public static final BlockEntityEntry<PanelControlBlockEntity> PANEL_CONTROL = REGISTRATE
             .blockEntity("panel_control", PanelControlBlockEntity::new)
             .validBlocks(ModBlocks.PANEL_BUTTON, ModBlocks.PANEL_SWITCH, ModBlocks.PANEL_KNOB, ModBlocks.PANEL_SLIDER,
-                    ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD)
+                    ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD, ModBlocks.PANEL_SPEAKER)
             .renderer(() -> PanelControlRenderer::new)
             .register();
 

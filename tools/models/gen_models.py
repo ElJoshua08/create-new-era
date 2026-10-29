@@ -200,6 +200,9 @@ MODELS = {
     "panel_gauge": panel(
         box("gauge", [3, 2, 3], [13, 4, 13], {"up": ("parts", part("gauge_face")), "sides": ("details", region("brass_bar", (0, 0, 10, 2)))}),
     ),
+    "panel_speaker": model({**PANEL_TEX, "speaker": "create_new_era:block/controls/speaker"}, panel(
+        box("speaker", [4, 2, 4], [12, 6, 12], {"up": ("speaker", [0, 0, 8, 8]), "sides": ("speaker", [0, 8, 8, 11])}),
+    )["elements"]),
     "panel_keypad": panel(
         box("keys", [3, 2, 2], [13, 3, 14], {"up": ("parts", part("keypad")), "sides": ("parts", part("slate_side", (0, 0, 10, 1)))}),
     ),

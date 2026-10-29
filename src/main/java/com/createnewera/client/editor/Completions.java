@@ -179,8 +179,19 @@ public final class Completions {
             return null;
         for (NetworkDevice.Fn fn : d.functions())
             if (fn.name().equals(function) && !fn.choices().isEmpty())
-                return fn.choices().contains(com.createnewera.bus.DeviceDrivers.DEVICES) ? deviceNames(devices, viewer) : values(fn.choices(), fn.name());
+                return fn.choices().contains(com.createnewera.bus.DeviceDrivers.DEVICES) ? deviceNames(devices, viewer)
+                        : fn.choices().contains(com.createnewera.block.control.PanelSpeakerBlock.SOUNDS) ? values(soundIds(), "sound")
+                        : values(fn.choices(), fn.name());
         return null;
+    }
+
+    private static List<String> sounds;
+
+    /** Every sound the game knows, sorted: the speaker's playSound(" offers them. */
+    private static List<String> soundIds() {
+        if (sounds == null)
+            sounds = net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.keySet().stream().map(Object::toString).sorted().toList();
+        return sounds;
     }
 
     /** What a variable holding {@code bus.get("name")} can do, or null if it isn't one. */
