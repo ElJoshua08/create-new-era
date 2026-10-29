@@ -1,0 +1,56 @@
+---
+import '@fontsource/barlow/400.css';
+import '@fontsource/barlow/500.css';
+import '@fontsource/barlow/600.css';
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { routes, ui, type Lang, type Page } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+  page: Page;
+  title: string;
+  description: string;
+}
+const { lang, page, title, description } = Astro.props;
+const site = Astro.site!;
+const canonical = new URL(routes[page][lang], site).href;
+const fullTitle = page === 'home' ? title : `${title} · Create: New Era`;
+const ogImage = new URL('/og.png', site).href;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={new URL(routes[page].en, site).href} />
+    <link rel="alternate" hreflang="es" href={new URL(routes[page].es, site).href} />
+    <link rel="alternate" hreflang="x-default" href={new URL(routes[page].en, site).href} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preload" href="/fonts/Monocraft.woff2" as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#15110e" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body data-page={page}>
+    <a class="skip" href="#main">{ui[lang].skip}</a>
+    <Nav lang={lang} page={page} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <script>
+      import '../scripts/release';
+    </script>
+  </body>
+</html>

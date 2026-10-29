@@ -1,0 +1,199 @@
+---
+import Base from '../layouts/Base.astro';
+import { REPO, routes, ui, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const soon = ui[lang].soon;
+
+const copy = {
+  en: {
+    title: 'What’s next',
+    description: 'What is coming to Create: New Era after the first pre-release: drawing on screens, wireless towers, the Flows panel, the spool winder and more.',
+    lede: 'The first pre-release has the computer, the data bus and the blocks to build with. Here’s what’s being built after it. None of this is in the current download yet.',
+    nextTitle: 'Next up',
+    next: [
+      ['brass_screen', 'Drawing on screens', 'Programs paint on Brass Screens pixel by pixel, with a small UI library for dashboards that look good without much code.'],
+      ['panel_gauge', 'Panel controls in your programs', 'Buttons, switches, knobs, sliders and keypads report to your code. Lamps, nixie digits and gauges show whatever it tells them.'],
+      ['bus_port', 'Wireless towers and antennas', 'Reach machines across the map without running a cable all the way there.'],
+      ['brass_computer', 'The Flows panel', 'A side panel in the editor that shows the data moving between your machines and your program as it happens.'],
+      ['port_expansion', 'Focus mode', 'A placement mode for putting ports exactly where you want them on crowded machines.'],
+      ['cable_spool', 'The spool winder', 'A machine that winds cable onto spools, so cabling has its own place in survival progression.'],
+      ['panel_keypad', 'Linked Typewriter support', 'Type into a running program from a Linked Typewriter.'],
+    ],
+    laterTitle: 'Further out',
+    later: [
+      ['bearing_servo', 'Aeronautics', 'The Bearing Servo turns a contraption to an exact angle on command, for gimbals, turrets and flaps on Create: Aeronautics ships. Sensors and drones would follow.'],
+      ['control_plate', 'Visual programming', 'Programs built from nodes, for people who would rather not write Lua.'],
+    ],
+    shippedTitle: 'Already in 0.1.0-alpha.1',
+    shipped: 'Brass Computer and editor · Lua with redstone · data ports, expansions and cables · drivers for kinetics, items and fluids · Brass Screens that join · panel controls · Ponder scenes',
+    follow: 'Follow along on GitHub',
+    download: 'Get the pre-release',
+  },
+  es: {
+    title: 'Lo que viene',
+    description: 'Lo que llega a Create: New Era después del primer prelanzamiento: dibujar en pantallas, torres inalámbricas, el panel de flujos, la bobinadora y más.',
+    lede: 'El primer prelanzamiento trae el ordenador, el bus de datos y los bloques para construir. Esto es lo que se está haciendo después. Nada de esto está todavía en la descarga actual.',
+    nextTitle: 'Lo siguiente',
+    next: [
+      ['brass_screen', 'Dibujar en las pantallas', 'Los programas pintan en las pantallas de latón píxel a píxel, con una pequeña librería para hacer paneles de control que se vean bien sin mucho código.'],
+      ['panel_gauge', 'Los controles de panel en tus programas', 'Pulsadores, interruptores, mandos, deslizadores y teclados le cuentan a tu código lo que pasa. Pilotos, dígitos nixie e indicadores muestran lo que él les diga.'],
+      ['bus_port', 'Torres y antenas inalámbricas', 'Llega a máquinas al otro lado del mapa sin tender un cable hasta allí.'],
+      ['brass_computer', 'El panel de flujos', 'Un panel lateral en el editor que enseña los datos que van y vienen entre tus máquinas y tu programa, en el momento.'],
+      ['port_expansion', 'Modo enfoque', 'Un modo de colocación para poner los puertos justo donde quieres en máquinas con poco sitio.'],
+      ['cable_spool', 'La bobinadora', 'Una máquina que enrolla cable en bobinas, para que el cableado tenga su sitio en la progresión de supervivencia.'],
+      ['panel_keypad', 'Compatibilidad con la Linked Typewriter', 'Escribe en un programa en marcha desde una Linked Typewriter.'],
+    ],
+    laterTitle: 'Más adelante',
+    later: [
+      ['bearing_servo', 'Aeronautics', 'El servo de rodamiento gira un artefacto hasta un ángulo exacto cuando se lo pides, para cardanes, torretas y alerones en barcos de Create: Aeronautics. Después vendrían sensores y drones.'],
+      ['control_plate', 'Programación visual', 'Programas hechos con nodos, para quien prefiera no escribir Lua.'],
+    ],
+    shippedTitle: 'Ya en la 0.1.0-alpha.1',
+    shipped: 'Ordenador de latón y editor · Lua con redstone · puertos de datos, ampliaciones y cables · drivers para cinética, objetos y fluidos · pantallas de latón que se juntan · controles de panel · escenas de Ponder',
+    follow: 'Síguelo en GitHub',
+    download: 'Descarga el prelanzamiento',
+  },
+}[lang];
+---
+
+<Base lang={lang} page="roadmap" title={copy.title} description={copy.description}>
+  <header class="page-head wrap">
+    <h1>{copy.title}</h1>
+    <p class="lede">{copy.lede}</p>
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap">
+      <h2 class="track__title">{copy.nextTitle}</h2>
+      <ol class="track">
+        {
+          copy.next.map(([icon, h, t]) => (
+            <li>
+              <img src={`/img/items/create_new_era_${icon}.png`} alt="" width="56" height="56" loading="lazy" />
+              <div>
+                <h3>
+                  {h} <span class="soon">{soon}</span>
+                </h3>
+                <p>{t}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section--tight later">
+    <div class="wrap">
+      <h2 class="track__title">{copy.laterTitle}</h2>
+      <ol class="track track--later">
+        {
+          copy.later.map(([icon, h, t]) => (
+            <li>
+              <img src={`/img/items/create_new_era_${icon}.png`} alt="" width="56" height="56" loading="lazy" />
+              <div>
+                <h3>{h}</h3>
+                <p>{t}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap shipped">
+      <div class="window">
+        <div class="window__bar">{copy.shippedTitle}</div>
+        <p class="window__body shipped__body">{copy.shipped}</p>
+      </div>
+      <div class="links">
+        <a class="more" href={routes.download[lang]}>{copy.download}</a>
+        <a class="more" href={REPO}>{copy.follow}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .track__title {
+    margin-bottom: 2rem;
+  }
+  .track {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: grid;
+    gap: 0;
+  }
+  .track::before {
+    content: '';
+    position: absolute;
+    left: 27px;
+    top: 28px;
+    bottom: 28px;
+    width: 3px;
+    background: repeating-linear-gradient(var(--brass-lo) 0 6px, transparent 6px 12px);
+  }
+  .track li {
+    position: relative;
+    display: grid;
+    grid-template-columns: 56px minmax(0, 40rem);
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.2rem 0;
+  }
+  .track img {
+    image-rendering: pixelated;
+    width: 56px;
+    height: 56px;
+    background: var(--ground);
+    box-shadow: 0 0 0 8px var(--ground);
+  }
+  .later .track img {
+    background: var(--ground-2);
+    box-shadow: 0 0 0 8px var(--ground-2);
+  }
+  .track h3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    align-items: center;
+    font-size: 1.25rem;
+    padding-top: 0.6rem;
+  }
+  .track .soon {
+    vertical-align: 0;
+  }
+  .track p {
+    margin-top: 0.45rem;
+    color: var(--ink-2);
+  }
+  .later {
+    background: var(--ground-2);
+  }
+  .track--later h3 {
+    color: var(--ink-2);
+  }
+  .shipped .window {
+    max-width: 52rem;
+  }
+  .shipped__body {
+    padding: 1.1rem 1.3rem;
+    color: #e9e2d4;
+    margin: 0;
+    line-height: 1.7;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.5rem;
+    margin-top: 1rem;
+  }
+</style>

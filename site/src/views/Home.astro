@@ -1,0 +1,433 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import SceneStage from '../components/SceneStage.astro';
+import { routes, ui, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const soon = ui[lang].soon;
+
+const copy = {
+  en: {
+    meta: {
+      title: 'Create: New Era · Program your Create factory',
+      description:
+        'A Create 6 addon for NeoForge 1.21.1: brass computers that run Lua, data cables that reach every machine, brass screens and panel controls.',
+    },
+    hero: {
+      title: 'Program your Create factory.',
+      lede: 'A brass computer runs the Lua you write. Data cables connect it to the machines around it, so the vault can tell the press when to slow down.',
+      needs: 'Creative worlds · Minecraft 1.21.1',
+      more: 'See it work',
+      alt: 'A small Create factory: a brass computer turned by a large cogwheel, a wall of brass screens, an item vault and a mechanical press over a depot, joined by copper data cables.',
+      chapters: [
+        { title: 'Write', text: 'Open the computer and type. The editor suggests the machines it can reach.' },
+        { title: 'Run', text: 'A shaft in its back powers it. The faster it spins, the faster your code runs.' },
+        { title: 'Connect', text: 'The vault reports its iron and the motor gets a new speed.' },
+        { title: 'Show', text: 'Screens put the numbers up in flip pixels.', soon: true },
+      ],
+      editor: { title: 'Brass Computer', run: 'Run', stop: 'Stop', console: 'Console', files: 'Files' },
+      config: {
+        code: `-- keep the press fed
+local vault = bus.get("item_vault")
+local motor = bus.get("creative_motor")
+
+vault.onChange(function(v)
+  local iron = v.count("minecraft:iron_ingot")
+  print("iron: " .. iron)
+  motor.setSpeed(iron > 64 and 128 or 32)
+end)`,
+        file: 'main.lua',
+        ran: 'run main.lua',
+        value: 'iron: {n}',
+        screenLabel: 'IRON',
+        suggest: ['item_vault', 'creative_motor'],
+        play: 'Play',
+        pause: 'Pause',
+        replay: 'Play again',
+      },
+    },
+    idea: {
+      title: 'Machines that report back',
+      text: 'Any Create machine can join a data network through a small port on one of its faces. A Brass Computer on that network reads speeds, stress, items and fluids, and sends orders back. You write the program in Lua, inside the game.',
+    },
+    rows: [
+      {
+        scene: 'power',
+        demo: 'spin',
+        alt: 'A Brass Computer with a lit screen, driven by a shaft from a large cogwheel behind it.',
+        title: 'A computer that runs on rotation',
+        text: 'Put a shaft into the back of a Brass Computer and it runs your program. At 256 RPM it gets 2 ms of every game tick, at 128 RPM it gets half that. Stop the shaft and the program waits exactly where it was. It draws 2 SU per RPM, like any other Create machine.',
+        link: 'More about the computer',
+        href: routes.computer.en,
+      },
+      {
+        scene: 'bus',
+        demo: 'pulse',
+        alt: 'A Brass Computer cabled to a fluid tank, an item vault and an encased fan. One cable runs flat along the floor, two hang through the air.',
+        title: 'Ports on anything, cables in between',
+        text: 'Data ports stick to any face of any block, Create machines included, and the block keeps working as before. Run cable from a spool, hanging across a gap of up to 24 blocks or flat along walls and floors. Dye it to keep two networks apart, or tuck it inside a casing.',
+        link: 'How the data bus works',
+        href: routes.bus.en,
+      },
+      {
+        scene: 'desk',
+        alt: 'A control desk built from casings, with a button, a switch, a knob, a slider, a lamp, two nixie digits, a gauge and a keypad.',
+        title: 'Screens and control desks',
+        text: 'Brass Screens placed side by side join into one pane and the frame between them disappears. Panel controls go on any face, so you can build a control desk wherever the factory needs one.',
+        soonText: 'Programs drawing on the screens and reading the controls',
+        link: 'Screens and panels',
+        href: routes.screens.en,
+      },
+    ],
+    status: {
+      title: 'What’s in the jar',
+      todayTitle: 'Today, in 0.1.0-alpha.1',
+      today: [
+        'The Brass Computer, with Lua and an in-game editor',
+        'Redstone in and out of all six sides',
+        'Data ports, port expansions and cables',
+        'Drivers for kinetics, items and fluids',
+        'Brass Screens that join into one pane',
+        'Panel controls for building desks',
+        'Ponder scenes for the main blocks',
+      ],
+      nextTitle: 'Coming next',
+      next: [
+        'Drawing on screens',
+        'Panel controls your programs can read',
+        'Wireless towers and antennas',
+        'A Flows panel with live data in the editor',
+        'Focus mode for placing ports',
+        'The spool winder, for survival',
+        'Linked Typewriter support',
+      ],
+      link: 'Everything that’s planned',
+    },
+    packs: {
+      title: 'For modpack makers',
+      text: 'It’s one jar. It needs Create 6.0.10 or newer on NeoForge 21.1.265 or newer, and it works alongside Create: Aeronautics. The mod is public domain, so you can ship it in any pack without asking anyone. English and Spanish are included.',
+    },
+    band: {
+      title: 'Try the pre-release',
+      text: 'This first build is for creative worlds. Survival recipes come later, and worlds made with it may need some repair after future updates, so try it in a test world.',
+      guide: 'Install guide',
+    },
+  },
+  es: {
+    meta: {
+      title: 'Create: New Era · Programa tu fábrica de Create',
+      description:
+        'Un addon de Create 6 para NeoForge 1.21.1: ordenadores de latón que ejecutan Lua, cables de datos que llegan a cualquier máquina, pantallas de latón y controles de panel.',
+    },
+    hero: {
+      title: 'Programa tu fábrica de Create.',
+      lede: 'Un ordenador de latón ejecuta el Lua que escribes. Los cables de datos lo conectan con las máquinas de alrededor, así que la bóveda puede avisar a la prensa de que vaya más despacio.',
+      needs: 'Mundos en creativo · Minecraft 1.21.1',
+      more: 'Míralo en marcha',
+      alt: 'Una pequeña fábrica de Create: un ordenador de latón movido por un engranaje grande, una pared de pantallas de latón, una bóveda de objetos y una prensa mecánica sobre un depósito, unidos con cables de datos de cobre.',
+      chapters: [
+        { title: 'Escribe', text: 'Abre el ordenador y escribe. El editor te sugiere las máquinas a las que llega.' },
+        { title: 'Ejecuta', text: 'Lo mueve un eje por detrás. Cuanto más rápido gira, más rápido va tu código.' },
+        { title: 'Conecta', text: 'La bóveda dice cuánto hierro tiene y el motor cambia de velocidad.' },
+        { title: 'Muestra', text: 'Las pantallas sacan los números en píxeles giratorios.', soon: true },
+      ],
+      editor: { title: 'Ordenador de latón', run: 'Ejecutar', stop: 'Parar', console: 'Consola', files: 'Archivos' },
+      config: {
+        code: `-- que a la prensa no le falte hierro
+local boveda = bus.get("item_vault")
+local motor = bus.get("creative_motor")
+
+boveda.onChange(function(b)
+  local hierro = b.count("minecraft:iron_ingot")
+  print("hierro: " .. hierro)
+  motor.setSpeed(hierro > 64 and 128 or 32)
+end)`,
+        file: 'main.lua',
+        ran: 'ejecutando main.lua',
+        value: 'hierro: {n}',
+        screenLabel: 'HIERRO',
+        suggest: ['item_vault', 'creative_motor'],
+        play: 'Reproducir',
+        pause: 'Pausar',
+        replay: 'Volver a ver',
+      },
+    },
+    idea: {
+      title: 'Máquinas que dan parte',
+      text: 'Cualquier máquina de Create puede entrar en una red de datos con un pequeño puerto en una de sus caras. Un ordenador de latón conectado a esa red lee velocidades, estrés, objetos y fluidos, y devuelve órdenes. El programa lo escribes en Lua, dentro del juego.',
+    },
+    rows: [
+      {
+        scene: 'power',
+        demo: 'spin',
+        alt: 'Un ordenador de latón con la pantalla encendida, movido por un eje que sale de un engranaje grande.',
+        title: 'Un ordenador que funciona con rotación',
+        text: 'Mete un eje por detrás del ordenador de latón y ejecutará tu programa. A 256 RPM tiene 2 ms de cada tick del juego; a 128 RPM, la mitad. Si el eje se para, el programa espera justo donde estaba. Consume 2 SU por RPM, como cualquier otra máquina de Create.',
+        link: 'Más sobre el ordenador',
+        href: routes.computer.es,
+      },
+      {
+        scene: 'bus',
+        demo: 'pulse',
+        alt: 'Un ordenador de latón cableado a un depósito de fluidos, una bóveda de objetos y un ventilador revestido. Un cable va pegado al suelo y dos cuelgan por el aire.',
+        title: 'Puertos en cualquier cosa y cables entre ellos',
+        text: 'Los puertos de datos se pegan a cualquier cara de cualquier bloque, máquinas de Create incluidas, y el bloque sigue funcionando igual. Tiende cable con una bobina, colgando hasta 24 bloques o pegado a paredes y suelos. Tíñelo para separar dos redes o escóndelo dentro de un revestimiento.',
+        link: 'Cómo funciona el bus de datos',
+        href: routes.bus.es,
+      },
+      {
+        scene: 'desk',
+        alt: 'Un pupitre de control hecho con revestimientos, con pulsador, interruptor, mando giratorio, deslizador, piloto, dos dígitos nixie, indicador de aguja y teclado.',
+        title: 'Pantallas y pupitres de control',
+        text: 'Las pantallas de latón que pones una al lado de otra se juntan en un solo panel y el marco entre ellas desaparece. Los controles de panel van en cualquier cara, así que puedes montar un pupitre de control donde lo necesite la fábrica.',
+        soonText: 'Que los programas dibujen en las pantallas y lean los controles',
+        link: 'Pantallas y paneles',
+        href: routes.screens.es,
+      },
+    ],
+    status: {
+      title: 'Qué trae el jar',
+      todayTitle: 'Hoy, en la 0.1.0-alpha.1',
+      today: [
+        'El ordenador de latón, con Lua y editor dentro del juego',
+        'Redstone de entrada y salida por las seis caras',
+        'Puertos de datos, ampliaciones de puertos y cables',
+        'Drivers para cinética, objetos y fluidos',
+        'Pantallas de latón que se juntan en un panel',
+        'Controles de panel para montar pupitres',
+        'Escenas de Ponder para los bloques principales',
+      ],
+      nextTitle: 'Lo siguiente',
+      next: [
+        'Dibujar en las pantallas',
+        'Controles de panel que tus programas pueden leer',
+        'Torres y antenas inalámbricas',
+        'Un panel de flujos con datos en directo en el editor',
+        'Modo enfoque para colocar puertos',
+        'La bobinadora, para supervivencia',
+        'Compatibilidad con la Linked Typewriter',
+      ],
+      link: 'Todo lo que está en camino',
+    },
+    packs: {
+      title: 'Para quien hace modpacks',
+      text: 'Es un solo jar. Necesita Create 6.0.10 o posterior sobre NeoForge 21.1.265 o posterior, y funciona junto a Create: Aeronautics. El mod es de dominio público, así que puedes meterlo en cualquier pack sin pedir permiso a nadie. Trae inglés y español.',
+    },
+    band: {
+      title: 'Prueba el prelanzamiento',
+      text: 'Esta primera versión es para mundos en creativo. Las recetas de supervivencia llegarán más adelante y puede que los mundos hechos con ella necesiten algún arreglo en próximas versiones, así que pruébalo en un mundo aparte.',
+      guide: 'Cómo instalarlo',
+    },
+  },
+}[lang];
+---
+
+<Base lang={lang} page="home" title={copy.meta.title} description={copy.meta.description}>
+  <Hero
+    lang={lang}
+    title={copy.hero.title}
+    lede={copy.hero.lede}
+    needs={copy.hero.needs}
+    more={copy.hero.more}
+    alt={copy.hero.alt}
+    chapters={copy.hero.chapters}
+    editor={copy.hero.editor}
+    config={copy.hero.config}
+    soon={soon}
+  />
+
+  <section class="idea section">
+    <div class="wrap idea__in">
+      <h2>{copy.idea.title}</h2>
+      <p class="lede">{copy.idea.text}</p>
+    </div>
+  </section>
+
+  {
+    copy.rows.map((r, i) => (
+      <section class="row section--tight">
+        <div class:list={['wrap split', { 'split--flip': i % 2 === 1 }]}>
+          <div class="row__text">
+            <h2>{r.title}</h2>
+            <p class="prose row__p">{r.text}</p>
+            {r.soonText && (
+              <p class="row__soon">
+                <span class="soon">{soon}</span> {r.soonText}
+              </p>
+            )}
+            <a class="more" href={r.href}>
+              {r.link}
+            </a>
+          </div>
+          <SceneStage scene={r.scene} alt={r.alt} demo={(r as any).demo} class="row__stage" />
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="status section">
+    <div class="wrap">
+      <h2>{copy.status.title}</h2>
+      <div class="status__cols">
+        <div class="window status__today">
+          <div class="window__bar">{copy.status.todayTitle}</div>
+          <ul class="window__body status__list">
+            {copy.status.today.map((s) => <li>{s}</li>)}
+          </ul>
+        </div>
+        <div class="status__next">
+          <h3>{copy.status.nextTitle}</h3>
+          <ul class="status__list status__list--next">
+            {copy.status.next.map((s) => <li>{s}</li>)}
+          </ul>
+          <a class="more" href={routes.roadmap[lang]}>{copy.status.link}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="packs section--tight">
+    <div class="wrap packs__in">
+      <h2>{copy.packs.title}</h2>
+      <p class="prose">{copy.packs.text}</p>
+    </div>
+  </section>
+
+  <section class="band section">
+    <div class="wrap band__in">
+      <div>
+        <h2>{copy.band.title}</h2>
+        <p class="prose band__p">{copy.band.text}</p>
+      </div>
+      <div class="band__cta">
+        <DownloadButton lang={lang} />
+        <a class="more" href={routes.download[lang]}>{copy.band.guide}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/demos';
+</script>
+
+<style>
+  .idea {
+    background: var(--ground-2);
+  }
+  .idea__in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 80px);
+    align-items: start;
+  }
+  .idea h2 {
+    font-size: clamp(1.8rem, 3.6vw, 3.1rem);
+  }
+  .row {
+    padding-block: clamp(40px, 5vw, 72px);
+  }
+  .row__p {
+    margin-top: 1.2rem;
+  }
+  .row__soon {
+    margin-top: 1.1rem;
+    color: var(--ink-3);
+    font-size: 1rem;
+  }
+  .row :global(.row__stage) {
+    width: min(100%, 620px);
+    margin-inline: auto;
+  }
+  .status {
+    background: var(--ground-2);
+  }
+  .status__cols {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+  }
+  .status__list {
+    margin: 0;
+    padding: 1.1rem 1.3rem;
+    list-style: none;
+    display: grid;
+    gap: 0.7rem;
+  }
+  .status__today .status__list li {
+    display: flex;
+    gap: 0.8rem;
+    align-items: baseline;
+    color: #e9e2d4;
+  }
+  .status__today .status__list li::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    background: var(--green);
+    box-shadow: inset -2px -2px 0 #3e8a2a;
+    transform: translateY(1px);
+  }
+  .status__next h3 {
+    color: var(--ink-2);
+    margin-top: 0.6rem;
+  }
+  .status__list--next {
+    padding: 1rem 0 0;
+  }
+  .status__list--next li {
+    display: flex;
+    gap: 0.8rem;
+    align-items: baseline;
+    color: var(--ink-2);
+  }
+  .status__list--next li::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    box-shadow: inset 0 0 0 2px var(--brass-lo);
+    transform: translateY(1px);
+  }
+  .packs__in {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 80px);
+  }
+  .band {
+    background:
+      linear-gradient(rgb(21 17 14 / 0.62), rgb(21 17 14 / 0.62)),
+      url('/gui/wood.png') 0 0 / 24px 24px;
+    image-rendering: pixelated;
+  }
+  .band__in {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem 4rem;
+    flex-wrap: wrap;
+  }
+  .band__p {
+    margin-top: 1rem;
+  }
+  .band__cta {
+    display: grid;
+    gap: 0.5rem;
+    justify-items: start;
+  }
+  @media (max-width: 860px) {
+    .idea__in,
+    .packs__in,
+    .status__cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

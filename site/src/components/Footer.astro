@@ -1,0 +1,77 @@
+---
+import { routes, ui, DOCS, REPO, type Lang } from '../i18n/routes';
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = ui[lang];
+---
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__brand">
+      <img src="/img/items/create_new_era_brass_computer.png" alt="" width="40" height="40" />
+      <div>
+        <p class="foot__name">Create: <b>New Era</b></p>
+        <p class="foot__small">{t.footer.unofficial} {t.footer.license}</p>
+      </div>
+    </div>
+    <nav class="foot__links" aria-label="Footer">
+      <a href={routes.download[lang]}>{t.download}</a>
+      <a href={DOCS}>{t.footer.docs}</a>
+      <a href={REPO}>{t.footer.source}</a>
+      <a href={`${REPO}/issues`}>{t.footer.issues}</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--ground-2);
+    padding-block: 56px;
+    margin-top: 0;
+  }
+  .foot__in {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .foot__brand {
+    display: flex;
+    gap: 1rem;
+    max-width: 34rem;
+  }
+  .foot__brand img {
+    image-rendering: pixelated;
+    width: 40px;
+    height: 40px;
+    flex: none;
+  }
+  .foot__name {
+    font: 400 1rem/1.2 var(--display);
+  }
+  .foot__name b {
+    font-weight: 400;
+    color: var(--brass);
+  }
+  .foot__small {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--ink-3);
+  }
+  .foot__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.6rem;
+  }
+  .foot__links a {
+    color: var(--ink-2);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .foot__links a:hover {
+    color: var(--ink);
+  }
+</style>

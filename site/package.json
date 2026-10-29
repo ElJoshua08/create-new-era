@@ -1,0 +1,22 @@
+{
+  "name": "create-new-era-site",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "scenes": "python3 tools/scene.py"
+  },
+  "dependencies": {
+    "astro": "^5.14.0",
+    "@fontsource/barlow": "^5.2.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "sharp"
+    ]
+  }
+}

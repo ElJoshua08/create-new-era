@@ -1,0 +1,245 @@
+---
+import { routes, ui, DOCS, FALLBACK, type Lang, type Page } from '../i18n/routes';
+interface Props {
+  lang: Lang;
+  page: Page;
+}
+const { lang, page } = Astro.props;
+const t = ui[lang];
+const other: Lang = lang === 'en' ? 'es' : 'en';
+const links: { key: Page; label: string }[] = [
+  { key: 'computer', label: t.nav.computer },
+  { key: 'bus', label: t.nav.bus },
+  { key: 'screens', label: t.nav.screens },
+  { key: 'roadmap', label: t.nav.roadmap },
+];
+---
+
+<header class="nav">
+  <div class="nav__in wrap">
+    <a class="brand" href={routes.home[lang]} aria-label="Create: New Era">
+      <img src="/img/items/create_new_era_brass_computer.png" alt="" width="32" height="32" />
+      <span>Create: <b>New Era</b></span>
+    </a>
+    <nav class="links" aria-label={lang === 'es' ? 'Principal' : 'Main'}>
+      {
+        links.map((l) => (
+          <a href={routes[l.key][lang]} aria-current={page === l.key ? 'page' : undefined}>
+            {l.label}
+          </a>
+        ))
+      }
+      <a href={DOCS}>{t.nav.docs}</a>
+    </nav>
+    <div class="nav__end">
+      <a class="lang" href={routes[page][other]} hreflang={other} lang={other}>
+        <span aria-hidden="true">{other.toUpperCase()}</span>
+        <span class="sr">{t.other}</span>
+      </a>
+      <a class="btn btn--brass nav__dl" href={FALLBACK.url} data-download>{t.download}</a>
+      <details class="menu">
+        <summary aria-label="Menu">
+          <span></span><span></span>
+        </summary>
+        <div class="menu__sheet">
+          {
+            links.map((l) => (
+              <a href={routes[l.key][lang]} aria-current={page === l.key ? 'page' : undefined}>
+                {l.label}
+              </a>
+            ))
+          }
+          <a href={DOCS}>{t.nav.docs}</a>
+          <a href={routes.download[lang]}>{t.download}</a>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(21 17 14 / 0.72);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+  }
+  .nav::after {
+    content: '';
+    position: absolute;
+    inset: 100% 0 auto;
+    height: 18px;
+    background: linear-gradient(rgb(21 17 14 / 0.55), transparent);
+    pointer-events: none;
+  }
+  .nav__in {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 72px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: var(--ink);
+    text-decoration: none;
+    font: 400 1rem/1 var(--display);
+    white-space: nowrap;
+  }
+  .brand b {
+    font-weight: 400;
+    color: var(--brass);
+  }
+  .brand img {
+    image-rendering: pixelated;
+    width: 32px;
+    height: 32px;
+  }
+  .links {
+    display: flex;
+    gap: 1.6rem;
+    margin-inline: auto;
+  }
+  .links a,
+  .lang {
+    font: 500 0.98rem/1 var(--body);
+    color: var(--ink-2);
+    text-decoration: none;
+    padding: 0.5rem 0;
+    position: relative;
+  }
+  .links a:hover,
+  .lang:hover {
+    color: var(--ink);
+  }
+  .links a[aria-current='page'] {
+    color: var(--ink);
+  }
+  .links a[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 3px;
+    background: var(--brass);
+  }
+  .nav__end {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+  .lang {
+    font-family: var(--display);
+    font-size: 0.85rem;
+    padding: 0.45rem 0.55rem;
+    box-shadow: inset 0 0 0 2px var(--line);
+  }
+  .nav__dl {
+    font-size: 0.85rem;
+    padding: 0.7em 1em 0.65em;
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .menu {
+    display: none;
+    position: relative;
+  }
+  .menu summary {
+    list-style: none;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-content: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu summary span {
+    width: 22px;
+    height: 3px;
+    background: var(--ink);
+    transition: transform 220ms var(--ease-out);
+  }
+  .menu[open] summary span:first-child {
+    transform: translateY(4.5px) rotate(45deg);
+  }
+  .menu[open] summary span:last-child {
+    transform: translateY(-4.5px) rotate(-45deg);
+  }
+  .menu__sheet {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 10px);
+    width: min(78vw, 300px);
+    display: grid;
+    padding: 0.5rem;
+    background: rgb(36 30 24 / 0.94);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 0 var(--px) #000, 0 18px 40px rgb(0 0 0 / 0.5);
+    transform-origin: top right;
+    animation: sheet-in 320ms var(--spring);
+  }
+  .menu__sheet a {
+    padding: 0.9rem 0.8rem;
+    color: var(--ink);
+    text-decoration: none;
+    font: 500 1.05rem/1 var(--body);
+  }
+  .menu__sheet a:active {
+    background: rgb(255 255 255 / 0.06);
+  }
+  .menu__sheet a[aria-current='page'] {
+    color: var(--brass);
+  }
+  @keyframes sheet-in {
+    from {
+      opacity: 0;
+      transform: scale(0.94) translateY(-6px);
+    }
+  }
+  @media (max-width: 980px) {
+    .links {
+      display: none;
+    }
+    .nav__end {
+      margin-left: auto;
+    }
+    .menu {
+      display: block;
+    }
+  }
+  @media (max-width: 520px) {
+    .nav__in {
+      gap: 0.75rem;
+      height: 64px;
+    }
+    .brand span {
+      font-size: 0.85rem;
+    }
+    .nav__dl {
+      display: none;
+    }
+    .nav__end {
+      gap: 0.5rem;
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .nav,
+    .menu__sheet {
+      background: var(--ground-2);
+      backdrop-filter: none;
+    }
+  }
+</style>

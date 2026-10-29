@@ -1,0 +1,53 @@
+---
+import { FALLBACK, ui, type Lang } from '../i18n/routes';
+interface Props {
+  lang: Lang;
+  big?: boolean;
+  note?: string;
+}
+const { lang, big = true, note } = Astro.props;
+const t = ui[lang];
+---
+
+<div class="dl">
+  <a class:list={['btn btn--brass', { 'btn--big': big }]} href={FALLBACK.url} data-download download>
+    <svg viewBox="0 0 10 10" aria-hidden="true" shape-rendering="crispEdges">
+      <path fill="currentColor" d="M4 0h2v5h2v1H7v1H6v1H4V7H3V6H2V5h2zM0 9h10v1H0z"></path>
+    </svg>
+    <span>{t.download} <span data-version>{FALLBACK.tag}</span></span>
+  </a>
+  <span class="dl__meta">
+    <span class="dl__badge" data-prerelease>{t.prerelease}</span>
+    <span>{note ?? 'Minecraft 1.21.1 · NeoForge'}</span>
+  </span>
+</div>
+
+<style>
+  .dl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.9rem 1.2rem;
+  }
+  .dl__meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    font: 400 0.78rem/1 var(--display);
+    color: var(--ink-3);
+  }
+  .dl__meta > span {
+    white-space: nowrap;
+  }
+  .dl__meta {
+    flex-wrap: wrap;
+  }
+  .dl__badge {
+    color: var(--amber);
+    padding: 0.4em 0.55em;
+    box-shadow: inset 0 0 0 2px currentColor;
+  }
+  .dl__badge[hidden] {
+    display: none;
+  }
+</style>

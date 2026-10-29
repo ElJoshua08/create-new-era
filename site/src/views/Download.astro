@@ -1,0 +1,234 @@
+---
+import Base from '../layouts/Base.astro';
+import DownloadButton from '../components/DownloadButton.astro';
+import SceneStage from '../components/SceneStage.astro';
+import { DOCS, REPO, routes, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  en: {
+    title: 'Download',
+    description: 'Download the latest Create: New Era jar for Minecraft 1.21.1, NeoForge and Create 6, with requirements and install steps.',
+    lede: 'The newest build, straight from the release.',
+    released: 'Released',
+    note: 'Creative worlds · Minecraft 1.21.1',
+    needsTitle: 'You’ll need',
+    needs: [
+      ['Minecraft', '1.21.1'],
+      ['NeoForge', '21.1.265 or newer'],
+      ['Create', '6.0.10 or newer'],
+      ['Create: Aeronautics', '1.3 or newer, with Sable 2.0 (optional)'],
+    ],
+    stepsTitle: 'Installing',
+    steps: [
+      'Install NeoForge 21.1.265 or newer for Minecraft 1.21.1.',
+      'Put Create 6.0.10 or newer in your mods folder.',
+      'Put the Create: New Era jar next to it.',
+      'Start the game and open a creative world. Everything is in the Create: New Era tab, right after Create’s own tabs. Hold W over an item to watch its Ponder scene.',
+    ],
+    warnTitle: 'Before you build',
+    warn: [
+      'This is a pre-release, made for creative. Some recipes are placeholders and the spool comes full from its recipe, so there’s no survival progression yet.',
+      'Worlds made with this version may need some repair after later updates. Try it in a test world, and keep a backup of anything you care about.',
+    ],
+    helpTitle: 'Help',
+    help: [
+      ['Documentation', DOCS],
+      ['Report a bug', `${REPO}/issues`],
+      ['Every release on GitHub', `${REPO}/releases`],
+    ],
+  },
+  es: {
+    title: 'Descargar',
+    description: 'Descarga el último jar de Create: New Era para Minecraft 1.21.1, NeoForge y Create 6, con requisitos y pasos de instalación.',
+    lede: 'La versión más reciente, directa de la publicación.',
+    released: 'Publicada el',
+    note: 'Mundos en creativo · Minecraft 1.21.1',
+    needsTitle: 'Necesitas',
+    needs: [
+      ['Minecraft', '1.21.1'],
+      ['NeoForge', '21.1.265 o posterior'],
+      ['Create', '6.0.10 o posterior'],
+      ['Create: Aeronautics', '1.3 o posterior, con Sable 2.0 (opcional)'],
+    ],
+    stepsTitle: 'Instalación',
+    steps: [
+      'Instala NeoForge 21.1.265 o posterior para Minecraft 1.21.1.',
+      'Pon Create 6.0.10 o posterior en la carpeta mods.',
+      'Pon el jar de Create: New Era a su lado.',
+      'Arranca el juego y abre un mundo en creativo. Lo tienes todo en la pestaña Create: New Era, justo después de las de Create. Mantén W sobre un objeto para ver su escena de Ponder.',
+    ],
+    warnTitle: 'Antes de ponerte a construir',
+    warn: [
+      'Es un prelanzamiento pensado para creativo. Algunas recetas son provisionales y la bobina sale llena de su receta, así que todavía no hay progresión de supervivencia.',
+      'Puede que los mundos hechos con esta versión necesiten algún arreglo tras próximas actualizaciones. Pruébalo en un mundo aparte y guarda una copia de lo que te importe.',
+    ],
+    helpTitle: 'Ayuda',
+    help: [
+      ['Documentación', DOCS],
+      ['Avisar de un fallo', `${REPO}/issues`],
+      ['Todas las versiones en GitHub', `${REPO}/releases`],
+    ],
+  },
+}[lang];
+---
+
+<Base lang={lang} page="download" title={copy.title} description={copy.description}>
+  <header class="page-head wrap dl-head">
+    <div>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.lede}</p>
+      <div class="dl-head__btn">
+        <DownloadButton lang={lang} note={copy.note} />
+      </div>
+      <p class="released">{copy.released} <span data-published>{lang === 'es' ? '29 de octubre de 2026' : '29 October 2026'}</span></p>
+    </div>
+    <SceneStage scene="power" alt="" class="dl-head__img" />
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap cols">
+      <div>
+        <h2>{copy.needsTitle}</h2>
+        <dl class="needs">
+          {
+            copy.needs.map(([k, v]) => (
+              <div>
+                <dt>{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+      <div>
+        <h2>{copy.stepsTitle}</h2>
+        <ol class="steps">
+          {copy.steps.map((s) => <li>{s}</li>)}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight warn-sec">
+    <div class="wrap cols">
+      <div>
+        <h2>{copy.warnTitle}</h2>
+        <div class="prose warn">
+          {copy.warn.map((w) => <p>{w}</p>)}
+        </div>
+      </div>
+      <div>
+        <h2>{copy.helpTitle}</h2>
+        <ul class="help">
+          {copy.help.map(([l, h]) => <li><a class="more" href={h}>{l}</a></li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .dl-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 2rem;
+    align-items: center;
+  }
+  .dl-head__btn {
+    margin-top: 2rem;
+  }
+  .released {
+    margin-top: 1rem;
+    color: var(--ink-3);
+    font-size: 0.95rem;
+  }
+  .dl-head :global(.dl-head__img) {
+    width: min(100%, 440px);
+    justify-self: end;
+  }
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .needs {
+    margin: 1.6rem 0 0;
+    display: grid;
+  }
+  .needs div {
+    display: grid;
+    grid-template-columns: 11rem 1fr;
+    gap: 1rem;
+    padding: 0.85rem 0;
+    box-shadow: inset 0 -2px 0 var(--line);
+  }
+  .needs dt {
+    font-weight: 600;
+  }
+  .needs dd {
+    margin: 0;
+    color: var(--ink-2);
+  }
+  .steps {
+    margin: 1.6rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: s;
+    display: grid;
+    gap: 1.1rem;
+  }
+  .steps li {
+    counter-increment: s;
+    display: grid;
+    grid-template-columns: 2.2rem 1fr;
+    gap: 0.8rem;
+    color: var(--ink-2);
+  }
+  .steps li::before {
+    content: counter(s);
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    font: 400 0.9rem/1 var(--display);
+    color: var(--brass-text);
+    background: var(--brass);
+    box-shadow: inset -3px -3px 0 var(--brass-deep), inset 3px 3px 0 var(--brass-hi);
+  }
+  .warn-sec {
+    background: var(--ground-2);
+  }
+  .warn {
+    margin-top: 1.4rem;
+  }
+  .warn p + p {
+    margin-top: 1em;
+  }
+  .help {
+    list-style: none;
+    padding: 0;
+    margin: 0.4rem 0 0;
+  }
+  .help .more {
+    margin-top: 1.1rem;
+  }
+  @media (max-width: 860px) {
+    .dl-head,
+    .cols {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .dl-head :global(.dl-head__img) {
+      display: none;
+    }
+    .needs div {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+</style>

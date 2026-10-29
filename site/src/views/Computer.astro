@@ -1,0 +1,601 @@
+---
+import Base from '../layouts/Base.astro';
+import SceneStage from '../components/SceneStage.astro';
+import { highlight } from '../scripts/lua';
+import { DOCS, routes, ui, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const soon = ui[lang].soon;
+
+const copy = {
+  en: {
+    title: 'The Brass Computer',
+    description: 'A Create machine that runs Lua. Power it with a shaft, write code in the in-game editor, read and drive redstone and every machine on the data bus.',
+    lede: 'A brass box with a screen on the front and a hole for a shaft in the back. Right-click it, write some Lua and press Run. The program keeps going after you close the editor and walk away.',
+    alt: 'A Brass Computer with a lit screen, turned by a shaft from a large cogwheel.',
+    speed: {
+      title: 'Faster shaft, faster code',
+      text: [
+        'The computer takes rotation like any Create machine and draws 2 SU per RPM. Its speed sets how much of each game tick your program gets: 2 ms at 256 RPM, 1 ms at 128.',
+        'Take the rotation away, or overstress the network, and the program pauses on the exact line it was on. When the shaft turns again it carries on from there.',
+        'A loop that forgets to sleep won’t hang the server either. It gets stopped at the end of its slice and picked up again on the next tick.',
+      ],
+      label: 'Shaft speed',
+      perTick: 'ms per tick',
+      stress: 'SU',
+      running: 'Running',
+      paused: 'Paused',
+    },
+    editor: {
+      title: 'An editor inside the game',
+      points: [
+        ['Tabs and files', 'Open several files at once. One file can load another with require, so a helper like lib/pid.lua lives in its own tab.'],
+        ['Suggestions as you type', 'Functions, variables and the names of the machines on the network, nearest first.'],
+        ['A console that points', 'Click an error and the editor jumps to the line that caused it.'],
+        ['Your layout', 'Drag the window, the console and the side panel to any size. It saves while you type.'],
+      ],
+      keysTitle: 'Keys you’ll use most',
+      keys: [
+        ['Ctrl+R', 'run'],
+        ['Ctrl+T', 'stop'],
+        ['Ctrl+Space', 'suggestions'],
+        ['Ctrl+/', 'comment lines'],
+      ],
+      window: { title: 'Brass Computer', files: 'Files', run: 'Run', stop: 'Stop', console: 'Console', redstone: 'Redstone', flows: 'Flows' },
+    },
+    red: {
+      title: 'Redstone on all six sides',
+      text: 'Sides are named from the computer’s front: front, back, left, right, top and bottom. Read what comes in as on or off, or as a level from 0 to 15, and send signals back out the same way. A new computer already has this program in it, so put a lamp on top and press Run.',
+    },
+    more: {
+      title: 'Also worth knowing',
+      items: [
+        'A program that was running when the world saved starts again from the top when it loads.',
+        'The usual Lua libraries are there: string, table, math, coroutine, utf8 and bit32.',
+        'Turn the computer with Create’s wrench and its sides turn with it.',
+        'Hold W over it in your inventory to watch its Ponder scene.',
+      ],
+    },
+    docs: 'Every function, in the docs',
+    next: 'Next: the data bus',
+  },
+  es: {
+    title: 'El ordenador de latón',
+    description: 'Una máquina de Create que ejecuta Lua. Muévela con un eje, escribe código en el editor del juego y controla la redstone y cualquier máquina del bus de datos.',
+    lede: 'Una caja de latón con una pantalla delante y un agujero para un eje detrás. Haz clic derecho, escribe un poco de Lua y dale a Ejecutar. El programa sigue funcionando aunque cierres el editor y te vayas.',
+    alt: 'Un ordenador de latón con la pantalla encendida, movido por un eje que sale de un engranaje grande.',
+    speed: {
+      title: 'Más rápido gira, más rápido va',
+      text: [
+        'El ordenador recibe rotación como cualquier máquina de Create y consume 2 SU por RPM. La velocidad decide cuánto de cada tick del juego tiene tu programa: 2 ms a 256 RPM, 1 ms a 128.',
+        'Si le quitas la rotación o sobrecargas la red, el programa se pausa en la misma línea en la que estaba. Cuando el eje vuelve a girar, sigue desde ahí.',
+        'Un bucle sin sleep tampoco cuelga el servidor. Se detiene al acabar su porción de tiempo y continúa en el siguiente tick.',
+      ],
+      label: 'Velocidad del eje',
+      perTick: 'ms por tick',
+      stress: 'SU',
+      running: 'En marcha',
+      paused: 'En pausa',
+    },
+    editor: {
+      title: 'Un editor dentro del juego',
+      points: [
+        ['Pestañas y archivos', 'Abre varios archivos a la vez. Uno puede cargar otro con require, así que una ayuda como lib/pid.lua vive en su propia pestaña.'],
+        ['Sugerencias al escribir', 'Funciones, variables y los nombres de las máquinas de la red, de la más cercana a la más lejana.'],
+        ['Una consola que te lleva', 'Haz clic en un error y el editor salta a la línea que lo ha provocado.'],
+        ['A tu manera', 'Ajusta el tamaño de la ventana, la consola y el panel lateral arrastrando. Guarda mientras escribes.'],
+      ],
+      keysTitle: 'Las teclas que más vas a usar',
+      keys: [
+        ['Ctrl+R', 'ejecutar'],
+        ['Ctrl+T', 'parar'],
+        ['Ctrl+Espacio', 'sugerencias'],
+        ['Ctrl+/', 'comentar líneas'],
+      ],
+      window: { title: 'Ordenador de latón', files: 'Archivos', run: 'Ejecutar', stop: 'Parar', console: 'Consola', redstone: 'Redstone', flows: 'Flujos' },
+    },
+    red: {
+      title: 'Redstone por las seis caras',
+      text: 'Los lados se nombran desde el frente del ordenador: front, back, left, right, top y bottom. Lee lo que entra como encendido o apagado, o como un nivel de 0 a 15, y saca señales de la misma forma. Un ordenador nuevo ya trae este programa, así que ponle una lámpara encima y dale a Ejecutar.',
+    },
+    more: {
+      title: 'Y además',
+      items: [
+        'Si un programa estaba en marcha al guardar el mundo, vuelve a empezar desde arriba al cargarlo.',
+        'Tienes las librerías de siempre de Lua: string, table, math, coroutine, utf8 y bit32.',
+        'Gira el ordenador con la llave inglesa de Create y sus lados giran con él.',
+        'Mantén W sobre él en el inventario para ver su escena de Ponder.',
+      ],
+    },
+    docs: 'Todas las funciones, en la documentación',
+    next: 'Siguiente: el bus de datos',
+  },
+}[lang];
+
+const blink = `while true do
+  redstone.setOutput("top", true)
+  sleep(0.5)
+  redstone.setOutput("top", false)
+  sleep(0.5)
+end`;
+const mainLua = lang === 'es'
+  ? `local pid = require("lib.pid")
+local motor = bus.get("creative_motor")
+local tanque = bus.get("fluid_tank")
+
+while true do
+  local nivel = tanque.fluids()[1].amount
+  motor.setSpeed(pid.step(4000, nivel))
+  sleep(0.25)
+end`
+  : `local pid = require("lib.pid")
+local motor = bus.get("creative_motor")
+local tank = bus.get("fluid_tank")
+
+while true do
+  local level = tank.fluids()[1].amount
+  motor.setSpeed(pid.step(4000, level))
+  sleep(0.25)
+end`;
+const w = copy.editor.window;
+---
+
+<Base lang={lang} page="computer" title={copy.title} description={copy.description}>
+  <header class="page-head wrap">
+    <h1>{copy.title}</h1>
+    <p class="lede">{copy.lede}</p>
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap split">
+      <div>
+        <h2>{copy.speed.title}</h2>
+        <div class="prose speed__text">
+          {copy.speed.text.map((t) => <p>{t}</p>)}
+        </div>
+      </div>
+      <SceneStage scene="power" alt={copy.alt} demo="power" class="power">
+        <div class="window gauge">
+          <div class="window__body gauge__body">
+            <label class="gauge__label" for="rpm">{copy.speed.label}</label>
+            <input id="rpm" type="range" min="0" max="256" step="8" value="128" />
+            <div class="gauge__read">
+              <span><b data-rpm>128</b> RPM</span>
+              <span><b data-ms>1.00</b> {copy.speed.perTick}</span>
+              <span><b data-su>256</b> {copy.speed.stress}</span>
+              <span class="gauge__state" data-state data-running={copy.speed.running} data-paused={copy.speed.paused} data-on="true">{copy.speed.running}</span>
+            </div>
+            <div class="slice" data-slice aria-hidden="true"><span></span></div>
+          </div>
+        </div>
+      </SceneStage>
+    </div>
+  </section>
+
+  <section class="section editor-sec">
+    <div class="wrap">
+      <h2>{copy.editor.title}</h2>
+      <div class="ed-grid">
+        <div class="window big-editor" aria-hidden="true">
+          <div class="window__bar">
+            <img src="/img/items/create_new_era_brass_computer.png" alt="" width="16" height="16" />
+            {w.title}
+          </div>
+          <div class="be">
+            <div class="be__activity">
+              <span class="on" title={w.files}><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h4l2 2v6H1zM2 1v6h4V3H4V1z" /></svg></span>
+              <span title={w.redstone}><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="#e0402a" d="M3 0h2v3h3v2H5v3H3V5H0V3h3z" /></svg></span>
+              <span title={w.flows}><svg viewBox="0 0 8 8" shape-rendering="crispEdges"><path fill="currentColor" d="M0 1h3v2H0zM5 5h3v2H5zM3 2h2v4h1v1H4V3H3z" /></svg></span>
+            </div>
+            <div class="be__side">
+              <span class="be__head">{w.files}</span>
+              <span class="be__file on">main.lua</span>
+              <span class="be__dir">lib</span>
+              <span class="be__file in">pid.lua</span>
+              <span class="be__file">startup.lua</span>
+            </div>
+            <div class="be__main">
+              <div class="be__tabs">
+                <span class="on">main.lua</span><span>pid.lua</span>
+                <span class="be__tools"><span class="ebtn ebtn--run">&#9654; {w.run}</span><span class="ebtn">&#9632; {w.stop}</span></span>
+              </div>
+              <div class="be__code">
+                <pre class="be__gutter">{mainLua.split('\n').map((_, i) => i + 1).join('\n')}</pre>
+                <pre class="be__text codeblock-inline"><code set:html={highlight(mainLua)} /></pre>
+                <ul class="be__suggest">
+                  <li class="hit">fluid_tank</li>
+                  <li>creative_motor</li>
+                  <li>item_vault</li>
+                </ul>
+              </div>
+              <div class="be__console">
+                <span class="be__head">{w.console}</span>
+                <div class="ok">&gt; main.lua</div>
+                <div class="err">main.lua:6: attempt to index a nil value</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ed-points">
+          {
+            copy.editor.points.map(([h, t]) => (
+              <div>
+                <h3>{h}</h3>
+                <p>{t}</p>
+              </div>
+            ))
+          }
+          <div class="keys">
+            <h3>{copy.editor.keysTitle}</h3>
+            <ul>
+              {copy.editor.keys.map(([k, v]) => <li><kbd>{k}</kbd> {v}</li>)}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight red-sec">
+    <div class="wrap split">
+      <div>
+        <h2>{copy.red.title}</h2>
+        <p class="prose red__p">{copy.red.text}</p>
+      </div>
+      <pre class="codeblock"><code set:html={highlight(blink)} /></pre>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap more-sec">
+      <h2>{copy.more.title}</h2>
+      <ul class="more-list">
+        {copy.more.items.map((t) => <li>{t}</li>)}
+      </ul>
+      <div class="links">
+        <a class="more" href={`${DOCS}`}>{copy.docs}</a>
+        <a class="more" href={routes.bus[lang]}>{copy.next}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/demos';
+</script>
+
+<style>
+  .speed__text {
+    margin-top: 1.2rem;
+  }
+  .gauge {
+    margin: -6% 0 0 auto;
+    width: min(100%, 440px);
+    position: relative;
+    z-index: 2;
+  }
+  .gauge__body {
+    padding: 1.1rem 1.2rem 1.2rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .gauge__label {
+    font: 400 0.8rem/1 var(--display);
+    color: #e9e2d4;
+  }
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 32px;
+    background: transparent;
+    margin: 0;
+    cursor: pointer;
+    --k: 0.5;
+  }
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 12px;
+    background: linear-gradient(90deg, var(--brass) calc(var(--k) * 100%), #222 0);
+    box-shadow: 0 0 0 3px #000, inset 0 3px 0 rgb(0 0 0 / 0.35);
+  }
+  input[type='range']::-moz-range-track {
+    height: 12px;
+    background: linear-gradient(90deg, var(--brass) calc(var(--k) * 100%), #222 0);
+    box-shadow: 0 0 0 3px #000;
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 30px;
+    margin-top: -9px;
+    background: var(--stone);
+    border: 0;
+    box-shadow: inset -3px -3px 0 var(--stone-lo), inset 3px 3px 0 #fff, 0 0 0 3px #000;
+    transition: transform 90ms var(--ease-out);
+  }
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 22px;
+    height: 30px;
+    border: 0;
+    border-radius: 0;
+    background: var(--stone);
+    box-shadow: inset -3px -3px 0 var(--stone-lo), inset 3px 3px 0 #fff, 0 0 0 3px #000;
+  }
+  .gauge__read {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.2rem;
+    font: 400 0.78rem/1.2 var(--display);
+    color: #cfc7b8;
+  }
+  .gauge__read b {
+    font-weight: 400;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .gauge__state {
+    margin-left: auto;
+    color: var(--green);
+  }
+  .gauge__state[data-on='false'] {
+    color: var(--amber);
+  }
+  .slice {
+    height: 10px;
+    background: #191919;
+    box-shadow: inset 0 0 0 2px #000;
+    position: relative;
+  }
+  .slice span {
+    position: absolute;
+    inset: 2px auto 2px 2px;
+    width: calc((100% - 4px) * var(--k, 0.5));
+    background: repeating-linear-gradient(90deg, var(--green) 0 6px, #4fa53a 6px 8px);
+    transition: width 220ms var(--ease-out);
+  }
+
+  .editor-sec {
+    background: var(--ground-2);
+  }
+  .ed-grid {
+    margin-top: 2.5rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 64px);
+    align-items: start;
+  }
+  .big-editor .window__bar img {
+    width: 16px;
+    height: 16px;
+    image-rendering: pixelated;
+  }
+  .be {
+    margin-top: var(--px);
+    display: grid;
+    grid-template-columns: 30px 128px minmax(0, 1fr);
+    background: var(--code);
+    font: 400 0.74rem/1.6 var(--display);
+    color: #c8c8c8;
+    min-height: 340px;
+  }
+  .be__activity {
+    background: #333;
+    display: grid;
+    align-content: start;
+    gap: 4px;
+    padding-top: 6px;
+  }
+  .be__activity span {
+    display: grid;
+    place-items: center;
+    height: 28px;
+    color: #8a8a8a;
+  }
+  .be__activity span.on {
+    color: #fff;
+    box-shadow: inset 2px 0 0 var(--brass);
+  }
+  .be__activity svg {
+    width: 14px;
+    height: 14px;
+  }
+  .be__side {
+    background: #252526;
+    display: grid;
+    align-content: start;
+    padding: 8px 0;
+  }
+  .be__head {
+    color: #8a8a8a;
+    padding: 0 10px 4px;
+    display: block;
+  }
+  .be__file,
+  .be__dir {
+    padding: 1px 10px;
+    white-space: nowrap;
+  }
+  .be__dir::before {
+    content: '▾ ';
+    color: #8a8a8a;
+  }
+  .be__file.in {
+    padding-left: 22px;
+  }
+  .be__file.on {
+    background: #094771;
+    color: #fff;
+  }
+  .be__main {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-width: 0;
+  }
+  .be__tabs {
+    display: flex;
+    background: #262626;
+    align-items: stretch;
+  }
+  .be__tabs > span {
+    padding: 6px 12px;
+    color: #9a9a9a;
+  }
+  .be__tabs > span.on {
+    background: #383838;
+    color: #fff;
+    box-shadow: inset 0 2px 0 var(--brass);
+  }
+  .be__tools {
+    margin-left: auto;
+    display: flex !important;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 6px !important;
+  }
+  .ebtn {
+    font: 400 0.64rem/1 var(--display);
+    padding: 0.45em 0.7em 0.4em;
+    color: #2a2a2a;
+    background: var(--stone);
+    box-shadow: inset -2px -2px 0 var(--stone-lo), inset 2px 2px 0 #fff;
+  }
+  .ebtn--run {
+    background: #7cc95a;
+    box-shadow: inset -2px -2px 0 #2f6a1d, inset 2px 2px 0 #b9f29c;
+    color: #11300a;
+  }
+  .be__code {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 8px 0;
+  }
+  .be__code pre {
+    margin: 0;
+    font: inherit;
+  }
+  .be__gutter {
+    color: #5a5a5a;
+    text-align: right;
+    padding: 0 10px;
+  }
+  .be__text {
+    overflow: hidden;
+    color: #d4d4d4;
+  }
+  .be__text :global(.k) { color: #f0c060; }
+  .be__text :global(.s) { color: #a6e07a; }
+  .be__text :global(.n) { color: #ef9a6a; }
+  .be__text :global(.c) { color: #8f8f8f; }
+  .be__text :global(.f) { color: #dcdcaa; }
+  .be__suggest {
+    position: absolute;
+    left: calc(2ch + 20px + 22ch);
+    top: calc(8px + 3 * 1.6em);
+    margin: 0;
+    padding: 3px;
+    list-style: none;
+    background: #252526;
+    box-shadow: 0 0 0 1px #454545, 0 8px 20px rgb(0 0 0 / 0.5);
+  }
+  .be__suggest li {
+    padding: 1px 8px;
+  }
+  .be__suggest li::before {
+    content: '';
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 7px;
+    background: var(--amber);
+  }
+  .be__suggest li.hit {
+    background: #094771;
+    color: #fff;
+  }
+  .be__console {
+    border-top: 3px solid #000;
+    background: #181818;
+    padding: 6px 10px 10px;
+    font-size: 0.68rem;
+  }
+  .be__console .be__head {
+    padding: 0 0 2px;
+  }
+  .be__console .ok {
+    color: var(--green);
+  }
+  .be__console .err {
+    color: #ff6a4a;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .ed-points {
+    display: grid;
+    gap: 1.6rem;
+  }
+  .ed-points p {
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+  }
+  .keys ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.8rem 0 0;
+    display: grid;
+    gap: 0.7rem;
+    color: var(--ink-2);
+  }
+  .red__p {
+    margin-top: 1.2rem;
+  }
+  .more-list {
+    margin: 1.8rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem 3rem;
+    color: var(--ink-2);
+    max-width: 60rem;
+  }
+  .more-list li {
+    padding-top: 1rem;
+    box-shadow: inset 0 3px 0 var(--line);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.5rem;
+    margin-top: 1rem;
+  }
+  @media (max-width: 980px) {
+    .ed-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 640px) {
+    .be {
+      grid-template-columns: 30px minmax(0, 1fr);
+      font-size: 0.62rem;
+    }
+    .be__side {
+      display: none;
+    }
+    .be__suggest {
+      left: calc(1ch + 20px + 16ch);
+    }
+    .more-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .gauge {
+      margin-top: 12px;
+    }
+  }
+</style>

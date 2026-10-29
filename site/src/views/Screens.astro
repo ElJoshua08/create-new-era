@@ -1,0 +1,295 @@
+---
+import Base from '../layouts/Base.astro';
+import SceneStage from '../components/SceneStage.astro';
+import { routes, ui, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const soon = ui[lang].soon;
+
+const copy = {
+  en: {
+    title: 'Screens and panels',
+    description: 'Brass Screens that join into one big display of flip pixels, and panel controls for building control desks in a Create factory.',
+    lede: 'Brass Screens that join into one big display, and small controls for building a desk to run the factory from. Both are in the game today. Hooking them up to your programs comes next.',
+    screens: {
+      title: 'One pane, however big',
+      text: [
+        'Screens facing the same way join up and the brass frame between them disappears, so any rectangle of them reads as a single display. Turn one with a wrench and it joins whatever it now lines up with.',
+        'Each block holds 48 by 48 flip pixels that turn over when they change. You can have square plates or round discs, whichever you prefer, in the client config.',
+      ],
+      apart: 'Apart',
+      joined: 'Joined',
+      draw: 'Draw on the pixels with your mouse or finger. Programs will be able to do the same.',
+      clear: 'Clear',
+      alt: 'A wall of twelve Brass Screens, four wide and three high, joined into one pane.',
+    },
+    panels: {
+      title: 'Build a control desk',
+      text: 'Each control is a control plate with one part on it, and it sits on floors, walls or ceilings. Put a few next to each other and you have a desk.',
+      soonText: 'Programs reading the controls and driving the lamps, digits and gauges',
+      alt: 'A control desk on andesite and brass casings with every panel control on it.',
+      items: [
+        ['panel_button', 'Button', 'A push button for programs to react to.'],
+        ['panel_switch', 'Switch', 'An on/off lever.'],
+        ['panel_knob', 'Knob', 'A rotary knob that dials in a value.'],
+        ['panel_slider', 'Slider', 'A fader from 0 to 100%.'],
+        ['panel_lamp', 'Lamp', 'A light your program switches on.'],
+        ['nixie_digit', 'Nixie digit', 'One glowing digit. Line several up for a number.'],
+        ['panel_gauge', 'Gauge', 'A needle that points at a value.'],
+        ['panel_keypad', 'Keypad', 'For typing numbers into a program.'],
+      ],
+    },
+    soonTitle: 'Coming to screens',
+    soonItems: [
+      ['Drawing from programs', 'Text, numbers, bars and graphs on any pane, with a small UI library for dashboards that look good without much code.'],
+      ['Linked Typewriter support', 'Type into a running program from a Linked Typewriter.'],
+    ],
+    next: 'What else is planned',
+  },
+  es: {
+    title: 'Pantallas y paneles',
+    description: 'Pantallas de latón que se juntan en una gran pantalla de píxeles giratorios, y controles de panel para montar pupitres de control en tu fábrica de Create.',
+    lede: 'Pantallas de latón que se juntan en una sola pantalla grande y pequeños controles para montar un pupitre desde el que manejar la fábrica. Las dos cosas ya están en el juego. Conectarlas a tus programas es lo siguiente.',
+    screens: {
+      title: 'Un solo panel, del tamaño que quieras',
+      text: [
+        'Las pantallas que miran al mismo lado se juntan y el marco de latón entre ellas desaparece, así que cualquier rectángulo de pantallas se ve como una sola. Gira una con la llave inglesa y se unirá a las que queden alineadas con ella.',
+        'Cada bloque tiene 48 por 48 píxeles giratorios que se dan la vuelta al cambiar. Pueden ser placas cuadradas o discos redondos, como prefieras, en la configuración del cliente.',
+      ],
+      apart: 'Separadas',
+      joined: 'Juntas',
+      draw: 'Dibuja en los píxeles con el ratón o con el dedo. Los programas podrán hacer lo mismo.',
+      clear: 'Borrar',
+      alt: 'Una pared de doce pantallas de latón, cuatro de ancho y tres de alto, unidas en un solo panel.',
+    },
+    panels: {
+      title: 'Monta un pupitre de control',
+      text: 'Cada control es una placa de control con una pieza encima, y va en suelos, paredes o techos. Pon unos cuantos juntos y ya tienes un pupitre.',
+      soonText: 'Que los programas lean los controles y manejen pilotos, dígitos e indicadores',
+      alt: 'Un pupitre de control sobre revestimientos de andesita y latón con todos los controles de panel.',
+      items: [
+        ['panel_button', 'Pulsador', 'Un botón al que pueden reaccionar los programas.'],
+        ['panel_switch', 'Interruptor', 'Una palanca de encendido y apagado.'],
+        ['panel_knob', 'Mando giratorio', 'Una rueda para ajustar un valor.'],
+        ['panel_slider', 'Deslizador', 'Un fader del 0 al 100 %.'],
+        ['panel_lamp', 'Piloto', 'Una luz que enciende tu programa.'],
+        ['nixie_digit', 'Dígito nixie', 'Un dígito que brilla. Pon varios en fila para formar un número.'],
+        ['panel_gauge', 'Indicador de aguja', 'Una aguja que señala un valor.'],
+        ['panel_keypad', 'Teclado', 'Para meter números en un programa.'],
+      ],
+    },
+    soonTitle: 'Lo que llega a las pantallas',
+    soonItems: [
+      ['Dibujar desde los programas', 'Texto, números, barras y gráficas en cualquier panel, con una pequeña librería para hacer paneles de control que se vean bien sin mucho código.'],
+      ['Compatibilidad con la Linked Typewriter', 'Escribe en un programa en marcha desde una Linked Typewriter.'],
+    ],
+    next: 'Qué más está en camino',
+  },
+}[lang];
+const s = copy.screens;
+---
+
+<Base lang={lang} page="screens" title={copy.title} description={copy.description}>
+  <header class="page-head wrap">
+    <h1>{copy.title}</h1>
+    <p class="lede">{copy.lede}</p>
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap split split--flip">
+      <div>
+        <h2>{s.title}</h2>
+        <div class="prose sp">
+          {s.text.map((t) => <p>{t}</p>)}
+        </div>
+      </div>
+      <SceneStage scene="wall" alt={s.alt} demo="wall" class="wall">
+        <div class="wall__controls">
+          <div class="seg" role="group">
+            <button type="button" data-join="off" aria-pressed="false">{s.apart}</button>
+            <button type="button" data-join="on" aria-pressed="true">{s.joined}</button>
+          </div>
+          <button type="button" class="btn wall__clear" data-clear>{s.clear}</button>
+        </div>
+        <p class="wall__hint"><span class="soon">{soon}</span> {s.draw}</p>
+      </SceneStage>
+    </div>
+  </section>
+
+  <section class="section panels">
+    <div class="wrap">
+      <div class="split">
+        <div>
+          <h2>{copy.panels.title}</h2>
+          <p class="prose sp">{copy.panels.text}</p>
+          <p class="panels__soon"><span class="soon">{soon}</span> {copy.panels.soonText}</p>
+        </div>
+        <SceneStage scene="desk" alt={copy.panels.alt} />
+      </div>
+      <ul class="controls">
+        {
+          copy.panels.items.map(([id, name, text]) => (
+            <li>
+              <img src={`/img/items/create_new_era_${id}.png`} alt="" width="48" height="48" loading="lazy" />
+              <div>
+                <h3>{name}</h3>
+                <p>{text}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap">
+      <h2>{copy.soonTitle}</h2>
+      <ul class="next">
+        {
+          copy.soonItems.map(([h, t]) => (
+            <li>
+              <h3>
+                {h} <span class="soon">{soon}</span>
+              </h3>
+              <p>{t}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="more" href={routes.roadmap[lang]}>{copy.next}</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/demos';
+</script>
+
+<style>
+  .sp {
+    margin-top: 1.2rem;
+  }
+  .sp p + p {
+    margin-top: 1em;
+  }
+  .wall :global(.stage) {
+    max-width: 560px;
+    margin-inline: auto;
+  }
+  .wall__controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .seg {
+    display: inline-flex;
+    padding: 4px;
+    background: #000;
+    gap: 4px;
+  }
+  .seg button {
+    font: 400 0.82rem/1 var(--display);
+    padding: 0.75em 1em 0.7em;
+    border: 0;
+    cursor: pointer;
+    background: #3a3a3a;
+    color: #cfcfcf;
+    box-shadow: inset -3px -3px 0 #222, inset 3px 3px 0 #555;
+    transition: transform 90ms var(--ease-out);
+  }
+  .seg button:active {
+    transform: translateY(2px);
+  }
+  .seg button[aria-pressed='true'] {
+    background: var(--brass);
+    color: var(--brass-text);
+    box-shadow: inset -3px -3px 0 var(--brass-deep), inset 3px 3px 0 var(--brass-hi);
+  }
+  .wall__clear {
+    font-size: 0.82rem;
+    padding: 0.75em 1em 0.7em;
+  }
+  :global([data-apart]) .wall__clear,
+  :global([data-apart]) .wall__hint {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .wall__hint {
+    margin-top: 1rem;
+    text-align: center;
+    color: var(--ink-3);
+    font-size: 0.98rem;
+    transition: opacity 200ms;
+  }
+  .panels {
+    background: var(--ground-2);
+  }
+  .panels__soon {
+    margin-top: 1.2rem;
+    color: var(--ink-3);
+    font-size: 1rem;
+  }
+  .controls {
+    list-style: none;
+    padding: 0;
+    margin: clamp(32px, 5vw, 64px) 0 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem 2rem;
+  }
+  .controls li {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 0.9rem;
+    align-items: start;
+  }
+  .controls img {
+    image-rendering: pixelated;
+    width: 48px;
+    height: 48px;
+  }
+  .controls p {
+    margin-top: 0.3rem;
+    color: var(--ink-2);
+    font-size: 1rem;
+  }
+  .next {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.8rem 3rem;
+  }
+  .next h3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    align-items: center;
+  }
+  .next .soon {
+    vertical-align: 0;
+  }
+  .next p {
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+  }
+  @media (max-width: 1000px) {
+    .controls {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .controls,
+    .next {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

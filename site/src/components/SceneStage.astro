@@ -1,0 +1,37 @@
+---
+import fs from 'node:fs';
+interface Props {
+  scene: string;
+  alt: string;
+  demo?: string;
+  class?: string;
+}
+const { scene, alt, demo, class: cls } = Astro.props;
+const meta = JSON.parse(fs.readFileSync(new URL(`../../public/scenes/${scene}/scene.json`, import.meta.url), 'utf8'));
+---
+
+<div class:list={['scene-demo', cls]} data-demo={demo}>
+  <div class="stage scene-demo__stage" style={`aspect-ratio:${meta.width}/${meta.height}`}>
+    <img src={`/scenes/${scene}/base.png`} width={meta.width} height={meta.height} alt={alt} loading="lazy" decoding="async" />
+    {demo && <canvas hidden aria-hidden="true" />}
+  </div>
+  <slot />
+</div>
+
+<style>
+  .scene-demo__stage img,
+  .scene-demo__stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  [data-demo='wall'] canvas {
+    touch-action: none;
+  }
+  @media (pointer: coarse) {
+    [data-demo='wall'] canvas {
+      touch-action: pan-y;
+    }
+  }
+</style>

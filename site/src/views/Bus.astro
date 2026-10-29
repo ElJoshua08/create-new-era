@@ -1,0 +1,370 @@
+---
+import Base from '../layouts/Base.astro';
+import SceneStage from '../components/SceneStage.astro';
+import { highlight } from '../scripts/lua';
+import { DOCS, routes, ui, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const soon = ui[lang].soon;
+
+const dyes = [
+  { id: 'copper', en: 'Bare copper', es: 'Cobre sin teñir' },
+  { id: 'orange', en: 'Orange', es: 'Naranja' },
+  { id: 'light_blue', en: 'Light blue', es: 'Azul claro' },
+  { id: 'lime', en: 'Lime', es: 'Lima' },
+  { id: 'magenta', en: 'Magenta', es: 'Magenta' },
+  { id: 'white', en: 'White', es: 'Blanco' },
+  { id: 'red', en: 'Red', es: 'Rojo' },
+];
+
+const copy = {
+  en: {
+    title: 'The data bus',
+    description: 'Data ports that stick to any block, cables you lay with a spool, and drivers that let Lua programs read and control Create machines.',
+    lede: 'Small ports on your machines, cables between them, and a computer that can see everything on the line.',
+    alt: 'A Brass Computer with a port expansion on top, cabled to a fluid tank, an item vault and an encased fan.',
+    ports: {
+      title: 'A port fits on anything',
+      text: [
+        'A data port goes on any face of any block, Create machines included, and the block keeps working exactly as before.',
+        'As an output, with an amber light, it lets programs read the block. Turn it with a wrench and it becomes an input, with a green light, so programs can give the block orders.',
+        'The Brass Computer has four ports of its own, already in the sockets on its sides. A port expansion adds four more, and a computer takes up to three.',
+      ],
+    },
+    cables: {
+      title: 'Cable you lay by hand',
+      text: [
+        'Click a port with a spool, then another one. The cable hangs between them, up to 24 blocks across. Sneak on the second click and it runs flat along the faces in between instead. A splice joins cables partway along a run.',
+        'Dyed cable only joins cable of the same colour, so two networks can share a wall without mixing. Bare copper joins any colour. If you’d rather not see a run, wrap it in andesite, brass or copper casing.',
+      ],
+      pick: 'Dye the hanging network',
+    },
+    drivers: {
+      title: 'What a program can do with a machine',
+      intro: 'Each kind of machine brings its own functions. A program finds machines with bus.list(), nearest first, or by name with bus.get().',
+      rows: [
+        ['Anything that turns', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) and getTargetSpeed() on machines with a speed setting, like the Creative Motor'],
+        ['Inventories', 'items(), count(item), getSlots()', 'Chests, vaults, depots and anything else that holds items'],
+        ['Tanks', 'fluids()', 'The name, amount and capacity of every tank in the block'],
+        ['Any device', 'onChange(fn)', 'Runs your function each time the device changes. The program keeps listening after its main code ends.'],
+      ],
+      head: ['Machine', 'Functions', 'Notes'],
+    },
+    next: {
+      title: 'Coming to the bus',
+      items: [
+        ['Wireless towers and antennas', 'For machines too far away to cable.'],
+        ['A Flows panel in the editor', 'Live data moving between your machines and your program.'],
+        ['Focus mode', 'A placement mode for putting ports on crowded machines.'],
+        ['The spool winder', 'A machine that winds cable for survival. For now a spool comes full from its recipe.'],
+      ],
+    },
+    docs: 'The bus API in the docs',
+    screens: 'Next: screens and panels',
+  },
+  es: {
+    title: 'El bus de datos',
+    description: 'Puertos de datos que se pegan a cualquier bloque, cables que tiendes con una bobina y drivers para que tus programas en Lua lean y controlen máquinas de Create.',
+    lede: 'Pequeños puertos en tus máquinas, cables entre ellos y un ordenador que ve todo lo que hay en la línea.',
+    alt: 'Un ordenador de latón con una ampliación de puertos encima, cableado a un depósito de fluidos, una bóveda de objetos y un ventilador revestido.',
+    ports: {
+      title: 'Un puerto va en cualquier cosa',
+      text: [
+        'Un puerto de datos se pone en cualquier cara de cualquier bloque, máquinas de Create incluidas, y el bloque sigue funcionando exactamente igual.',
+        'En salida, con la luz ámbar, deja que los programas lean el bloque. Gíralo con la llave inglesa y pasa a entrada, con la luz verde, para que los programas le den órdenes.',
+        'El ordenador de latón trae cuatro puertos propios, ya puestos en los huecos de sus lados. Cada ampliación de puertos añade cuatro más, y un ordenador admite hasta tres.',
+      ],
+    },
+    cables: {
+      title: 'Cable tendido a mano',
+      text: [
+        'Haz clic en un puerto con una bobina y luego en otro. El cable queda colgando entre los dos, hasta 24 bloques. Si te agachas en el segundo clic, va pegado a las caras que hay por medio. Un empalme une cables a mitad de recorrido.',
+        'El cable teñido solo se une con cable del mismo color, así que dos redes pueden compartir pared sin mezclarse. El cobre sin teñir se une con todos. Si prefieres no verlo, mételo en un revestimiento de andesita, latón o cobre.',
+      ],
+      pick: 'Tiñe la red que cuelga',
+    },
+    drivers: {
+      title: 'Qué puede hacer un programa con una máquina',
+      intro: 'Cada tipo de máquina trae sus funciones. Un programa encuentra las máquinas con bus.list(), de la más cercana a la más lejana, o por su nombre con bus.get().',
+      rows: [
+        ['Todo lo que gira', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) y getTargetSpeed() en máquinas con ajuste de velocidad, como el motor creativo'],
+        ['Inventarios', 'items(), count(objeto), getSlots()', 'Cofres, bóvedas, depósitos y cualquier cosa que guarde objetos'],
+        ['Tanques', 'fluids()', 'El nombre, la cantidad y la capacidad de cada tanque del bloque'],
+        ['Cualquier dispositivo', 'onChange(fn)', 'Ejecuta tu función cada vez que el dispositivo cambia. El programa sigue escuchando aunque su código principal haya terminado.'],
+      ],
+      head: ['Máquina', 'Funciones', 'Notas'],
+    },
+    next: {
+      title: 'Lo que llega al bus',
+      items: [
+        ['Torres y antenas inalámbricas', 'Para las máquinas que están demasiado lejos para cablearlas.'],
+        ['Un panel de flujos en el editor', 'Los datos que van y vienen entre tus máquinas y tu programa, en directo.'],
+        ['Modo enfoque', 'Un modo de colocación para poner puertos en máquinas con poco sitio.'],
+        ['La bobinadora', 'Una máquina que enrolla cable para supervivencia. De momento la bobina sale llena de su receta.'],
+      ],
+    },
+    docs: 'La API del bus en la documentación',
+    screens: 'Siguiente: pantallas y paneles',
+  },
+}[lang];
+
+const listCode =
+  lang === 'es'
+    ? `for _, d in ipairs(bus.list()) do
+  print(d.name, d.type, d.distance)
+end
+
+local tanque = bus.get("fluid_tank")
+tanque.onChange(function(t)
+  print("agua:", t.fluids()[1].amount)
+end)`
+    : `for _, d in ipairs(bus.list()) do
+  print(d.name, d.type, d.distance)
+end
+
+local tank = bus.get("fluid_tank")
+tank.onChange(function(t)
+  print("water:", t.fluids()[1].amount)
+end)`;
+---
+
+<Base lang={lang} page="bus" title={copy.title} description={copy.description}>
+  <header class="page-head wrap">
+    <h1>{copy.title}</h1>
+    <p class="lede">{copy.lede}</p>
+  </header>
+
+  <section class="section--tight">
+    <div class="wrap split">
+      <div>
+        <h2>{copy.ports.title}</h2>
+        <div class="prose sp">
+          {copy.ports.text.map((t) => <p>{t}</p>)}
+        </div>
+      </div>
+      <SceneStage scene="bus" alt={copy.alt} demo="dyes">
+        <div class="dyes" role="group" aria-label={copy.cables.pick}>
+          <span class="dyes__label">{copy.cables.pick}</span>
+          <div class="dyes__row">
+            {
+              dyes.map((d) => (
+                <button type="button" data-dye={d.id} aria-pressed="false" title={d[lang]} aria-label={d[lang]} style={`background-image:url(/img/cable/${d.id}.png)`} />
+              ))
+            }
+          </div>
+        </div>
+      </SceneStage>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap cables">
+      <h2>{copy.cables.title}</h2>
+      <div class="prose sp cables__text">
+        {copy.cables.text.map((t) => <p>{t}</p>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section drivers">
+    <div class="wrap">
+      <h2>{copy.drivers.title}</h2>
+      <p class="prose sp">{copy.drivers.intro}</p>
+      <div class="drivers__grid">
+        <table>
+          <thead>
+            <tr>{copy.drivers.head.map((h) => <th scope="col">{h}</th>)}</tr>
+          </thead>
+          <tbody>
+            {
+              copy.drivers.rows.map(([m, f, n]) => (
+                <tr>
+                  <th scope="row">{m}</th>
+                  <td><code>{f}</code></td>
+                  <td>{n}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+        <pre class="codeblock"><code set:html={highlight(listCode)} /></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap">
+      <h2>{copy.next.title}</h2>
+      <ul class="next">
+        {
+          copy.next.items.map(([h, t]) => (
+            <li>
+              <h3>
+                {h} <span class="soon">{soon}</span>
+              </h3>
+              <p>{t}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="links">
+        <a class="more" href={DOCS}>{copy.docs}</a>
+        <a class="more" href={routes.screens[lang]}>{copy.screens}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import '../scripts/demos';
+</script>
+
+<style>
+  .sp {
+    margin-top: 1.2rem;
+  }
+  .sp p + p {
+    margin-top: 1em;
+  }
+  .dyes {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.7rem;
+    justify-items: center;
+  }
+  .dyes__label {
+    font: 400 0.8rem/1 var(--display);
+    color: var(--ink-2);
+  }
+  .dyes__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  .dyes button {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    background-size: 64px 64px;
+    image-rendering: pixelated;
+    box-shadow: 0 0 0 3px #000, inset 3px 3px 0 rgb(255 255 255 / 0.25), inset -3px -3px 0 rgb(0 0 0 / 0.3);
+    margin: 3px;
+    transition: transform 140ms var(--spring);
+  }
+  .dyes button:active {
+    transform: scale(0.9);
+  }
+  .dyes button[aria-pressed='true'] {
+    box-shadow: 0 0 0 3px #000, 0 0 0 6px var(--brass-hi);
+    transform: translateY(-3px);
+  }
+  .cables {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: clamp(24px, 5vw, 80px);
+  }
+  .cables__text {
+    margin-top: 0;
+    max-width: 40em;
+  }
+  .drivers {
+    background: var(--ground-2);
+  }
+  .drivers__grid {
+    margin-top: 2.4rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: start;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1rem;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.9rem 1rem 0.9rem 0;
+    box-shadow: inset 0 -2px 0 var(--line);
+  }
+  thead th {
+    font: 400 0.75rem/1 var(--display);
+    color: var(--ink-3);
+    padding-bottom: 0.7rem;
+  }
+  tbody th {
+    font-weight: 600;
+    color: var(--ink);
+    width: 22%;
+  }
+  td {
+    color: var(--ink-2);
+  }
+  td code {
+    font-size: 0.78rem;
+    line-height: 1.6;
+  }
+  .next {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.8rem 3rem;
+  }
+  .next h3 {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    align-items: center;
+  }
+  .next .soon {
+    vertical-align: 0;
+  }
+  .next p {
+    margin-top: 0.4rem;
+    color: var(--ink-2);
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 2.5rem;
+    margin-top: 1.4rem;
+  }
+  @media (max-width: 900px) {
+    .cables,
+    .drivers__grid,
+    .next {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    table,
+    thead,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+    }
+    thead {
+      display: none;
+    }
+    tr {
+      padding: 1rem 0;
+      box-shadow: inset 0 -2px 0 var(--line);
+    }
+    th,
+    td {
+      padding: 0.2rem 0;
+      box-shadow: none;
+      width: auto !important;
+    }
+  }
+</style>
