@@ -112,6 +112,8 @@ public final class DeviceDrivers {
             ScrollValueBehaviour speedSetting = speedSetting(kinetic);
             if (speedSetting != null) {
                 api.read("getTargetSpeed", "", "RPM", args -> speedSetting.getValue());
+                api.read("getMinValue", "", "RPM", args -> -256);
+                api.read("getMaxValue", "", "RPM", args -> 256);
                 api.order("setSpeed", "rpm: -256..256", "", args -> {
                     int rpm = args.arg(1).checkInteger();
                     speedSetting.setValue(Mth.clamp(rpm, -256, 256));

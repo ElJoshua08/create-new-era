@@ -31,6 +31,8 @@ public class NixieDigitBlock extends PanelControlBlock {
 
     @Override
     public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("getMinValue", "", "number", args -> 0);
+        api.read("getMaxValue", "", "number", args -> 9);
         api.read("getDigit", "", "number 0-9 | nil", args -> {
             int digit = level.getBlockState(pos).getValue(DIGIT);
             return digit == DARK ? null : digit;

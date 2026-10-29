@@ -64,6 +64,8 @@ public class PanelDialBlock extends PanelControlBlock implements EntityBlock {
     @Override
     public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
         api.read("getValue", "", "number 0-15", args -> level.getBlockState(pos).getValue(VALUE));
+        api.read("getMinValue", "", "number", args -> 0);
+        api.read("getMaxValue", "", "number", args -> 15);
         api.order("setValue", "value: 0-15", "", args -> {
             set(level, pos, Mth.clamp(args.arg(1).checkInteger(), 0, 15));
             return null;

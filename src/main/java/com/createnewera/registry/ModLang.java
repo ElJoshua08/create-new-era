@@ -108,6 +108,16 @@ public final class ModLang {
         lang("create_new_era.api.on_change", "Runs your function every time the device changes, until the program stops. It's given value, then device. value is %s");
         lang("create_new_era.api.on_press", "Runs your function each time the button is pressed down (not when it pops back up).");
         lang("create_new_era.api.on_key", "Runs your function for every key pressed, with the key: \"0\" to \"9\", \"*\" or \"#\".");
+        lang("create_new_era.api.kinetic.getMinValue", "The lowest speed it can be set to: -256 RPM.");
+        lang("create_new_era.api.kinetic.getMaxValue", "The highest speed it can be set to: 256 RPM.");
+        lang("create_new_era.api.panel_knob.getMinValue", "Its lowest value: 0.");
+        lang("create_new_era.api.panel_knob.getMaxValue", "Its highest value: 15.");
+        lang("create_new_era.api.panel_slider.getMinValue", "Its lowest value: 0.");
+        lang("create_new_era.api.panel_slider.getMaxValue", "Its highest value: 15.");
+        lang("create_new_era.api.panel_gauge.getMinValue", "The needle's lowest position: 0, empty.");
+        lang("create_new_era.api.panel_gauge.getMaxValue", "The needle's highest position: 1, full.");
+        lang("create_new_era.api.nixie_digit.getMinValue", "The lowest digit it shows: 0.");
+        lang("create_new_era.api.nixie_digit.getMaxValue", "The highest digit it shows: 9.");
         // cables
         lang("item.create_new_era.cable_spool.dyed", "%s Cable Spool");
         lang("item.create_new_era.cable_spool.tooltip.summary", "Data cable on a reel. The bar is the _metres left_; an empty spool is wound again, not thrown away.");

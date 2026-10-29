@@ -224,5 +224,15 @@
   "create_new_era.api.panel_keypad.read": "La última tecla pulsada.",
   "create_new_era.api.on_change": "Ejecuta tu función cada vez que cambia el dispositivo, hasta que el programa se para. Recibe value y después device. value es %s",
   "create_new_era.api.on_press": "Ejecuta tu función cada vez que se pulsa el botón (no cuando vuelve a subir).",
-  "create_new_era.api.on_key": "Ejecuta tu función con cada tecla pulsada, y le pasa la tecla: de \"0\" a \"9\", \"*\" o \"#\"."
+  "create_new_era.api.on_key": "Ejecuta tu función con cada tecla pulsada, y le pasa la tecla: de \"0\" a \"9\", \"*\" o \"#\".",
+  "create_new_era.api.kinetic.getMinValue": "La velocidad más baja a la que se puede ajustar: -256 RPM.",
+  "create_new_era.api.kinetic.getMaxValue": "La velocidad más alta a la que se puede ajustar: 256 RPM.",
+  "create_new_era.api.panel_knob.getMinValue": "Su valor más bajo: 0.",
+  "create_new_era.api.panel_knob.getMaxValue": "Su valor más alto: 15.",
+  "create_new_era.api.panel_slider.getMinValue": "Su valor más bajo: 0.",
+  "create_new_era.api.panel_slider.getMaxValue": "Su valor más alto: 15.",
+  "create_new_era.api.panel_gauge.getMinValue": "La posición más baja de la aguja: 0, vacío.",
+  "create_new_era.api.panel_gauge.getMaxValue": "La posición más alta de la aguja: 1, lleno.",
+  "create_new_era.api.nixie_digit.getMinValue": "El dígito más bajo que muestra: 0.",
+  "create_new_era.api.nixie_digit.getMaxValue": "El dígito más alto que muestra: 9."
 }

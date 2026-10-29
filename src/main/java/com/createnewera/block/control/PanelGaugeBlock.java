@@ -29,6 +29,8 @@ public class PanelGaugeBlock extends PanelControlBlock {
     @Override
     public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
         api.read("get", "", "number 0-1", args -> level.getBlockState(pos).getValue(NEEDLE) / 15.0);
+        api.read("getMinValue", "", "number", args -> 0);
+        api.read("getMaxValue", "", "number", args -> 1);
         api.order("set", "fraction: 0-1", "", args -> {
             double fraction = Mth.clamp(args.arg(1).checkDouble(), 0, 1);
             int needle = (int) Math.round(fraction * 15);
