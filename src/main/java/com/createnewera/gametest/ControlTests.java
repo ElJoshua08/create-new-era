@@ -132,7 +132,7 @@ public class ControlTests {
         helper.setBlock(new BlockPos(1, 1, 1), ModBlocks.PANEL_SLIDER.getDefaultState());
         helper.setBlock(new BlockPos(3, 0, 1), Blocks.STONE);
         helper.setBlock(new BlockPos(3, 1, 1), ModBlocks.PANEL_BUTTON.getDefaultState());
-        if (!(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(1, 1, 1))) instanceof com.createnewera.block.control.PanelDialBlockEntity))
+        if (!(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(1, 1, 1))) instanceof com.createnewera.block.control.PanelControlBlockEntity))
             helper.fail("the slider has no block entity to draw its handle");
         click(helper, new BlockPos(3, 1, 1), 8, 4, 8);
         helper.runAfterDelay(15, () -> {

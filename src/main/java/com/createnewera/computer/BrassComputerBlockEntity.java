@@ -29,6 +29,7 @@ import com.createnewera.network.ComputerStatePayload;
 import com.createnewera.network.EditorActionPayload;
 import com.createnewera.network.OpenEditorPayload;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -36,6 +37,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
@@ -338,6 +340,23 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
             PacketDistributor.sendToPlayer(player, payload);
     }
 
+    /** Under goggles: Create's stress figures, then what program it runs and how fast it's going. */
+    @Override
+    public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
+        super.addToGoggleTooltip(tooltip, isPlayerSneaking);
+        tooltip.add(Component.literal("    ").append(Component.translatable("create_new_era.goggles.computer")));
+        if (!running) {
+            tooltip.add(Component.literal("    ").append(Component.translatable("create_new_era.goggles.idle")).withStyle(ChatFormatting.DARK_GRAY));
+            return true;
+        }
+        tooltip.add(Component.literal("    ").append(Component.translatable("create_new_era.goggles.program", entry)).withStyle(ChatFormatting.GRAY));
+        Component pace = getSpeed() == 0
+                ? Component.translatable(overStressed ? "create_new_era.goggles.paused_stress" : "create_new_era.goggles.paused_rotation").withStyle(ChatFormatting.GOLD)
+                : Component.translatable("create_new_era.goggles.pace", Math.round(100 * Math.min(1, Math.abs(getSpeed()) / FULL_SPEED))).withStyle(ChatFormatting.GRAY);
+        tooltip.add(Component.literal("    ").append(pace));
+        return true;
+    }
+
     /** Broken or unloaded: the program goes with it (a saved running flag restarts it on load). */
     @Override
     public void invalidate() {
@@ -348,12 +367,12 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
     @Override
     protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.write(tag, registries, clientPacket);
+        tag.putString("Entry", entry);
+        tag.putBoolean("Running", running);
         // the disk and console reach editors through their own packets, not chunk updates
         if (clientPacket)
             return;
         tag.put("Disk", files.save());
-        tag.putString("Entry", entry);
-        tag.putBoolean("Running", running);
         tag.putIntArray("Outputs", outputs);
         ListTag lines = new ListTag();
         console.forEach(line -> lines.add(StringTag.valueOf(line.encode())));
@@ -363,8 +382,11 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
     @Override
     protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
         super.read(tag, registries, clientPacket);
-        if (clientPacket)
+        if (clientPacket) { // for the goggles
+            entry = tag.getString("Entry");
+            running = tag.getBoolean("Running");
             return;
+        }
         if (tag.contains("Disk"))
             files.load(tag.getCompound("Disk"));
         else if (tag.contains("Source")) // single-program computers from before files existed

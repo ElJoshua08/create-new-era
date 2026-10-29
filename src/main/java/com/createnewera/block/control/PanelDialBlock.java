@@ -2,17 +2,15 @@ package com.createnewera.block.control;
 
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
-import com.createnewera.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -22,7 +20,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
  * like Aeronautics' throttle lever (see DialDrag); the knob's cap turns and the slider's handle
  * slides as they go.
  */
-public class PanelDialBlock extends PanelControlBlock implements EntityBlock {
+public class PanelDialBlock extends PanelControlBlock {
     public static final IntegerProperty VALUE = IntegerProperty.create("value", 0, 15);
 
     public enum Style {
@@ -45,11 +43,6 @@ public class PanelDialBlock extends PanelControlBlock implements EntityBlock {
 
     public Style style() {
         return style;
-    }
-
-    @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new PanelDialBlockEntity(ModBlockEntities.PANEL_DIAL.get(), pos, state);
     }
 
     /** Sets it from a player's drag, or a program. */
@@ -80,5 +73,10 @@ public class PanelDialBlock extends PanelControlBlock implements EntityBlock {
     @Override
     public String valueType() {
         return "number 0-15";
+    }
+
+    @Override
+    public Component goggleValue(BlockState state) {
+        return Component.translatable("create_new_era.goggles.value", state.getValue(VALUE), 15);
     }
 }

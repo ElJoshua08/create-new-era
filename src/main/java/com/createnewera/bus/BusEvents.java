@@ -27,6 +27,8 @@ public final class BusEvents {
      * class never loads client code. Empty on servers.
      */
     public static Function<BlockPos, List<BusPort>> clientParts = pos -> List.of();
+    /** The client's answer to whether a part has a cable plugged in, set like {@link #clientParts}. */
+    public static java.util.function.LongPredicate clientCabled = id -> false;
 
     public static void register(IEventBus gameBus) {
         gameBus.addListener(BusEvents::wrench);

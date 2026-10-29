@@ -271,11 +271,27 @@ for light in ("off", "amber", "green", "red"):
         f: glowing({"texture": "#light", "uv": [0, 0, 4, 4] if f == "up" else [0, 4, 4, 7]}, lit) for f in e["faces"]}}})
     MODELS[f"panel_lamp_{light}"] = with_texture(lamp, "light", f"create_new_era:block/controls/lamp_{light}")
 
+# the glowing layer a renderer draws at full brightness over a lit lamp or nixie
+# (PanelControlRenderer): just the lit faces, a hair outside the block model's own
+def glow_layer(model, element, faces, inflate=0.05):
+    e = json.loads(json.dumps(next(x for x in MODELS[model]["elements"] if x["name"] == element)))
+    e["from"] = [v - inflate for v in e["from"]]
+    e["to"] = [v + inflate for v in e["to"]]
+    e["faces"] = {f: {k: v for k, v in spec.items() if k != "neoforge_data"} for f, spec in e["faces"].items() if f in faces}
+    return {"textures": MODELS[model]["textures"], "elements": [e]}
+
+
 for digit in [str(d) for d in range(10)] + ["off"]:
     nixie = control_state("nixie_digit", {"tube": lambda e, lit=digit != "off": {**e, "faces": {**e["faces"],
         "north": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit),
         "south": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit)}}})
     MODELS[f"nixie_digit_{digit}"] = with_texture(nixie, "digit", f"create_new_era:block/controls/nixie_{digit}")
+
+
+for light in ("amber", "green", "red"):
+    MODELS[f"panel_lamp_glow_{light}"] = glow_layer(f"panel_lamp_{light}", "lamp", ("up", "north", "south", "east", "west"))
+for digit in range(10):
+    MODELS[f"nixie_digit_glow_{digit}"] = glow_layer(f"nixie_digit_{digit}", "tube", ("north", "south"))
 
 
 # Brass screen, front facing north. Screens next to each other (same facing) join:

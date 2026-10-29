@@ -4,10 +4,14 @@ import com.createnewera.block.DirectionalPartBlock;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.Bus;
 import com.createnewera.bus.DeviceDrivers;
+import com.createnewera.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -15,7 +19,7 @@ import net.minecraft.world.phys.Vec3;
  * A control for a hand-built panel: it sits on an andesite plate on any face, takes a data cable
  * straight into that plate, and is a device on the bus with its own functions.
  */
-public abstract class PanelControlBlock extends DirectionalPartBlock {
+public abstract class PanelControlBlock extends DirectionalPartBlock implements EntityBlock {
     protected PanelControlBlock(Properties properties, DirectionalShape shape) {
         super(properties, shape, Placement.AGAINST_FACE);
     }
@@ -31,6 +35,14 @@ public abstract class PanelControlBlock extends DirectionalPartBlock {
 
     /** What {@link #value} is, for the editor: "number 0-15", "boolean"... */
     public abstract String valueType();
+
+    /** Its state as goggles show it: "Value: 7 / 15", "On"... */
+    public abstract Component goggleValue(BlockState state);
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new PanelControlBlockEntity(ModBlockEntities.PANEL_CONTROL.get(), pos, state);
+    }
 
     /** Everything about it a program could notice changing: its block state says it all. */
     public Object snapshot(BlockState state) {

@@ -1,0 +1,44 @@
+{
+  "textures": {
+    "casing": "create:block/andesite_casing",
+    "parts": "create_new_era:block/interface_parts",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/andesite_casing",
+    "digit": "create_new_era:block/controls/nixie_9"
+  },
+  "elements": [
+    {
+      "name": "tube",
+      "from": [
+        4.95,
+        2.95,
+        5.95
+      ],
+      "to": [
+        11.05,
+        13.05,
+        10.05
+      ],
+      "faces": {
+        "north": {
+          "texture": "#digit",
+          "uv": [
+            0,
+            0,
+            6,
+            10
+          ]
+        },
+        "south": {
+          "texture": "#digit",
+          "uv": [
+            0,
+            0,
+            6,
+            10
+          ]
+        }
+      }
+    }
+  ]
+}

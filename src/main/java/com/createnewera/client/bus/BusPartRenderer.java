@@ -49,6 +49,7 @@ public final class BusPartRenderer {
 
     public static void register(IEventBus modBus, IEventBus gameBus) {
         BusEvents.clientParts = ClientBusParts::at;
+        BusEvents.clientCabled = id -> ClientBusParts.spans().stream().anyMatch(span -> span.touches(id));
         modBus.addListener(ModelEvent.RegisterAdditional.class, event -> {
             event.register(PORT_IN);
             event.register(PORT_OUT);

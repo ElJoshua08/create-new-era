@@ -4,7 +4,7 @@ import com.createnewera.client.bus.BusPartRenderer;
 import com.createnewera.client.bus.CableRenderer;
 import com.createnewera.client.bus.DeviceHighlight;
 import com.createnewera.client.control.DialDrag;
-import com.createnewera.client.control.PanelDialRenderer;
+import com.createnewera.client.control.PanelControlRenderer;
 import com.createnewera.ponder.NewEraPonderPlugin;
 
 import net.createmod.ponder.foundation.PonderIndex;
@@ -25,7 +25,7 @@ public class CreateNewEraClient {
         BusPartRenderer.register(modEventBus, NeoForge.EVENT_BUS);
         CableRenderer.register(modEventBus, NeoForge.EVENT_BUS);
         DeviceHighlight.register(NeoForge.EVENT_BUS);
-        PanelDialRenderer.register(modEventBus);
+        PanelControlRenderer.register(modEventBus);
         DialDrag.register(NeoForge.EVENT_BUS);
     }
 }

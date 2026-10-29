@@ -4,6 +4,7 @@ import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -65,5 +66,10 @@ public class PanelButtonBlock extends PanelControlBlock {
     @Override
     public String valueType() {
         return "boolean";
+    }
+
+    @Override
+    public Component goggleValue(BlockState state) {
+        return Component.translatable(state.getValue(PRESSED) ? "create_new_era.goggles.pressed" : "create_new_era.goggles.released");
     }
 }

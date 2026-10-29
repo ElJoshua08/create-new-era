@@ -4,6 +4,7 @@ import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -71,5 +72,10 @@ public class PanelKeypadBlock extends PanelControlBlock {
     @Override
     public String valueType() {
         return "\"0\"-\"9\" | \"*\" | \"#\" | nil";
+    }
+
+    @Override
+    public Component goggleValue(BlockState state) {
+        return state.getValue(KEY) == NONE ? Component.translatable("create_new_era.goggles.no_key") : Component.translatable("create_new_era.goggles.key", KEYS[state.getValue(KEY)]);
     }
 }

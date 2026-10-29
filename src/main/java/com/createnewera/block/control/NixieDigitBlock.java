@@ -6,6 +6,7 @@ import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,5 +58,10 @@ public class NixieDigitBlock extends PanelControlBlock {
     @Override
     public String valueType() {
         return "number 0-9 | nil";
+    }
+
+    @Override
+    public Component goggleValue(BlockState state) {
+        return state.getValue(DIGIT) == DARK ? Component.translatable("create_new_era.goggles.dark") : Component.translatable("create_new_era.goggles.digit", state.getValue(DIGIT));
     }
 }

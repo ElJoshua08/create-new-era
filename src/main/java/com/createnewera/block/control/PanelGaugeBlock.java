@@ -4,6 +4,7 @@ import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.Block;
@@ -49,5 +50,10 @@ public class PanelGaugeBlock extends PanelControlBlock {
     @Override
     public String valueType() {
         return "number 0-1";
+    }
+
+    @Override
+    public Component goggleValue(BlockState state) {
+        return Component.translatable("create_new_era.goggles.needle", Math.round(state.getValue(NEEDLE) * 100 / 15f));
     }
 }

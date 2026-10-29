@@ -1,10 +1,13 @@
 package com.createnewera.client.control;
 
+import java.util.List;
+
 import org.jetbrains.annotations.Nullable;
 
 import com.createnewera.block.control.PanelDialBlock;
-import com.createnewera.block.control.PanelDialBlockEntity;
+import com.createnewera.block.control.PanelControlBlockEntity;
 import com.createnewera.network.DialPayload;
+import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.gui.AllGuiTextures;
 
 import net.createmod.catnip.gui.UIRenderHelper;
@@ -106,7 +109,7 @@ public final class DialDrag {
             PacketDistributor.sendToServer(new DialPayload(pos, step));
             mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.6f + step / 30f, 0.25f));
         }
-        if (mc.level.getBlockEntity(pos) instanceof PanelDialBlockEntity dial)
+        if (mc.level.getBlockEntity(pos) instanceof PanelControlBlockEntity dial)
             dial.dragged = step / 15f;
     }
 
@@ -122,7 +125,7 @@ public final class DialDrag {
 
     private static void release() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level != null && pos != null && mc.level.getBlockEntity(pos) instanceof PanelDialBlockEntity dial)
+        if (mc.level != null && pos != null && mc.level.getBlockEntity(pos) instanceof PanelControlBlockEntity dial)
             dial.dragged = -1;
         pos = null;
     }
@@ -134,47 +137,64 @@ public final class DialDrag {
         GuiGraphics g = event.getGuiGraphics();
         int cx = g.guiWidth() / 2, cy = g.guiHeight() / 2;
         if (dial.style() == PanelDialBlock.Style.KNOB)
-            drawDial(g, mc, cx, cy);
+            drawRing(g, mc, cx, cy);
         else
             drawThrottle(g, mc, cx, cy);
-        Component name = dial.getName();
-        g.drawString(mc.font, name, cx - mc.font.width(name) / 2, cy - 44, 0xFFEEDDAA, true);
+
+        // as Aeronautics' throttle lever does it: the value in a goggles tooltip beside the
+        // crosshair, how to use it below
+        Component value = Component.translatable("create_new_era.dial.value", step, 15);
+        g.renderComponentTooltip(mc.font, List.of(Component.literal("    ").append(value)), cx + 12, cy + 4);
+        g.pose().pushPose();
+        g.pose().translate(cx + 23, cy - 9, 500);
+        g.pose().scale(0.625f, 0.625f, 1);
+        g.renderItem(AllItems.GOGGLES.asStack(), 0, 0);
+        g.pose().popPose();
+        Component hint = Component.translatable("create_new_era.dial.hint");
+        g.drawString(mc.font, hint, cx - mc.font.width(hint) / 2, cy + 52, 0xFFFFFFFF, true);
     }
 
+    /** The cursor with the number in it, centred on x: Create's value-settings cursor. */
+    private static void cursor(GuiGraphics g, Minecraft mc, int x, int y) {
+        AllGuiTextures left = AllGuiTextures.VALUE_SETTINGS_CURSOR_LEFT, right = AllGuiTextures.VALUE_SETTINGS_CURSOR_RIGHT;
+        int w = 14;
+        int x0 = x - w / 2;
+        left.render(g, x0 - left.getWidth(), y);
+        UIRenderHelper.drawCropped(g, x0, y, w, 14, 0, AllGuiTextures.VALUE_SETTINGS_CURSOR);
+        right.render(g, x0 + w, y);
+        String label = String.valueOf(step);
+        g.drawString(mc.font, label, x - mc.font.width(label) / 2 + 1, y + 3, CURSOR_TEXT, false);
+    }
+
+    /** The colour of the number on the cursor: the brown Aeronautics uses */
+    private static final int CURSOR_TEXT = 0xFF5B3A1D;
+
     /**
-     * The knob: its sixteen notches in a ring round the crosshair, from -135 to +135 degrees as
-     * the knob turns, lit up to where it's set, the number in the middle.
+     * The slider: Aeronautics' throttle lever bar lying down under the crosshair: a brass frame
+     * round Create's value bar, filled to where the handle is, the cursor riding along it.
      */
-    private static void drawDial(GuiGraphics g, Minecraft mc, int cx, int cy) {
-        int radius = 24;
+    private static void drawThrottle(GuiGraphics g, Minecraft mc, int cx, int cy) {
+        int w = 100, h = 14;
+        int x = cx - w / 2, y = cy + 16;
+        brassFrame(g, x, y, w + 4, h);
+        int length = w - 6;
+        UIRenderHelper.drawCropped(g, x + 3, y + 3, Math.min(AllGuiTextures.VALUE_SETTINGS_BAR.getWidth(), length), 8, 0,
+                AllGuiTextures.VALUE_SETTINGS_BAR);
+        int at = x + 3 + 7 + Math.round((length - 14) * (step / 15f));
+        cursor(g, mc, at, y);
+    }
+
+    /** The knob: its sixteen notches in a ring round the crosshair, the cursor on the one it's at. */
+    private static void drawRing(GuiGraphics g, Minecraft mc, int cx, int cy) {
+        int radius = 26;
         for (int i = 0; i <= 15; i++) {
             double a = Math.toRadians(-135 + 270 * i / 15.0);
             int x = cx + (int) Math.round(radius * Math.sin(a)), y = cy - (int) Math.round(radius * Math.cos(a));
-            boolean lit = i <= step, here = i == step;
-            int size = here ? 3 : 2;
-            g.fill(x - size, y - size, x + size, y + size, 0xFF3A2411);
-            g.fill(x - size + 1, y - size + 1, x + size - 1, y + size - 1,
-                    here ? 0xFFFFEB8C : lit ? 0xFFE4B763 : 0xFF5E4A36);
+            g.fill(x - 2, y - 2, x + 2, y + 2, 0xFF3A2411);
+            g.fill(x - 1, y - 1, x + 1, y + 1, i <= step ? 0xFFE4B763 : 0xFF6B5240);
         }
-        String label = String.valueOf(step);
-        g.drawString(mc.font, label, cx - mc.font.width(label) / 2, cy + 10, 0xFFFFEB8C, true);
-    }
-
-    /**
-     * The slider: Aeronautics' throttle lever bar, lying down: a brass frame round Create's
-     * value-settings bar, filled up to where the handle is, the number beside it.
-     */
-    private static void drawThrottle(GuiGraphics g, Minecraft mc, int cx, int cy) {
-        AllGuiTextures bar = AllGuiTextures.VALUE_SETTINGS_BAR;
-        int w = bar.getWidth(), h = bar.getHeight();
-        int x = cx - w / 2, y = cy + 20;
-        brassFrame(g, x - 4, y - 4, w + 8, h + 8);
-        UIRenderHelper.drawStretched(g, x, y, w, h, 0, AllGuiTextures.VALUE_SETTINGS_BAR_BG);
-        int filled = Math.round(w * step / 15f);
-        if (filled > 0)
-            UIRenderHelper.drawCropped(g, x, y, filled, h, 0, bar);
-        String label = step + " / 15";
-        g.drawString(mc.font, label, cx - mc.font.width(label) / 2, y + h + 7, 0xFFFFEB8C, true);
+        double a = Math.toRadians(-135 + 270 * step / 15.0);
+        cursor(g, mc, cx + (int) Math.round(radius * Math.sin(a)), cy - (int) Math.round(radius * Math.cos(a)) - 7);
     }
 
     private static void brassFrame(GuiGraphics g, int x, int y, int w, int h) {

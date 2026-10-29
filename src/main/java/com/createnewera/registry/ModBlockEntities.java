@@ -2,8 +2,8 @@ package com.createnewera.registry;
 
 import static com.createnewera.CreateNewEra.REGISTRATE;
 
-import com.createnewera.block.control.PanelDialBlockEntity;
-import com.createnewera.client.control.PanelDialRenderer;
+import com.createnewera.block.control.PanelControlBlockEntity;
+import com.createnewera.client.control.PanelControlRenderer;
 import com.createnewera.client.render.BrassComputerRenderer;
 import com.createnewera.computer.BrassComputerBlockEntity;
 import com.simibubi.create.AllPartialModels;
@@ -19,11 +19,12 @@ public final class ModBlockEntities {
             .renderer(() -> BrassComputerRenderer::new)
             .register();
 
-    /** Knobs and sliders: drawn turning and sliding smoothly. */
-    public static final BlockEntityEntry<PanelDialBlockEntity> PANEL_DIAL = REGISTRATE
-            .blockEntity("panel_dial", PanelDialBlockEntity::new)
-            .validBlocks(ModBlocks.PANEL_KNOB, ModBlocks.PANEL_SLIDER)
-            .renderer(() -> PanelDialRenderer::new)
+    /** Every panel control: goggle info, knobs and sliders moving smoothly, lamps and nixies glowing. */
+    public static final BlockEntityEntry<PanelControlBlockEntity> PANEL_CONTROL = REGISTRATE
+            .blockEntity("panel_control", PanelControlBlockEntity::new)
+            .validBlocks(ModBlocks.PANEL_BUTTON, ModBlocks.PANEL_SWITCH, ModBlocks.PANEL_KNOB, ModBlocks.PANEL_SLIDER,
+                    ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD)
+            .renderer(() -> PanelControlRenderer::new)
             .register();
 
     public static void register() {}
