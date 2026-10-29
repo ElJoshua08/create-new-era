@@ -239,11 +239,21 @@ def flipped(e):
 
 MODELS["panel_switch_on"] = control_state("panel_switch", {"lever": flipped, "tip": flipped})
 
+def split(base, moving):
+    """A control's model in two: what stays put, and the part a renderer moves (PanelDialRenderer)."""
+    m = MODELS[base]
+    fixed = {"textures": m["textures"], "elements": [e for e in m["elements"] if e.get("name") != moving]}
+    part = {"textures": m["textures"], "elements": [e for e in m["elements"] if e.get("name") == moving]}
+    return fixed, part
+
+
+# the knob's cap turns and the slider's handle slides smoothly, drawn by a renderer; at value 0
+# the cap points at -135 degrees and the handle sits at the track's left end
+MODELS["panel_knob_base"], MODELS["panel_knob_cap"] = split("panel_knob", "knob")
+MODELS["panel_slider_base"], MODELS["panel_slider_handle"] = split("panel_slider", "handle")
+MODELS["panel_slider_handle"]["elements"] = [moved(MODELS["panel_slider_handle"]["elements"][0], [2.5, 2.5, 6.5], [5.5, 5, 9.5])]
+
 for value in range(16):
-    knob = control_state("panel_knob", {"knob": lambda e: {**e, "faces": {**e["faces"], "up": {"texture": "#knob", "uv": [0, 0, 6, 6]}}}})
-    MODELS[f"panel_knob_{value}"] = with_texture(knob, "knob", f"create_new_era:block/controls/knob_{value}")
-    x = 2.5 + value * 8 / 15
-    MODELS[f"panel_slider_{value}"] = control_state("panel_slider", {"handle": lambda e, x=x: moved(e, [x, 2.5, 6.5], [x + 3, 5, 9.5])})
     gauge = control_state("panel_gauge", {"gauge": lambda e: {**e, "faces": {**e["faces"], "up": {"texture": "#dial", "uv": [0, 0, 10, 10]}}}})
     MODELS[f"panel_gauge_{value}"] = with_texture(gauge, "dial", f"create_new_era:block/controls/gauge_{value}")
 

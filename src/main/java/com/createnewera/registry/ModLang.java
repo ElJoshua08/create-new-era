@@ -177,12 +177,12 @@ public final class ModLang {
         lang("block.create_new_era.panel_knob.tooltip.condition1", "When placed");
         lang("block.create_new_era.panel_knob.tooltip.behaviour1", "Sits on the face you click: _floors, walls or ceilings_. Put several together to build a _control desk_.");
         lang("block.create_new_era.panel_knob.tooltip.condition2", "On the bus");
-        lang("block.create_new_era.panel_knob.tooltip.behaviour2", "_getValue()_ reads it, _setValue(n)_ turns it. R-Click turns it up, sneaking turns it down.");
+        lang("block.create_new_era.panel_knob.tooltip.behaviour2", "_getValue()_ reads it, _setValue(n)_ turns it. Hold R-Click on it and drag the mouse sideways to turn it.");
         lang("block.create_new_era.panel_slider.tooltip.summary", "A fader for a value from _0 to 15_.");
         lang("block.create_new_era.panel_slider.tooltip.condition1", "When placed");
         lang("block.create_new_era.panel_slider.tooltip.behaviour1", "Sits on the face you click: _floors, walls or ceilings_. Put several together to build a _control desk_.");
         lang("block.create_new_era.panel_slider.tooltip.condition2", "On the bus");
-        lang("block.create_new_era.panel_slider.tooltip.behaviour2", "_getValue()_ reads it, _setValue(n)_ slides it. Click where along the track you want it.");
+        lang("block.create_new_era.panel_slider.tooltip.behaviour2", "_getValue()_ reads it, _setValue(n)_ slides it. Hold R-Click on it and drag the mouse sideways to slide it.");
         lang("block.create_new_era.panel_lamp.tooltip.summary", "An indicator light a program can switch and _colour_.");
         lang("block.create_new_era.panel_lamp.tooltip.condition1", "When placed");
         lang("block.create_new_era.panel_lamp.tooltip.behaviour1", "Sits on the face you click: _floors, walls or ceilings_. Put several together to build a _control desk_.");

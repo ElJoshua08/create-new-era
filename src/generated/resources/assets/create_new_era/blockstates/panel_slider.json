@@ -1,418 +1,418 @@
 {
   "variants": {
     "facing=down,value=0": {
-      "model": "create_new_era:block/panel_slider_0",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=1": {
-      "model": "create_new_era:block/panel_slider_1",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=10": {
-      "model": "create_new_era:block/panel_slider_10",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=11": {
-      "model": "create_new_era:block/panel_slider_11",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=12": {
-      "model": "create_new_era:block/panel_slider_12",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=13": {
-      "model": "create_new_era:block/panel_slider_13",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=14": {
-      "model": "create_new_era:block/panel_slider_14",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=15": {
-      "model": "create_new_era:block/panel_slider_15",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=2": {
-      "model": "create_new_era:block/panel_slider_2",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=3": {
-      "model": "create_new_era:block/panel_slider_3",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=4": {
-      "model": "create_new_era:block/panel_slider_4",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=5": {
-      "model": "create_new_era:block/panel_slider_5",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=6": {
-      "model": "create_new_era:block/panel_slider_6",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=7": {
-      "model": "create_new_era:block/panel_slider_7",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=8": {
-      "model": "create_new_era:block/panel_slider_8",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=down,value=9": {
-      "model": "create_new_era:block/panel_slider_9",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 180
     },
     "facing=east,value=0": {
-      "model": "create_new_era:block/panel_slider_0",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=1": {
-      "model": "create_new_era:block/panel_slider_1",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=10": {
-      "model": "create_new_era:block/panel_slider_10",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=11": {
-      "model": "create_new_era:block/panel_slider_11",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=12": {
-      "model": "create_new_era:block/panel_slider_12",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=13": {
-      "model": "create_new_era:block/panel_slider_13",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=14": {
-      "model": "create_new_era:block/panel_slider_14",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=15": {
-      "model": "create_new_era:block/panel_slider_15",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=2": {
-      "model": "create_new_era:block/panel_slider_2",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=3": {
-      "model": "create_new_era:block/panel_slider_3",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=4": {
-      "model": "create_new_era:block/panel_slider_4",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=5": {
-      "model": "create_new_era:block/panel_slider_5",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=6": {
-      "model": "create_new_era:block/panel_slider_6",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=7": {
-      "model": "create_new_era:block/panel_slider_7",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=8": {
-      "model": "create_new_era:block/panel_slider_8",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=east,value=9": {
-      "model": "create_new_era:block/panel_slider_9",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 90
     },
     "facing=north,value=0": {
-      "model": "create_new_era:block/panel_slider_0",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=1": {
-      "model": "create_new_era:block/panel_slider_1",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=10": {
-      "model": "create_new_era:block/panel_slider_10",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=11": {
-      "model": "create_new_era:block/panel_slider_11",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=12": {
-      "model": "create_new_era:block/panel_slider_12",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=13": {
-      "model": "create_new_era:block/panel_slider_13",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=14": {
-      "model": "create_new_era:block/panel_slider_14",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=15": {
-      "model": "create_new_era:block/panel_slider_15",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=2": {
-      "model": "create_new_era:block/panel_slider_2",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=3": {
-      "model": "create_new_era:block/panel_slider_3",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=4": {
-      "model": "create_new_era:block/panel_slider_4",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=5": {
-      "model": "create_new_era:block/panel_slider_5",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=6": {
-      "model": "create_new_era:block/panel_slider_6",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=7": {
-      "model": "create_new_era:block/panel_slider_7",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=8": {
-      "model": "create_new_era:block/panel_slider_8",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=north,value=9": {
-      "model": "create_new_era:block/panel_slider_9",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90
     },
     "facing=south,value=0": {
-      "model": "create_new_era:block/panel_slider_0",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=1": {
-      "model": "create_new_era:block/panel_slider_1",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=10": {
-      "model": "create_new_era:block/panel_slider_10",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=11": {
-      "model": "create_new_era:block/panel_slider_11",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=12": {
-      "model": "create_new_era:block/panel_slider_12",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=13": {
-      "model": "create_new_era:block/panel_slider_13",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=14": {
-      "model": "create_new_era:block/panel_slider_14",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=15": {
-      "model": "create_new_era:block/panel_slider_15",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=2": {
-      "model": "create_new_era:block/panel_slider_2",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=3": {
-      "model": "create_new_era:block/panel_slider_3",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=4": {
-      "model": "create_new_era:block/panel_slider_4",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=5": {
-      "model": "create_new_era:block/panel_slider_5",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=6": {
-      "model": "create_new_era:block/panel_slider_6",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=7": {
-      "model": "create_new_era:block/panel_slider_7",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=8": {
-      "model": "create_new_era:block/panel_slider_8",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=south,value=9": {
-      "model": "create_new_era:block/panel_slider_9",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 180
     },
     "facing=up,value=0": {
-      "model": "create_new_era:block/panel_slider_0"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=1": {
-      "model": "create_new_era:block/panel_slider_1"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=10": {
-      "model": "create_new_era:block/panel_slider_10"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=11": {
-      "model": "create_new_era:block/panel_slider_11"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=12": {
-      "model": "create_new_era:block/panel_slider_12"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=13": {
-      "model": "create_new_era:block/panel_slider_13"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=14": {
-      "model": "create_new_era:block/panel_slider_14"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=15": {
-      "model": "create_new_era:block/panel_slider_15"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=2": {
-      "model": "create_new_era:block/panel_slider_2"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=3": {
-      "model": "create_new_era:block/panel_slider_3"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=4": {
-      "model": "create_new_era:block/panel_slider_4"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=5": {
-      "model": "create_new_era:block/panel_slider_5"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=6": {
-      "model": "create_new_era:block/panel_slider_6"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=7": {
-      "model": "create_new_era:block/panel_slider_7"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=8": {
-      "model": "create_new_era:block/panel_slider_8"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=up,value=9": {
-      "model": "create_new_era:block/panel_slider_9"
+      "model": "create_new_era:block/panel_slider_base"
     },
     "facing=west,value=0": {
-      "model": "create_new_era:block/panel_slider_0",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=1": {
-      "model": "create_new_era:block/panel_slider_1",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=10": {
-      "model": "create_new_era:block/panel_slider_10",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=11": {
-      "model": "create_new_era:block/panel_slider_11",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=12": {
-      "model": "create_new_era:block/panel_slider_12",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=13": {
-      "model": "create_new_era:block/panel_slider_13",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=14": {
-      "model": "create_new_era:block/panel_slider_14",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=15": {
-      "model": "create_new_era:block/panel_slider_15",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=2": {
-      "model": "create_new_era:block/panel_slider_2",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=3": {
-      "model": "create_new_era:block/panel_slider_3",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=4": {
-      "model": "create_new_era:block/panel_slider_4",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=5": {
-      "model": "create_new_era:block/panel_slider_5",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=6": {
-      "model": "create_new_era:block/panel_slider_6",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=7": {
-      "model": "create_new_era:block/panel_slider_7",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=8": {
-      "model": "create_new_era:block/panel_slider_8",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     },
     "facing=west,value=9": {
-      "model": "create_new_era:block/panel_slider_9",
+      "model": "create_new_era:block/panel_slider_base",
       "x": 90,
       "y": 270
     }

@@ -1,0 +1,70 @@
+{
+  "textures": {
+    "casing": "create:block/andesite_casing",
+    "parts": "create_new_era:block/interface_parts",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/andesite_casing"
+  },
+  "elements": [
+    {
+      "name": "handle",
+      "from": [
+        2.5,
+        2.5,
+        6.5
+      ],
+      "to": [
+        5.5,
+        5,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            8.0,
+            4.0,
+            10.0,
+            5.0
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            8.0,
+            4.0,
+            10.0,
+            5.0
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            8.0,
+            4.0,
+            10.0,
+            5.0
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            8.0,
+            4.0,
+            10.0,
+            5.0
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            6.0,
+            4.0,
+            8.0,
+            5.5
+          ]
+        }
+      }
+    }
+  ]
+}

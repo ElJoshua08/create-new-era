@@ -105,8 +105,8 @@ public class ControlTests {
             expectPrinted(helper, computer, "{2, 3}"); // print shows a table's contents
             expectPrinted(helper, computer, "{a = 1, b = {2, 3}, name = \"x\"}");
             click(helper, button, 8, 4, 8);
-            for (int i = 0; i < 6; i++)
-                click(helper, knob, 8, 4, 8);
+            // what the server does with a player's drag (DialDrag sends the step it's dragged to)
+            ModBlocks.PANEL_KNOB.get().set(helper.getLevel(), helper.absolutePos(knob), 6);
             click(helper, keypad, 8, 3, 6.5); // the middle key of the second row
         });
         helper.runAfterDelay(30, () -> {
@@ -118,24 +118,22 @@ public class ControlTests {
             if (level.getBlockState(helper.absolutePos(nixie)).getValue(NixieDigitBlock.DIGIT) != 7)
                 helper.fail("the nixie doesn't show 7");
             if (level.getBlockState(helper.absolutePos(knob)).getValue(PanelDialBlock.VALUE) != 6)
-                helper.fail("six clicks didn't turn the knob to 6");
+                helper.fail("the knob didn't take the dragged value");
             if (level.getBlockState(helper.absolutePos(gauge)).getValue(PanelGaugeBlock.NEEDLE) != 6)
                 helper.fail("the gauge didn't follow the knob");
             helper.succeed();
         });
     }
 
-    // the slider goes where it's clicked; the button pops back up by itself
+    // knobs and sliders carry a block entity for their smooth drawing; the button pops back up by itself
     @GameTest(template = ROOM)
     public static void slidersAndButtonsMoveLikeTheirModels(GameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 0, 1), Blocks.STONE);
         helper.setBlock(new BlockPos(1, 1, 1), ModBlocks.PANEL_SLIDER.getDefaultState());
         helper.setBlock(new BlockPos(3, 0, 1), Blocks.STONE);
         helper.setBlock(new BlockPos(3, 1, 1), ModBlocks.PANEL_BUTTON.getDefaultState());
-        click(helper, new BlockPos(1, 1, 1), 13.4, 4, 8);
-        int value = helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(1, 1, 1))).getValue(PanelDialBlock.VALUE);
-        if (value < 14)
-            helper.fail("a click at the slider's far end set " + value);
+        if (!(helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(1, 1, 1))) instanceof com.createnewera.block.control.PanelDialBlockEntity))
+            helper.fail("the slider has no block entity to draw its handle");
         click(helper, new BlockPos(3, 1, 1), 8, 4, 8);
         helper.runAfterDelay(15, () -> {
             if (helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(3, 1, 1))).getValue(

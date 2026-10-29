@@ -1,5 +1,6 @@
 package com.createnewera.network;
 
+import com.createnewera.block.control.PanelDialBlock;
 import com.createnewera.cable.CableActions;
 import com.createnewera.client.ClientPayloads;
 import com.createnewera.computer.BrassComputerBlockEntity;
@@ -24,6 +25,13 @@ public final class ModNetwork {
         registrar.playToClient(BusPartsPayload.TYPE, BusPartsPayload.STREAM_CODEC,
                 (payload, context) -> ClientPayloads.busParts(payload));
         registrar.playToServer(EditorActionPayload.TYPE, EditorActionPayload.STREAM_CODEC, ModNetwork::editorAction);
+        registrar.playToServer(DialPayload.TYPE, DialPayload.STREAM_CODEC, (payload, context) -> {
+            if (!(context.player() instanceof ServerPlayer player) || !player.canInteractWithBlock(payload.pos(), 1))
+                return;
+            var level = player.serverLevel();
+            if (level.getBlockState(payload.pos()).getBlock() instanceof PanelDialBlock dial)
+                dial.set(level, payload.pos(), Math.clamp(payload.value(), 0, 15));
+        });
         registrar.playToServer(CableActionPayload.TYPE, CableActionPayload.STREAM_CODEC, (payload, context) -> {
             if (context.player() instanceof ServerPlayer player)
                 CableActions.handle(player, payload.span(), payload.attack());

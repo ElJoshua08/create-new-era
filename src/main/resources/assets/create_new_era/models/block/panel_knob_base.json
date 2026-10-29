@@ -1,12 +1,9 @@
 {
-  "credit": "Create: New Era",
-  "parent": "block/block",
   "textures": {
     "casing": "create:block/andesite_casing",
     "parts": "create_new_era:block/interface_parts",
     "details": "create_new_era:block/computing_details",
-    "particle": "create:block/andesite_casing",
-    "knob": "create_new_era:block/controls/knob_12"
+    "particle": "create:block/andesite_casing"
   },
   "elements": [
     {
@@ -74,66 +71,6 @@
             2,
             14,
             14
-          ]
-        }
-      }
-    },
-    {
-      "name": "knob",
-      "from": [
-        5,
-        2,
-        5
-      ],
-      "to": [
-        11,
-        5,
-        11
-      ],
-      "faces": {
-        "north": {
-          "texture": "#parts",
-          "uv": [
-            10.0,
-            0.0,
-            13.0,
-            1.0
-          ]
-        },
-        "south": {
-          "texture": "#parts",
-          "uv": [
-            10.0,
-            0.0,
-            13.0,
-            1.0
-          ]
-        },
-        "east": {
-          "texture": "#parts",
-          "uv": [
-            10.0,
-            0.0,
-            13.0,
-            1.0
-          ]
-        },
-        "west": {
-          "texture": "#parts",
-          "uv": [
-            10.0,
-            0.0,
-            13.0,
-            1.0
-          ]
-        },
-        "up": {
-          "texture": "#knob",
-          "uv": [
-            0,
-            0,
-            6,
-            6
           ]
         }
       }

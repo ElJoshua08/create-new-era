@@ -241,18 +241,6 @@ def draw_control_states():
     out = OUT / "controls"
     out.mkdir(exist_ok=True)
 
-    # knob: the brass pointer swept from -135 to +135 degrees over values 0 to 15
-    for value in range(16):
-        c = Canvas(16, 16)
-        c.rect(0, 0, 6, 6, SLATE[2])
-        c.bevel(0, 0, 6, 6, SLATE[4], SLATE[1])
-        for px_, py_ in [(0, 0), (5, 0), (0, 5), (5, 5)]:
-            c.px(px_, py_, SLATE[1])
-        a = math.radians(-135 + 270 * value / 15)
-        for r, col in [(0.6, BRASS[4]), (1.6, BRASS[5]), (2.3, BRASS[6])]:
-            c.px(int(round(2.5 + r * math.sin(a))), int(round(2.5 - r * math.cos(a))), col)
-        c.img.save(out / f"knob_{value}.png")
-
     # gauge: the dial without its needle, then a red needle from -75 to +75 degrees
     for value in range(16):
         c = Canvas(16, 16)

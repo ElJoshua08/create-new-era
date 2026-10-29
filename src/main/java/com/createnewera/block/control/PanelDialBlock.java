@@ -2,34 +2,32 @@ package com.createnewera.block.control;
 
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.DeviceDrivers;
+import com.createnewera.registry.ModBlockEntities;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * A setting from 0 to 15 the player picks: the knob clicks round a step at a time (sneak to
- * turn it back), the slider jumps to where it's clicked.
+ * A setting from 0 to 15 the player picks by holding use on it and dragging the mouse sideways,
+ * like Aeronautics' throttle lever (see DialDrag); the knob's cap turns and the slider's handle
+ * slides as they go.
  */
-public class PanelDialBlock extends PanelControlBlock {
+public class PanelDialBlock extends PanelControlBlock implements EntityBlock {
     public static final IntegerProperty VALUE = IntegerProperty.create("value", 0, 15);
 
     public enum Style {
         KNOB, SLIDER
     }
-
-    /** The slider's track, in the model's pixels along x. */
-    private static final double TRACK_FROM = 2.5, TRACK_TO = 13.5;
 
     private final Style style;
 
@@ -45,26 +43,22 @@ public class PanelDialBlock extends PanelControlBlock {
         builder.add(VALUE);
     }
 
-    @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        int value = state.getValue(VALUE);
-        int now = switch (style) {
-            case KNOB -> Mth.clamp(value + (player.isShiftKeyDown() ? -1 : 1), 0, 15);
-            case SLIDER -> {
-                double along = (local(state, pos, hit.getLocation())[0] - TRACK_FROM) / (TRACK_TO - TRACK_FROM);
-                yield Mth.clamp((int) Math.round(along * 15), 0, 15);
-            }
-        };
-        set(level, pos, now);
-        return InteractionResult.sidedSuccess(level.isClientSide);
+    public Style style() {
+        return style;
     }
 
-    private void set(Level level, BlockPos pos, int value) {
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new PanelDialBlockEntity(ModBlockEntities.PANEL_DIAL.get(), pos, state);
+    }
+
+    /** Sets it from a player's drag, or a program. */
+    public void set(Level level, BlockPos pos, int value) {
         BlockState state = level.getBlockState(pos);
-        if (state.getValue(VALUE) == value)
+        if (!state.is(this) || state.getValue(VALUE) == value)
             return;
         level.setBlock(pos, state.setValue(VALUE, value), Block.UPDATE_ALL);
-        level.playSound(null, pos, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.3f, 1.2f + value / 30f);
+        level.playSound(null, pos, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.2f, 1.2f + value / 30f);
     }
 
     @Override

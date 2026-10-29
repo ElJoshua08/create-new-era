@@ -89,10 +89,10 @@ public final class ModBlocks {
             s -> s.getValue(PanelSwitchBlock.ON) ? "panel_switch_on" : "panel_switch");
     public static final BlockEntry<PanelDialBlock> PANEL_KNOB = control("panel_knob", "Panel Knob",
             box(5, 2, 5, 11, 5, 11), (p, shape) -> new PanelDialBlock(p, shape, PanelDialBlock.Style.KNOB),
-            s -> "panel_knob_" + s.getValue(PanelDialBlock.VALUE));
+            s -> "panel_knob_base");
     public static final BlockEntry<PanelDialBlock> PANEL_SLIDER = control("panel_slider", "Panel Slider",
             box(2.5, 2, 6, 13.5, 5, 10), (p, shape) -> new PanelDialBlock(p, shape, PanelDialBlock.Style.SLIDER),
-            s -> "panel_slider_" + s.getValue(PanelDialBlock.VALUE));
+            s -> "panel_slider_base");
     public static final BlockEntry<PanelLampBlock> PANEL_LAMP = control("panel_lamp", "Panel Lamp",
             box(5, 2, 5, 11, 6, 11), PanelLampBlock::new,
             s -> "panel_lamp_" + s.getValue(PanelLampBlock.LIGHT).getSerializedName());
