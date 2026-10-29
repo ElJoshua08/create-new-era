@@ -108,8 +108,9 @@ public class CableTests {
         if (route == null)
             helper.fail("no route over the floor");
         int metres = CableRoute.metres(route, false);
-        if (metres < 9 || metres > 12)
-            helper.fail("route is " + metres + " m, expected about 10");
+        // down a side, across the floor on the diagonal, up the other: about 2 + 4.2 + 0.6
+        if (metres < 6 || metres > 9)
+            helper.fail("route is " + metres + " m, expected about 7");
         // every point lies in open space, on a face
         for (Vec3 p : route)
             if (!helper.getLevel().getBlockState(BlockPos.containing(p)).isAir())
@@ -120,6 +121,30 @@ public class CableTests {
         BusPort floating = Bus.placePort(helper.getLevel(), helper.absolutePos(new BlockPos(2, 3, 2)), Direction.UP, 6, 6, PortMode.OUT);
         if (CableRoute.surface(helper.getLevel(), a, floating) != null)
             helper.fail("found a surface route to a floating block");
+        helper.succeed();
+    }
+
+    // across one flat floor the cable is a straight line, not a detour through block centres
+    @GameTest(template = ROOM)
+    public static void surfaceRoutesRunStraightAcrossAFace(GameTestHelper helper) {
+        floor(helper);
+        var level = helper.getLevel();
+        BusPort a = Bus.placePort(level, helper.absolutePos(new BlockPos(0, 0, 1)), Direction.UP, 3, 9, PortMode.OUT);
+        BusPort b = Bus.placePort(level, helper.absolutePos(new BlockPos(4, 0, 3)), Direction.UP, 9, 2, PortMode.OUT);
+        List<Vec3> route = CableRoute.surface(level, a, b);
+        if (route == null || route.size() != 2)
+            helper.fail("expected a straight two-point run, got " + route);
+        // with a block in the way, it goes round it, still on the floor
+        helper.setBlock(new BlockPos(2, 1, 2), Blocks.STONE);
+        List<Vec3> round = CableRoute.surface(level, a, b);
+        if (round == null || round.size() < 3)
+            helper.fail("expected a route round the block, got " + round);
+        for (int i = 1; i < round.size(); i++)
+            for (int k = 0; k <= 20; k++) {
+                BlockPos at = BlockPos.containing(round.get(i - 1).lerp(round.get(i), k / 20.0));
+                if (!level.getBlockState(at).isAir())
+                    helper.fail("the route cuts through " + at);
+            }
         helper.succeed();
     }
 

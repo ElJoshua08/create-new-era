@@ -75,21 +75,124 @@ public final class CableRoute {
             if (c.equals(start))
                 break;
         }
-        List<Vec3> points = new ArrayList<>();
-        points.add(onFace(PartGeometry.anchor(from), from.face()));
-        for (int i = 0; i < cells.size(); i++) {
-            Cell c = cells.get(i);
-            if (i > 0) {
-                Cell prev = cells.get(i - 1);
-                if (prev.face != c.face)
-                    points.add(bend(prev, c));
-            }
-            // the middle of the face, unless it's an end: there the cable starts at the part
-            if (i > 0 && i < cells.size() - 1)
-                points.add(faceCentre(c));
+        return pull(level, cells, onFace(PartGeometry.anchor(from), from.face()), onFace(PartGeometry.anchor(to), to.face()));
+    }
+
+    /**
+     * A point the cable passes through: fixed (its ends), the middle of a face it may skip
+     * (dropped wherever a straight line along that face does the job), or a bend that slides
+     * along the edge it sits on.
+     *
+     * @param face the face the cable lies on from this point to the next
+     * @param axis for a bend, the edge's direction; null otherwise
+     */
+    private static final class Node {
+        Vec3 at;
+        final Direction face;
+        final boolean optional;
+        final Vec3 edgeMiddle, axis;
+
+        Node(Vec3 at, Direction face, boolean optional, Vec3 edgeMiddle, Vec3 axis) {
+            this.at = at;
+            this.face = face;
+            this.optional = optional;
+            this.edgeMiddle = edgeMiddle;
+            this.axis = axis;
         }
-        points.add(onFace(PartGeometry.anchor(to), to.face()));
+    }
+
+    /** How far a bend may slide from the middle of its edge: not right into the corner. */
+    private static final double BEND_REACH = 0.5 - 0.125;
+
+    /**
+     * Pulls the cable tight along the cells, like a string: straight across each face wherever
+     * the face allows it, bending where its straightened line crosses each edge.
+     */
+    private static List<Vec3> pull(BlockGetter level, List<Cell> cells, Vec3 start, Vec3 end) {
+        List<Node> nodes = new ArrayList<>();
+        nodes.add(new Node(start, cells.get(0).face, false, null, null));
+        for (int i = 1; i < cells.size(); i++) {
+            Cell prev = cells.get(i - 1), c = cells.get(i);
+            if (prev.face != c.face) {
+                Vec3 middle = bend(prev, c);
+                Direction along = prev.pos.equals(c.pos) ? c.face : c.face.getOpposite();
+                Vec3 axis = offset(prev.face, 1).cross(offset(along, 1));
+                nodes.add(new Node(middle, c.face, false, middle, axis));
+            }
+            if (i < cells.size() - 1)
+                nodes.add(new Node(faceCentre(c), c.face, true, null, null));
+        }
+        nodes.add(new Node(end, cells.get(cells.size() - 1).face, false, null, null));
+        List<Vec3> unpulled = new ArrayList<>(nodes.size());
+        for (Node n : nodes)
+            unpulled.add(n.at);
+
+        for (int round = 0; round < 6; round++) {
+            slideBends(nodes);
+            // drop face middles a straight line can do without, nearest the ends first
+            for (int i = 1; i < nodes.size() - 1; i++) {
+                Node n = nodes.get(i);
+                if (n.optional && n.face == nodes.get(i - 1).face
+                        && alongFace(level, nodes.get(i - 1).at, nodes.get(i + 1).at, n.face)) {
+                    nodes.remove(i);
+                    i--;
+                }
+            }
+        }
+        slideBends(nodes);
+        // a bend that slid can pull a run across something on the face: then keep the safe route
+        for (int i = 0; i < nodes.size() - 1; i++)
+            if (!alongFace(level, nodes.get(i).at, nodes.get(i + 1).at, nodes.get(i).face))
+                return unpulled;
+        List<Vec3> points = new ArrayList<>(nodes.size());
+        for (Node n : nodes)
+            points.add(n.at);
         return points;
+    }
+
+    /** Each bend moves along its edge to where the cable through it is shortest. */
+    private static void slideBends(List<Node> nodes) {
+        for (int pass = 0; pass < 4; pass++)
+            for (int i = 1; i < nodes.size() - 1; i++) {
+                Node n = nodes.get(i);
+                if (n.axis == null)
+                    continue;
+                Vec3 before = nodes.get(i - 1).at, after = nodes.get(i + 1).at;
+                // the length through the bend is convex in its position along the edge
+                double lo = -BEND_REACH, hi = BEND_REACH;
+                for (int k = 0; k < 40; k++) {
+                    double m1 = lo + (hi - lo) / 3, m2 = hi - (hi - lo) / 3;
+                    if (through(before, n, m1, after) < through(before, n, m2, after))
+                        hi = m2;
+                    else
+                        lo = m1;
+                }
+                n.at = n.edgeMiddle.add(n.axis.scale((lo + hi) / 2));
+            }
+    }
+
+    private static double through(Vec3 before, Node bend, double t, Vec3 after) {
+        Vec3 at = bend.edgeMiddle.add(bend.axis.scale(t));
+        return before.distanceTo(at) + at.distanceTo(after);
+    }
+
+    /**
+     * Whether a straight run from a to b stays on open face: every block it passes over is open
+     * with something solid under it on that side. The very ends are left out, as they sit on the
+     * edges where the cable bends.
+     */
+    private static boolean alongFace(BlockGetter level, Vec3 a, Vec3 b, Direction face) {
+        double length = a.distanceTo(b);
+        int steps = Math.max(2, (int) Math.ceil(length * 8));
+        for (int i = 0; i <= steps; i++) {
+            double along = length * i / steps;
+            if (along < 0.15 || along > length - 0.15)
+                continue;
+            BlockPos cell = BlockPos.containing(a.lerp(b, (double) i / steps));
+            if (!open(level, cell) || !solid(level, cell.relative(face)))
+                return false;
+        }
+        return true;
     }
 
     private static List<Cell> neighbours(BlockGetter level, Cell cell) {
