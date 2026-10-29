@@ -141,6 +141,7 @@
   "create_new_era.cable.metres_left": "%s / %s m of cable",
   "create_new_era.cable.no_route": "No way along the faces between them",
   "create_new_era.cable.not_enough": "Needs %s m, the spool has %s m",
+  "create_new_era.cable.port_taken": "That port already has its cable: bring several together at a Port Hub",
   "create_new_era.cable.same_part": "Pick a different part",
   "create_new_era.cable.started": "Cable started: click the other end (sneak to run it along faces)",
   "create_new_era.cable.too_far": "Too far to hang a cable (24 blocks at most)",

@@ -242,5 +242,6 @@
   "item.create_new_era.brass_port.tooltip.action1": "Pega un puerto donde pinchas. No hay modo que elegir con la llave.",
   "block.create_new_era.port_hub.tooltip.summary": "Veinticuatro tomas de datos, _cuatro en cada cara_, unidas por dentro: donde se juntan los cables de una red.",
   "block.create_new_era.port_hub.tooltip.condition1": "Con una bobina de cable",
-  "block.create_new_era.port_hub.tooltip.behaviour1": "Pincha cualquiera de sus tomas. Los cables de _distinto color_ siguen sin unirse a través de él; el cobre sin teñir une con todos."
+  "block.create_new_era.port_hub.tooltip.behaviour1": "Pincha cualquiera de sus tomas. Los cables de _distinto color_ siguen sin unirse a través de él; el cobre sin teñir une con todos.",
+  "create_new_era.cable.port_taken": "Ese puerto ya tiene su cable: para juntar varios, usa un hub de puertos"
 }

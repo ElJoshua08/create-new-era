@@ -78,6 +78,8 @@ public class CableSpoolItem extends Item {
         if (from == null) {
             if (!data.accepts(part.id(), color, -1))
                 return refuse(player, Component.translatable("create_new_era.cable.color_clash"));
+            if (Bus.full(data, part))
+                return refuse(player, Component.translatable("create_new_era.cable.port_taken"));
             stack.set(ModComponents.CABLE_START.get(), new CableStart(part.id(), PartGeometry.anchor(part), level.dimension()));
             tell(player, Component.translatable("create_new_era.cable.started"));
             server.playSound(null, part.pos(), SoundEvents.COPPER_HIT, SoundSource.PLAYERS, 0.6f, 1.6f);

@@ -221,7 +221,15 @@ public final class Bus {
     }
 
     public enum Laid {
-        OK, SAME_PART, TOO_FAR, NO_ROUTE, COLOR_CLASH, ALREADY_JOINED
+        OK, SAME_PART, TOO_FAR, NO_ROUTE, COLOR_CLASH, ALREADY_JOINED, PORT_TAKEN
+    }
+
+    /**
+     * Whether a part already has all the cables it takes: one, except a splice, which is there to
+     * join several. To bring many cables together there's the port hub, a socket each.
+     */
+    public static boolean full(BusData data, BusPort part) {
+        return part.kind() != BusPort.Kind.SPLICE && !data.spansAt(part.id()).isEmpty();
     }
 
     /** Where a cable from one part to another would run, or null if it can't. */
@@ -246,6 +254,8 @@ public final class Bus {
         for (BusSpan s : data.spansAt(from.id()))
             if (s.touches(to.id()))
                 return Plan.refused(Laid.ALREADY_JOINED);
+        if (full(data, from) || full(data, to))
+            return Plan.refused(Laid.PORT_TAKEN);
         List<Vec3> points = route(level, from, to, aerial);
         if (points == null)
             return Plan.refused(aerial ? Laid.TOO_FAR : Laid.NO_ROUTE);

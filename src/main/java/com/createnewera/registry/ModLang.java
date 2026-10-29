@@ -146,6 +146,7 @@ public final class ModLang {
         lang("create_new_era.cable.too_far", "Too far to hang a cable (24 blocks at most)");
         lang("create_new_era.cable.no_route", "No way along the faces between them");
         lang("create_new_era.cable.already_joined", "Those two are already joined");
+        lang("create_new_era.cable.port_taken", "That port already has its cable: bring several together at a Port Hub");
 
         // Create-style tooltips: summary always, conditionN/behaviourN on Shift, controlN/actionN on Ctrl
         lang("block.create_new_era.brass_computer.tooltip.summary", "Runs _Lua_ programs you write in its built-in _editor_. They drive _redstone_ and, through _data ports_ and _cables_, the machines on the _data bus_.");

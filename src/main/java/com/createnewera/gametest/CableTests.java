@@ -204,6 +204,24 @@ public class CableTests {
         helper.succeed();
     }
 
+    // a port takes one cable; a splice takes several
+    @GameTest(template = ROOM)
+    public static void portsTakeOneCable(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BusPort a = part(helper, new BlockPos(0, 1, 0), BusPort.Kind.PORT);
+        BusPort b = part(helper, new BlockPos(4, 1, 0), BusPort.Kind.PORT);
+        BusPort c = part(helper, new BlockPos(0, 1, 4), BusPort.Kind.PORT);
+        BusPort splice = part(helper, new BlockPos(2, 1, 2), BusPort.Kind.SPLICE);
+        lay(helper, a, b, null);
+        if (Bus.plan(level, a, c, null, true).result() != Bus.Laid.PORT_TAKEN)
+            helper.fail("a second cable went into a port");
+        lay(helper, c, splice, null);
+        BusPort d = part(helper, new BlockPos(4, 1, 4), BusPort.Kind.PORT);
+        if (Bus.plan(level, d, splice, null, true).result() != Bus.Laid.OK)
+            helper.fail("a splice refused a second cable");
+        helper.succeed();
+    }
+
     private static void click(GameTestHelper helper, Player player, ItemStack spool, BusPort part) {
         player.setItemInHand(InteractionHand.MAIN_HAND, spool);
         Vec3 at = PartGeometry.anchor(part);
