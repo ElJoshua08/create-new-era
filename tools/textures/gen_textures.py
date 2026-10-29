@@ -7,6 +7,7 @@ naturally on them. 1 px here = 1/16 of a block, matching Create's density.
 
 Run: python3 tools/textures/gen_textures.py
 """
+import math
 from pathlib import Path
 
 import pixel_iso as iso
@@ -221,6 +222,93 @@ def draw_cap(c, x, y, ramp):
     c.px(x + 3, y, ramp[1])
     c.px(x, y + 3, ramp[0])
     c.px(x + 3, y + 3, ramp[0])
+
+
+NIXIE_GLYPHS = {
+    "0": ["###", "#.#", "#.#", "#.#", "###"], "1": [".#.", "##.", ".#.", ".#.", "###"],
+    "2": ["###", "..#", "###", "#..", "###"], "3": ["###", "..#", ".##", "..#", "###"],
+    "4": ["#.#", "#.#", "###", "..#", "..#"], "5": ["###", "#..", "###", "..#", "###"],
+    "6": ["###", "#..", "###", "#.#", "###"], "7": ["###", "..#", ".#.", ".#.", ".#."],
+    "8": ["###", "#.#", "###", "#.#", "###"], "9": ["###", "#.#", "###", "..#", "###"],
+}
+LAMP_OFF = ["#1a1310", "#2a1f19", "#3a2d24", "#4a3a2e"]
+
+
+def draw_control_states():
+    """One small texture per state of the panel controls that move or light up: a knob's
+    pointer, a gauge's needle, a nixie's digit, a lamp's colour. The models (gen_models.py)
+    swap just that face, so the blockstate can pick a model per state."""
+    out = OUT / "controls"
+    out.mkdir(exist_ok=True)
+
+    # knob: the brass pointer swept from -135 to +135 degrees over values 0 to 15
+    for value in range(16):
+        c = Canvas(16, 16)
+        c.rect(0, 0, 6, 6, SLATE[2])
+        c.bevel(0, 0, 6, 6, SLATE[4], SLATE[1])
+        for px_, py_ in [(0, 0), (5, 0), (0, 5), (5, 5)]:
+            c.px(px_, py_, SLATE[1])
+        a = math.radians(-135 + 270 * value / 15)
+        for r, col in [(0.6, BRASS[4]), (1.6, BRASS[5]), (2.3, BRASS[6])]:
+            c.px(int(round(2.5 + r * math.sin(a))), int(round(2.5 - r * math.cos(a))), col)
+        c.img.save(out / f"knob_{value}.png")
+
+    # gauge: the dial without its needle, then a red needle from -75 to +75 degrees
+    for value in range(16):
+        c = Canvas(16, 16)
+        c.rect(0, 0, 10, 10, BRASS[3])
+        c.bevel(0, 0, 10, 10, BRASS[6], BRASS[1], BRASS[2])
+        c.rect(1, 1, 8, 8, PARCHMENT[3])
+        c.bevel(1, 1, 8, 8, PARCHMENT[1], PARCHMENT[2])
+        for tx, ty, col in [(2, 6, PHOSPHOR[1]), (2, 4, PHOSPHOR[1]), (3, 2, AMBER[1]), (5, 2, AMBER[1]), (7, 3, RED[1]), (7, 5, RED[1])]:
+            c.px(tx, ty, col)
+        a = math.radians(-75 + 150 * value / 15)
+        cx, cy = 4.5, 6.5
+        drawn = set()
+        for step in range(1, 9):
+            r = step * 0.5
+            pt = (int(round(cx + r * math.sin(a))), int(round(cy - r * math.cos(a))))
+            if 1 <= pt[0] <= 8 and 1 <= pt[1] <= 8 and pt not in drawn:
+                drawn.add(pt)
+                c.px(*pt, RED[2] if r >= 3.5 else SLATE[0])
+        c.px(4, 7, BRASS[0])
+        c.px(5, 7, BRASS[1])
+        c.img.save(out / f"gauge_{value}.png")
+
+    # nixie: a glowing digit, or the cold filaments of all of them when it's dark
+    glass, glass_dk, glass_hi = "#1e1612", "#2e231c", "#6a5546"
+    for name in list(NIXIE_GLYPHS) + ["off"]:
+        c = Canvas(16, 16)
+        c.rect(0, 0, 6, 10, glass)
+        c.rect(0, 0, 1, 10, glass_hi)
+        c.rect(5, 0, 1, 10, glass_dk)
+        c.rect(0, 0, 6, 1, "#4a3a2e")
+        if name == "off":
+            for j, row in enumerate(NIXIE_GLYPHS["8"]):
+                for i, ch in enumerate(row):
+                    if ch == "#":
+                        c.px(1 + i, 2 + j, "#3a2a20")
+        else:
+            lit = {(1 + i, 2 + j) for j, row in enumerate(NIXIE_GLYPHS[name]) for i, ch in enumerate(row) if ch == "#"}
+            for (i, j) in list(lit):
+                for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    n = (i + di, j + dj)
+                    if n not in lit and 1 <= n[0] <= 4 and 1 <= n[1] <= 8:
+                        c.px(n[0], n[1], AMBER[0])
+            for (i, j) in lit:
+                c.px(i, j, AMBER[3] if j == 2 else AMBER[2])
+        c.img.save(out / f"nixie_{name}.png")
+
+    # lamp: the cap on top (4x4 at 0,0) and its side (4x3 at 0,4), lit or dark
+    for name, ramp in [("off", LAMP_OFF), ("amber", AMBER), ("green", PHOSPHOR), ("red", RED)]:
+        c = Canvas(16, 16)
+        draw_cap(c, 0, 0, ramp)
+        if name != "off":
+            c.px(1, 1, "#ffffff")
+        c.rect(0, 4, 4, 2, ramp[2])
+        c.px(0, 4, ramp[3])
+        c.rect(0, 6, 4, 1, BRASS[2])
+        c.img.save(out / f"lamp_{name}.png")
 
 
 def draw_parts():
@@ -610,6 +698,7 @@ def main():
     draw_editor_checker()
     draw_bus_parts()
     draw_port_panel()
+    draw_control_states()
     draw_control_plate_item()
     draw_bus_items()
     draw_cables()

@@ -1,0 +1,142 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/andesite_casing",
+    "parts": "create_new_era:block/interface_parts",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/andesite_casing",
+    "dial": "create_new_era:block/controls/gauge_2"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        2,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ]
+        }
+      }
+    },
+    {
+      "name": "gauge",
+      "from": [
+        3,
+        2,
+        3
+      ],
+      "to": [
+        13,
+        4,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            13.0,
+            2.0
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            13.0,
+            2.0
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            13.0,
+            2.0
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            13.0,
+            2.0
+          ]
+        },
+        "up": {
+          "texture": "#dial",
+          "uv": [
+            0,
+            0,
+            10,
+            10
+          ]
+        }
+      }
+    }
+  ]
+}

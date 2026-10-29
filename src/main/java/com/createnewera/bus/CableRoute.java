@@ -9,9 +9,12 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.createnewera.block.control.PanelControlBlock;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -42,8 +45,7 @@ public final class CableRoute {
      * on aren't joined by open surface (or it's too long).
      */
     public static @Nullable List<Vec3> surface(BlockGetter level, BusPort from, BusPort to) {
-        Cell start = new Cell(from.pos().relative(from.face()), from.face().getOpposite());
-        Cell goal = new Cell(to.pos().relative(to.face()), to.face().getOpposite());
+        Cell start = cellOf(from), goal = cellOf(to);
         if (!open(level, start.pos) || !open(level, goal.pos))
             return null;
         Map<Cell, Cell> came = new HashMap<>();
@@ -195,6 +197,13 @@ public final class CableRoute {
         return true;
     }
 
+    /** The cell a part's cable starts from: the space in front of it, or a control's own space. */
+    private static Cell cellOf(BusPort part) {
+        if (part.kind() == BusPort.Kind.CONTROL) // lying on the block that holds the control
+            return new Cell(part.pos(), part.face().getOpposite());
+        return new Cell(part.pos().relative(part.face()), part.face().getOpposite());
+    }
+
     private static List<Cell> neighbours(BlockGetter level, Cell cell) {
         List<Cell> out = new ArrayList<>(4);
         for (Direction m : Direction.values()) {
@@ -233,8 +242,10 @@ public final class CableRoute {
         return new Vec3(d.getStepX() * by, d.getStepY() * by, d.getStepZ() * by);
     }
 
+    /** Room for a cable: nothing there, or only a thin panel control it can run past. */
     private static boolean open(BlockGetter level, BlockPos pos) {
-        return level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
+        BlockState state = level.getBlockState(pos);
+        return state.getBlock() instanceof PanelControlBlock || state.getCollisionShape(level, pos).isEmpty();
     }
 
     private static boolean solid(BlockGetter level, BlockPos pos) {

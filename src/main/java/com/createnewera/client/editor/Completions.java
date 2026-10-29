@@ -163,6 +163,12 @@ public final class Completions {
                     out.add(new Entry(method, Kind.FUNCTION, method + "($0)", d.name() + " · " + translate.apply(d.typeKey()), ""));
                 out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function()\n  $0\nend)",
                         "runs when " + d.name() + " changes", ""));
+                if (d.methods().contains("isPressed"))
+                    out.add(new Entry("onPress", Kind.FUNCTION, "onPress(function()\n  $0\nend)",
+                            "runs each time " + d.name() + " is pressed", ""));
+                if (d.methods().contains("getKey"))
+                    out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)",
+                            "runs for every key pressed on " + d.name(), ""));
                 return out;
             }
         return null;

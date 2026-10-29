@@ -206,6 +206,58 @@ MODELS = {
 }
 
 
+# Panel controls, one model per state the player or a program can change; the blockstate
+# (ModBlocks.control) picks one. Each swaps only the part that moves or lights up, textured
+# from textures/block/controls/ (gen_textures.draw_control_states).
+def control_state(base, swap):
+    """A copy of a control's model with some elements replaced: swap maps element name to a
+    function given that element, returning its replacement."""
+    m = json.loads(json.dumps(MODELS[base]))
+    m["elements"] = [swap[e["name"]](e) if e.get("name") in swap else e for e in m["elements"]]
+    return m
+
+
+def with_texture(m, key, texture):
+    m["textures"][key] = texture
+    return m
+
+
+def moved(e, frm, to):
+    e = json.loads(json.dumps(e))
+    e["from"], e["to"] = frm, to
+    return e
+
+
+MODELS["panel_button_pressed"] = control_state("panel_button", {"cap": lambda e: moved(e, [6, 3, 6], [10, 3.75, 10])})
+
+
+def flipped(e):
+    e = json.loads(json.dumps(e))
+    e["rotation"]["angle"] = -e["rotation"]["angle"]
+    return e
+
+
+MODELS["panel_switch_on"] = control_state("panel_switch", {"lever": flipped, "tip": flipped})
+
+for value in range(16):
+    knob = control_state("panel_knob", {"knob": lambda e: {**e, "faces": {**e["faces"], "up": {"texture": "#knob", "uv": [0, 0, 6, 6]}}}})
+    MODELS[f"panel_knob_{value}"] = with_texture(knob, "knob", f"create_new_era:block/controls/knob_{value}")
+    x = 2.5 + value * 8 / 15
+    MODELS[f"panel_slider_{value}"] = control_state("panel_slider", {"handle": lambda e, x=x: moved(e, [x, 2.5, 6.5], [x + 3, 5, 9.5])})
+    gauge = control_state("panel_gauge", {"gauge": lambda e: {**e, "faces": {**e["faces"], "up": {"texture": "#dial", "uv": [0, 0, 10, 10]}}}})
+    MODELS[f"panel_gauge_{value}"] = with_texture(gauge, "dial", f"create_new_era:block/controls/gauge_{value}")
+
+for light in ("off", "amber", "green", "red"):
+    lamp = control_state("panel_lamp", {"lamp": lambda e: {**e, "faces": {
+        f: {"texture": "#light", "uv": [0, 0, 4, 4] if f == "up" else [0, 4, 4, 7]} for f in e["faces"]}}})
+    MODELS[f"panel_lamp_{light}"] = with_texture(lamp, "light", f"create_new_era:block/controls/lamp_{light}")
+
+for digit in [str(d) for d in range(10)] + ["off"]:
+    nixie = control_state("nixie_digit", {"tube": lambda e: {**e, "faces": {**e["faces"],
+        "north": {"texture": "#digit", "uv": [0, 0, 6, 10]}, "south": {"texture": "#digit", "uv": [0, 0, 6, 10]}}}})
+    MODELS[f"nixie_digit_{digit}"] = with_texture(nixie, "digit", f"create_new_era:block/controls/nixie_{digit}")
+
+
 # Brass screen, front facing north. Screens next to each other (same facing) join:
 # a side with a neighbour swaps its brass frame strip for glass, so the wall reads as one pane.
 # The blockstate (datagen, ModBlocks) picks the pieces. Seen from the front, +x is the

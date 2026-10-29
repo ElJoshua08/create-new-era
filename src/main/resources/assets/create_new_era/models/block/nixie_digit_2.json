@@ -1,0 +1,271 @@
+{
+  "credit": "Create: New Era",
+  "parent": "block/block",
+  "textures": {
+    "casing": "create:block/andesite_casing",
+    "parts": "create_new_era:block/interface_parts",
+    "details": "create_new_era:block/computing_details",
+    "particle": "create:block/andesite_casing",
+    "digit": "create_new_era:block/controls/nixie_2"
+  },
+  "elements": [
+    {
+      "name": "base",
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        2,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            14,
+            14,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ]
+        }
+      }
+    },
+    {
+      "name": "socket",
+      "from": [
+        4,
+        2,
+        5
+      ],
+      "to": [
+        12,
+        3,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            12.0,
+            1.5
+          ]
+        },
+        "south": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            12.0,
+            1.5
+          ]
+        },
+        "east": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            12.0,
+            1.5
+          ]
+        },
+        "west": {
+          "texture": "#details",
+          "uv": [
+            8.0,
+            1.0,
+            12.0,
+            1.5
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            4.0,
+            0.0,
+            7.0,
+            3.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "tube",
+      "from": [
+        5,
+        3,
+        6
+      ],
+      "to": [
+        11,
+        13,
+        10
+      ],
+      "faces": {
+        "north": {
+          "texture": "#digit",
+          "uv": [
+            0,
+            0,
+            6,
+            10
+          ]
+        },
+        "south": {
+          "texture": "#digit",
+          "uv": [
+            0,
+            0,
+            6,
+            10
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            13.0,
+            3.0,
+            15.0,
+            8.0
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            13.0,
+            3.0,
+            15.0,
+            8.0
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            10.0,
+            8.0,
+            13.0,
+            10.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "dome",
+      "from": [
+        6,
+        13,
+        7
+      ],
+      "to": [
+        10,
+        14,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        },
+        "south": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        },
+        "east": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        },
+        "up": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        },
+        "down": {
+          "texture": "#parts",
+          "uv": [
+            10.5,
+            8.5,
+            12.5,
+            9.5
+          ]
+        }
+      }
+    }
+  ]
+}

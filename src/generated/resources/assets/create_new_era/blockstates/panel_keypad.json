@@ -1,27 +1,677 @@
 {
   "variants": {
-    "facing=down": {
+    "facing=down,key=0,stroke=false": {
       "model": "create_new_era:block/panel_keypad",
       "x": 180
     },
-    "facing=east": {
+    "facing=down,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=down,key=9,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 180
+    },
+    "facing=east,key=0,stroke=false": {
       "model": "create_new_era:block/panel_keypad",
       "x": 90,
       "y": 90
     },
-    "facing=north": {
+    "facing=east,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,key=9,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,key=0,stroke=false": {
       "model": "create_new_era:block/panel_keypad",
       "x": 90
     },
-    "facing=south": {
+    "facing=north,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=north,key=9,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90
+    },
+    "facing=south,key=0,stroke=false": {
       "model": "create_new_era:block/panel_keypad",
       "x": 90,
       "y": 180
     },
-    "facing=up": {
+    "facing=south,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,key=9,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,key=0,stroke=false": {
       "model": "create_new_era:block/panel_keypad"
     },
-    "facing=west": {
+    "facing=up,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=up,key=9,stroke=true": {
+      "model": "create_new_era:block/panel_keypad"
+    },
+    "facing=west,key=0,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=0,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=1,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=1,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=10,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=10,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=11,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=11,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=12,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=12,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=2,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=2,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=3,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=3,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=4,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=4,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=5,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=5,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=6,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=6,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=7,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=7,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=8,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=8,stroke=true": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=9,stroke=false": {
+      "model": "create_new_era:block/panel_keypad",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,key=9,stroke=true": {
       "model": "create_new_era:block/panel_keypad",
       "x": 90,
       "y": 270

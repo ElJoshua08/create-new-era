@@ -3,12 +3,22 @@ package com.createnewera.registry;
 import static com.createnewera.CreateNewEra.REGISTRATE;
 
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.createnewera.block.BrassScreenBlock;
 import com.createnewera.block.DirectionalPartBlock;
 import com.createnewera.block.DirectionalPartBlock.Placement;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.HorizontalMachineBlock;
+import com.createnewera.block.control.NixieDigitBlock;
+import com.createnewera.block.control.PanelButtonBlock;
+import com.createnewera.block.control.PanelControlBlock;
+import com.createnewera.block.control.PanelDialBlock;
+import com.createnewera.block.control.PanelGaugeBlock;
+import com.createnewera.block.control.PanelKeypadBlock;
+import com.createnewera.block.control.PanelLampBlock;
+import com.createnewera.block.control.PanelSwitchBlock;
 import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.api.stress.BlockStressValues;
 import com.simibubi.create.foundation.data.SharedProperties;
@@ -24,8 +34,11 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 
@@ -68,25 +81,52 @@ public final class ModBlocks {
 
     private static final double[] PLATE = box(2, 0, 2, 14, 2, 14);
 
-    public static final BlockEntry<DirectionalPartBlock> PANEL_BUTTON = control("panel_button", "Panel Button",
-            box(5, 2, 5, 11, 5, 11));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_SWITCH = control("panel_switch", "Panel Switch",
-            box(6, 2, 6, 10, 11, 10));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_KNOB = control("panel_knob", "Panel Knob",
-            box(5, 2, 5, 11, 5, 11));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_SLIDER = control("panel_slider", "Panel Slider",
-            box(2.5, 2, 6, 13.5, 5, 10));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_LAMP = control("panel_lamp", "Panel Lamp",
-            box(5, 2, 5, 11, 6, 11));
-    public static final BlockEntry<DirectionalPartBlock> NIXIE_DIGIT = control("nixie_digit", "Nixie Digit",
-            box(4, 2, 5, 12, 14, 11));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_GAUGE = control("panel_gauge", "Panel Gauge",
-            box(3, 2, 3, 13, 4, 13));
-    public static final BlockEntry<DirectionalPartBlock> PANEL_KEYPAD = control("panel_keypad", "Panel Keypad",
-            box(3, 2, 2, 13, 3, 14));
+    public static final BlockEntry<PanelButtonBlock> PANEL_BUTTON = control("panel_button", "Panel Button",
+            box(5, 2, 5, 11, 5, 11), PanelButtonBlock::new,
+            s -> s.getValue(PanelButtonBlock.PRESSED) ? "panel_button_pressed" : "panel_button");
+    public static final BlockEntry<PanelSwitchBlock> PANEL_SWITCH = control("panel_switch", "Panel Switch",
+            box(6, 2, 6, 10, 11, 10), PanelSwitchBlock::new,
+            s -> s.getValue(PanelSwitchBlock.ON) ? "panel_switch_on" : "panel_switch");
+    public static final BlockEntry<PanelDialBlock> PANEL_KNOB = control("panel_knob", "Panel Knob",
+            box(5, 2, 5, 11, 5, 11), (p, shape) -> new PanelDialBlock(p, shape, PanelDialBlock.Style.KNOB),
+            s -> "panel_knob_" + s.getValue(PanelDialBlock.VALUE));
+    public static final BlockEntry<PanelDialBlock> PANEL_SLIDER = control("panel_slider", "Panel Slider",
+            box(2.5, 2, 6, 13.5, 5, 10), (p, shape) -> new PanelDialBlock(p, shape, PanelDialBlock.Style.SLIDER),
+            s -> "panel_slider_" + s.getValue(PanelDialBlock.VALUE));
+    public static final BlockEntry<PanelLampBlock> PANEL_LAMP = control("panel_lamp", "Panel Lamp",
+            box(5, 2, 5, 11, 6, 11), PanelLampBlock::new,
+            s -> "panel_lamp_" + s.getValue(PanelLampBlock.LIGHT).getSerializedName());
+    public static final BlockEntry<NixieDigitBlock> NIXIE_DIGIT = control("nixie_digit", "Nixie Digit",
+            box(4, 2, 5, 12, 14, 11), NixieDigitBlock::new,
+            s -> "nixie_digit_" + (s.getValue(NixieDigitBlock.DIGIT) == NixieDigitBlock.DARK ? "off" : s.getValue(NixieDigitBlock.DIGIT)));
+    public static final BlockEntry<PanelGaugeBlock> PANEL_GAUGE = control("panel_gauge", "Panel Gauge",
+            box(3, 2, 3, 13, 4, 13), PanelGaugeBlock::new,
+            s -> "panel_gauge_" + s.getValue(PanelGaugeBlock.NEEDLE));
+    public static final BlockEntry<PanelKeypadBlock> PANEL_KEYPAD = control("panel_keypad", "Panel Keypad",
+            box(3, 2, 2, 13, 3, 14), PanelKeypadBlock::new, s -> "panel_keypad");
 
-    private static BlockEntry<DirectionalPartBlock> control(String name, String english, double[] part) {
-        return part(name, english, DirectionalShape.up(PLATE, part), Placement.AGAINST_FACE, MapColor.STONE);
+    /**
+     * A panel control on its andesite plate. Its model follows its state (a pressed button, a
+     * knob's setting...), turned to whichever face it was put on.
+     */
+    private static <T extends PanelControlBlock> BlockEntry<T> control(String name, String english, double[] part,
+            BiFunction<BlockBehaviour.Properties, DirectionalShape, T> factory, Function<BlockState, String> model) {
+        DirectionalShape shape = DirectionalShape.up(PLATE, part);
+        return REGISTRATE
+                .block(name, p -> factory.apply(p, shape))
+                .initialProperties(SharedProperties::stone)
+                .properties(p -> p.mapColor(MapColor.STONE).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops().noOcclusion())
+                .transform(TagGen.pickaxeOnly())
+                .blockstate((c, p) -> p.getVariantBuilder(c.get()).forAllStates(state -> {
+                    Direction facing = state.getValue(DirectionalPartBlock.FACING);
+                    return ConfiguredModel.builder().modelFile(existing(p, model.apply(state)))
+                            .rotationX(facing == Direction.DOWN ? 180 : facing.getAxis().isHorizontal() ? 90 : 0)
+                            .rotationY(facing.getAxis().isVertical() ? 0 : ((int) facing.toYRot() + 180) % 360)
+                            .build();
+                }))
+                .lang(english)
+                .item().model(ModBlocks::blockItemModel).build()
+                .register();
     }
 
     private static BlockEntry<DirectionalPartBlock> part(String name, String english, DirectionalShape shape,

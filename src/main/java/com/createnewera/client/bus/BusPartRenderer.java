@@ -86,6 +86,8 @@ public final class BusPartRenderer {
             for (BusPort part : chunk) {
                 if (part.pos().distToCenterSqr(camera) > RANGE * RANGE)
                     continue;
+                if (part.kind() == BusPort.Kind.CONTROL)
+                    continue; // built into the control's plate
                 // a computer's own ports are drawn by its side panels: only their lamp goes on top
                 boolean builtIn = Bus.builtIn(mc.level.getBlockState(part.pos()), part);
                 BakedModel model = models.getModel(switch (part.kind()) {
@@ -93,6 +95,7 @@ public final class BusPartRenderer {
                             : part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
                     case EXPANSION -> EXPANSION;
                     case SPLICE -> SPLICE;
+                    case CONTROL -> SPLICE; // never reached: skipped above
                 });
                 BlockPos outside = part.pos().relative(part.face());
                 pose.pushPose();

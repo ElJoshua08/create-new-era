@@ -82,11 +82,30 @@ public final class Bus {
         return part;
     }
 
+    /** Gives a panel control its built-in connection, once. */
+    public static void fitControl(ServerLevel level, BlockPos pos, Direction facing) {
+        BusData data = BusData.get(level);
+        if (data.portsAt(pos).stream().anyMatch(p -> p.kind() == BusPort.Kind.CONTROL))
+            return;
+        if (data.addPart(pos, facing, 6, 6, BusPort.Kind.CONTROL, PortMode.IN) != null)
+            sync(level, pos);
+    }
+
+    /** A panel control's connection, if the block has one. */
+    public static @Nullable BusPort controlAt(List<BusPort> parts) {
+        for (BusPort part : parts)
+            if (part.kind() == BusPort.Kind.CONTROL)
+                return part;
+        return null;
+    }
+
     /**
      * Whether a part is one of a computer's own ports, sitting in one of its sockets: those come
      * with the computer and can't be taken off.
      */
     public static boolean builtIn(BlockState state, BusPort part) {
+        if (part.kind() == BusPort.Kind.CONTROL)
+            return true;
         return part.kind() == BusPort.Kind.PORT && state.getBlock() instanceof BrassComputerBlock
                 && BrassComputerBlock.sockets(state, part.pos()).stream()
                         .anyMatch(s -> s.face() == part.face() && s.u() == part.u() && s.v() == part.v());
@@ -292,10 +311,12 @@ public final class Bus {
         Map<BlockPos, boolean[]> modes = new LinkedHashMap<>(); // pos → {readable, writable}
         for (long id : reachable) {
             BusPort port = data.port(id);
-            if (port == null || port.pos().equals(computer) || port.kind() != BusPort.Kind.PORT)
+            if (port == null || port.pos().equals(computer) || (port.kind() != BusPort.Kind.PORT && port.kind() != BusPort.Kind.CONTROL))
                 continue;
             boolean[] m = modes.computeIfAbsent(port.pos(), p -> new boolean[2]);
-            if (port.mode() == PortMode.OUT)
+            if (port.kind() == BusPort.Kind.CONTROL) {
+                m[0] = m[1] = true; // read and given orders through the same connection
+            } else if (port.mode() == PortMode.OUT)
                 m[0] = true;
             else
                 m[1] = true;

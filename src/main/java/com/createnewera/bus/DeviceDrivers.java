@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.Varargs;
 
+import com.createnewera.block.control.PanelControlBlock;
 import com.simibubi.create.content.kinetics.KineticNetwork;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntity;
 import com.simibubi.create.content.kinetics.motor.CreativeMotorBlockEntity;
@@ -23,6 +24,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -42,6 +44,10 @@ public final class DeviceDrivers {
     /** Readers need an output port on the device, writers an input port. */
     public static Map<String, Method> methods(ServerLevel level, BlockPos pos, boolean readable, boolean writable) {
         Map<String, Method> out = new LinkedHashMap<>();
+        if (level.getBlockState(pos).getBlock() instanceof PanelControlBlock control) {
+            control.methods(out, level, pos);
+            return out;
+        }
         BlockEntity be = level.getBlockEntity(pos);
 
         if (be instanceof KineticBlockEntity kinetic) {
@@ -80,6 +86,9 @@ public final class DeviceDrivers {
      * when it changed without knowing what kind of device it is.
      */
     public static Object snapshot(ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof PanelControlBlock control)
+            return control.snapshot(state);
         List<Object> parts = new ArrayList<>();
         if (level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic) {
             parts.add(kinetic.getSpeed());

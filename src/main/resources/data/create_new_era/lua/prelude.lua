@@ -102,6 +102,31 @@ function bus.get(name)
         end
         list[#list + 1] = { fn = fn, device = device }
     end
+    -- a panel button: runs fn(device) each time it's pressed down
+    if device.isPressed then
+        function device.onPress(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onPress' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            device.onChange(function(d)
+                if d.isPressed() then fn(d) end
+            end)
+        end
+    end
+    -- a keypad: runs fn(key, device) for every key pressed, key being "0" to "9", "*" or "#"
+    if device.getKey then
+        function device.onKey(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onKey' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            device.onChange(function(d)
+                local key = d.getKey()
+                if key then fn(key, d) end
+            end)
+        end
+    end
     return device
 end
 

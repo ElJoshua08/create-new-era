@@ -33,8 +33,12 @@ public final class PartGeometry {
                 outside.getX() + Math.max(a[0], b[0]) / 16, outside.getY() + Math.max(a[1], b[1]) / 16, outside.getZ() + Math.max(a[2], b[2]) / 16);
     }
 
-    /** Where a cable plugs in: the middle of the part. */
+    /** Where a cable plugs in: the middle of the part, or for a panel control the edge of its plate. */
     public static Vec3 anchor(BusPort part) {
+        if (part.kind() == BusPort.Kind.CONTROL) {
+            double[] at = DirectionalShape.map(8, 1, 13.5, part.face());
+            return new Vec3(part.pos().getX() + at[0] / 16, part.pos().getY() + at[1] / 16, part.pos().getZ() + at[2] / 16);
+        }
         return box(part).getCenter();
     }
 
@@ -65,7 +69,8 @@ public final class PartGeometry {
     /** The part on this face that the click landed on, if any. */
     public static @Nullable BusPort partAt(Iterable<BusPort> parts, Direction face, Vec3 hit) {
         for (BusPort part : parts)
-            if (part.face() == face && box(part).inflate(0.01).contains(hit))
+            // a control's connection is the whole control: clicking it works the control
+            if (part.kind() != BusPort.Kind.CONTROL && part.face() == face && box(part).inflate(0.01).contains(hit))
                 return part;
         return null;
     }

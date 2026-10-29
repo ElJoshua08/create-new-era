@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.createnewera.block.control.PanelControlBlock;
 import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusData;
 import com.createnewera.bus.BusEvents;
@@ -56,6 +57,14 @@ public class CableSpoolItem extends Item {
                 ? BusData.get(server).portsAt(context.getClickedPos())
                 : BusEvents.clientParts.apply(context.getClickedPos());
         BusPort part = PartGeometry.partAt(parts, context.getClickedFace(), context.getClickLocation());
+        // a panel control takes the cable anywhere on it, into its own connection (fitted now
+        // if it was placed before controls had one)
+        if (part == null && level.getBlockState(context.getClickedPos()).getBlock() instanceof PanelControlBlock) {
+            if (!(level instanceof ServerLevel server))
+                return InteractionResult.SUCCESS;
+            Bus.fitControl(server, context.getClickedPos(), level.getBlockState(context.getClickedPos()).getValue(PanelControlBlock.FACING));
+            part = Bus.controlAt(BusData.get(server).portsAt(context.getClickedPos()));
+        }
         if (part == null || !part.takesCables())
             return InteractionResult.PASS;
         if (!(level instanceof ServerLevel server) || context.getPlayer() == null)

@@ -18,7 +18,9 @@ public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind 
         /** Gives a computer more ports. */
         EXPANSION(6),
         /** Joins cables in the middle of a run; it isn't a device. */
-        SPLICE(4);
+        SPLICE(4),
+        /** A panel control's own connection, built into its plate: placed with it, never drawn. */
+        CONTROL(4);
 
         /** Footprint on the face, in pixels. */
         public final int size;

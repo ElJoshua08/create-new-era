@@ -40,6 +40,18 @@ public final class DirectionalShape {
                 Math.max(p[0], q[0]), Math.max(p[1], q[1]), Math.max(p[2], q[2]));
     }
 
+    /** The other way round from {@link #map}: a point in the block, in the up-facing model's pixels. */
+    public static double[] unmap(double x, double y, double z, Direction facing) {
+        return switch (facing) {
+            case UP -> new double[] {x, y, z};
+            case DOWN -> new double[] {x, 16 - y, 16 - z};
+            case NORTH -> new double[] {x, 16 - z, y};
+            case SOUTH -> new double[] {16 - x, z, y};
+            case EAST -> new double[] {z, x, y};
+            case WEST -> new double[] {16 - z, 16 - x, y};
+        };
+    }
+
     /** A point (in pixels) of something authored facing up, where it ends up facing {@code facing}. */
     public static double[] map(double x, double y, double z, Direction facing) {
         return switch (facing) {
