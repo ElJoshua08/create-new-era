@@ -102,14 +102,14 @@ public final class CableRenderer {
         for (BusSpan span : ClientBusParts.spans()) {
             if (span.points().get(0).distanceToSqr(camera) > RANGE * RANGE)
                 continue;
-            tube(pose, consumer, mc.level, CableShape.line(span), CableShape.radius(span), sprite(texture(span)), 0xFFFFFF);
+            tube(pose, consumer, mc.level, CableShape.line(span, mc.level), CableShape.radius(span), sprite(texture(span)), 0xFFFFFF);
         }
         preview(mc, pose, consumer);
         buffers.endBatch(RenderType.cutout());
 
         BusSpan hovered = hovered(mc, mc.player.blockInteractionRange());
         if (hovered != null) {
-            outline(pose, buffers.getBuffer(RenderType.lines()), CableShape.line(hovered), CableShape.radius(hovered) + 0.01);
+            outline(pose, buffers.getBuffer(RenderType.lines()), CableShape.line(hovered, mc.level), CableShape.radius(hovered) + 0.01);
             buffers.endBatch(RenderType.lines());
         }
         pose.popPose();
@@ -133,17 +133,17 @@ public final class CableRenderer {
             List<Vec3> route = aerial ? CableRoute.aerial(from, to) : CableRoute.surface(mc.level, from, to);
             boolean colours = BusSpan.compatible(ClientBusParts.colorAt(to.id()), color);
             if (route != null) {
-                line = aerial ? CableShape.hanging(route.get(0), route.get(1)) : route;
+                line = aerial ? CableShape.hanging(route.get(0), route.get(1), mc.level, CableShape.BARE) : route;
                 ok = colours && (player.getAbilities().instabuild
                         || CableRoute.metres(route, aerial) <= CableSpoolItem.metresLeft(held));
             }
         }
         if (line == null) {
             HitResult hit = mc.hitResult;
-            Vec3 end = to != null ? PartGeometry.anchor(to)
+            Vec3 end = to != null ? PartGeometry.anchor(to, start.anchor())
                     : hit != null && hit.getType() != HitResult.Type.MISS ? hit.getLocation()
                     : player.getEyePosition().add(player.getViewVector(1).scale(4));
-            line = CableShape.hanging(start.anchor(), end);
+            line = CableShape.hanging(start.anchor(), end, mc.level, CableShape.BARE);
             ok = to == null && start.anchor().distanceTo(end) <= CableRoute.MAX_AERIAL;
         }
         tube(pose, consumer, mc.level, line, CableShape.BARE * 0.75, sprite(cableTexture(color)), ok ? 0xFFFFFF : 0xFF5050);
@@ -238,7 +238,7 @@ public final class CableRenderer {
         Vec3 eye = mc.player.getEyePosition();
         if (mc.hitResult != null && mc.hitResult.getType() != HitResult.Type.MISS)
             reach = Math.min(reach, mc.hitResult.getLocation().distanceTo(eye));
-        return CableShape.pick(ClientBusParts.spans(), eye, mc.player.getViewVector(1), reach);
+        return CableShape.pick(ClientBusParts.spans(), mc.level, eye, mc.player.getViewVector(1), reach);
     }
 
     private static void click(InputEvent.InteractionKeyMappingTriggered event) {

@@ -10,6 +10,7 @@ import com.createnewera.bus.BusSpan;
 import com.createnewera.bus.CableRoute;
 import com.createnewera.bus.PartGeometry;
 import com.createnewera.bus.PortMode;
+import com.createnewera.cable.CableShape;
 import com.createnewera.cable.CableSpoolItem;
 import com.createnewera.computer.BrassComputerBlock;
 import com.createnewera.cable.SpoolDyeRecipe;
@@ -145,6 +146,35 @@ public class CableTests {
                 if (!level.getBlockState(at).isAir())
                     helper.fail("the route cuts through " + at);
             }
+        helper.succeed();
+    }
+
+    // a sagging cable between two low points lies on the floor instead of sinking into it
+    @GameTest(template = ROOM)
+    public static void hangingCablesRestOnWhatTheyCross(GameTestHelper helper) {
+        floor(helper);
+        BlockPos base = helper.absolutePos(BlockPos.ZERO);
+        Vec3 a = Vec3.atLowerCornerOf(base).add(0.5, 1.05, 0.5), b = Vec3.atLowerCornerOf(base).add(4.5, 1.05, 4.5);
+        List<Vec3> line = CableShape.hanging(a, b, helper.getLevel(), CableShape.BARE);
+        for (Vec3 p : line.subList(1, line.size() - 1)) // the ends are the ports themselves
+            if (p.y < base.getY() + 1 + CableShape.BARE - 1e-6)
+                helper.fail("the cable sinks into the floor at " + p);
+        helper.succeed();
+    }
+
+    // a panel control's cable leaves its plate on the side facing the other end
+    @GameTest(template = ROOM)
+    public static void controlCablesLeaveTowardsTheOtherEnd(GameTestHelper helper) {
+        floor(helper);
+        helper.setBlock(new BlockPos(1, 1, 2), ModBlocks.PANEL_LAMP.getDefaultState());
+        BlockPos lamp = helper.absolutePos(new BlockPos(1, 1, 2));
+        BusPort connection = Bus.controlAt(BusData.get(helper.getLevel()).portsAt(lamp));
+        Vec3 east = Vec3.atCenterOf(lamp).add(3, 0, 0), north = Vec3.atCenterOf(lamp).add(0, 0, -3);
+        Vec3 towardsEast = PartGeometry.anchor(connection, east), towardsNorth = PartGeometry.anchor(connection, north);
+        if (Math.abs(towardsEast.x - (lamp.getX() + 14 / 16.0)) > 1e-6)
+            helper.fail("a cable going east leaves at " + towardsEast);
+        if (Math.abs(towardsNorth.z - (lamp.getZ() + 2 / 16.0)) > 1e-6)
+            helper.fail("a cable going north leaves at " + towardsNorth);
         helper.succeed();
     }
 

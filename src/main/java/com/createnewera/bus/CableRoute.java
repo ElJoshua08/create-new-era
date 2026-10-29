@@ -34,7 +34,10 @@ public final class CableRoute {
 
     /** A hanging span: just its two ends; the sag is drawn, not stored. */
     public static @Nullable List<Vec3> aerial(BusPort from, BusPort to) {
-        Vec3 a = PartGeometry.anchor(from), b = PartGeometry.anchor(to);
+        // each end faces the other: a control's cable leaves its plate on the side it's heading for
+        Vec3 a = PartGeometry.anchor(from, PartGeometry.anchor(to));
+        Vec3 b = PartGeometry.anchor(to, a);
+        a = PartGeometry.anchor(from, b);
         return a.distanceTo(b) <= MAX_AERIAL ? List.of(a, b) : null;
     }
 
@@ -77,7 +80,8 @@ public final class CableRoute {
             if (c.equals(start))
                 break;
         }
-        return pull(level, cells, onFace(PartGeometry.anchor(from), from.face()), onFace(PartGeometry.anchor(to), to.face()));
+        Vec3 a = PartGeometry.anchor(from, PartGeometry.anchor(to)), b = PartGeometry.anchor(to, a);
+        return pull(level, cells, onFace(a, from.face()), onFace(b, to.face()));
     }
 
     /**

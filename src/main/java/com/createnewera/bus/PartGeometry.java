@@ -33,13 +33,40 @@ public final class PartGeometry {
                 outside.getX() + Math.max(a[0], b[0]) / 16, outside.getY() + Math.max(a[1], b[1]) / 16, outside.getZ() + Math.max(a[2], b[2]) / 16);
     }
 
-    /** Where a cable plugs in: the middle of the part, or for a panel control the edge of its plate. */
+    /** Where a cable plugs in: the middle of the part, or for a panel control the middle of its plate's near edge. */
     public static Vec3 anchor(BusPort part) {
-        if (part.kind() == BusPort.Kind.CONTROL) {
-            double[] at = DirectionalShape.map(8, 1, 13.5, part.face());
-            return new Vec3(part.pos().getX() + at[0] / 16, part.pos().getY() + at[1] / 16, part.pos().getZ() + at[2] / 16);
+        return part.kind() == BusPort.Kind.CONTROL ? plateEdge(part, 8, 14) : box(part).getCenter();
+    }
+
+    /**
+     * Where a cable heading for {@code toward} plugs in. A panel control's connection runs all
+     * round the edge of its plate, so the cable leaves from the point of that edge nearest where
+     * it's going; anything else has the one spot.
+     */
+    public static Vec3 anchor(BusPort part, Vec3 toward) {
+        if (part.kind() != BusPort.Kind.CONTROL)
+            return anchor(part);
+        double[] t = DirectionalShape.unmap((toward.x - part.pos().getX()) * 16, (toward.y - part.pos().getY()) * 16,
+                (toward.z - part.pos().getZ()) * 16, part.face());
+        double x = Mth.clamp(t[0], PLATE_FROM, PLATE_TO), z = Mth.clamp(t[2], PLATE_FROM, PLATE_TO);
+        // inside the plate's outline (straight above it, say): out to the nearest side
+        double toLeft = x - PLATE_FROM, toRight = PLATE_TO - x, toNear = z - PLATE_FROM, toFar = PLATE_TO - z;
+        double nearest = Math.min(Math.min(toLeft, toRight), Math.min(toNear, toFar));
+        if (nearest > 0) {
+            if (nearest == toLeft) x = PLATE_FROM;
+            else if (nearest == toRight) x = PLATE_TO;
+            else if (nearest == toNear) z = PLATE_FROM;
+            else z = PLATE_TO;
         }
-        return box(part).getCenter();
+        return plateEdge(part, x, z);
+    }
+
+    /** A panel control's andesite plate, in the up-facing model's pixels. */
+    private static final double PLATE_FROM = 2, PLATE_TO = 14;
+
+    private static Vec3 plateEdge(BusPort part, double x, double z) {
+        double[] at = DirectionalShape.map(x, 1, z, part.face());
+        return new Vec3(part.pos().getX() + at[0] / 16, part.pos().getY() + at[1] / 16, part.pos().getZ() + at[2] / 16);
     }
 
     /**

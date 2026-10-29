@@ -104,7 +104,7 @@ public final class CableActions {
     private static boolean inReach(ServerPlayer player, BusSpan span) {
         Vec3 eye = player.getEyePosition();
         double reach = player.blockInteractionRange() + 1.5;
-        return CableShape.hit(span, eye, player.getViewVector(1), reach) >= 0
+        return CableShape.hit(span, player.level(), eye, player.getViewVector(1), reach) >= 0
                 || span.points().stream().anyMatch(p -> p.distanceTo(eye) <= reach);
     }
 
