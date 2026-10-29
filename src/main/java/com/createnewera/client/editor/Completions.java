@@ -16,6 +16,7 @@ import com.createnewera.client.editor.LuaApi.Kind;
 import com.createnewera.network.NetworkDevice;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 
 /** Works out what to suggest at the cursor. Pure text in, ranked suggestions out. */
 public final class Completions {
@@ -45,18 +46,18 @@ public final class Completions {
      * @param document     the whole file, for names it defines
      * @param files        files on the computer, for require("...")
      * @param devices      the computer's network, nearest first, for device names and their methods
-     * @param computer     where the computer is, to say which way each device lies
+     * @param viewer       the player, to say which way each device lies from them
      * @param explicit     Ctrl+Space: suggest even with nothing typed
      */
     public static Result complete(String beforeCursor, String document, List<String> files, List<NetworkDevice> devices,
-                                  BlockPos computer, boolean explicit) {
+                                  Viewer viewer, boolean explicit) {
         int lineStart = beforeCursor.lastIndexOf('\n') + 1;
         String line = beforeCursor.substring(lineStart);
         Matcher m;
         if ((m = SIDE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(LuaApi.SIDES, "side"));
         if ((m = DEVICE_ARG.matcher(line)).find())
-            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices, computer));
+            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices, viewer));
         if ((m = REQUIRE_ARG.matcher(line)).find())
             return rank(line.length() - m.group(2).length(), m.group(2), values(modules(files), "file on this computer"));
 
@@ -101,40 +102,49 @@ public final class Completions {
     /** Turns lang keys into text; the editor plugs in I18n, tests can leave it as is. */
     public static Function<String, String> translate = key -> key;
 
+    /**
+     * Where the player is and which way they face, so a device's arrow points the way they'd
+     * turn to find it.
+     *
+     * @param yaw Minecraft's yaw: 0 faces south (+z), 90 faces west
+     */
+    public record Viewer(Vec3 eye, float yaw) {}
+
     /** Device names in distance order: rank keeps that order among equally good matches. */
-    private static List<Entry> deviceNames(List<NetworkDevice> devices, BlockPos computer) {
+    private static List<Entry> deviceNames(List<NetworkDevice> devices, Viewer viewer) {
         return devices.stream().map(d -> {
-            String compass = compass(d.pos(), computer);
-            String where = d.pos().getX() + " " + d.pos().getY() + " " + d.pos().getZ()
-                    + (compass.isEmpty() ? "" : " · " + translate.apply("create_new_era.editor.dir.long." + compass))
-                    + height(d.pos().getY() - computer.getY()) + ". ";
-            return new Entry(d.name(), Kind.VALUE, d.name(),
-                    d.distance() + " m " + (compass.isEmpty() ? "" : translate.apply("create_new_era.editor.dir." + compass)) + " · " + d.type(),
-                    where + access(d));
+            String type = translate.apply(d.typeKey());
+            List<String> doc = new ArrayList<>();
+            doc.add(translate.apply(d.readable() && d.writable() ? "create_new_era.editor.device.ports_both"
+                    : d.readable() ? "create_new_era.editor.device.ports_out" : "create_new_era.editor.device.ports_in"));
+            if (!d.reads().isEmpty())
+                doc.add(translate.apply("create_new_era.editor.device.reads") + " " + calls(d.reads()) + ".");
+            if (!d.orders().isEmpty())
+                doc.add(translate.apply("create_new_era.editor.device.orders") + " " + calls(d.orders()) + ".");
+            String footer = "x " + d.pos().getX() + " · y " + d.pos().getY() + " · z " + d.pos().getZ();
+            return new Entry(d.name(), Kind.DEVICE, d.name(), d.name() + " · " + type, String.join(" ", doc),
+                    type, d.distance() + " m " + arrow(d.pos(), viewer), footer);
         }).toList();
     }
 
-    /** Which way the device lies from the computer, on the compass: "n", "ne"... or "" if straight above or below. */
-    static String compass(BlockPos device, BlockPos computer) {
-        int dx = device.getX() - computer.getX(), dz = device.getZ() - computer.getZ();
-        if (dx == 0 && dz == 0)
-            return "";
-        // north is -z; eight 45° sectors starting at north, clockwise
-        double angle = Math.toDegrees(Math.atan2(dx, -dz));
-        int sector = (int) Math.round(((angle % 360) + 360) % 360 / 45) % 8;
-        return new String[] {"n", "ne", "e", "se", "s", "sw", "w", "nw"}[sector];
+    private static String calls(List<String> names) {
+        return String.join(", ", names.stream().map(n -> n + "()").toList());
     }
 
-    private static String height(int dy) {
-        if (dy == 0)
-            return "";
-        return ", " + String.format(translate.apply(dy > 0 ? "create_new_era.editor.dir.above" : "create_new_era.editor.dir.below"), Math.abs(dy));
-    }
-
-    private static String access(NetworkDevice d) {
-        String can = translate.apply(d.readable() && d.writable() ? "create_new_era.editor.device.read_write"
-                : d.readable() ? "create_new_era.editor.device.read" : "create_new_era.editor.device.write");
-        return can + (d.methods().isEmpty() ? "" : " " + String.join(", ", d.methods()));
+    /**
+     * Which way the device lies for someone at the viewer's eye, facing their way: ↑ straight
+     * ahead, → to their right, and so on round; ⇡ or ⇣ when it's mostly straight up or down.
+     */
+    static String arrow(BlockPos device, Viewer viewer) {
+        Vec3 to = Vec3.atCenterOf(device).subtract(viewer.eye());
+        double flat = Math.hypot(to.x, to.z);
+        if (flat < 1 && Math.abs(to.y) >= 1)
+            return to.y > 0 ? "⇡" : "⇣";
+        double yaw = Math.toRadians(viewer.yaw());
+        double ahead = to.x * -Math.sin(yaw) + to.z * Math.cos(yaw);
+        double right = to.x * -Math.cos(yaw) + to.z * -Math.sin(yaw);
+        int sector = (int) Math.round(((Math.toDegrees(Math.atan2(right, ahead)) % 360) + 360) % 360 / 45) % 8;
+        return new String[] {"↑", "↗", "→", "↘", "↓", "↙", "←", "↖"}[sector];
     }
 
     /** What a variable holding {@code bus.get("name")} can do, or null if it isn't one. */
@@ -150,7 +160,7 @@ public final class Completions {
             if (d.name().equals(name)) {
                 List<Entry> out = new ArrayList<>();
                 for (String method : d.methods())
-                    out.add(new Entry(method, Kind.FUNCTION, method + "($0)", d.name() + " · " + d.type(), ""));
+                    out.add(new Entry(method, Kind.FUNCTION, method + "($0)", d.name() + " · " + translate.apply(d.typeKey()), ""));
                 out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function()\n  $0\nend)",
                         "runs when " + d.name() + " changes", ""));
                 return out;
@@ -237,8 +247,8 @@ public final class Completions {
         }
         Comparator<Scored> byScore = Comparator.comparingInt((Scored s) -> -s.score)
                 .thenComparingInt(s -> order(s.match.entry().kind()));
-        if (pool.stream().allMatch(e -> e.kind() == Kind.VALUE)) {
-            // sides and files read best in their own order (front, back, left...)
+        if (pool.stream().allMatch(e -> e.kind() == Kind.VALUE || e.kind() == Kind.DEVICE)) {
+            // sides and files read best in their own order (front, back, left...), devices nearest first
             scored.sort(byScore);
         } else if (query.isEmpty()) {
             scored.sort(byScore.thenComparing(s -> s.match.entry().label()));
@@ -255,7 +265,7 @@ public final class Completions {
 
     private static int order(Kind kind) {
         return switch (kind) {
-            case VALUE, FIELD -> 0;
+            case VALUE, DEVICE, FIELD -> 0;
             case VARIABLE, FUNCTION, CONSTANT -> 1;
             case MODULE -> 2;
             case SNIPPET -> 3;

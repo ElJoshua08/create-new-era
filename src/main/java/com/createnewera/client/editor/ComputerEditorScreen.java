@@ -32,6 +32,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
@@ -573,7 +574,10 @@ public class ComputerEditorScreen extends Screen {
 
     private void refreshCompletion(boolean explicit) {
         CodeEditor editor = editor();
-        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), pos, explicit);
+        var player = Minecraft.getInstance().player;
+        var viewer = player == null ? new Completions.Viewer(Vec3.atCenterOf(pos), 0)
+                : new Completions.Viewer(player.getEyePosition(), player.getYRot());
+        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), viewer, explicit);
         selected = 0;
         listTop = 0;
     }
@@ -592,7 +596,7 @@ public class ComputerEditorScreen extends Screen {
         editor().applyCompletion(completion.from(), item.insert());
         closeCompletion();
         // a device picked by name: show where it is once the editor closes
-        if (item.kind() == LuaApi.Kind.VALUE)
+        if (item.kind() == LuaApi.Kind.DEVICE)
             snapshot.devices().stream().filter(d -> d.name().equals(item.label())).findFirst()
                     .ifPresent(d -> DeviceHighlight.show(d.pos()));
         // straight into the next level: "redstone" + "." shows its functions
@@ -605,17 +609,24 @@ public class ComputerEditorScreen extends Screen {
     }
 
     private static final int POPUP_W = 150, DOC_W = 140;
+    /** Device rows carry their kind of block and how far away it is, so they need more room. */
+    private static final int DEVICE_POPUP_W = 230, DEVICE_DOC_W = 170;
+
+    private boolean devicesShown() {
+        return !completion.items().isEmpty() && completion.items().get(0).entry().kind() == LuaApi.Kind.DEVICE;
+    }
 
     private Rect completionRect() {
         int[] at = editor().cursorScreenPos();
         int h = visibleItems() * 10 + 2;
         // line the labels up with the start of the word being completed (badge sits to its left)
         int wordX = at[0] - (editor().getCol() - completion.from()) * CodeEditor.CELL;
-        int x = Mth.clamp(wordX - 11, 2, width - POPUP_W - 2);
+        int w = devicesShown() ? DEVICE_POPUP_W : POPUP_W;
+        int x = Mth.clamp(wordX - 11, 2, width - w - 2);
         int y = at[1] + CodeEditor.LINE;
         if (y + h > height - 2)
             y = at[1] - h - 1;
-        return new Rect(x, y, POPUP_W, h);
+        return new Rect(x, y, w, h);
     }
 
     private boolean clickCompletion(double mx, double my) {
@@ -655,8 +666,21 @@ public class ComputerEditorScreen extends Screen {
                 tx += font.width(ch);
             }
             String detail = entry.kind() == LuaApi.Kind.KEYWORD ? "keyword" : entry.kind() == LuaApi.Kind.SNIPPET ? "snippet" : "";
-            if (!detail.isEmpty() && tx + 6 + font.width(detail) < r.right() - 2)
-                g.drawString(font, detail, r.right() - 3 - font.width(detail), rowY + 1, 0xFF8A8A8A, false);
+            int right = r.right() - 3;
+            // a device: how far and which way at the end, its kind of block before that
+            if (!entry.rowHint().isEmpty()) {
+                int hintW = 34;
+                g.drawString(font, entry.rowHint(), right - font.width(entry.rowHint()), rowY + 1,
+                        index == selected ? 0xFFFFD75E : 0xFF8A8A8A, false);
+                right -= hintW + 4;
+            }
+            if (!entry.rowType().isEmpty()) {
+                String type = font.plainSubstrByWidth(entry.rowType(), Math.max(0, right - tx - 6));
+                if (!type.isEmpty())
+                    g.drawString(font, type, right - font.width(type), rowY + 1, index == selected ? 0xFFC8C8C8 : 0xFF8A8A8A, false);
+            }
+            if (!detail.isEmpty() && tx + 6 + font.width(detail) < right)
+                g.drawString(font, detail, right - font.width(detail), rowY + 1, 0xFF8A8A8A, false);
         }
         if (completion.items().size() > visibleItems()) {
             int track = r.h - 2, thumb = Math.max(6, track * visibleItems() / completion.items().size());
@@ -667,13 +691,17 @@ public class ComputerEditorScreen extends Screen {
         // details of the selected suggestion, like VS Code's side pane
         var entry = completion.items().get(selected).entry();
         if (!entry.detail().isEmpty() || !entry.doc().isEmpty()) {
+            int docW = devicesShown() ? DEVICE_DOC_W : DOC_W;
             List<FormattedCharSequence> doc = entry.doc().isEmpty() ? List.of()
-                    : font.split(Component.literal(entry.doc()), DOC_W - 8);
-            List<FormattedCharSequence> sig = font.split(Component.literal(entry.detail()), DOC_W - 8);
-            int dh = 4 + sig.size() * 9 + (doc.isEmpty() ? 0 : 3 + doc.size() * 9) + 2;
-            int dx = r.right() + 2 + DOC_W > width ? r.x - DOC_W - 2 : r.right() + 2;
-            g.fill(dx - 1, r.y - 1, dx + DOC_W + 1, r.y + dh + 1, 0xFF454545);
-            g.fill(dx, r.y, dx + DOC_W, r.y + dh, 0xFF252526);
+                    : font.split(Component.literal(entry.doc()), docW - 8);
+            List<FormattedCharSequence> sig = font.split(Component.literal(entry.detail()), docW - 8);
+            List<FormattedCharSequence> footer = entry.footer().isEmpty() ? List.of()
+                    : font.split(Component.literal(entry.footer()), docW - 8);
+            int dh = 4 + sig.size() * 9 + (doc.isEmpty() ? 0 : 3 + doc.size() * 9)
+                    + (footer.isEmpty() ? 0 : 3 + footer.size() * 9) + 2;
+            int dx = r.right() + 2 + docW > width ? r.x - docW - 2 : r.right() + 2;
+            g.fill(dx - 1, r.y - 1, dx + docW + 1, r.y + dh + 1, 0xFF454545);
+            g.fill(dx, r.y, dx + docW, r.y + dh, 0xFF252526);
             int ty = r.y + 3;
             for (FormattedCharSequence line : sig) {
                 g.drawString(font, line, dx + 4, ty, 0xFFDCDCAA, false);
@@ -683,6 +711,13 @@ public class ComputerEditorScreen extends Screen {
                 ty += 3;
                 for (FormattedCharSequence line : doc) {
                     g.drawString(font, line, dx + 4, ty, 0xFFC8C8C8, false);
+                    ty += 9;
+                }
+            }
+            if (!footer.isEmpty()) {
+                ty += 3;
+                for (FormattedCharSequence line : footer) {
+                    g.drawString(font, line, dx + 4, ty, 0xFF8A8A8A, false);
                     ty += 9;
                 }
             }

@@ -313,9 +313,17 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
         for (BusDevice device : Bus.devicesSeenFrom(server, worldPosition)) {
             if (out.size() == ComputerSnapshot.MAX_DEVICES)
                 break;
-            List<String> methods = new ArrayList<>(DeviceDrivers.methods(server, device.pos(), device.readable(), device.writable()).keySet());
-            out.add(new NetworkDevice(device.name(), device.type(), device.pos(), (int) Math.round(device.distance()),
-                    device.readable(), device.writable(), methods));
+            // what its ports let a program do: read through an output port, order through an input
+            List<String> reads = device.readable()
+                    ? new ArrayList<>(DeviceDrivers.methods(server, device.pos(), true, false).keySet()) : List.of();
+            List<String> orders = new ArrayList<>();
+            if (device.writable())
+                for (String method : DeviceDrivers.methods(server, device.pos(), false, true).keySet())
+                    if (!reads.contains(method))
+                        orders.add(method);
+            String typeKey = level.getBlockState(device.pos()).getBlock().getDescriptionId();
+            out.add(new NetworkDevice(device.name(), device.type(), typeKey, device.pos(), (int) Math.round(device.distance()),
+                    device.readable(), device.writable(), reads, orders));
         }
         devicesForEditor = List.copyOf(out);
         return devicesForEditor;

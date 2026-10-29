@@ -12,7 +12,9 @@ import java.util.Map;
 public final class LuaApi {
     public enum Kind {
         KEYWORD(0xFFF0C060, "k"), FUNCTION(0xFFC586E8, "f"), MODULE(0xFF7FB2E8, "m"), FIELD(0xFF6FC3C3, "p"),
-        VARIABLE(0xFF9CDCFE, "v"), CONSTANT(0xFFEF9A6A, "c"), SNIPPET(0xFFA6E07A, "s"), VALUE(0xFFA6E07A, "\"");
+        VARIABLE(0xFF9CDCFE, "v"), CONSTANT(0xFFEF9A6A, "c"), SNIPPET(0xFFA6E07A, "s"), VALUE(0xFFA6E07A, "\""),
+        /** a machine on the network, offered by name */
+        DEVICE(0xFFE8B75A, "");
 
         public final int color;
         public final String badge;
@@ -28,7 +30,17 @@ public final class LuaApi {
      * @param detail signature or short type, shown next to the name
      * @param doc    one or two sentences, shown beside the list
      */
-    public record Entry(String label, Kind kind, String insert, String detail, String doc) {}
+    /**
+     * @param rowType shown dimmed on the suggestion's own row (a device's kind of block)
+     * @param rowHint shown at the row's right end (a device's distance and direction)
+     * @param footer  shown last in the detail pane, dimmed (a device's coordinates)
+     */
+    public record Entry(String label, Kind kind, String insert, String detail, String doc, String rowType, String rowHint,
+                        String footer) {
+        public Entry(String label, Kind kind, String insert, String detail, String doc) {
+            this(label, kind, insert, detail, doc, "", "", "");
+        }
+    }
 
     public static final List<Entry> GLOBALS = new ArrayList<>();
     public static final Map<String, List<Entry>> MEMBERS = new LinkedHashMap<>();
