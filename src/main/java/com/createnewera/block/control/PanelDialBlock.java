@@ -1,9 +1,7 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -70,11 +68,21 @@ public class PanelDialBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("getValue", args -> level.getBlockState(pos).getValue(VALUE));
-        out.put("setValue", args -> {
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("getValue", "", "number 0-15", args -> level.getBlockState(pos).getValue(VALUE));
+        api.order("setValue", "value: 0-15", "", args -> {
             set(level, pos, Mth.clamp(args.arg(1).checkInteger(), 0, 15));
             return null;
         });
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        return state.getValue(VALUE);
+    }
+
+    @Override
+    public String valueType() {
+        return "number 0-15";
     }
 }

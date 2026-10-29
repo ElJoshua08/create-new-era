@@ -127,8 +127,8 @@ public final class Completions {
         }).toList();
     }
 
-    private static String calls(List<String> names) {
-        return String.join(", ", names.stream().map(n -> n + "()").toList());
+    private static String calls(List<NetworkDevice.Fn> fns) {
+        return String.join(", ", fns.stream().map(f -> f.name() + "()").toList());
     }
 
     /**
@@ -147,32 +147,80 @@ public final class Completions {
         return new String[] {"↑", "↗", "→", "↘", "↓", "↙", "←", "↖"}[sector];
     }
 
-    /** What a variable holding {@code bus.get("name")} can do, or null if it isn't one. */
-    private static List<Entry> deviceMethods(String document, String base, List<NetworkDevice> devices) {
+    /** The device a variable holds, from {@code local x = bus.get("name")} in the file, if it's on the network. */
+    private static NetworkDevice deviceIn(String document, String variable, List<NetworkDevice> devices) {
         Matcher m = DEVICE_VAR.matcher(document);
         String name = null;
         while (m.find())
-            if (m.group(1).equals(base))
+            if (m.group(1).equals(variable))
                 name = m.group(2);
         if (name == null)
             return null;
         for (NetworkDevice d : devices)
-            if (d.name().equals(name)) {
-                List<Entry> out = new ArrayList<>();
-                for (String method : d.methods())
-                    out.add(new Entry(method, Kind.FUNCTION, method + "($0)", d.name() + " · " + translate.apply(d.typeKey()), ""));
-                out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function()\n  $0\nend)",
-                        "runs when " + d.name() + " changes", ""));
-                if (d.methods().contains("isPressed"))
-                    out.add(new Entry("onPress", Kind.FUNCTION, "onPress(function()\n  $0\nend)",
-                            "runs each time " + d.name() + " is pressed", ""));
-                if (d.methods().contains("getKey"))
-                    out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)",
-                            "runs for every key pressed on " + d.name(), ""));
-                return out;
-            }
+            if (d.name().equals(name))
+                return d;
         return null;
     }
+
+    /** What a variable holding {@code bus.get("name")} can do, or null if it isn't one. */
+    private static List<Entry> deviceMethods(String document, String base, List<NetworkDevice> devices) {
+        NetworkDevice d = deviceIn(document, base, devices);
+        if (d == null)
+            return null;
+        List<Entry> out = new ArrayList<>();
+        for (NetworkDevice.Fn fn : d.functions())
+            out.add(new Entry(fn.name(), Kind.FUNCTION, fn.name() + (fn.params().isEmpty() ? "()" : "($0)"),
+                    fn.signature(), translate.apply(fn.doc())));
+        out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function(value)\n  $0\nend)",
+                "onChange(fn(value, device))", changeDoc(d)));
+        if (d.methods().contains("isPressed"))
+            out.add(new Entry("onPress", Kind.FUNCTION, "onPress(function()\n  $0\nend)", "onPress(fn(device))",
+                    translate.apply("create_new_era.api.on_press")));
+        if (d.methods().contains("getKey"))
+            out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)", "onKey(fn(key, device))",
+                    translate.apply("create_new_era.api.on_key")));
+        return out;
+    }
+
+    /** What onChange's function is handed for this device: the same as its read(). */
+    private static String changeDoc(NetworkDevice d) {
+        String value = d.read().map(f -> f.returns() + ": " + translate.apply(f.doc())).orElse("nil");
+        return String.format(translate.apply("create_new_era.api.on_change"), value);
+    }
+
+    private static final Pattern CALL_OPEN = Pattern.compile("([A-Za-z_]\\w*)\\s*([.:])\\s*([A-Za-z_]\\w*)\\s*\\(([^()]*)$");
+    private static final Pattern GLOBAL_CALL_OPEN = Pattern.compile("(?<![.:\\w])([A-Za-z_]\\w*)\\s*\\(([^()]*)$");
+
+    /**
+     * Signature help: inside a call's parentheses, what that function takes and does, like VS
+     * Code's parameter hints. Null when the cursor isn't inside a call the editor knows.
+     */
+    public static Entry signature(String beforeCursor, String document, List<NetworkDevice> devices) {
+        String line = beforeCursor.substring(beforeCursor.lastIndexOf('\n') + 1);
+        Matcher m = CALL_OPEN.matcher(line);
+        if (m.find()) {
+            String base = m.group(1), method = m.group(3);
+            NetworkDevice d = deviceIn(document, base, devices);
+            if (d != null) {
+                for (NetworkDevice.Fn fn : d.functions())
+                    if (fn.name().equals(method))
+                        return new Entry(fn.name(), Kind.FUNCTION, "", fn.signature(), translate.apply(fn.doc()));
+                if (method.equals("onChange"))
+                    return new Entry("onChange", Kind.FUNCTION, "", "onChange(fn(value, device))", changeDoc(d));
+            }
+            for (Entry e : LuaApi.MEMBERS.getOrDefault(base, List.of()))
+                if (e.label().equals(method))
+                    return e;
+            return null;
+        }
+        m = GLOBAL_CALL_OPEN.matcher(line);
+        if (m.find())
+            for (Entry e : LuaApi.GLOBALS)
+                if (e.label().equals(m.group(1)) && e.kind() == Kind.FUNCTION)
+                    return e;
+        return null;
+    }
+
 
     private static List<String> modules(List<String> files) {
         return files.stream().map(f -> f.endsWith(".lua") ? f.substring(0, f.length() - 4) : f).toList();

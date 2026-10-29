@@ -1,14 +1,12 @@
 package com.createnewera.block.control;
 
 import java.util.Locale;
-import java.util.Map;
-
 import org.squiddev.cobalt.LuaBoolean;
 import org.squiddev.cobalt.LuaError;
 import org.squiddev.cobalt.LuaValue;
 
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -43,9 +41,9 @@ public class PanelLampBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("get", args -> level.getBlockState(pos).getValue(LIGHT).getSerializedName());
-        out.put("set", args -> {
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("get", "", "\"off\" | \"amber\" | \"green\" | \"red\"", args -> level.getBlockState(pos).getValue(LIGHT).getSerializedName());
+        api.order("set", "light: \"amber\" | \"green\" | \"red\" | \"off\" | boolean", "", args -> {
             Light light = parse(args.arg(1));
             BlockState state = level.getBlockState(pos);
             if (state.getValue(LIGHT) != light)
@@ -65,5 +63,15 @@ public class PanelLampBlock extends PanelControlBlock {
             if (light.getSerializedName().equals(name))
                 return light;
         throw new LuaError("unknown light \"" + name + "\" (amber, green, red or off)");
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        return state.getValue(LIGHT).getSerializedName();
+    }
+
+    @Override
+    public String valueType() {
+        return "\"off\" | \"amber\" | \"green\" | \"red\"";
     }
 }

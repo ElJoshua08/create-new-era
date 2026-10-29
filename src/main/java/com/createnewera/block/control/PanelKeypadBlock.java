@@ -1,9 +1,7 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -57,10 +55,21 @@ public class PanelKeypadBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("getKey", args -> {
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("getKey", "", "\"0\"-\"9\" | \"*\" | \"#\" | nil", args -> {
             int key = level.getBlockState(pos).getValue(KEY);
             return key == NONE ? null : KEYS[key];
         });
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        int key = state.getValue(KEY);
+        return key == NONE ? null : KEYS[key];
+    }
+
+    @Override
+    public String valueType() {
+        return "\"0\"-\"9\" | \"*\" | \"#\" | nil";
     }
 }

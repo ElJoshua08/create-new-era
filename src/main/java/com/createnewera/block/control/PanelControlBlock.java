@@ -1,11 +1,9 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import com.createnewera.block.DirectionalPartBlock;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.bus.Bus;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -26,7 +24,13 @@ public abstract class PanelControlBlock extends DirectionalPartBlock {
      * What a program can do with it. Every control is both read and given orders through its
      * own connection, so there's no output or input port to pick.
      */
-    public abstract void methods(Map<String, Method> out, ServerLevel level, BlockPos pos);
+    public abstract void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos);
+
+    /** Its state as one value: what read() returns and what onChange hands its function. */
+    public abstract Object value(BlockState state);
+
+    /** What {@link #value} is, for the editor: "number 0-15", "boolean"... */
+    public abstract String valueType();
 
     /** Everything about it a program could notice changing: its block state says it all. */
     public Object snapshot(BlockState state) {

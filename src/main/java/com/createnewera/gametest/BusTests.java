@@ -170,7 +170,7 @@ public class BusTests {
         link(helper, pc, port(helper, MOTOR, PortMode.OUT));
         link(helper, pc, port(helper, MOTOR, PortMode.IN));
         String name = BusData.get(helper.getLevel()).nameOf(helper.absolutePos(MOTOR), AllBlocks.CREATIVE_MOTOR.get());
-        run(computer, "local m = bus.get('" + name + "')\nm.onChange(function(d) print('target', d.getTargetSpeed()) end)\nprint('listening')");
+        run(computer, "local m = bus.get('" + name + "')\nm.onChange(function(state, d) print('target', d.getTargetSpeed(), state.targetSpeed) end)\nprint('listening')");
         helper.runAfterDelay(10, () -> {
             expectPrinted(helper, computer, ConsoleLine.Kind.OUTPUT, "listening");
             if (!computer.isRunning())

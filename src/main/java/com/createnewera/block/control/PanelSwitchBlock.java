@@ -1,9 +1,7 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -49,11 +47,21 @@ public class PanelSwitchBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("isOn", args -> level.getBlockState(pos).getValue(ON));
-        out.put("setOn", args -> {
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("isOn", "", "boolean", args -> level.getBlockState(pos).getValue(ON));
+        api.order("setOn", "on: boolean", "", args -> {
             set(level, pos, args.arg(1).checkBoolean());
             return null;
         });
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        return state.getValue(ON);
+    }
+
+    @Override
+    public String valueType() {
+        return "boolean";
     }
 }

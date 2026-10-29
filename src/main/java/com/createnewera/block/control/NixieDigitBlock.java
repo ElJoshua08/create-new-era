@@ -1,11 +1,9 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import org.squiddev.cobalt.LuaError;
 
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -32,12 +30,12 @@ public class NixieDigitBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("getDigit", args -> {
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("getDigit", "", "number 0-9 | nil", args -> {
             int digit = level.getBlockState(pos).getValue(DIGIT);
             return digit == DARK ? null : digit;
         });
-        out.put("setDigit", args -> {
+        api.order("setDigit", "digit: 0-9 | nil", "", args -> {
             int digit = args.arg(1).isNil() ? DARK : args.arg(1).checkInteger();
             if (digit < 0 || digit > 9 && digit != DARK)
                 throw new LuaError("bad argument #1 to 'setDigit' (a digit 0-9 or nil expected, got " + digit + ")");
@@ -46,5 +44,16 @@ public class NixieDigitBlock extends PanelControlBlock {
                 level.setBlock(pos, state.setValue(DIGIT, digit), Block.UPDATE_ALL);
             return null;
         });
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        int digit = state.getValue(DIGIT);
+        return digit == DARK ? null : digit;
+    }
+
+    @Override
+    public String valueType() {
+        return "number 0-9 | nil";
     }
 }

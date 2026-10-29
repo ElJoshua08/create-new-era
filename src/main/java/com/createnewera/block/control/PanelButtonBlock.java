@@ -1,9 +1,7 @@
 package com.createnewera.block.control;
 
-import java.util.Map;
-
 import com.createnewera.block.DirectionalShape;
-import com.createnewera.bus.DeviceDrivers.Method;
+import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -55,7 +53,17 @@ public class PanelButtonBlock extends PanelControlBlock {
     }
 
     @Override
-    public void methods(Map<String, Method> out, ServerLevel level, BlockPos pos) {
-        out.put("isPressed", args -> level.getBlockState(pos).getValue(PRESSED));
+    public void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
+        api.read("isPressed", "", "boolean", args -> level.getBlockState(pos).getValue(PRESSED));
+    }
+
+    @Override
+    public Object value(BlockState state) {
+        return state.getValue(PRESSED);
+    }
+
+    @Override
+    public String valueType() {
+        return "boolean";
     }
 }

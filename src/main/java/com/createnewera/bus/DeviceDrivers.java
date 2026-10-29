@@ -41,43 +41,123 @@ public final class DeviceDrivers {
         Object call(Varargs args) throws LuaError;
     }
 
+    /**
+     * A function a program can call on a device, with what the editor shows for it.
+     *
+     * @param params  its arguments as the editor writes them, e.g. "value: 0-15"
+     * @param returns what it gives back, e.g. "number 0-15", or "" for nothing
+     * @param doc     lang key of what it does: create_new_era.api.(family).(name)
+     * @param reads   reads the device (needs an output port) rather than giving it an order
+     */
+    public record Fn(String name, String params, String returns, String doc, boolean reads, Method call) {}
+
+    /** Collects a device's functions, keeping only those its ports allow. */
+    public static final class Api {
+        private final Map<String, Fn> fns = new LinkedHashMap<>();
+        private final boolean readable, writable;
+        private String family = "machine";
+
+        Api(boolean readable, boolean writable) {
+            this.readable = readable;
+            this.writable = writable;
+        }
+
+        /** Which group of docs the functions added next belong to: "kinetic", "items", "panel_lamp"... */
+        public Api family(String family) {
+            this.family = family;
+            return this;
+        }
+
+        public void read(String name, String params, String returns, Method call) {
+            if (readable)
+                fns.put(name, new Fn(name, params, returns, docKey(family, name), true, call));
+        }
+
+        public void order(String name, String params, String returns, Method call) {
+            if (writable)
+                fns.put(name, new Fn(name, params, returns, docKey(family, name), false, call));
+        }
+    }
+
+    public static String docKey(String family, String name) {
+        return "create_new_era.api." + family + "." + name;
+    }
+
     /** Readers need an output port on the device, writers an input port. */
     public static Map<String, Method> methods(ServerLevel level, BlockPos pos, boolean readable, boolean writable) {
         Map<String, Method> out = new LinkedHashMap<>();
+        describe(level, pos, readable, writable).forEach(fn -> out.put(fn.name(), fn.call()));
+        return out;
+    }
+
+    /**
+     * Every function the device's ports allow, in the order the editor lists them, ending with
+     * read(): the device's state in one value, which onChange also hands its function.
+     */
+    public static List<Fn> describe(ServerLevel level, BlockPos pos, boolean readable, boolean writable) {
+        Api api = new Api(readable, writable);
         if (level.getBlockState(pos).getBlock() instanceof PanelControlBlock control) {
-            control.methods(out, level, pos);
-            return out;
+            api.family(BuiltInRegistries.BLOCK.getKey(control).getPath());
+            control.methods(api, level, pos);
+            api.read("read", "", control.valueType(), args -> control.value(level.getBlockState(pos)));
+            return List.copyOf(api.fns.values());
         }
         BlockEntity be = level.getBlockEntity(pos);
 
         if (be instanceof KineticBlockEntity kinetic) {
-            if (readable) {
-                out.put("getSpeed", args -> kinetic.getSpeed());
-                out.put("isOverstressed", args -> overstressed(kinetic));
-                out.put("getStress", args -> stress(kinetic));
-            }
+            api.family("kinetic");
+            api.read("getSpeed", "", "RPM", args -> kinetic.getSpeed());
+            api.read("isOverstressed", "", "boolean", args -> overstressed(kinetic));
+            api.read("getStress", "", "{used, capacity}", args -> stress(kinetic));
             ScrollValueBehaviour speedSetting = speedSetting(kinetic);
-            if (writable && speedSetting != null) {
-                out.put("setSpeed", args -> {
+            if (speedSetting != null) {
+                api.read("getTargetSpeed", "", "RPM", args -> speedSetting.getValue());
+                api.order("setSpeed", "rpm: -256..256", "", args -> {
                     int rpm = args.arg(1).checkInteger();
                     speedSetting.setValue(Mth.clamp(rpm, -256, 256));
                     return null;
                 });
             }
-            if (readable && speedSetting != null)
-                out.put("getTargetSpeed", args -> speedSetting.getValue());
         }
 
         IItemHandler items = itemHandler(level, pos);
-        if (items != null && readable) {
-            out.put("items", args -> itemCounts(items));
-            out.put("count", args -> itemCounts(items).getOrDefault(args.arg(1).checkString(), 0));
-            out.put("getSlots", args -> items.getSlots());
+        if (items != null) {
+            api.family("items");
+            api.read("items", "", "{[item id] = count}", args -> itemCounts(items));
+            api.read("count", "item: id", "number", args -> itemCounts(items).getOrDefault(args.arg(1).checkString(), 0));
+            api.read("getSlots", "", "number", args -> items.getSlots());
         }
 
         IFluidHandler fluids = fluidHandler(level, pos);
-        if (fluids != null && readable)
-            out.put("fluids", args -> tanks(fluids));
+        if (fluids != null) {
+            api.family("fluids");
+            api.read("fluids", "", "{{name, amount, capacity}, ...}", args -> tanks(fluids));
+        }
+
+        if (!api.fns.isEmpty()) {
+            api.family("machine");
+            api.read("read", "", "{speed, overstressed, stress, items, fluids...}", args -> state(level, pos));
+        }
+        return List.copyOf(api.fns.values());
+    }
+
+    /** What read() gives for a machine: everything readable about it, by name. */
+    private static Map<String, Object> state(ServerLevel level, BlockPos pos) {
+        Map<String, Object> out = new LinkedHashMap<>();
+        if (level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic) {
+            out.put("speed", kinetic.getSpeed());
+            out.put("overstressed", overstressed(kinetic));
+            out.put("stress", stress(kinetic));
+            ScrollValueBehaviour speedSetting = speedSetting(kinetic);
+            if (speedSetting != null)
+                out.put("targetSpeed", speedSetting.getValue());
+        }
+        IItemHandler items = itemHandler(level, pos);
+        if (items != null)
+            out.put("items", itemCounts(items));
+        IFluidHandler fluids = fluidHandler(level, pos);
+        if (fluids != null)
+            out.put("fluids", tanks(fluids));
         return out;
     }
 

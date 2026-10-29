@@ -1030,9 +1030,47 @@ public class ComputerEditorScreen extends Screen {
         renderActivityBar(g, mouseX, mouseY);
         renderToolbar(g, mouseX, mouseY);
 
+        renderSignature(g);
         if (completionOpen())
             renderCompletion(g, mouseX, mouseY);
         updateCursorShape(mouseX, mouseY);
+    }
+
+    private static final int SIGNATURE_W = 220;
+
+    /** Inside a call's parentheses: what the function takes and does, above the line being written. */
+    private void renderSignature(GuiGraphics g) {
+        CodeEditor editor = editor();
+        if (editor == null || nameDraft != null)
+            return;
+        var help = Completions.signature(editor.textBeforeCursor(), editor.getText(), snapshot.devices());
+        if (help == null)
+            return;
+        List<FormattedCharSequence> sig = font.split(Component.literal(help.detail()), SIGNATURE_W - 8);
+        List<FormattedCharSequence> doc = help.doc().isEmpty() ? List.of() : font.split(Component.literal(help.doc()), SIGNATURE_W - 8);
+        int h = 4 + sig.size() * 9 + (doc.isEmpty() ? 0 : 2 + doc.size() * 9) + 2;
+        int[] at = editor.cursorScreenPos();
+        int x = Mth.clamp(at[0] - 12, 2, width - SIGNATURE_W - 2);
+        int y = at[1] - h - 2;
+        if (y < 2)
+            y = at[1] + CodeEditor.LINE + 2;
+        g.pose().pushPose();
+        g.pose().translate(0, 0, 390);
+        g.fill(x - 1, y - 1, x + SIGNATURE_W + 1, y + h + 1, 0xFF454545);
+        g.fill(x, y, x + SIGNATURE_W, y + h, 0xFF252526);
+        int ty = y + 3;
+        for (FormattedCharSequence line : sig) {
+            g.drawString(font, line, x + 4, ty, 0xFFDCDCAA, false);
+            ty += 9;
+        }
+        if (!doc.isEmpty()) {
+            ty += 2;
+            for (FormattedCharSequence line : doc) {
+                g.drawString(font, line, x + 4, ty, 0xFFC8C8C8, false);
+                ty += 9;
+            }
+        }
+        g.pose().popPose();
     }
 
     private Rect closeButton() {

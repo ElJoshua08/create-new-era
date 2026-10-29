@@ -95,12 +95,15 @@ public class ControlTests {
                 "local nixie, knob = bus.get('" + name(helper, nixie) + "'), bus.get('" + name(helper, knob) + "')",
                 "local gauge = bus.get('" + name(helper, gauge) + "')",
                 "button.onPress(function() lamp.set('green') nixie.setDigit(7) print('pressed') end)",
-                "knob.onChange(function() gauge.set(knob.getValue() / 15) end)",
+                "knob.onChange(function(value) gauge.set(value / 15) end)",
+                "print({b = {2, 3}, a = 1, name = 'x'})",
                 "bus.get('" + name(helper, keypad) + "').onKey(function(key) print('key ' .. key) end)",
                 "print('ready')"));
         computer.start("create_new_era.console.running");
         helper.runAfterDelay(10, () -> {
             expectPrinted(helper, computer, "ready");
+            expectPrinted(helper, computer, "{2, 3}"); // print shows a table's contents
+            expectPrinted(helper, computer, "{a = 1, b = {2, 3}, name = \"x\"}");
             click(helper, button, 8, 4, 8);
             for (int i = 0; i < 6; i++)
                 click(helper, knob, 8, 4, 8);

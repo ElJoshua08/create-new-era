@@ -9,10 +9,33 @@ local load = load
 local ceil, max = math.ceil, math.max
 local create, resume, status, yield = coroutine.create, coroutine.resume, coroutine.status, coroutine.yield
 
+-- a value as print shows it: tables with what's in them ({speed = 64, items = {...}}), not their address
+local function show(value, depth, seen)
+    local kind = type(value)
+    if kind == "string" then return depth > 0 and string.format("%q", value) or value end
+    if kind == "function" then return "<function>" end
+    if kind ~= "table" then return tostring(value) end
+    if seen[value] or depth > 3 then return "{...}" end
+    seen[value] = true
+    local parts, n = {}, #value
+    for i = 1, n do parts[#parts + 1] = show(value[i], depth + 1, seen) end
+    local keys = {}
+    for k in next, value do
+        if not (type(k) == "number" and k >= 1 and k <= n and k % 1 == 0) then keys[#keys + 1] = k end
+    end
+    table.sort(keys, function(a, b) return tostring(a) < tostring(b) end)
+    for _, k in ipairs(keys) do
+        local key = type(k) == "string" and k:match("^[%a_][%w_]*$") and k or "[" .. show(k, depth + 1, seen) .. "]"
+        parts[#parts + 1] = key .. " = " .. show(value[k], depth + 1, seen)
+    end
+    seen[value] = nil
+    return "{" .. concat(parts, ", ") .. "}"
+end
+
 function print(...)
     local parts = {}
     for i = 1, select("#", ...) do
-        parts[i] = tostring((select(i, ...)))
+        parts[i] = show((select(i, ...)), 0, {})
     end
     native.write(concat(parts, "\t"))
 end
@@ -88,7 +111,8 @@ function bus.get(name)
             return nativeBus.call(name, method, ...)
         end
     end
-    -- runs fn(device) every time anything about the device changes, until the program stops
+    -- runs fn(value, device) every time anything about the device changes, until the program
+    -- stops; value is what device.read() gives: a slider's position, a machine's whole state...
     function device.onChange(a, b)
         local fn = a == device and b or a
         if type(fn) ~= "function" then
@@ -109,8 +133,8 @@ function bus.get(name)
             if type(fn) ~= "function" then
                 error("bad argument #1 to 'onPress' (function expected, got " .. type(fn) .. ")", 2)
             end
-            device.onChange(function(d)
-                if d.isPressed() then fn(d) end
+            device.onChange(function(pressed, d)
+                if pressed then fn(d) end
             end)
         end
     end
@@ -121,8 +145,7 @@ function bus.get(name)
             if type(fn) ~= "function" then
                 error("bad argument #1 to 'onKey' (function expected, got " .. type(fn) .. ")", 2)
             end
-            device.onChange(function(d)
-                local key = d.getKey()
+            device.onChange(function(key, d)
                 if key then fn(key, d) end
             end)
         end
@@ -136,8 +159,10 @@ local function kernel(main)
     local changed = {}
     while true do
         for _, name in ipairs(changed) do
+            -- what changed, read once for every function listening (nil if it can't be read)
+            local ok, value = pcall(nativeBus.call, name, "read")
             for _, handler in ipairs(handlers[name] or {}) do
-                spawn(handler.fn, handler.device)
+                spawn(handler.fn, ok and value or nil, handler.device)
             end
         end
 
