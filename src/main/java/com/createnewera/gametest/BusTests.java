@@ -1,5 +1,7 @@
 package com.createnewera.gametest;
 
+import java.util.List;
+
 import com.createnewera.CreateNewEra;
 import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusData;
@@ -97,6 +99,54 @@ public class BusTests {
     }
 
     // the list is in distance order, and only holds what's actually connected
+    // Aeronautics makes a ship of these blocks: Sable moves them into a plot of their own, and
+    // the ports and the cable between them go along
+    @GameTest(template = ROOM, timeoutTicks = 100)
+    public static void portsAndCablesBoardShips(GameTestHelper helper) {
+        if (!net.neoforged.fml.ModList.get().isLoaded("sable")) {
+            helper.succeed();
+            return;
+        }
+        BlockPos a = new BlockPos(1, 1, 1), b = new BlockPos(3, 1, 1);
+        helper.setBlock(a, Blocks.STONE);
+        helper.setBlock(b, Blocks.STONE);
+        var level = helper.getLevel();
+        BusPort pa = Bus.placePart(level, helper.absolutePos(a), Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
+        BusPort pb = Bus.placePart(level, helper.absolutePos(b), Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.IN);
+        BusData data = BusData.get(level);
+        data.connect(pa.id(), pb.id());
+        data.rename(helper.absolutePos(a), "deck_port");
+        try {
+            Class<?> box = Class.forName("dev.ryanhcode.sable.companion.math.BoundingBox3i");
+            Object bounds = box.getConstructor(BlockPos.class, BlockPos.class).newInstance(helper.absolutePos(a), helper.absolutePos(b));
+            Class<?> helperClass = Class.forName("dev.ryanhcode.sable.api.SubLevelAssemblyHelper");
+            java.lang.reflect.Method assemble = null;
+            for (var m : helperClass.getMethods())
+                if (m.getName().equals("assembleBlocks"))
+                    assemble = m;
+            assemble.invoke(null, level, helper.absolutePos(a),
+                    List.of(helper.absolutePos(a), helper.absolutePos(new BlockPos(2, 1, 1)), helper.absolutePos(b)), bounds);
+        } catch (ReflectiveOperationException e) {
+            helper.fail("couldn't make a ship: " + e);
+            return;
+        }
+        BusPort na = data.port(pa.id()), nb = data.port(pb.id());
+        if (na == null || nb == null)
+            helper.fail("the ports were lost");
+        if (na.pos().equals(helper.absolutePos(a)))
+            helper.fail("the port stayed where the block was");
+        if (!level.getBlockState(na.pos()).is(Blocks.STONE) || !level.getBlockState(nb.pos()).is(Blocks.STONE))
+            helper.fail("the ports aren't on the blocks: " + na.pos() + " " + level.getBlockState(na.pos()));
+        if (data.spansAt(na.id()).stream().noneMatch(s -> s.b() == nb.id() || s.a() == nb.id()))
+            helper.fail("the cable didn't come along");
+        var span = data.spansAt(na.id()).get(0);
+        if (span.points().get(0).distanceTo(PartGeometry.anchor(na)) > 0.01)
+            helper.fail("the cable's end should be at the port: " + span.points().get(0) + " vs " + PartGeometry.anchor(na));
+        if (!"deck_port".equals(data.nameOf(na.pos(), Blocks.STONE)))
+            helper.fail("the name stayed behind");
+        helper.succeed();
+    }
+
     // a port goes on the block's real surface: on top of a slab, half way down, not floating
     @GameTest(template = ROOM)
     public static void portsSitOnSmallBlocks(GameTestHelper helper) {

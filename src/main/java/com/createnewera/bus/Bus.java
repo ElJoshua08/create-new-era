@@ -310,6 +310,27 @@ public final class Bus {
     }
 
     /** Sends the chunk's parts to everyone who has it loaded. */
+    /**
+     * Blocks were moved elsewhere in one go, turned by {@code rotation} (see BusData.relocate):
+     * their parts, names and cables follow them, and players see it.
+     */
+    public static void relocate(ServerLevel from, ServerLevel to, Map<BlockPos, BlockPos> moves,
+                                net.minecraft.world.level.block.Rotation rotation, java.util.function.UnaryOperator<Vec3> movePoint) {
+        BusData data = BusData.get(from), into = BusData.get(to);
+        Set<Long> touched = data.relocate(moves, part -> {
+            BlockPos pos = moves.get(part.pos());
+            Direction face = rotation.rotate(part.face());
+            // where the part's middle went, then its spot on its (turned) face from there
+            int[] spot = PartGeometry.spotAt(pos, face, movePoint.apply(PartGeometry.box(part).getCenter()), part.kind().size);
+            return new BusPort(part.id(), pos, face, spot[0], spot[1], part.kind(), part.mode(), part.depth());
+        }, movePoint, into);
+        for (long chunk : touched) {
+            sync(from, new ChunkPos(chunk));
+            if (to != from)
+                sync(to, new ChunkPos(chunk));
+        }
+    }
+
     public static void sync(ServerLevel level, BlockPos pos) {
         sync(level, new ChunkPos(pos));
     }

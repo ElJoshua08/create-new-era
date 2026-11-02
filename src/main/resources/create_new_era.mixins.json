@@ -4,6 +4,7 @@
   "package": "com.createnewera.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "SableAssemblyMixin",
     "TypewriterMixin"
   ],
   "injectors": {

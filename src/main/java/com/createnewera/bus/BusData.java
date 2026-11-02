@@ -143,6 +143,69 @@ public class BusData extends SavedData {
         return moved;
     }
 
+    /**
+     * Blocks moved somewhere else at once (Aeronautics building a ship out of them, Sable taking
+     * it apart): their parts, names and the cables between them go along. A cable with one end
+     * left behind snaps.
+     *
+     * @param moves     where each block went
+     * @param movePart  a part where its block went: its position, face and spot on the face
+     * @param movePoint a point of a cable where it went
+     * @param into      the bus of the level they went to: this one, or another
+     * @return the chunks whose parts or cables changed, in this level and in {@code into}
+     */
+    public Set<Long> relocate(Map<BlockPos, BlockPos> moves, java.util.function.UnaryOperator<BusPort> movePart,
+                              java.util.function.UnaryOperator<Vec3> movePoint, BusData into) {
+        Set<Long> touched = new HashSet<>();
+        List<BusPort> moving = ports.values().stream().filter(p -> moves.containsKey(p.pos())).toList();
+        Map<Long, Long> ids = new HashMap<>();
+        for (BusPort part : moving) {
+            removePortOnly(part.id());
+            touched.add(ChunkPos.asLong(part.pos()));
+            BusPort moved = movePart.apply(part);
+            long id = into == this ? part.id() : into.nextId++;
+            moved = new BusPort(id, moved.pos(), moved.face(), moved.u(), moved.v(), moved.kind(), moved.mode(), moved.depth());
+            into.ports.put(id, moved);
+            into.index(moved);
+            ids.put(part.id(), id);
+            into.setDirty();
+        }
+        for (BusSpan span : List.copyOf(spans.values())) {
+            boolean a = ids.containsKey(span.a()), b = ids.containsKey(span.b());
+            if (!a && !b)
+                continue;
+            spans.remove(span.id());
+            for (Vec3 p : span.points())
+                touched.add(ChunkPos.asLong(net.minecraft.core.BlockPos.containing(p)));
+            if (a && b) {
+                long id = into == this ? span.id() : into.nextId++;
+                into.spans.put(id, new BusSpan(id, ids.get(span.a()), ids.get(span.b()), span.color(), span.casing(), span.aerial(),
+                        span.points().stream().map(movePoint).toList()));
+            }
+        }
+        for (var move : moves.entrySet()) {
+            String name = names.remove(move.getKey());
+            if (name != null)
+                into.names.put(move.getValue().immutable(), name);
+        }
+        for (BusPort part : into.ports.values())
+            if (ids.containsValue(part.id()) && moves.containsValue(part.pos()))
+                touched.add(ChunkPos.asLong(part.pos()));
+        setDirty();
+        into.setDirty();
+        return touched;
+    }
+
+    /** Takes a part out of the indexes, leaving its spans alone. */
+    private void removePortOnly(long id) {
+        BusPort removed = ports.remove(id);
+        if (removed == null)
+            return;
+        Set<Long> chunk = byChunk.get(ChunkPos.asLong(removed.pos()));
+        if (chunk != null)
+            chunk.remove(id);
+    }
+
     /** Moves the end of a span that plugs into a part, after the part moved. */
     public void moveSpanEnd(long spanId, long port, Vec3 anchor) {
         BusSpan span = spans.get(spanId);
