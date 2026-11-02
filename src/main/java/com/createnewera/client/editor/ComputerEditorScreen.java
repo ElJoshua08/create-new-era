@@ -345,6 +345,10 @@ public class ComputerEditorScreen extends Screen {
     public boolean keyPressed(int key, int scan, int modifiers) {
         if (nameDraft != null)
             return nameKey(key);
+        // Ctrl+Enter makes a new line whatever is open, as in VS Code
+        boolean lineKey = hasControlDown() && (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER);
+        if (lineKey)
+            closeCompletion();
         if (completionOpen()) {
             switch (key) {
                 case GLFW.GLFW_KEY_DOWN -> { moveSelection(1); return true; }
@@ -636,12 +640,27 @@ public class ComputerEditorScreen extends Screen {
         int h = visibleItems() * 10 + 2;
         // line the labels up with the start of the word being completed (badge sits to its left)
         int wordX = at[0] - (editor().getCol() - completion.from()) * CodeEditor.CELL;
-        int w = devicesShown() ? DEVICE_POPUP_W : POPUP_W;
+        int w = Math.min(popupWidth(), width - 4);
         int x = Mth.clamp(wordX - 11, 2, width - w - 2);
         int y = at[1] + CodeEditor.LINE;
         if (y + h > height - 2)
             y = at[1] - h - 1;
         return new Rect(x, y, w, h);
+    }
+
+    /** Wide enough for the longest suggestion: its badge, its name, its kind of block, its distance. */
+    private int popupWidth() {
+        int widest = devicesShown() ? DEVICE_POPUP_W : POPUP_W;
+        for (var match : completion.items()) {
+            var e = match.entry();
+            int w = 11 + font.width(Component.literal(e.label()).withStyle(CodeEditor.MONO)) + 6;
+            if (!e.rowType().isEmpty())
+                w += font.width(e.rowType()) + 8;
+            if (!e.rowHint().isEmpty())
+                w += 38;
+            widest = Math.max(widest, w);
+        }
+        return widest;
     }
 
     private boolean clickCompletion(double mx, double my) {
@@ -714,11 +733,20 @@ public class ComputerEditorScreen extends Screen {
                     : font.split(Component.literal(entry.footer()), docW - 8);
             int dh = 4 + sig.size() * 9 + (doc.isEmpty() ? 0 : 3 + doc.size() * 9)
                     + (footer.isEmpty() ? 0 : 3 + footer.size() * 9) + 2;
-            int dx = r.right() + 2 + docW > width ? r.x - docW - 2 : r.right() + 2;
-            g.fill(dx - 1, r.y - 1, dx + docW + 1, r.y + dh + 1, 0xFF454545);
-            docBottom = r.y + dh + 1;
-            g.fill(dx, r.y, dx + docW, r.y + dh, 0xFF252526);
-            int ty = r.y + 3;
+            // beside the list, on whichever side has room; under it when neither does
+            int dx, dy = r.y;
+            if (r.right() + 2 + docW <= width - 2)
+                dx = r.right() + 2;
+            else if (r.x - docW - 2 >= 2)
+                dx = r.x - docW - 2;
+            else {
+                dx = Mth.clamp(r.x, 2, width - docW - 2);
+                dy = r.bottom() + 2;
+            }
+            g.fill(dx - 1, dy - 1, dx + docW + 1, dy + dh + 1, 0xFF454545);
+            docBottom = dy + dh + 1;
+            g.fill(dx, dy, dx + docW, dy + dh, 0xFF252526);
+            int ty = dy + 3;
             for (FormattedCharSequence line : sig) {
                 g.drawString(font, line, dx + 4, ty, 0xFFDCDCAA, false);
                 ty += 9;

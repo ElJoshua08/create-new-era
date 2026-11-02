@@ -360,6 +360,22 @@ public class CodeEditor {
                     toggleComment();
                     return true;
                 }
+                // a new line below, or above with Shift, wherever the cursor is on this one
+                case GLFW.GLFW_KEY_ENTER, GLFW.GLFW_KEY_KP_ENTER -> {
+                    anchorRow = -1;
+                    if (shift) {
+                        String indent = indentOf(lines.get(row));
+                        col = 0;
+                        insert(indent + "\n", EditKind.OTHER);
+                        row--;
+                        col = indent.length();
+                    } else {
+                        col = lines.get(row).length();
+                        newLine();
+                    }
+                    wantedCol = col;
+                    return true;
+                }
                 default -> {}
             }
         }

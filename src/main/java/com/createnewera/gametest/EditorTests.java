@@ -73,6 +73,17 @@ public class EditorTests {
         check(helper, offered(vars + "sw.setOn(", devices), "true", "booleans, bare");
         check(helper, offered("redstone.setOutput(", devices), "\"front\"", "sides");
         check(helper, offered("bus.get(", devices), "\"speaker\"", "devices by name");
+        check(helper, offered("bus.get(\"wit", devices), "switch", "a name found by its middle");
+        // a variable says what it is: a device what it does, anything else the line that sets it
+        var speaker = Completions.complete(vars + "spe", vars + "spe", List.of(), n -> null, devices, null, true).items().stream()
+                .map(m -> m.entry()).filter(e -> e.label().equals("speaker")).findFirst().orElse(null);
+        helper.assertTrue(speaker != null && speaker.detail().startsWith("speaker"), "speaker said " + (speaker == null ? null : speaker.detail()));
+        String code = "local count = 0\n-- Adds one.\nlocal function bump(n) count = count + n end\nco";
+        var names = Completions.complete(code, code, List.of(), n -> null, List.of(), null, true).items().stream().map(m -> m.entry()).toList();
+        helper.assertTrue(names.stream().anyMatch(e -> e.label().equals("count") && e.detail().equals("local count = 0")), "count: " + names);
+        String fnCode = "local count = 0\n-- Adds one.\nlocal function bump(n) count = count + n end\nbu";
+        var bump = Completions.complete(fnCode, fnCode, List.of(), n -> null, List.of(), null, true).items().get(0).entry();
+        helper.assertTrue(bump.detail().equals("function bump(n)") && bump.doc().equals("Adds one."), "bump: " + bump.detail() + " / " + bump.doc());
         helper.succeed();
     }
 

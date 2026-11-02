@@ -28,7 +28,6 @@ public final class Completions {
     /** {@code local terminal = require("terminal")}: the variable holds what that file returns */
     private static final Pattern MODULE_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*require\\s*\\(?\\s*[\"']([\\w./\\-]+)[\"']");
     private static final Pattern RETURNED = Pattern.compile("(?m)^return\\s+([A-Za-z_]\\w*)\\s*$");
-    private static final Pattern FUNCTION_DEF = Pattern.compile("\\bfunction\\s+([A-Za-z_][\\w.:]*)|([A-Za-z_]\\w*)\\s*=\\s*function\\b");
 
     /**
      * @param from  column where the replaced text starts; accepting replaces from there to the cursor
@@ -90,7 +89,7 @@ public final class Completions {
         String query = m.find() ? m.group(1) : "";
         if (query.isEmpty() && !explicit)
             return Result.NONE;
-        List<Entry> pool = new ArrayList<>(namesInDocument(document, query));
+        List<Entry> pool = new ArrayList<>(namesInDocument(document, query, devices));
         Matcher r = MODULE_VAR.matcher(document);
         while (r.find()) {
             String file = file(r.group(2), files);
@@ -102,8 +101,9 @@ public final class Completions {
         return rank(line.length() - query.length(), query, pool);
     }
 
-    private static List<Entry> values(List<String> names, String detail) {
-        return names.stream().map(n -> new Entry(n, Kind.VALUE, n, detail, "")).toList();
+    /** Plain values: no detail pane, it would only cover the signature with "sound" or "side". */
+    private static List<Entry> values(List<String> names) {
+        return names.stream().map(n -> new Entry(n, Kind.VALUE, n, "", "")).toList();
     }
 
     /** Turns lang keys into text; the editor plugs in I18n, tests can leave it as is. */
@@ -119,7 +119,12 @@ public final class Completions {
 
     /** Device names in distance order: rank keeps that order among equally good matches. */
     private static List<Entry> deviceNames(List<NetworkDevice> devices, Viewer viewer) {
-        return devices.stream().map(d -> {
+        return devices.stream().map(d -> deviceEntry(d, viewer)).toList();
+    }
+
+    /** A device as a suggestion: its kind of block, what it reads and does, where it is. */
+    private static Entry deviceEntry(NetworkDevice d, Viewer viewer) {
+        {
             String type = translate.apply(d.typeKey());
             List<String> doc = new ArrayList<>();
             doc.add(translate.apply(d.readable() && d.writable() ? "create_new_era.editor.device.ports_both"
@@ -131,7 +136,7 @@ public final class Completions {
             String footer = "x " + d.pos().getX() + " · y " + d.pos().getY() + " · z " + d.pos().getZ();
             return new Entry(d.name(), Kind.DEVICE, d.name(), d.name() + " · " + type, String.join(" ", doc),
                     type, d.distance() + " m " + arrow(d.pos(), viewer), footer);
-        }).toList();
+        }
     }
 
     private static String calls(List<NetworkDevice.Fn> fns) {
@@ -221,7 +226,7 @@ public final class Completions {
                 pool.add(e.kind() == Kind.CONSTANT ? e : new Entry(e.label(), e.kind(), "\"" + e.insert() + "\"", e.detail(), e.doc(),
                         e.rowType(), e.rowHint(), e.footer()));
             if (!query.isEmpty())
-                pool.addAll(namesInDocument(document, query));
+                pool.addAll(namesInDocument(document, query, devices));
             return rank(line.length() - query.length(), query, pool);
         }
         values = values.stream().filter(e -> e.kind() != Kind.CONSTANT).toList();
@@ -232,10 +237,10 @@ public final class Completions {
     private static List<Entry> choicesFor(String base, String function, int index, String document, List<String> files,
                                           List<NetworkDevice> devices, Viewer viewer) {
         if (base == null)
-            return function.equals("require") && index == 0 ? values(modules(files), "file on this computer") : null;
+            return function.equals("require") && index == 0 ? values(modules(files)) : null;
         if ((base.equals("redstone") || base.equals("rs")) && index == 0)
             return LuaApi.MEMBERS.get(base).stream().anyMatch(e -> e.label().equals(function) && e.detail().contains("side"))
-                    ? values(LuaApi.SIDES, "side") : null;
+                    ? values(LuaApi.SIDES) : null;
         if (base.equals("bus") && (function.equals("get") || function.equals("info")) && index == 0)
             return deviceNames(devices, viewer);
         NetworkDevice d = deviceIn(document, base, devices);
@@ -268,15 +273,15 @@ public final class Completions {
         for (String c : choices) {
             switch (c) {
                 case com.createnewera.bus.DeviceDrivers.DEVICES -> out.addAll(deviceNames(devices, viewer));
-                case com.createnewera.block.control.PanelSpeakerBlock.SOUNDS -> out.addAll(values(soundIds(), "sound"));
-                case com.createnewera.bus.DeviceDrivers.ITEMS -> out.addAll(values(registry(net.minecraft.core.registries.BuiltInRegistries.ITEM), "item"));
-                case com.createnewera.bus.DeviceDrivers.FLUIDS -> out.addAll(values(registry(net.minecraft.core.registries.BuiltInRegistries.FLUID), "fluid"));
-                case com.createnewera.bus.DeviceDrivers.PLAYERS -> out.addAll(values(players.get(), "player"));
+                case com.createnewera.block.control.PanelSpeakerBlock.SOUNDS -> out.addAll(values(soundIds()));
+                case com.createnewera.bus.DeviceDrivers.ITEMS -> out.addAll(named(net.minecraft.core.registries.BuiltInRegistries.ITEM));
+                case com.createnewera.bus.DeviceDrivers.FLUIDS -> out.addAll(named(net.minecraft.core.registries.BuiltInRegistries.FLUID));
+                case com.createnewera.bus.DeviceDrivers.PLAYERS -> out.addAll(values(players.get()));
                 case com.createnewera.bus.DeviceDrivers.BOOLEAN -> {
                     out.add(new Entry("true", Kind.CONSTANT, "true", "boolean", ""));
                     out.add(new Entry("false", Kind.CONSTANT, "false", "boolean", ""));
                 }
-                default -> out.add(new Entry(c, Kind.VALUE, c, fn.name(), ""));
+                default -> out.add(new Entry(c, Kind.VALUE, c, "", ""));
             }
         }
         return out;
@@ -284,6 +289,19 @@ public final class Completions {
 
     /** The players online, for tell(" ; the editor plugs in the client's list. */
     public static java.util.function.Supplier<List<String>> players = List::of;
+
+    private static final Map<Object, List<Entry>> NAMED = new java.util.HashMap<>();
+
+    /** Every id in an item or fluid registry, each with the name players know it by beside it. */
+    private static List<Entry> named(net.minecraft.core.Registry<?> registry) {
+        return NAMED.computeIfAbsent(registry, r -> registry(registry).stream().map(id -> {
+            Object thing = registry.get(net.minecraft.resources.ResourceLocation.parse(id));
+            String name = thing instanceof net.minecraft.world.item.Item item ? item.getDescription().getString()
+                    : thing instanceof net.minecraft.world.level.material.Fluid fluid
+                            ? fluid.getFluidType().getDescription().getString() : "";
+            return new Entry(id, Kind.VALUE, id, "", "", name, "", "");
+        }).toList());
+    }
 
     private static final Map<Object, List<String>> REGISTRY_IDS = new java.util.HashMap<>();
 
@@ -471,30 +489,59 @@ public final class Completions {
         return out;
     }
 
-    /** Variables and functions the file defines or uses, except the word being typed. */
-    private static List<Entry> namesInDocument(String document, String typing) {
-        Map<String, Kind> found = new LinkedHashMap<>();
-        Matcher f = FUNCTION_DEF.matcher(document);
+    private static final Pattern FUNCTION_SIGNATURE = Pattern.compile("(?m)^[ \\t]*(?:local\\s+)?function\\s+([A-Za-z_]\\w*)\\s*\\(([^)]*)\\)"
+            + "|(?m)^[ \\t]*(?:local\\s+)?([A-Za-z_]\\w*)\\s*=\\s*function\\s*\\(([^)]*)\\)");
+
+    /**
+     * Variables and functions the file defines or uses, except the word being typed. Each says
+     * what it is: a function its parameters and the comment above it, a device what it is and
+     * does, any other name the line that gives it its value.
+     */
+    private static List<Entry> namesInDocument(String document, String typing, List<NetworkDevice> devices) {
+        Map<String, Entry> found = new LinkedHashMap<>();
+        Matcher f = FUNCTION_SIGNATURE.matcher(document);
         while (f.find()) {
-            String name = f.group(1) != null ? f.group(1) : f.group(2);
-            if (!name.contains(".") && !name.contains(":"))
-                found.put(name, Kind.FUNCTION);
+            String name = f.group(1) != null ? f.group(1) : f.group(3);
+            String params = (f.group(1) != null ? f.group(2) : f.group(4)).trim().replaceAll("\\s*,\\s*", ", ");
+            found.putIfAbsent(name, new Entry(name, Kind.FUNCTION, name + (params.isEmpty() ? "()" : "($0)"),
+                    "function " + name + "(" + params + ")", commentAbove(document, f.start())));
         }
+        Set<String> skip = new HashSet<>();
+        LuaApi.GLOBALS.forEach(e -> skip.add(e.label()));
+        Matcher r = MODULE_VAR.matcher(document);
+        while (r.find())
+            skip.add(r.group(1)); // offered as modules
         Map<String, Integer> counts = new LinkedHashMap<>();
         Matcher m = IDENT.matcher(stripStringsAndComments(document));
         while (m.find())
             counts.merge(m.group(), 1, Integer::sum);
-        Set<String> known = new HashSet<>();
-        LuaApi.GLOBALS.forEach(e -> known.add(e.label()));
         counts.forEach((name, count) -> {
-            if (known.contains(name) || (name.equals(typing) && count <= 1))
+            if (skip.contains(name) || found.containsKey(name) || (name.equals(typing) && count <= 1))
                 return;
-            found.putIfAbsent(name, Kind.VARIABLE);
+            NetworkDevice d = deviceIn(document, name, devices);
+            if (d != null) {
+                Entry e = deviceEntry(d, null);
+                found.put(name, new Entry(name, Kind.VARIABLE, name, e.detail(), e.doc(), e.rowType(), "", e.footer()));
+            } else {
+                found.put(name, new Entry(name, Kind.VARIABLE, name, definition(document, name), ""));
+            }
         });
-        List<Entry> out = new ArrayList<>();
-        found.forEach((name, kind) -> out.add(new Entry(name, kind, kind == Kind.FUNCTION ? name + "($0)" : name,
-                kind == Kind.FUNCTION ? "function in this file" : "in this file", "")));
-        return out;
+        return new ArrayList<>(found.values());
+    }
+
+    /** The line that first gives a name its value (or else first uses it), trimmed: what it holds. */
+    private static String definition(String document, String name) {
+        String n = Pattern.quote(name);
+        Pattern assigned = Pattern.compile("(?m)^[ \\t]*(.*(?:\\blocal\\b[^=\\n]*\\b" + n + "\\b|(?<![.:\\w])" + n
+                + "\\s*=(?!=)|\\bfor\\b[^\\n]*\\b" + n + "\\b|\\bfunction\\b[^\\n]*\\([^)]*\\b" + n + "\\b).*)$");
+        Matcher m = assigned.matcher(document);
+        String line = m.find() ? m.group(1) : null;
+        if (line == null) {
+            Matcher used = Pattern.compile("(?m)^[ \\t]*(.*(?<![.:\\w])" + n + "\\b.*)$").matcher(document);
+            line = used.find() ? used.group(1) : name;
+        }
+        line = line.strip();
+        return line.length() > 60 ? line.substring(0, 59) + "…" : line;
     }
 
     private static String stripStringsAndComments(String document) {
@@ -575,8 +622,8 @@ public final class Completions {
         }
         int at = 0;
         String lower = label.toLowerCase(), q = query.toLowerCase();
-        // ids: "bell" finds minecraft:block.bell.use
-        int inside = label.indexOf(':') >= 0 ? lower.indexOf(q) : -1;
+        // anywhere in it: "bell" finds minecraft:block.bell.use, "kn" panel_knob_2
+        int inside = lower.indexOf(q);
         if (inside > 0) {
             for (int i = 0; i < q.length(); i++) matched[inside + i] = true;
             return 2;
