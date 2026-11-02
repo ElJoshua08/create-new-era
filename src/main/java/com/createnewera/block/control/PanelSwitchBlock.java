@@ -54,6 +54,7 @@ public class PanelSwitchBlock extends PanelControlBlock {
             set(level, pos, args.arg(1).checkBoolean());
             return null;
         });
+        api.choices("setOn", java.util.List.of(com.createnewera.bus.DeviceDrivers.BOOLEAN));
     }
 
     @Override

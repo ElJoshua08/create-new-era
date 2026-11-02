@@ -20,13 +20,8 @@ import net.minecraft.world.phys.Vec3;
 
 /** Works out what to suggest at the cursor. Pure text in, ranked suggestions out. */
 public final class Completions {
-    private static final Pattern SIDE_ARG = Pattern.compile("\\b(?:redstone|rs)\\s*\\.\\s*\\w+\\s*\\(\\s*([\"'])(\\w*)$");
-    private static final Pattern DEVICE_ARG = Pattern.compile("\\bbus\\s*[.:]\\s*(?:get|info)\\s*\\(\\s*([\"'])(\\w*)$");
     /** {@code local press = bus.get("press")}: the variable holds that device */
     private static final Pattern DEVICE_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*bus\\s*[.:]\\s*get\\s*\\(\\s*[\"'](\\w+)[\"']\\s*\\)");
-    /** {@code lamp.set("am}: a string as a device function's first argument */
-    private static final Pattern STRING_ARG = Pattern.compile("([A-Za-z_]\\w*)\\s*[.:]\\s*([A-Za-z_]\\w*)\\s*\\(\\s*([\"'])([\\w:.\\-]*)$");
-    private static final Pattern REQUIRE_ARG = Pattern.compile("\\brequire\\s*\\(?\\s*([\"'])([\\w./\\-]*)$");
     private static final Pattern MEMBER = Pattern.compile("([A-Za-z_]\\w*)\\s*([.:])\\s*(\\w*)$");
     private static final Pattern WORD = Pattern.compile("([A-Za-z_]\\w*)$");
     private static final Pattern IDENT = Pattern.compile("[A-Za-z_]\\w*");
@@ -59,18 +54,10 @@ public final class Completions {
                                   List<NetworkDevice> devices, Viewer viewer, boolean explicit) {
         int lineStart = beforeCursor.lastIndexOf('\n') + 1;
         String line = beforeCursor.substring(lineStart);
+        Result argument = argument(line, document, files, devices, viewer);
+        if (argument != null)
+            return argument;
         Matcher m;
-        if ((m = SIDE_ARG.matcher(line)).find())
-            return rank(line.length() - m.group(2).length(), m.group(2), values(LuaApi.SIDES, "side"));
-        if ((m = DEVICE_ARG.matcher(line)).find())
-            return rank(line.length() - m.group(2).length(), m.group(2), deviceNames(devices, viewer));
-        if ((m = STRING_ARG.matcher(line)).find()) {
-            List<Entry> values = argumentChoices(document, m.group(1), m.group(2), devices, viewer);
-            if (values != null)
-                return rank(line.length() - m.group(4).length(), m.group(4), values);
-        }
-        if ((m = REQUIRE_ARG.matcher(line)).find())
-            return rank(line.length() - m.group(2).length(), m.group(2), values(modules(files), "file on this computer"));
 
         // nothing to suggest inside comments and strings (sides and file names were handled above)
         int[] colors = new int[line.length()];
@@ -184,18 +171,126 @@ public final class Completions {
         return null;
     }
 
-    /** What a string first argument of a device's function can be: its choices, or the devices on the network. */
-    private static List<Entry> argumentChoices(String document, String variable, String function, List<NetworkDevice> devices,
-                                               Viewer viewer) {
-        NetworkDevice d = deviceIn(document, variable, devices);
+    /** A call still open at the cursor: {@code base.method(args so far} or {@code function(args so far} */
+    private static final Pattern OPEN_CALL = Pattern.compile("(?:([A-Za-z_]\\w*)\\s*[.:]\\s*)?([A-Za-z_]\\w*)\\s*\\(([^()]*)$");
+
+    /**
+     * Inside a call's parentheses, what the argument under the cursor can be: a lamp's colours,
+     * a sound, a device, a side, a file... With the quote typed or not: without it, picking a value
+     * writes the quotes too. Null when the cursor isn't on an argument the editor knows values for.
+     */
+    private static Result argument(String line, String document, List<String> files, List<NetworkDevice> devices, Viewer viewer) {
+        Matcher m = OPEN_CALL.matcher(line);
+        if (!m.find())
+            return null;
+        String base = m.group(1), function = m.group(2), args = m.group(3);
+        // which argument, and where it starts: commas inside strings don't count
+        int index = 0, start = 0;
+        char quote = 0;
+        for (int i = 0; i < args.length(); i++) {
+            char c = args.charAt(i);
+            if (quote != 0) {
+                if (c == '\\')
+                    i++;
+                else if (c == quote)
+                    quote = 0;
+            } else if (c == '"' || c == '\'') {
+                quote = c;
+            } else if (c == ',') {
+                index++;
+                start = i + 1;
+            } else if (c == '{') {
+                return null;
+            }
+        }
+        String current = args.substring(start).stripLeading();
+        boolean quoted = !current.isEmpty() && (current.charAt(0) == '"' || current.charAt(0) == '\'');
+        String query = quoted ? current.substring(1) : current;
+        // an argument already finished ("red" then a space), or an expression rather than a value
+        if (quoted ? query.indexOf(current.charAt(0)) >= 0 : !query.matches("\\w*"))
+            return null;
+        if (quoted && !query.matches("[\\w:./\\- ]*"))
+            return null;
+        List<Entry> values = choicesFor(base, function, index, document, files, devices, viewer);
+        if (values == null)
+            return null;
+        if (!quoted) {
+            // unquoted: a variable fits too, and picking a string value writes its quotes
+            List<Entry> pool = new ArrayList<>();
+            for (Entry e : values)
+                pool.add(e.kind() == Kind.CONSTANT ? e : new Entry(e.label(), e.kind(), "\"" + e.insert() + "\"", e.detail(), e.doc(),
+                        e.rowType(), e.rowHint(), e.footer()));
+            if (!query.isEmpty())
+                pool.addAll(namesInDocument(document, query));
+            return rank(line.length() - query.length(), query, pool);
+        }
+        values = values.stream().filter(e -> e.kind() != Kind.CONSTANT).toList();
+        return values.isEmpty() ? null : rank(line.length() - query.length(), query, values);
+    }
+
+    /** What argument {@code index} of base.function can be, or null if the editor doesn't know. */
+    private static List<Entry> choicesFor(String base, String function, int index, String document, List<String> files,
+                                          List<NetworkDevice> devices, Viewer viewer) {
+        if (base == null)
+            return function.equals("require") && index == 0 ? values(modules(files), "file on this computer") : null;
+        if ((base.equals("redstone") || base.equals("rs")) && index == 0)
+            return LuaApi.MEMBERS.get(base).stream().anyMatch(e -> e.label().equals(function) && e.detail().contains("side"))
+                    ? values(LuaApi.SIDES, "side") : null;
+        if (base.equals("bus") && (function.equals("get") || function.equals("info")) && index == 0)
+            return deviceNames(devices, viewer);
+        NetworkDevice d = deviceIn(document, base, devices);
         if (d == null)
             return null;
         for (NetworkDevice.Fn fn : d.functions())
-            if (fn.name().equals(function) && !fn.choices().isEmpty())
-                return fn.choices().contains(com.createnewera.bus.DeviceDrivers.DEVICES) ? deviceNames(devices, viewer)
-                        : fn.choices().contains(com.createnewera.block.control.PanelSpeakerBlock.SOUNDS) ? values(soundIds(), "sound")
-                        : values(fn.choices(), fn.name());
+            if (fn.name().equals(function))
+                return expand(argChoices(fn.choices(), index), fn, devices, viewer);
         return null;
+    }
+
+    /** The part of a function's flat choices list for one argument (see DeviceDrivers.Api.choices). */
+    private static List<String> argChoices(List<String> all, int index) {
+        List<String> out = new ArrayList<>();
+        int arg = 0;
+        for (String c : all) {
+            if (c.startsWith(com.createnewera.bus.DeviceDrivers.ARG))
+                arg = Integer.parseInt(c.substring(com.createnewera.bus.DeviceDrivers.ARG.length()));
+            else if (arg == index)
+                out.add(c);
+        }
+        return out;
+    }
+
+    /** Choices to suggestions, the editor filling in the lists only it has: sounds, items, devices... */
+    private static List<Entry> expand(List<String> choices, NetworkDevice.Fn fn, List<NetworkDevice> devices, Viewer viewer) {
+        if (choices.isEmpty())
+            return null;
+        List<Entry> out = new ArrayList<>();
+        for (String c : choices) {
+            switch (c) {
+                case com.createnewera.bus.DeviceDrivers.DEVICES -> out.addAll(deviceNames(devices, viewer));
+                case com.createnewera.block.control.PanelSpeakerBlock.SOUNDS -> out.addAll(values(soundIds(), "sound"));
+                case com.createnewera.bus.DeviceDrivers.ITEMS -> out.addAll(values(registry(net.minecraft.core.registries.BuiltInRegistries.ITEM), "item"));
+                case com.createnewera.bus.DeviceDrivers.FLUIDS -> out.addAll(values(registry(net.minecraft.core.registries.BuiltInRegistries.FLUID), "fluid"));
+                case com.createnewera.bus.DeviceDrivers.PLAYERS -> out.addAll(values(players.get(), "player"));
+                case com.createnewera.bus.DeviceDrivers.BOOLEAN -> {
+                    out.add(new Entry("true", Kind.CONSTANT, "true", "boolean", ""));
+                    out.add(new Entry("false", Kind.CONSTANT, "false", "boolean", ""));
+                }
+                default -> out.add(new Entry(c, Kind.VALUE, c, fn.name(), ""));
+            }
+        }
+        return out;
+    }
+
+    /** The players online, for tell(" ; the editor plugs in the client's list. */
+    public static java.util.function.Supplier<List<String>> players = List::of;
+
+    private static final Map<Object, List<String>> REGISTRY_IDS = new java.util.HashMap<>();
+
+    private static List<String> registry(net.minecraft.core.Registry<?> registry) {
+        return REGISTRY_IDS.computeIfAbsent(registry, r -> registry.keySet().stream()
+                .filter(id -> !id.getPath().equals("air") && !id.getPath().equals("empty"))
+                .map(Object::toString).sorted().toList());
     }
 
     private static List<String> sounds;
@@ -480,6 +575,12 @@ public final class Completions {
         }
         int at = 0;
         String lower = label.toLowerCase(), q = query.toLowerCase();
+        // ids: "bell" finds minecraft:block.bell.use
+        int inside = label.indexOf(':') >= 0 ? lower.indexOf(q) : -1;
+        if (inside > 0) {
+            for (int i = 0; i < q.length(); i++) matched[inside + i] = true;
+            return 2;
+        }
         if (lower.charAt(0) != q.charAt(0))
             return 0;
         for (int i = 0; i < label.length() && at < q.length(); i++) {

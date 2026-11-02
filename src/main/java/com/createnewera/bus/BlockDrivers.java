@@ -72,6 +72,7 @@ final class BlockDrivers {
                 setOpen(level, pos, args.arg(1).checkBoolean());
                 return null;
             });
+            api.choices("setOpen", List.of(DeviceDrivers.BOOLEAN));
         }
         if (state.hasProperty(BlockStateProperties.LIT)) {
             api.family("lit");
@@ -121,8 +122,10 @@ final class BlockDrivers {
                     args -> moveItems(level, pos, other(level, pos, args, "pushItems"), args, true));
             api.order("pullItems", "from: device, count?: number, item?: id", "number moved",
                     args -> moveItems(level, pos, other(level, pos, args, "pullItems"), args, false));
-            api.choices("pushItems", List.of(DeviceDrivers.DEVICES));
-            api.choices("pullItems", List.of(DeviceDrivers.DEVICES));
+            for (String fn : List.of("pushItems", "pullItems")) {
+                api.choices(fn, List.of(DeviceDrivers.DEVICES));
+                api.choices(fn, 2, List.of(DeviceDrivers.ITEMS));
+            }
         }
         IFluidHandler fluids = DeviceDrivers.fluidHandler(level, pos);
         if (fluids != null) {
@@ -131,8 +134,10 @@ final class BlockDrivers {
                     args -> moveFluid(level, pos, other(level, pos, args, "pushFluid"), args, true));
             api.order("pullFluid", "from: device, amount?: mB, fluid?: id", "number moved",
                     args -> moveFluid(level, pos, other(level, pos, args, "pullFluid"), args, false));
-            api.choices("pushFluid", List.of(DeviceDrivers.DEVICES));
-            api.choices("pullFluid", List.of(DeviceDrivers.DEVICES));
+            for (String fn : List.of("pushFluid", "pullFluid")) {
+                api.choices(fn, List.of(DeviceDrivers.DEVICES));
+                api.choices(fn, 2, List.of(DeviceDrivers.FLUIDS));
+            }
         }
     }
 
@@ -295,6 +300,7 @@ final class BlockDrivers {
                         .append(Component.literal(args.arg(2).checkString()).withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC)));
                 return true;
             });
+            api.choices("tell", List.of(DeviceDrivers.PLAYERS));
         }
 
         // ---- Minecraft ----

@@ -287,6 +287,11 @@ public class ComputerEditorScreen extends Screen {
     @Override
     protected void init() {
         Completions.translate = I18n::get;
+        Completions.players = () -> {
+            var connection = Minecraft.getInstance().getConnection();
+            return connection == null ? List.of() : connection.getOnlinePlayers().stream()
+                    .map(p -> p.getProfile().getName()).sorted().toList();
+        };
         code = Rect.EMPTY;
         computeLayout();
     }
@@ -385,7 +390,7 @@ public class ComputerEditorScreen extends Screen {
         boolean typed = editor().charTyped(ch);
         if (typed) {
             // keep suggesting while a word, a member access, a string argument or a path is being typed
-            if (Character.isLetterOrDigit(ch) || "_.:\"'/(".indexOf(ch) >= 0)
+            if (Character.isLetterOrDigit(ch) || "_.:\"'/(, -".indexOf(ch) >= 0)
                 refreshCompletion(false);
             else
                 closeCompletion();
@@ -598,6 +603,9 @@ public class ComputerEditorScreen extends Screen {
             listTop = selected - visibleItems() + 1;
     }
 
+    /** Where this frame's suggestion details pane ends, 0 when none is drawn. */
+    private int docBottom;
+
     private void acceptCompletion() {
         var item = completion.items().get(selected).entry();
         editor().applyCompletion(completion.from(), item.insert());
@@ -708,6 +716,7 @@ public class ComputerEditorScreen extends Screen {
                     + (footer.isEmpty() ? 0 : 3 + footer.size() * 9) + 2;
             int dx = r.right() + 2 + docW > width ? r.x - docW - 2 : r.right() + 2;
             g.fill(dx - 1, r.y - 1, dx + docW + 1, r.y + dh + 1, 0xFF454545);
+            docBottom = r.y + dh + 1;
             g.fill(dx, r.y, dx + docW, r.y + dh, 0xFF252526);
             int ty = r.y + 3;
             for (FormattedCharSequence line : sig) {
@@ -1037,9 +1046,11 @@ public class ComputerEditorScreen extends Screen {
         renderActivityBar(g, mouseX, mouseY);
         renderToolbar(g, mouseX, mouseY);
 
-        renderSignature(g);
+        // suggestions first: the signature box goes under them when there's no room above the line
+        docBottom = 0;
         if (completionOpen())
             renderCompletion(g, mouseX, mouseY);
+        renderSignature(g);
         updateCursorShape(mouseX, mouseY);
     }
 
@@ -1059,8 +1070,12 @@ public class ComputerEditorScreen extends Screen {
         int[] at = editor.cursorScreenPos();
         int x = Mth.clamp(at[0] - 12, 2, width - SIGNATURE_W - 2);
         int y = at[1] - h - 2;
-        if (y < 2)
-            y = at[1] + CodeEditor.LINE + 2;
+        if (y < 2) {
+            // no room above the line: below it, and below the suggestions if they're open there
+            y = completionOpen() ? Math.max(completionRect().bottom(), docBottom) + 3 : at[1] + CodeEditor.LINE + 2;
+            if (y + h > height - 2)
+                return;
+        }
         g.pose().pushPose();
         g.pose().translate(0, 0, 390);
         g.fill(x - 1, y - 1, x + SIGNATURE_W + 1, y + h + 1, 0xFF454545);

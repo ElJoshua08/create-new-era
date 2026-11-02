@@ -57,6 +57,12 @@ public final class DeviceDrivers {
 
     /** In choices: the names of the devices the computer reaches, filled in by the editor */
     public static final String DEVICES = "@devices";
+    /** In choices, filled in by the editor: every item id, every fluid id, the players online */
+    public static final String ITEMS = "@items", FLUIDS = "@fluids", PLAYERS = "@players";
+    /** In choices: true or false, written bare rather than as a string */
+    public static final String BOOLEAN = "@boolean";
+    /** In choices: the values after it are for argument number N (from 0) */
+    public static final String ARG = "@arg:";
 
     /** Collects a device's functions, keeping only those its ports allow. */
     public static final class Api {
@@ -85,11 +91,24 @@ public final class DeviceDrivers {
                 fns.put(name, new Fn(name, params, returns, docKey(family, name), false, call));
         }
 
-        /** The values a function's first argument takes when it's a string, for the editor to offer. */
+        /** The values a function's first argument takes, for the editor to offer. */
         public void choices(String name, List<String> values) {
+            choices(name, 0, values);
+        }
+
+        /**
+         * The values its argument number {@code arg} (from 0) takes. Sent as one flat list:
+         * after the first argument's, each argument's values follow an "@arg:N" marker.
+         */
+        public void choices(String name, int arg, List<String> values) {
             Fn fn = fns.get(name);
-            if (fn != null)
-                fns.put(name, new Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads(), fn.call(), List.copyOf(values)));
+            if (fn == null)
+                return;
+            List<String> all = new java.util.ArrayList<>(fn.choices());
+            if (arg > 0)
+                all.add(ARG + arg);
+            all.addAll(values);
+            fns.put(name, new Fn(fn.name(), fn.params(), fn.returns(), fn.doc(), fn.reads(), fn.call(), List.copyOf(all)));
         }
     }
 
@@ -144,6 +163,7 @@ public final class DeviceDrivers {
             api.family("items");
             api.read("items", "", "{[item id] = count}", args -> itemCounts(items));
             api.read("count", "item: id", "number", args -> itemCounts(items).getOrDefault(args.arg(1).checkString(), 0));
+            api.choices("count", List.of(ITEMS));
             api.read("getSlots", "", "number", args -> items.getSlots());
         }
 
