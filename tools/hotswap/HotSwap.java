@@ -54,6 +54,14 @@ public class HotSwap {
                 if (loaded.isEmpty())
                     notLoaded++; // the game will load the new version from disk when it first needs it
                 for (ReferenceType type : loaded) {
+                    // the VM takes a new static field but never runs its initialiser, so it would sit
+                    // at null and crash the game the first time it's used
+                    List<String> had = type.fields().stream().filter(f -> f.isStatic()).map(f -> f.name()).toList();
+                    List<String> added = staticFields(e.getValue()).stream().filter(f -> !had.contains(f)).toList();
+                    if (!added.isEmpty()) {
+                        failed.put(e.getKey(), "new static field " + String.join(", ", added));
+                        continue;
+                    }
                     redefine.put(type, e.getValue());
                     names.put(type, e.getKey());
                 }
@@ -90,6 +98,45 @@ public class HotSwap {
         save(state, now);
         if (!failed.isEmpty())
             System.exit(RESTART_NEEDED);
+    }
+
+    /** Names of the static fields a class file declares. */
+    static List<String> staticFields(byte[] bytes) throws IOException {
+        var in = new java.io.DataInputStream(new java.io.ByteArrayInputStream(bytes));
+        in.skipNBytes(8);
+        int count = in.readUnsignedShort();
+        String[] utf8 = new String[count];
+        for (int i = 1; i < count; i++) {
+            int tag = in.readUnsignedByte();
+            switch (tag) {
+                case 1 -> utf8[i] = in.readUTF();
+                case 7, 8, 16, 19, 20 -> in.skipNBytes(2);
+                case 15 -> in.skipNBytes(3);
+                case 3, 4, 9, 10, 11, 12, 17, 18 -> in.skipNBytes(4);
+                case 5, 6 -> {
+                    in.skipNBytes(8);
+                    i++;
+                }
+                default -> throw new IOException("constant pool tag " + tag);
+            }
+        }
+        in.skipNBytes(6);
+        in.skipNBytes(2L * in.readUnsignedShort());
+        List<String> out = new java.util.ArrayList<>();
+        int fields = in.readUnsignedShort();
+        for (int f = 0; f < fields; f++) {
+            int access = in.readUnsignedShort();
+            String name = utf8[in.readUnsignedShort()];
+            in.skipNBytes(2);
+            if ((access & 0x0008) != 0)
+                out.add(name);
+            int attributes = in.readUnsignedShort();
+            for (int a = 0; a < attributes; a++) {
+                in.skipNBytes(2);
+                in.skipNBytes(in.readInt());
+            }
+        }
+        return out;
     }
 
     /** Exit code when some classes need a restart, so a script can restart the game for them. */
