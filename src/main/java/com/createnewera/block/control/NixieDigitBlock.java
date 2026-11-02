@@ -36,7 +36,7 @@ public class NixieDigitBlock extends PanelControlBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
     public NixieDigitBlock(Properties properties, DirectionalShape shape) {
-        super(properties.lightLevel(s -> s.getValue(LIT) ? 9 : 0), shape);
+        super(properties.lightLevel(s -> s.getValue(LIT) ? 12 : 0), shape);
         registerDefaultState(defaultBlockState().setValue(READS, Direction.SOUTH).setValue(LIT, false));
     }
 

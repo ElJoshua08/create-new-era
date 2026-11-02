@@ -4,6 +4,7 @@
   "package": "com.createnewera.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "LevelSignalMixin",
     "SableAssemblyMixin",
     "TypewriterMixin"
   ],
@@ -11,6 +12,7 @@
     "defaultRequire": 0
   },
   "client": [
+    "client.IrisBlockIdsMixin",
     "client.TypewriterKeysMixin"
   ]
 }
