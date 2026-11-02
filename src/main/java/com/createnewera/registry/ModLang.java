@@ -78,6 +78,15 @@ public final class ModLang {
         lang("create_new_era.api.nixie_digit.clear", "Turns the whole row dark.");
         lang("create_new_era.api.nixie_digit.setColor", "Makes the whole row glow in a dye colour: \"orange\", \"lime\", \"light_blue\"...");
         lang("create_new_era.api.nixie_digit.read", "What the whole row shows, as getText.");
+        lang("create_new_era.api.altitude_sensor.getAltitude", "The height it's at in the world, in blocks: on a moving ship, where the ship has carried it.");
+        lang("create_new_era.api.altitude_sensor.getAirPressure", "How thick the air is up there, from 1 at the bottom of the world thinning towards 0 as it climbs.");
+        lang("create_new_era.api.altitude_sensor.getSignal", "The redstone signal it gives for its height, 0 to 15, as set in its screen.");
+        lang("create_new_era.api.gimbal_sensor.getPitch", "How far its ship pitches nose up or down, in degrees, as its swinging gimbal reads it.");
+        lang("create_new_era.api.gimbal_sensor.getRoll", "How far its ship rolls to one side, in degrees, as its swinging gimbal reads it.");
+        lang("create_new_era.api.gimbal_sensor.getAngles", "Pitch and roll together, in degrees: {pitch = ..., roll = ...}.");
+        lang("create_new_era.api.gimbal_sensor.getPower", "The redstone signal it gives out of one side, 0 to 15.");
+        lang("create_new_era.api.velocity_sensor.getSpeed", "How fast its ship moves along the way it points, in blocks a second; negative going backwards.");
+        lang("create_new_era.api.velocity_sensor.getSignal", "The signal it gives for that speed, -15 to 15: below 0 when going backwards.");
         lang("create_new_era.editor.module", "A module: what %s returns. Its functions are listed after a dot.");
         lang("create_new_era.editor.module_missing", "No file on this computer by that name yet.");
         lang("create_new_era.editor.device.orders", "Orders:");

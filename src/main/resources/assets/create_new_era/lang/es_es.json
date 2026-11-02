@@ -354,5 +354,14 @@
   "create_new_era.api.nixie_digit.setChar": "Pone un carácter en un tubo, contando desde 1 por la izquierda; nil lo apaga.",
   "create_new_era.api.nixie_digit.clear": "Apaga toda la fila.",
   "create_new_era.api.nixie_digit.setColor": "Hace brillar toda la fila con un color de tinte: \"orange\", \"lime\", \"light_blue\"...",
-  "create_new_era.api.nixie_digit.read": "Lo que muestra toda la fila, como getText."
+  "create_new_era.api.nixie_digit.read": "Lo que muestra toda la fila, como getText.",
+  "create_new_era.api.altitude_sensor.getAltitude": "La altura a la que está en el mundo, en bloques: en un barco que se mueve, adonde lo ha llevado el barco.",
+  "create_new_era.api.altitude_sensor.getAirPressure": "Lo denso que está el aire ahí arriba, de 1 en el fondo del mundo bajando hacia 0 al subir.",
+  "create_new_era.api.altitude_sensor.getSignal": "La señal de redstone que da por su altura, de 0 a 15, como esté ajustado en su pantalla.",
+  "create_new_era.api.gimbal_sensor.getPitch": "Cuánto cabecea su barco, morro arriba o abajo, en grados, según su cardán oscilante.",
+  "create_new_era.api.gimbal_sensor.getRoll": "Cuánto se inclina su barco a un lado, en grados, según su cardán oscilante.",
+  "create_new_era.api.gimbal_sensor.getAngles": "Cabeceo e inclinación juntos, en grados: {pitch = ..., roll = ...}.",
+  "create_new_era.api.gimbal_sensor.getPower": "La señal de redstone que da por un lado, de 0 a 15.",
+  "create_new_era.api.velocity_sensor.getSpeed": "A qué velocidad se mueve su barco en la dirección a la que apunta, en bloques por segundo; negativa marcha atrás.",
+  "create_new_era.api.velocity_sensor.getSignal": "La señal que da por esa velocidad, de -15 a 15: por debajo de 0 marcha atrás."
 }

@@ -46,6 +46,37 @@ public class EndpointTests {
         return data.nameOf(abs, level.getBlockState(abs).getBlock());
     }
 
+    // Aeronautics' sensors give programs what they measure
+    @GameTest(template = "empty5", timeoutTicks = 120)
+    public static void aeronauticsSensorsAreReadable(GameTestHelper helper) {
+        var altitude = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("simulated", "altitude_sensor"));
+        var velocity = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("simulated", "velocity_sensor"));
+        if (altitude == Blocks.AIR) {
+            helper.succeed();
+            return;
+        }
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        helper.setBlock(new BlockPos(2, 1, 3), AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(new BlockPos(2, 1, 3));
+        motor.generatedSpeed.setValue(256);
+        helper.setBlock(new BlockPos(0, 1, 0), altitude);
+        helper.setBlock(new BlockPos(4, 1, 0), velocity);
+        String alt = device(helper, new BlockPos(0, 1, 0), 0), vel = device(helper, new BlockPos(4, 1, 0), 1);
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        int y = helper.absolutePos(new BlockPos(0, 1, 0)).getY();
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local a, v = bus.get('" + alt + "'), bus.get('" + vel + "')",
+                "print('altitude', math.floor(a.getAltitude()), a.getAirPressure() > 0, v.getSpeed())"));
+        computer.start("create_new_era.console.running");
+        helper.succeedWhen(() -> {
+            String line = "altitude\t" + y + "\ttrue\t0";
+            if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals(line)))
+                helper.fail("expected '" + line + "' in " + computer.getConsole());
+        });
+    }
+
     // the chat log hears chat, hands each message to onMessage, and keeps them
     @GameTest(template = "empty5", timeoutTicks = 120)
     public static void chatLogsHearAndSpeak(GameTestHelper helper) {

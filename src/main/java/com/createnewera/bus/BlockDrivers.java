@@ -270,6 +270,8 @@ final class BlockDrivers {
         }
 
         Typewriter.add(api, level, be);
+        if (be != null)
+            AeronauticsSensors.add(api, be);
 
         // ---- this mod's own ----
         if (be instanceof ChatLogBlockEntity log) {
@@ -375,7 +377,8 @@ final class BlockDrivers {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ChatLogBlockEntity log)
             return log.heard();
-        return Typewriter.snapshot(be);
+        Object sensor = AeronauticsSensors.snapshot(be);
+        return sensor != null ? sensor : Typewriter.snapshot(be);
     }
 
     private static @Nullable Train train(StationBlockEntity station) {
