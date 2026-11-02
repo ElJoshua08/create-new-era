@@ -41,8 +41,15 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
     public String glyph = "";
     public DyeColor color = DyeColor.ORANGE;
 
+    /** Client only: an airspeed dial's speed, from how far the ship moved between frames, smoothed */
+    public double shownSpeed;
+    public @org.jetbrains.annotations.Nullable net.minecraft.world.phys.Vec3 lastSeenAt;
+    public long lastSeenNanos;
+
     public PanelControlBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        if (state.getBlock() instanceof PanelInstrumentBlock)
+            max = PanelInstrumentBlock.TOP_SPEED;
     }
 
     /** How many steps from min to max: the last notch. A fine range is capped so it stays draggable. */
@@ -81,6 +88,8 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
             tag.putDouble("step", step);
             tag.putInt("position", position());
         }
+        if (getBlockState().getBlock() instanceof PanelInstrumentBlock)
+            tag.putDouble("max", max);
         if (getBlockState().getBlock() instanceof NixieDigitBlock) {
             tag.putString("glyph", glyph);
             tag.putString("color", color.getSerializedName());
@@ -96,6 +105,8 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
             step = tag.getDouble("step");
             position = tag.getInt("position");
         }
+        if (!tag.contains("position") && tag.contains("max"))
+            max = tag.getDouble("max");
         if (tag.contains("glyph")) {
             glyph = tag.getString("glyph");
             color = DyeColor.byName(tag.getString("color"), DyeColor.ORANGE);

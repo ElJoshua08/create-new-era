@@ -156,6 +156,33 @@ public class ControlTests {
         });
     }
 
+    // on solid ground the instruments read the ground: its height, level, facing north, still
+    @GameTest(template = ROOM, timeoutTicks = 200)
+    public static void instrumentsReadWhereTheyAre(GameTestHelper helper) {
+        var computer = computer(helper);
+        BlockPos alt = control(helper, 0, 0, ModBlocks.PANEL_ALTIMETER.get());
+        BlockPos gyro = control(helper, 1, 0, ModBlocks.PANEL_GYROSCOPE.get());
+        BlockPos compass = control(helper, 3, 0, ModBlocks.PANEL_COMPASS.get());
+        BlockPos speed = control(helper, 4, 0, ModBlocks.PANEL_AIRSPEED.get());
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local a, g = bus.get('" + name(helper, alt) + "'), bus.get('" + name(helper, gyro) + "')",
+                "local c, s = bus.get('" + name(helper, compass) + "'), bus.get('" + name(helper, speed) + "')",
+                "print('alt', a.getAltitude(), a.getVerticalSpeed())",
+                "print('gyro', g.getPitch(), g.getRoll(), g.getHeading())",
+                "print('compass', c.getHeading(), c.getDirection())",
+                "s.setMaxSpeed(20)",
+                "print('speed', s.getSpeed(), s.getMaxSpeed())"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(30, () -> {
+            double y = helper.absolutePos(alt).getY() + 0.5;
+            expectPrinted(helper, computer, "alt\t" + y + "\t0");
+            expectPrinted(helper, computer, "gyro\t0\t0\t0");
+            expectPrinted(helper, computer, "compass\t0\tnorth");
+            expectPrinted(helper, computer, "speed\t0\t20");
+            helper.succeed();
+        });
+    }
+
     // nixies side by side make one display; a cable to the last drives the whole row
     @GameTest(template = ROOM, timeoutTicks = 200)
     public static void nixiesInARowShowText(GameTestHelper helper) {

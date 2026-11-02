@@ -1,0 +1,114 @@
+{
+  "variants": {
+    "facing=down,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "x": 180,
+      "y": 90
+    },
+    "facing=down,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "x": 180
+    },
+    "facing=down,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "x": 180,
+      "y": 180
+    },
+    "facing=down,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "x": 180,
+      "y": 270
+    },
+    "facing=east,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90
+    },
+    "facing=north,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90
+    },
+    "facing=north,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90
+    },
+    "facing=north,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90
+    },
+    "facing=south,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "y": 270
+    },
+    "facing=up,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "y": 180
+    },
+    "facing=up,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope"
+    },
+    "facing=up,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope",
+      "y": 90
+    },
+    "facing=west,reads=east": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,reads=north": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,reads=south": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,reads=west": {
+      "model": "create_new_era:block/panel_gyroscope_wall",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

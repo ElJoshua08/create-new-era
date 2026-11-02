@@ -300,6 +300,24 @@ MODELS["nixie_digit"] = {
 PREVIEWS = {"nixie_digit_preview": model(NIXIE_TEX, _nixie_solid["elements"] + [_nixie_glass])}
 
 
+# Panel instruments: a brass housing on the whole plate, the dial on top (gen_instruments.py)
+# with its 12 o'clock towards the way the ship flies. Their needles, horizon and compass card
+# are drawn by PanelControlRenderer. On a wall the model turns face out, which would put 12
+# o'clock at the bottom: the wall variant turns the dial back round.
+INSTRUMENTS = ("altimeter", "gyroscope", "compass", "airspeed")
+for _name in INSTRUMENTS:
+    _face = "attitude" if _name == "gyroscope" else _name
+    for _wall in (False, True):
+        _up = {"texture": "#face", "uv": [0, 0, 16, 16]}
+        if _wall:
+            _up["rotation"] = 180
+        _housing = box("housing", [2, 2, 2], [14, 4, 14], {"sides": ("brass", [2, 0, 14, 2])})
+        _housing["faces"]["up"] = _up
+        MODELS[f"panel_{_name}" + ("_wall" if _wall else "")] = model(
+            {**PANEL_TEX, "brass": "create:block/brass_casing", "face": f"create_new_era:block/instruments/{_face}"},
+            panel(_housing)["elements"])
+
+
 # Brass screen, front facing north. Screens next to each other (same facing) join:
 # a side with a neighbour swaps its brass frame strip for glass, so the wall reads as one pane.
 # The blockstate (datagen, ModBlocks) picks the pieces. Seen from the front, +x is the

@@ -13,6 +13,7 @@ import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.HorizontalMachineBlock;
 import com.createnewera.block.PortHubBlock;
 import com.createnewera.block.control.NixieDigitBlock;
+import com.createnewera.block.control.PanelInstrumentBlock;
 import com.createnewera.block.control.PanelButtonBlock;
 import com.createnewera.block.control.PanelControlBlock;
 import com.createnewera.block.control.PanelDialBlock;
@@ -135,6 +136,40 @@ public final class ModBlocks {
      * A panel control on its andesite plate. Its model follows its state (a pressed button, a
      * knob's setting...), turned to whichever face it was put on.
      */
+    public static final BlockEntry<PanelInstrumentBlock> PANEL_ALTIMETER = instrument("panel_altimeter", "Panel Altimeter",
+            PanelInstrumentBlock.Kind.ALTIMETER);
+    public static final BlockEntry<PanelInstrumentBlock> PANEL_GYROSCOPE = instrument("panel_gyroscope", "Panel Gyroscope",
+            PanelInstrumentBlock.Kind.GYROSCOPE);
+    public static final BlockEntry<PanelInstrumentBlock> PANEL_COMPASS = instrument("panel_compass", "Panel Compass",
+            PanelInstrumentBlock.Kind.COMPASS);
+    public static final BlockEntry<PanelInstrumentBlock> PANEL_AIRSPEED = instrument("panel_airspeed", "Panel Airspeed Indicator",
+            PanelInstrumentBlock.Kind.AIRSPEED);
+
+    /**
+     * A flight instrument: a brass housing on the plate, its dial's 12 o'clock turned the way
+     * the ship flies (InstrumentRenderer.rotation draws its needles the same way).
+     */
+    private static BlockEntry<PanelInstrumentBlock> instrument(String name, String english, PanelInstrumentBlock.Kind kind) {
+        DirectionalShape shape = DirectionalShape.up(PLATE, box(2, 2, 2, 14, 4, 14));
+        return REGISTRATE
+                .block(name, p -> new PanelInstrumentBlock(p, shape, kind))
+                .initialProperties(SharedProperties::stone)
+                .properties(p -> p.mapColor(MapColor.GOLD).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops().noOcclusion())
+                .transform(TagGen.pickaxeOnly())
+                .blockstate((c, p) -> p.getVariantBuilder(c.get()).forAllStates(state -> {
+                    Direction facing = state.getValue(DirectionalPartBlock.FACING);
+                    int reads = (int) state.getValue(PanelInstrumentBlock.READS).toYRot();
+                    boolean wall = facing.getAxis().isHorizontal();
+                    return ConfiguredModel.builder().modelFile(existing(p, name + (wall ? "_wall" : "")))
+                            .rotationX(facing == Direction.DOWN ? 180 : wall ? 90 : 0)
+                            .rotationY(wall ? ((int) facing.toYRot() + 180) % 360 : facing == Direction.DOWN ? (reads + 180) % 360 : reads % 360)
+                            .build();
+                }))
+                .lang(english)
+                .item().model(ModBlocks::blockItemModel).build()
+                .register();
+    }
+
     private static <T extends PanelControlBlock> BlockEntry<T> control(String name, String english, double[] part,
             BiFunction<BlockBehaviour.Properties, DirectionalShape, T> factory, Function<BlockState, String> model) {
         DirectionalShape shape = DirectionalShape.up(PLATE, part);

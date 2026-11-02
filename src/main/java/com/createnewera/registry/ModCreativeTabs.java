@@ -41,6 +41,10 @@ public final class ModCreativeTabs {
                         output.accept(ModBlocks.PANEL_GAUGE);
                         output.accept(ModBlocks.PANEL_KEYPAD);
                         output.accept(ModBlocks.PANEL_SPEAKER);
+                        output.accept(ModBlocks.PANEL_ALTIMETER);
+                        output.accept(ModBlocks.PANEL_GYROSCOPE);
+                        output.accept(ModBlocks.PANEL_COMPASS);
+                        output.accept(ModBlocks.PANEL_AIRSPEED);
                     })
                     .build());
 

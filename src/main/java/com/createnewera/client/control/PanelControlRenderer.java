@@ -59,6 +59,10 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
             renderNixie(control, pose, buffers);
             return;
         }
+        if (state.getBlock() instanceof com.createnewera.block.control.PanelInstrumentBlock instrument) {
+            InstrumentRenderer.render(control, instrument, partialTick, pose, buffers, light);
+            return;
+        }
         pose.pushPose();
         // the turn the blockstate gives the model, so everything here lines up with it
         Direction facing = state.getValue(DirectionalPartBlock.FACING);

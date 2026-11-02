@@ -14,6 +14,10 @@
     "create_new_era:nixie_digit",
     "create_new_era:panel_gauge",
     "create_new_era:panel_speaker",
-    "create_new_era:panel_keypad"
+    "create_new_era:panel_keypad",
+    "create_new_era:panel_altimeter",
+    "create_new_era:panel_gyroscope",
+    "create_new_era:panel_compass",
+    "create_new_era:panel_airspeed"
   ]
 }

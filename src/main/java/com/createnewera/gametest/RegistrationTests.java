@@ -37,7 +37,7 @@ public class RegistrationTests {
 
     private static final List<String> RECIPES = List.of(
             "brass_computer", "brass_screen", "universal_adapter", "bearing_servo", "control_plate",
-            "panel_button", "panel_switch", "panel_knob", "panel_slider", "panel_lamp",
+            "panel_button", "panel_switch", "panel_altimeter", "panel_gyroscope", "panel_compass", "panel_airspeed", "panel_knob", "panel_slider", "panel_lamp",
             "nixie_digit", "panel_gauge", "panel_keypad", "bus_port", "brass_port", "port_hub", "panel_speaker", "chat_log");
 
     @GameTest(template = EMPTY)
@@ -46,7 +46,8 @@ public class RegistrationTests {
         List<BlockEntry<? extends Block>> blocks = List.of(
                 ModBlocks.BRASS_COMPUTER, ModBlocks.BRASS_SCREEN, ModBlocks.UNIVERSAL_ADAPTER, ModBlocks.BEARING_SERVO,
                 ModBlocks.PANEL_BUTTON, ModBlocks.PANEL_SWITCH, ModBlocks.PANEL_KNOB, ModBlocks.PANEL_SLIDER,
-                ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD);
+                ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD,
+                ModBlocks.PANEL_ALTIMETER, ModBlocks.PANEL_GYROSCOPE, ModBlocks.PANEL_COMPASS, ModBlocks.PANEL_AIRSPEED);
         for (BlockEntry<? extends Block> entry : blocks) {
             BlockState base = entry.getDefaultState();
             for (Direction facing : Direction.values()) {
@@ -82,8 +83,8 @@ public class RegistrationTests {
         var level = helper.getLevel();
         CreativeModeTabs.tryRebuildTabContents(level.enabledFeatures(), true, level.registryAccess());
         int count = ModCreativeTabs.MAIN.get().getDisplayItems().size();
-        if (count != 20)
-            helper.fail("main tab has " + count + " items, expected 20");
+        if (count != 24)
+            helper.fail("main tab has " + count + " items, expected 24");
         helper.succeed();
     }
 
