@@ -1129,13 +1129,29 @@ public class ComputerEditorScreen extends Screen {
             };
             boolean link = line.kind() == ConsoleLine.Kind.ERROR && ERROR_AT.matcher(line.text()).find()
                     && new Rect(console.x, y, console.w, 9).contains(mouseX, mouseY);
-            g.drawString(font, text, console.x + 5, y, color, false);
+            // program output in the code's monospace, so print's tab-separated columns line up
+            Component shown = Component.literal(expandTabs(text)).withStyle(CodeEditor.MONO);
+            g.drawString(font, shown, console.x + 5, y, color, false);
             if (link)
-                g.fill(console.x + 5, y + 8, console.x + 5 + font.width(text), y + 9, color);
+                g.fill(console.x + 5, y + 8, console.x + 5 + font.width(shown), y + 9, color);
         }
         g.disableScissor();
         if (lines.isEmpty())
             g.drawString(font, I18n.get("create_new_era.editor.console_empty"), console.x + 5, console.y + 3, 0xFF5A5A5A, false);
+    }
+
+    /** Tabs to spaces up to the next stop of 4: the font has no glyph for a tab. */
+    static String expandTabs(String text) {
+        if (text.indexOf('\t') < 0)
+            return text;
+        StringBuilder out = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            if (c == '\t')
+                do out.append(' '); while (out.length() % 4 != 0);
+            else
+                out.append(c);
+        }
+        return out.toString();
     }
 
     private int consoleRowsVisible() {

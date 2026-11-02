@@ -97,7 +97,8 @@ public class EndpointTests {
                 "local t = bus.get('" + typewriter + "')",
                 "print('typewriter', #t.getPressedKeys(), t.isInUse(), t.isPressed('w'), t.getUser())",
                 "t.onKeyDown(function(key) print('down', key) end)",
-                "t.onKeyUp(function(key) print('up', key) end)"));
+                "t.onKeyUp(function(key) print('up', key) end)",
+                "t.onKey(function(key, down) if key == 'e' and not down then print('typed', t.getTyped()) end end)"));
         computer.start("create_new_era.console.running");
         // a tap within one tick, through the typewriter's own key handling: it mustn't be missed
         helper.runAfterDelay(10, () -> {
@@ -105,12 +106,21 @@ public class EndpointTests {
             try {
                 be.getClass().getMethod("pressKey", int.class).invoke(be, 87); // W
                 be.getClass().getMethod("releaseKey", int.class).invoke(be, 87);
+                // a key with no frequency: Aeronautics doesn't send it, our client does, for whoever is typing
+                var player = java.util.UUID.randomUUID();
+                com.createnewera.bus.TypewriterEvents.typedBy(helper.getLevel(), abs, player, 69, true); // not typing on it yet: ignored
+                // as checkAndStartUsing does, without the welcome message a mock player can't receive
+                var user = be.getClass().getDeclaredField("currentUser");
+                user.setAccessible(true);
+                user.set(be, player);
+                com.createnewera.bus.TypewriterEvents.typedBy(helper.getLevel(), abs, player, 69, true); // E
+                com.createnewera.bus.TypewriterEvents.typedBy(helper.getLevel(), abs, player, 69, false);
             } catch (ReflectiveOperationException e) {
                 helper.fail("couldn't press the typewriter's keys: " + e);
             }
         });
         helper.succeedWhen(() -> {
-            for (String line : new String[] {"typewriter\t0\tfalse\tfalse\tnil", "down\tw", "up\tw"})
+            for (String line : new String[] {"typewriter\t0\tfalse\tfalse\tnil", "down\tw", "up\tw", "down\te", "up\te", "typed\twe"})
                 if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals(line)))
                     helper.fail("expected '" + line + "' in " + computer.getConsole());
         });

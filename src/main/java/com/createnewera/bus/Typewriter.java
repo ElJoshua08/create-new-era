@@ -62,19 +62,29 @@ final class Typewriter {
         });
         api.read("getKeyEvents", "since?: number", "{{key, down, seq}, ...}",
                 args -> TypewriterEvents.since(be, args.arg(1).isNil() ? 0 : (long) args.arg(1).checkDouble()));
-        api.read("getTyped", "", "string", args -> {
-            Object typed = call(be, "getTypedEntry");
-            return typed == null ? "" : typed.toString();
-        });
+        api.read("getTyped", "", "string", args -> TypewriterEvents.typed(be));
+    }
+
+    /** Whether this player is the one typing on it. */
+    static boolean usedBy(BlockEntity be, UUID player) {
+        try {
+            return (boolean) be.getClass().getMethod("checkUser", UUID.class).invoke(be, player);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return false;
+        }
     }
 
     /** The keys held right now, by name. */
     static List<String> pressed(BlockEntity be) {
         List<String> out = new ArrayList<>();
-        if (call(be, "getPressedKeys") instanceof List<?> codes)
-            for (Object code : codes)
+        java.util.Set<Integer> codes = new java.util.LinkedHashSet<>();
+        if (call(be, "getPressedKeys") instanceof List<?> list)
+            for (Object code : list)
                 if (code instanceof Integer c)
-                    out.add(KEYS.getOrDefault(c, "key_" + c));
+                    codes.add(c);
+        codes.addAll(TypewriterEvents.held(be));
+        for (int c : codes)
+            out.add(KEYS.getOrDefault(c, "key_" + c));
         return out;
     }
 

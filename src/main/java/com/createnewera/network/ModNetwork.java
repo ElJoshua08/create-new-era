@@ -34,6 +34,10 @@ public final class ModNetwork {
             if (level.getBlockState(payload.pos()).getBlock() instanceof PanelDialBlock dial)
                 dial.set(level, payload.pos(), Math.clamp(payload.value(), 0, 15));
         });
+        registrar.playToServer(TypewriterKeyPayload.TYPE, TypewriterKeyPayload.STREAM_CODEC, (payload, context) -> {
+            if (context.player() instanceof ServerPlayer player && player.canInteractWithBlock(payload.pos(), 4))
+                com.createnewera.bus.TypewriterEvents.typedBy(player.serverLevel(), payload.pos(), player.getUUID(), payload.key(), payload.down());
+        });
         registrar.playToServer(CableActionPayload.TYPE, CableActionPayload.STREAM_CODEC, (payload, context) -> {
             if (context.player() instanceof ServerPlayer player)
                 CableActions.handle(player, payload.span(), payload.attack());
