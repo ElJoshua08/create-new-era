@@ -38,6 +38,37 @@ public final class ClientPayloads {
             voice = com.mojang.text2speech.Narrator.getNarrator();
         if (voice.active())
             voice.say(payload.text(), false);
+        else
+            SPEECH.execute(() -> sayWithCommand(payload.text()));
+    }
+
+    /**
+     * Linux has Minecraft's voice only with libflite installed; most desktops have espeak or
+     * speech-dispatcher instead, so those speak when it can't. One line at a time, in order.
+     */
+    private static final java.util.concurrent.ExecutorService SPEECH = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "Create: New Era speaker voice");
+        t.setDaemon(true);
+        return t;
+    });
+    private static final java.util.List<String> VOICES = java.util.List.of("espeak-ng", "espeak", "spd-say");
+    private static int voiceCommand = 0;
+
+    private static void sayWithCommand(String text) {
+        while (voiceCommand < VOICES.size()) {
+            String command = VOICES.get(voiceCommand);
+            java.util.List<String> args = command.equals("spd-say") ? java.util.List.of(command, "--wait", "--", text)
+                    : java.util.List.of(command, "--", text);
+            try {
+                new ProcessBuilder(args).redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.DISCARD).start().waitFor();
+                return;
+            } catch (java.io.IOException e) {
+                voiceCommand++; // not installed: try the next, and don't try this one again
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
     }
 
     private ClientPayloads() {}

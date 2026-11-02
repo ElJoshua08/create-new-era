@@ -1,6 +1,5 @@
 package com.createnewera.client.control;
 
-import java.util.List;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +69,7 @@ public final class DialDrag {
             return;
         }
         var state = mc.level.getBlockState(hit.getBlockPos());
-        if (!(state.getBlock() instanceof PanelDialBlock))
+        if (!(state.getBlock() instanceof PanelDialBlock) || holdingTool(mc))
             return;
         pos = hit.getBlockPos().immutable();
         step = state.getValue(PanelDialBlock.VALUE);
@@ -79,6 +78,13 @@ public final class DialDrag {
         lastFrame = System.nanoTime();
         event.setCanceled(true);
         event.setSwingHand(false);
+    }
+
+    /** A cable, a port or a wrench in hand is for wiring the control, not turning it. */
+    private static boolean holdingTool(Minecraft mc) {
+        var held = mc.player == null ? net.minecraft.world.item.ItemStack.EMPTY : mc.player.getMainHandItem();
+        return held.getItem() instanceof com.createnewera.cable.CableSpoolItem || held.getItem() instanceof com.createnewera.bus.BusPartItem
+                || AllItems.WRENCH.isIn(held);
     }
 
     /** While dragging, the mouse moves the control, not the view. */
@@ -141,15 +147,7 @@ public final class DialDrag {
         else
             drawThrottle(g, mc, cx, cy);
 
-        // as Aeronautics' throttle lever does it: the value in a goggles tooltip beside the
-        // crosshair, how to use it below
-        Component value = Component.translatable("create_new_era.dial.value", step, 15);
-        g.renderComponentTooltip(mc.font, List.of(Component.literal("    ").append(value)), cx + 12, cy + 4);
-        g.pose().pushPose();
-        g.pose().translate(cx + 23, cy - 9, 500);
-        g.pose().scale(0.625f, 0.625f, 1);
-        g.renderItem(AllItems.GOGGLES.asStack(), 0, 0);
-        g.pose().popPose();
+        // the bar or ring already says the value: just how to use it, below
         Component hint = Component.translatable("create_new_era.dial.hint");
         g.drawString(mc.font, hint, cx - mc.font.width(hint) / 2, cy + 52, 0xFFFFFFFF, true);
     }
