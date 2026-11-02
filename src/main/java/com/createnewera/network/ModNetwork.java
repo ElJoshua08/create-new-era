@@ -32,7 +32,7 @@ public final class ModNetwork {
                 return;
             var level = player.serverLevel();
             if (level.getBlockState(payload.pos()).getBlock() instanceof PanelDialBlock dial)
-                dial.set(level, payload.pos(), Math.clamp(payload.value(), 0, 15));
+                dial.set(level, payload.pos(), payload.value());
         });
         registrar.playToServer(TypewriterKeyPayload.TYPE, TypewriterKeyPayload.STREAM_CODEC, (payload, context) -> {
             if (context.player() instanceof ServerPlayer player && player.canInteractWithBlock(payload.pos(), 4))

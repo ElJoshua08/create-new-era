@@ -135,7 +135,7 @@ public final class DeviceDrivers {
         if (level.getBlockState(pos).getBlock() instanceof PanelControlBlock control) {
             api.family(BuiltInRegistries.BLOCK.getKey(control).getPath());
             control.methods(api, level, pos);
-            api.read("read", "", control.valueType(), args -> control.value(level.getBlockState(pos)));
+            api.read("read", "", control.valueType(), args -> control.value(level, pos));
             return List.copyOf(api.fns.values());
         }
         BlockEntity be = level.getBlockEntity(pos);
@@ -215,7 +215,7 @@ public final class DeviceDrivers {
     public static Object snapshot(ServerLevel level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof PanelControlBlock control)
-            return control.snapshot(state);
+            return control.snapshot(level, pos);
         List<Object> parts = new ArrayList<>();
         parts.add(state); // a door opening, a lamp lighting, a note block's note
         parts.add(BlockDrivers.extra(level, pos)); // a chat message, a key pressed on a typewriter

@@ -49,6 +49,16 @@ public abstract class PanelControlBlock extends DirectionalPartBlock implements 
         return state;
     }
 
+    /** {@link #value} for controls that keep more than their block state shows. */
+    public Object value(Level level, BlockPos pos) {
+        return value(level.getBlockState(pos));
+    }
+
+    /** {@link #snapshot} for controls that keep more than their block state shows. */
+    public Object snapshot(Level level, BlockPos pos) {
+        return snapshot(level.getBlockState(pos));
+    }
+
     /** Where a click landed, in the pixels of the model as authored (facing up, plate at y 0 to 2). */
     protected static double[] local(BlockState state, BlockPos pos, Vec3 hit) {
         return DirectionalShape.unmap((hit.x - pos.getX()) * 16, (hit.y - pos.getY()) * 16, (hit.z - pos.getZ()) * 16,

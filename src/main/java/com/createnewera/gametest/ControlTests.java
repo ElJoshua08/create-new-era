@@ -130,6 +130,31 @@ public class ControlTests {
         });
     }
 
+    // a program gives a slider its own range; dragging and setValue stay on its steps
+    @GameTest(template = ROOM, timeoutTicks = 200)
+    public static void slidersTakeTheRangeProgramsGive(GameTestHelper helper) {
+        var computer = computer(helper);
+        BlockPos slider = control(helper, 0, 0, ModBlocks.PANEL_SLIDER.get());
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local s = bus.get('" + name(helper, slider) + "')",
+                "s.setRange(-1, 1, 0.1)",
+                "s.setValue(0.5)",
+                "print('range', s.getValue(), s.getMinValue(), s.getMaxValue(), s.getStep(), s.getFraction())",
+                "s.onChange(function(value) print('moved', value) end)"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(30, () -> {
+            expectPrinted(helper, computer, "range\t0.5\t-1\t1\t0.1\t0.75");
+            // a player drags it to the top notch
+            ModBlocks.PANEL_SLIDER.get().set(helper.getLevel(), helper.absolutePos(slider), 20);
+        });
+        helper.runAfterDelay(60, () -> {
+            expectPrinted(helper, computer, "moved\t1");
+            if (helper.getLevel().getBlockState(helper.absolutePos(slider)).getValue(PanelDialBlock.VALUE) != 15)
+                helper.fail("the slider's block state should show it at the top");
+            helper.succeed();
+        });
+    }
+
     // knobs and sliders carry a block entity for their smooth drawing; the button pops back up by itself
     @GameTest(template = ROOM)
     public static void slidersAndButtonsMoveLikeTheirModels(GameTestHelper helper) {

@@ -35,7 +35,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * notches for the knob, the throttle lever's bar for the slider.
  */
 public final class DialDrag {
-    /** Mouse pixels to go from 0 to 15 */
+    /** Mouse pixels to go across its whole range */
     private static final double FULL_SWEEP = 420;
     /** However fast the mouse goes, the control moves at most this much of its range a second */
     private static final double MAX_SPEED = 1.1;
@@ -45,8 +45,13 @@ public final class DialDrag {
     private static @Nullable BlockPos pos;
     /** where the mouse has taken it, 0 to 1, between notches */
     private static float raw;
-    /** the notch it rests in, 0 to 15 */
+    /** the notch it rests in, 0 to {@link #notches} */
     private static int step;
+    /** its range's last notch: 15 unless a program set a range */
+    private static int notches = 15;
+    /** the value at each notch, for the label */
+    private static @Nullable PanelControlBlockEntity dialAt;
+    private static long lastClick;
     private static double lastX;
     private static long lastFrame;
 
@@ -71,9 +76,13 @@ public final class DialDrag {
         var state = mc.level.getBlockState(hit.getBlockPos());
         if (!(state.getBlock() instanceof PanelDialBlock) || holdingTool(mc))
             return;
+        if (!(mc.level.getBlockEntity(hit.getBlockPos()) instanceof PanelControlBlockEntity dial))
+            return;
         pos = hit.getBlockPos().immutable();
-        step = state.getValue(PanelDialBlock.VALUE);
-        raw = step / 15f;
+        dialAt = dial;
+        notches = dial.notches();
+        step = dial.position();
+        raw = (float) step / notches;
         lastX = mc.mouseHandler.xpos();
         lastFrame = System.nanoTime();
         event.setCanceled(true);
@@ -104,19 +113,24 @@ public final class DialDrag {
         lastX = x;
         lastFrame = now;
         // it sits in a notch until the mouse has gone a little past its edge, like a geared dial
-        float at = raw * 15;
+        float at = raw * notches;
         int notch = step;
         if (at > step + 0.5f + DETENT)
-            notch = Math.min(15, Math.round(at));
+            notch = Math.min(notches, Math.round(at));
         else if (at < step - 0.5f - DETENT)
             notch = Math.max(0, Math.round(at));
         if (notch != step) {
             step = notch;
             PacketDistributor.sendToServer(new DialPayload(pos, step));
-            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.6f + step / 30f, 0.25f));
+            // a fine range would rattle: one click at most every few frames
+            long ms = System.currentTimeMillis();
+            if (ms - lastClick > 45) {
+                lastClick = ms;
+                mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WOODEN_BUTTON_CLICK_ON, 1.6f + 0.5f * step / notches, 0.25f));
+            }
         }
         if (mc.level.getBlockEntity(pos) instanceof PanelControlBlockEntity dial)
-            dial.dragged = step / 15f;
+            dial.dragged = (float) step / notches;
     }
 
     private static void tick(ClientTickEvent.Post event) {
@@ -134,6 +148,7 @@ public final class DialDrag {
         if (mc.level != null && pos != null && mc.level.getBlockEntity(pos) instanceof PanelControlBlockEntity dial)
             dial.dragged = -1;
         pos = null;
+        dialAt = null;
     }
 
     private static void drawBar(RenderGuiEvent.Post event) {
@@ -152,15 +167,24 @@ public final class DialDrag {
         g.drawString(mc.font, hint, cx - mc.font.width(hint) / 2, cy + 52, 0xFFFFFFFF, true);
     }
 
+    /** The value at the notch it's at, as a program would read it: 7, 0.35, -12.5 */
+    private static String label() {
+        double v = dialAt == null ? step : dialAt.valueAt(step);
+        if (v == Math.rint(v))
+            return String.valueOf((long) v);
+        String s = String.format(java.util.Locale.ROOT, "%.3f", v).replaceAll("0+$", "");
+        return s.endsWith(".") ? s.substring(0, s.length() - 1) : s;
+    }
+
     /** The cursor with the number in it, centred on x: Create's value-settings cursor. */
     private static void cursor(GuiGraphics g, Minecraft mc, int x, int y) {
         AllGuiTextures left = AllGuiTextures.VALUE_SETTINGS_CURSOR_LEFT, right = AllGuiTextures.VALUE_SETTINGS_CURSOR_RIGHT;
-        int w = 14;
+        int w = Math.max(14, mc.font.width(label()) + 4);
         int x0 = x - w / 2;
         left.render(g, x0 - left.getWidth(), y);
         UIRenderHelper.drawCropped(g, x0, y, w, 14, 0, AllGuiTextures.VALUE_SETTINGS_CURSOR);
         right.render(g, x0 + w, y);
-        String label = String.valueOf(step);
+        String label = label();
         g.drawString(mc.font, label, x - mc.font.width(label) / 2 + 1, y + 3, CURSOR_TEXT, false);
     }
 
@@ -178,7 +202,7 @@ public final class DialDrag {
         int length = w - 6;
         UIRenderHelper.drawCropped(g, x + 3, y + 3, Math.min(AllGuiTextures.VALUE_SETTINGS_BAR.getWidth(), length), 8, 0,
                 AllGuiTextures.VALUE_SETTINGS_BAR);
-        int at = x + 3 + 7 + Math.round((length - 14) * (step / 15f));
+        int at = x + 3 + 7 + Math.round((length - 14) * ((float) step / notches));
         cursor(g, mc, at, y);
     }
 
@@ -189,9 +213,9 @@ public final class DialDrag {
             double a = Math.toRadians(-135 + 270 * i / 15.0);
             int x = cx + (int) Math.round(radius * Math.sin(a)), y = cy - (int) Math.round(radius * Math.cos(a));
             g.fill(x - 2, y - 2, x + 2, y + 2, 0xFF3A2411);
-            g.fill(x - 1, y - 1, x + 1, y + 1, i <= step ? 0xFFE4B763 : 0xFF6B5240);
+            g.fill(x - 1, y - 1, x + 1, y + 1, i <= Math.round(15f * step / notches) ? 0xFFE4B763 : 0xFF6B5240);
         }
-        double a = Math.toRadians(-135 + 270 * step / 15.0);
+        double a = Math.toRadians(-135 + 270.0 * step / notches);
         cursor(g, mc, cx + (int) Math.round(radius * Math.sin(a)), cy - (int) Math.round(radius * Math.cos(a)) - 7);
     }
 
