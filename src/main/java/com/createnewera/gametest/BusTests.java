@@ -115,7 +115,10 @@ public class BusTests {
         BusPort pb = Bus.placePart(level, helper.absolutePos(b), Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.IN);
         BusData data = BusData.get(level);
         data.connect(pa.id(), pb.id());
-        data.rename(helper.absolutePos(a), "deck_port");
+        // names stay in the test world from run to run: a fresh one each time
+        String name = "deck_port_" + Long.toHexString(level.getGameTime());
+        if (!data.rename(helper.absolutePos(a), name))
+            helper.fail("couldn't name the port's block");
         try {
             Class<?> box = Class.forName("dev.ryanhcode.sable.companion.math.BoundingBox3i");
             Object bounds = box.getConstructor(BlockPos.class, BlockPos.class).newInstance(helper.absolutePos(a), helper.absolutePos(b));
@@ -142,7 +145,7 @@ public class BusTests {
         var span = data.spansAt(na.id()).get(0);
         if (span.points().get(0).distanceTo(PartGeometry.anchor(na)) > 0.01)
             helper.fail("the cable's end should be at the port: " + span.points().get(0) + " vs " + PartGeometry.anchor(na));
-        if (!"deck_port".equals(data.nameOf(na.pos(), Blocks.STONE)))
+        if (!name.equals(data.nameOf(na.pos(), Blocks.STONE)))
             helper.fail("the name stayed behind");
         helper.succeed();
     }
