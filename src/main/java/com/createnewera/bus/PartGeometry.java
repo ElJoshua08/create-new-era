@@ -21,13 +21,18 @@ public final class PartGeometry {
 
     /** The part's box in the world, for outlines and clicks. */
     public static AABB box(BusPort part) {
-        return box(part.pos(), part.face(), part.u(), part.v(), part.kind().size);
+        return box(part.pos(), part.face(), part.u(), part.v(), part.kind().size, part.depth());
     }
 
     public static AABB box(BlockPos pos, Direction face, int u, int v, int size) {
+        return box(pos, face, u, v, size, 0);
+    }
+
+    /** @param depth how far in from the full face the part sits, in pixels: see {@link BusPort#depth} */
+    public static AABB box(BlockPos pos, Direction face, int u, int v, int size, double depth) {
         BlockPos outside = pos.relative(face);
-        double[] a = DirectionalShape.map(u, 0, v, face);
-        double[] b = DirectionalShape.map(u + size, HEIGHT, v + size, face);
+        double[] a = DirectionalShape.map(u, -depth, v, face);
+        double[] b = DirectionalShape.map(u + size, HEIGHT - depth, v + size, face);
         return new AABB(
                 outside.getX() + Math.min(a[0], b[0]) / 16, outside.getY() + Math.min(a[1], b[1]) / 16, outside.getZ() + Math.min(a[2], b[2]) / 16,
                 outside.getX() + Math.max(a[0], b[0]) / 16, outside.getY() + Math.max(a[1], b[1]) / 16, outside.getZ() + Math.max(a[2], b[2]) / 16);
@@ -91,6 +96,23 @@ public final class PartGeometry {
         int u = Mth.clamp((int) Math.floor(up[0] - size / 2.0 + 0.5), 0, 16 - size);
         int v = Mth.clamp((int) Math.floor(up[1] - size / 2.0 + 0.5), 0, 16 - size);
         return new int[] {u, v};
+    }
+
+    /**
+     * How far in from the full face the block's real surface is where it was clicked, in
+     * pixels: the click lands on the surface, so its distance from the face's plane is it.
+     */
+    public static double depthAt(BlockPos pos, Direction face, Vec3 hit) {
+        double along = switch (face) {
+            case UP -> pos.getY() + 1 - hit.y;
+            case DOWN -> hit.y - pos.getY();
+            case EAST -> pos.getX() + 1 - hit.x;
+            case WEST -> hit.x - pos.getX();
+            case SOUTH -> pos.getZ() + 1 - hit.z;
+            case NORTH -> hit.z - pos.getZ();
+        };
+        // whole and half pixels, so near-misses on a full face count as on it
+        return Mth.clamp(Math.round(along * 32) / 2.0, 0, 15);
     }
 
     /** The part on this face that the click landed on, if any. */

@@ -12,7 +12,16 @@ import net.minecraft.core.Direction;
  * @param v    top edge, likewise
  * @param mode which way a port faces; ignored by other kinds
  */
-public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind kind, PortMode mode) {
+/**
+ * @param depth how far in from the block's full face its real surface is under the part, in
+ *              pixels: 0 on a full block, more on a slab, a sensor, anything smaller, so the part
+ *              sits on the block rather than floating at the edge of its space
+ */
+public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind kind, PortMode mode, double depth) {
+    public BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind kind, PortMode mode) {
+        this(id, pos, face, u, v, kind, mode, 0);
+    }
+
     public enum Kind {
         PORT(4),
         /** Gives a computer more ports. */
@@ -40,7 +49,7 @@ public record BusPort(long id, BlockPos pos, Direction face, int u, int v, Kind 
     }
 
     public BusPort withMode(PortMode newMode) {
-        return new BusPort(id, pos, face, u, v, kind, newMode);
+        return new BusPort(id, pos, face, u, v, kind, newMode, depth);
     }
 
     public boolean overlaps(Direction otherFace, int otherU, int otherV, int otherSize) {

@@ -43,6 +43,12 @@ public final class Bus {
      */
     public static @Nullable BusPort placePart(ServerLevel level, BlockPos pos, Direction face, int u, int v,
                                               BusPort.Kind kind, PortMode mode) {
+        return placePart(level, pos, face, u, v, kind, mode, 0);
+    }
+
+    /** @param depth how far in from the full face the block's surface is there: see {@link BusPort#depth} */
+    public static @Nullable BusPort placePart(ServerLevel level, BlockPos pos, Direction face, int u, int v,
+                                              BusPort.Kind kind, PortMode mode, double depth) {
         BlockState state = level.getBlockState(pos);
         if (state.isAir())
             return null;
@@ -76,7 +82,7 @@ public final class Bus {
             if (!inSocket && sockets.stream().anyMatch(s -> s.overlaps(spot, kind.size)))
                 return null; // keep the sockets clear
         }
-        BusPort part = data.addPart(pos, face, u, v, kind, mode);
+        BusPort part = data.addPart(pos, face, u, v, kind, mode, computer ? 0 : depth);
         if (part != null)
             sync(level, pos);
         return part;

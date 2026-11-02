@@ -53,12 +53,17 @@ public class BusData extends SavedData {
 
     /** @return the new part, or null when it would overlap another or hang off the face */
     public @Nullable BusPort addPart(BlockPos pos, Direction face, int u, int v, BusPort.Kind kind, PortMode mode) {
+        return addPart(pos, face, u, v, kind, mode, 0);
+    }
+
+    /** @param depth see {@link BusPort#depth} */
+    public @Nullable BusPort addPart(BlockPos pos, Direction face, int u, int v, BusPort.Kind kind, PortMode mode, double depth) {
         if (u < 0 || v < 0 || u + kind.size > 16 || v + kind.size > 16)
             return null;
         for (BusPort p : portsAt(pos))
             if (p.overlaps(face, u, v, kind.size))
                 return null;
-        BusPort port = new BusPort(nextId++, pos.immutable(), face, u, v, kind, mode);
+        BusPort port = new BusPort(nextId++, pos.immutable(), face, u, v, kind, mode, Math.clamp(depth, 0, 15));
         ports.put(port.id(), port);
         index(port);
         setDirty();
@@ -131,7 +136,8 @@ public class BusData extends SavedData {
         BusPort part = ports.get(id);
         if (part == null)
             return null;
-        BusPort moved = new BusPort(id, part.pos(), face, u, v, part.kind(), part.mode());
+        // a turned block's surface may sit elsewhere on its new face: the full face is the safe guess
+        BusPort moved = new BusPort(id, part.pos(), face, u, v, part.kind(), part.mode(), face == part.face() ? part.depth() : 0);
         ports.put(id, moved);
         setDirty();
         return moved;
@@ -338,6 +344,8 @@ public class BusData extends SavedData {
             t.putByte("V", (byte) p.v());
             t.putBoolean("Out", p.mode() == PortMode.OUT);
             t.putString("Kind", p.kind().name());
+            if (p.depth() > 0)
+                t.putDouble("Depth", p.depth());
             portList.add(t);
         }
         tag.put("Ports", portList);
@@ -381,7 +389,7 @@ public class BusData extends SavedData {
             BusPort.Kind kind = c.contains("Kind") ? BusPort.Kind.valueOf(c.getString("Kind")) : BusPort.Kind.PORT;
             NbtUtils.readBlockPos(c, "Pos").ifPresent(pos -> {
                 BusPort port = new BusPort(c.getLong("Id"), pos, Direction.from3DDataValue(c.getByte("Face")),
-                        c.getByte("U"), c.getByte("V"), kind, c.getBoolean("Out") ? PortMode.OUT : PortMode.IN);
+                        c.getByte("U"), c.getByte("V"), kind, c.getBoolean("Out") ? PortMode.OUT : PortMode.IN, c.getDouble("Depth"));
                 data.ports.put(port.id(), port);
                 data.index(port);
             });

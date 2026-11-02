@@ -97,6 +97,32 @@ public class BusTests {
     }
 
     // the list is in distance order, and only holds what's actually connected
+    // a port goes on the block's real surface: on top of a slab, half way down, not floating
+    @GameTest(template = ROOM)
+    public static void portsSitOnSmallBlocks(GameTestHelper helper) {
+        BlockPos slab = new BlockPos(1, 1, 1);
+        helper.setBlock(slab, Blocks.STONE_SLAB);
+        BlockPos abs = helper.absolutePos(slab);
+        Vec3 click = new Vec3(abs.getX() + 0.5, abs.getY() + 0.5, abs.getZ() + 0.5);
+        double depth = PartGeometry.depthAt(abs, Direction.UP, click);
+        if (depth != 8)
+            helper.fail("a slab's top is 8 pixels in, got " + depth);
+        BusPort port = Bus.placePart(helper.getLevel(), abs, Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.OUT, depth);
+        if (port == null)
+            helper.fail("no port on the slab");
+        var box = PartGeometry.box(port);
+        if (Math.abs(box.minY - (abs.getY() + 0.5)) > 1e-6)
+            helper.fail("the port should sit on the slab at y " + (abs.getY() + 0.5) + ", it's at " + box.minY);
+        // and it still takes a cable, its end where the port is
+        BlockPos stone = new BlockPos(3, 1, 1);
+        helper.setBlock(stone, Blocks.STONE);
+        BusPort other = Bus.placePart(helper.getLevel(), helper.absolutePos(stone), Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.IN);
+        var span = BusData.get(helper.getLevel()).connect(port.id(), other.id());
+        if (span == null || span.points().get(0).distanceTo(PartGeometry.anchor(port)) > 1e-6)
+            helper.fail("the cable should plug into the port on the slab");
+        helper.succeed();
+    }
+
     @GameTest(template = ROOM)
     public static void listsConnectedDevicesNearestFirst(GameTestHelper helper) {
         var computer = computer(helper);

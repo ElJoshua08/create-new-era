@@ -27,7 +27,8 @@ public class BusPartItem extends Item {
         if (!(context.getLevel() instanceof ServerLevel level))
             return InteractionResult.SUCCESS;
         int[] spot = PartGeometry.spotAt(context.getClickedPos(), context.getClickedFace(), context.getClickLocation(), kind.size);
-        BusPort part = Bus.placePart(level, context.getClickedPos(), context.getClickedFace(), spot[0], spot[1], kind, PortMode.OUT);
+        double depth = PartGeometry.depthAt(context.getClickedPos(), context.getClickedFace(), context.getClickLocation());
+        BusPort part = Bus.placePart(level, context.getClickedPos(), context.getClickedFace(), spot[0], spot[1], kind, PortMode.OUT, depth);
         Player player = context.getPlayer();
         if (part == null) {
             if (player != null) {

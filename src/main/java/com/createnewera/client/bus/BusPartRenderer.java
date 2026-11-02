@@ -108,7 +108,7 @@ public final class BusPartRenderer {
                 pose.translate(0.5, 0.5, 0.5);
                 pose.mulPose(rotation(part.face()).getRotation().getLeftRotation());
                 pose.translate(-0.5, -0.5, -0.5);
-                pose.translate(part.u() / 16.0, 0, part.v() / 16.0);
+                pose.translate(part.u() / 16.0, -part.depth() / 16, part.v() / 16.0);
                 int light = LevelRenderer.getLightColor(mc.level, outside);
                 modelRenderer.renderModel(pose.last(), consumer, null, model, 1, 1, 1, light, OverlayTexture.NO_OVERLAY,
                         ModelData.EMPTY, RenderType.cutout());

@@ -95,7 +95,7 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
 
     private static void renderLamp(BlockState state, PoseStack pose, MultiBufferSource buffers, int overlay) {
         PanelLampBlock.Light lit = state.getValue(PanelLampBlock.LIGHT);
-        draw(state, model("panel_lamp_glow_" + lit.getSerializedName()), pose, buffers, LightTexture.FULL_BRIGHT, overlay);
+        ShaderGlow.draw(() -> draw(state, model("panel_lamp_glow_" + lit.getSerializedName()), pose, buffers, LightTexture.FULL_BRIGHT, overlay));
         int rgb = switch (lit) {
             case AMBER -> 0xFFB03A;
             case GREEN -> 0x7FD06A;
@@ -126,7 +126,7 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
         pose.mulPose(Axis.YP.rotationDegrees(-reads.toYRot()));
         float scale = endOn ? 0.035f : 0.05f;
         pose.scale(scale, -scale, scale);
-        NixieTubeRenderer.drawTube(pose, buffers, tube.glyph, 3, tube.color, tube.getLevel().getRandom());
+        ShaderGlow.draw(() -> NixieTubeRenderer.drawTube(pose, buffers, tube.glyph, 3, tube.color, tube.getLevel().getRandom()));
         pose.popPose();
     }
 

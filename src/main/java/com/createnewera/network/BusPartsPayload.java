@@ -34,9 +34,11 @@ public record BusPartsPayload(long chunk, List<BusPort> parts, List<BusSpan> spa
                 buf.writeByte(p.v());
                 buf.writeByte(p.kind().ordinal());
                 buf.writeBoolean(p.mode() == PortMode.OUT);
+                buf.writeFloat((float) p.depth());
             },
             buf -> new BusPort(buf.readLong(), BlockPos.STREAM_CODEC.decode(buf), Direction.from3DDataValue(buf.readByte()),
-                    buf.readByte(), buf.readByte(), BusPort.Kind.values()[buf.readByte()], buf.readBoolean() ? PortMode.OUT : PortMode.IN));
+                    buf.readByte(), buf.readByte(), BusPort.Kind.values()[buf.readByte()], buf.readBoolean() ? PortMode.OUT : PortMode.IN,
+                    buf.readFloat()));
 
     private static final StreamCodec<ByteBuf, BusSpan> SPAN = StreamCodec.of(
             (buf, s) -> {
