@@ -121,9 +121,8 @@ public final class ModBlocks {
     public static final BlockEntry<PanelLampBlock> PANEL_LAMP = control("panel_lamp", "Panel Lamp",
             box(5, 2, 5, 11, 6, 11), PanelLampBlock::new,
             s -> "panel_lamp_" + s.getValue(PanelLampBlock.LIGHT).getSerializedName());
-    public static final BlockEntry<NixieDigitBlock> NIXIE_DIGIT = control("nixie_digit", "Nixie Digit",
-            box(4, 2, 5, 12, 14, 11), NixieDigitBlock::new,
-            s -> "nixie_digit_" + (s.getValue(NixieDigitBlock.DIGIT) == NixieDigitBlock.DARK ? "off" : s.getValue(NixieDigitBlock.DIGIT)));
+    public static final BlockEntry<NixieDigitBlock> NIXIE_DIGIT = control("nixie_digit", "Panel Nixie Tube",
+            box(5, 2, 5, 11, 14, 11), NixieDigitBlock::new, s -> "nixie_digit");
     public static final BlockEntry<PanelGaugeBlock> PANEL_GAUGE = control("panel_gauge", "Panel Gauge",
             box(3, 2, 3, 13, 4, 13), PanelGaugeBlock::new,
             s -> "panel_gauge_" + s.getValue(PanelGaugeBlock.NEEDLE));

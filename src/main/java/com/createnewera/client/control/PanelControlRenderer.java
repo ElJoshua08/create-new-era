@@ -2,7 +2,9 @@ package com.createnewera.client.control;
 
 import com.createnewera.CreateNewEra;
 import com.createnewera.block.DirectionalPartBlock;
+import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.control.NixieDigitBlock;
+import com.simibubi.create.content.redstone.nixieTube.NixieTubeRenderer;
 import com.createnewera.block.control.PanelControlBlockEntity;
 import com.createnewera.block.control.PanelDialBlock;
 import com.createnewera.block.control.PanelLampBlock;
@@ -43,8 +45,6 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
             event.register(SLIDER_HANDLE);
             for (String light : new String[] {"amber", "green", "red"})
                 event.register(model("panel_lamp_glow_" + light));
-            for (int digit = 0; digit <= 9; digit++)
-                event.register(model("nixie_digit_glow_" + digit));
         });
     }
 
@@ -55,6 +55,10 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
     @Override
     public void render(PanelControlBlockEntity control, float partialTick, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {
         BlockState state = control.getBlockState();
+        if (state.getBlock() instanceof NixieDigitBlock) {
+            renderNixie(control, pose, buffers);
+            return;
+        }
         pose.pushPose();
         // the turn the blockstate gives the model, so everything here lines up with it
         Direction facing = state.getValue(DirectionalPartBlock.FACING);
@@ -65,8 +69,6 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
             renderDial(control, dial, pose, buffers, light, overlay);
         else if (state.getBlock() instanceof PanelLampBlock && state.getValue(PanelLampBlock.LIGHT) != PanelLampBlock.Light.OFF)
             renderLamp(state, pose, buffers, overlay);
-        else if (state.getBlock() instanceof NixieDigitBlock && state.getValue(NixieDigitBlock.DIGIT) != NixieDigitBlock.DARK)
-            renderNixie(state, pose, buffers, overlay);
         pose.popPose();
     }
 
@@ -106,9 +108,26 @@ public class PanelControlRenderer implements BlockEntityRenderer<PanelControlBlo
         halo(pose, buffers, 5.25f - grow, 2.75f - grow / 2, 5.25f - grow, 10.75f + grow, 6.75f + grow, 10.75f + grow, rgb, 0.15f + 0.35f * glow);
     }
 
-    private static void renderNixie(BlockState state, PoseStack pose, MultiBufferSource buffers, int overlay) {
-        draw(state, model("nixie_digit_glow_" + state.getValue(NixieDigitBlock.DIGIT)), pose, buffers, LightTexture.FULL_BRIGHT, overlay);
-        halo(pose, buffers, 4.6f, 2.8f, 5.6f, 11.4f, 13.2f, 10.4f, 0xFF8A2A, 0.22f);
+    /**
+     * A nixie's character, drawn by Create's own nixie tube renderer so it glows and flickers
+     * like Create's: upright, facing the way the tube reads. On a wall the tube points out at
+     * you and the character is seen end on, through the top of the glass, so it's drawn smaller.
+     */
+    private static void renderNixie(PanelControlBlockEntity tube, PoseStack pose, MultiBufferSource buffers) {
+        if (tube.glyph.isBlank() || tube.getLevel() == null)
+            return;
+        BlockState state = tube.getBlockState();
+        Direction facing = state.getValue(DirectionalPartBlock.FACING), reads = state.getValue(NixieDigitBlock.READS);
+        boolean endOn = facing.getAxis().isHorizontal();
+        // the middle of the glass (y 5-14 as authored, facing up); drawTube centres half a pixel low
+        double[] at = DirectionalShape.map(8, facing == Direction.UP ? 10 : facing == Direction.DOWN ? 9 : 9.5, 8, facing);
+        pose.pushPose();
+        pose.translate(at[0] / 16, at[1] / 16, at[2] / 16);
+        pose.mulPose(Axis.YP.rotationDegrees(-reads.toYRot()));
+        float scale = endOn ? 0.035f : 0.05f;
+        pose.scale(scale, -scale, scale);
+        NixieTubeRenderer.drawTube(pose, buffers, tube.glyph, 3, tube.color, tube.getLevel().getRandom());
+        pose.popPose();
     }
 
     private static void draw(BlockState state, ModelResourceLocation where, PoseStack pose, MultiBufferSource buffers, int light, int overlay) {

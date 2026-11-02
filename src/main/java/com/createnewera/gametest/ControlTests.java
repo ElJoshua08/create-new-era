@@ -3,6 +3,7 @@ package com.createnewera.gametest;
 import com.createnewera.CreateNewEra;
 import com.createnewera.block.DirectionalShape;
 import com.createnewera.block.control.NixieDigitBlock;
+import com.createnewera.block.control.PanelControlBlockEntity;
 import com.createnewera.block.control.PanelDialBlock;
 import com.createnewera.block.control.PanelGaugeBlock;
 import com.createnewera.block.control.PanelLampBlock;
@@ -95,7 +96,7 @@ public class ControlTests {
                 "local button, lamp = bus.get('" + name(helper, button) + "'), bus.get('" + name(helper, lamp) + "')",
                 "local nixie, knob = bus.get('" + name(helper, nixie) + "'), bus.get('" + name(helper, knob) + "')",
                 "local gauge = bus.get('" + name(helper, gauge) + "')",
-                "button.onPress(function() lamp.set('green') nixie.setDigit(7) print('pressed') end)",
+                "button.onPress(function() lamp.set('green') nixie.setText('7') print('pressed') end)",
                 "knob.onChange(function(value) gauge.set(value / 15) end)",
                 "print({b = {2, 3}, a = 1, name = 'x'})",
                 "bus.get('" + name(helper, keypad) + "').onKey(function(key) print('key ' .. key) end)",
@@ -120,7 +121,7 @@ public class ControlTests {
             var level = helper.getLevel();
             if (level.getBlockState(helper.absolutePos(lamp)).getValue(PanelLampBlock.LIGHT) != PanelLampBlock.Light.GREEN)
                 helper.fail("the lamp didn't turn green");
-            if (level.getBlockState(helper.absolutePos(nixie)).getValue(NixieDigitBlock.DIGIT) != 7)
+            if (!(level.getBlockEntity(helper.absolutePos(nixie)) instanceof PanelControlBlockEntity tube) || !tube.glyph.equals("7"))
                 helper.fail("the nixie doesn't show 7");
             if (level.getBlockState(helper.absolutePos(knob)).getValue(PanelDialBlock.VALUE) != 6)
                 helper.fail("the knob didn't take the dragged value");
@@ -151,6 +152,45 @@ public class ControlTests {
             expectPrinted(helper, computer, "moved\t1");
             if (helper.getLevel().getBlockState(helper.absolutePos(slider)).getValue(PanelDialBlock.VALUE) != 15)
                 helper.fail("the slider's block state should show it at the top");
+            helper.succeed();
+        });
+    }
+
+    // nixies side by side make one display; a cable to the last drives the whole row
+    @GameTest(template = ROOM, timeoutTicks = 200)
+    public static void nixiesInARowShowText(GameTestHelper helper) {
+        var computer = computer(helper);
+        for (int x = 0; x < 3; x++) {
+            helper.setBlock(new BlockPos(x, 0, 0), Blocks.STONE);
+            helper.setBlock(new BlockPos(x, 1, 0), ModBlocks.NIXIE_DIGIT.getDefaultState());
+        }
+        BlockPos last = control(helper, 3, 0, ModBlocks.NIXIE_DIGIT.get());
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local n = bus.get('" + name(helper, last) + "')",
+                "print('len', n.getLength())",
+                "n.setText('HI!')",
+                "print('text', n.getText())",
+                "n.show(42)",
+                "print('num', n.getText())",
+                "n.setChar(1, 'A')",
+                "print('char', n.getText(), n.getChar(1), n.getChar(2))",
+                "n.show(3.14159, 2) print('dec', n.getText())",
+                "n.setColor('lime') print('color', n.getColor())",
+                "n.show(12345) print('over', n.getText())"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(30, () -> {
+            expectPrinted(helper, computer, "len\t4");
+            expectPrinted(helper, computer, "text\tHI!");
+            expectPrinted(helper, computer, "num\t  42");
+            expectPrinted(helper, computer, "char\tA 42\tA\tnil");
+            expectPrinted(helper, computer, "dec\t3.14");
+            expectPrinted(helper, computer, "color\tlime");
+            expectPrinted(helper, computer, "over\t----");
+            var first = (PanelControlBlockEntity) helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(0, 1, 0)));
+            if (!first.glyph.equals("-") || first.color != net.minecraft.world.item.DyeColor.LIME)
+                helper.fail("the first tube, with no cable of its own, should show a lime -: " + first.glyph + " " + first.color);
+            if (!helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(0, 1, 0))).getValue(NixieDigitBlock.LIT))
+                helper.fail("a lit tube gives light");
             helper.succeed();
         });
     }

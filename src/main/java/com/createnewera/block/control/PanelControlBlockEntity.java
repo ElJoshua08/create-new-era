@@ -9,6 +9,7 @@ import com.simibubi.create.api.equipment.goggles.IHaveGoggleInformation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -35,6 +36,10 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
     public double min = 0, max = 15, step = 1;
     /** Which notch of its range a knob or slider is at, 0 to {@link #notches()} */
     public int position = -1;
+
+    /** A nixie tube's character, "" when dark, and the dye colour it glows */
+    public String glyph = "";
+    public DyeColor color = DyeColor.ORANGE;
 
     public PanelControlBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -76,6 +81,10 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
             tag.putDouble("step", step);
             tag.putInt("position", position());
         }
+        if (getBlockState().getBlock() instanceof NixieDigitBlock) {
+            tag.putString("glyph", glyph);
+            tag.putString("color", color.getSerializedName());
+        }
     }
 
     @Override
@@ -86,6 +95,10 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
             max = tag.getDouble("max");
             step = tag.getDouble("step");
             position = tag.getInt("position");
+        }
+        if (tag.contains("glyph")) {
+            glyph = tag.getString("glyph");
+            color = DyeColor.byName(tag.getString("color"), DyeColor.ORANGE);
         }
     }
 
@@ -106,7 +119,7 @@ public class PanelControlBlockEntity extends BlockEntity implements IHaveGoggleI
         if (!(state.getBlock() instanceof PanelControlBlock control) || control instanceof PanelDialBlock)
             return false;
         tooltip.add(Component.literal("    ").append(state.getBlock().getName()));
-        tooltip.add(Component.literal("    ").append(control.goggleValue(state)).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.literal("    ").append(control.goggleValue(level, worldPosition)).withStyle(ChatFormatting.GRAY));
         boolean cabled = level != null && BusEvents.clientParts.apply(worldPosition).stream()
                 .anyMatch(p -> p.kind() == BusPort.Kind.CONTROL && BusEvents.clientCabled.test(p.id()));
         tooltip.add(Component.literal("    ").append(Component.translatable(cabled

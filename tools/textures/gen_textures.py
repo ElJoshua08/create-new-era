@@ -224,13 +224,6 @@ def draw_cap(c, x, y, ramp):
     c.px(x + 3, y + 3, ramp[0])
 
 
-NIXIE_GLYPHS = {
-    "0": ["###", "#.#", "#.#", "#.#", "###"], "1": [".#.", "##.", ".#.", ".#.", "###"],
-    "2": ["###", "..#", "###", "#..", "###"], "3": ["###", "..#", ".##", "..#", "###"],
-    "4": ["#.#", "#.#", "###", "..#", "..#"], "5": ["###", "#..", "###", "..#", "###"],
-    "6": ["###", "#..", "###", "#.#", "###"], "7": ["###", "..#", ".#.", ".#.", ".#."],
-    "8": ["###", "#.#", "###", "#.#", "###"], "9": ["###", "#.#", "###", "..#", "###"],
-}
 LAMP_OFF = ["#1a1310", "#2a1f19", "#3a2d24", "#4a3a2e"]
 
 
@@ -299,30 +292,6 @@ def draw_control_states():
         c.px(4, 7, BRASS[0])
         c.px(5, 7, BRASS[1])
         c.img.save(out / f"gauge_{value}.png")
-
-    # nixie: a glowing digit, or the cold filaments of all of them when it's dark
-    glass, glass_dk, glass_hi = "#1e1612", "#2e231c", "#6a5546"
-    for name in list(NIXIE_GLYPHS) + ["off"]:
-        c = Canvas(16, 16)
-        c.rect(0, 0, 6, 10, glass)
-        c.rect(0, 0, 1, 10, glass_hi)
-        c.rect(5, 0, 1, 10, glass_dk)
-        c.rect(0, 0, 6, 1, "#4a3a2e")
-        if name == "off":
-            for j, row in enumerate(NIXIE_GLYPHS["8"]):
-                for i, ch in enumerate(row):
-                    if ch == "#":
-                        c.px(1 + i, 2 + j, "#3a2a20")
-        else:
-            lit = {(1 + i, 2 + j) for j, row in enumerate(NIXIE_GLYPHS[name]) for i, ch in enumerate(row) if ch == "#"}
-            for (i, j) in list(lit):
-                for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                    n = (i + di, j + dj)
-                    if n not in lit and 1 <= n[0] <= 4 and 1 <= n[1] <= 8:
-                        c.px(n[0], n[1], AMBER[0])
-            for (i, j) in lit:
-                c.px(i, j, AMBER[3] if j == 2 else AMBER[2])
-        c.img.save(out / f"nixie_{name}.png")
 
     # lamp: the cap on top (4x4 at 0,0) and its side (4x3 at 0,4), lit or dark
     for name, ramp in [("off", LAMP_OFF), ("amber", AMBER), ("green", PHOSPHOR), ("red", RED)]:

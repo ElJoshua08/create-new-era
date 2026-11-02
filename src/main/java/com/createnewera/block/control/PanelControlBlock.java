@@ -49,6 +49,11 @@ public abstract class PanelControlBlock extends DirectionalPartBlock implements 
         return state;
     }
 
+    /** {@link #goggleValue} for controls that keep more than their block state shows. */
+    public Component goggleValue(Level level, BlockPos pos) {
+        return goggleValue(level.getBlockState(pos));
+    }
+
     /** {@link #value} for controls that keep more than their block state shows. */
     public Object value(Level level, BlockPos pos) {
         return value(level.getBlockState(pos));

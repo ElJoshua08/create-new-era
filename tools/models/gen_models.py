@@ -188,15 +188,6 @@ MODELS = {
         bezel(5, 11),
         box("lamp", [6, 3, 6], [10, 6, 10], {"up": ("parts", part("lamp_amber")), "sides": ("parts", part("lamp_amber_side"))}),
     ),
-    "nixie_digit": panel(
-        box("socket", [4, 2, 5], [12, 3, 11], {"up": ("parts", part("bezel")), "sides": ("details", region("brass_bar", (0, 0, 8, 1)))}),
-        box("tube", [5, 3, 6], [11, 13, 10], {
-            "north": ("parts", part("nixie_face")), "south": ("parts", part("nixie_face")),
-            "east": ("parts", part("nixie_side")), "west": ("parts", part("nixie_side")),
-            "up": ("parts", part("nixie_top")),
-        }),
-        box("dome", [6, 13, 7], [10, 14, 9], {"all": ("parts", part("nixie_top", (1, 1, 4, 2)))}),
-    ),
     "panel_gauge": panel(
         box("gauge", [3, 2, 3], [13, 4, 13], {"up": ("parts", part("gauge_face")), "sides": ("details", region("brass_bar", (0, 0, 10, 2)))}),
     ),
@@ -284,17 +275,29 @@ def glow_layer(model, element, faces, inflate=0.05):
     return {"textures": MODELS[model]["textures"], "elements": [e]}
 
 
-for digit in [str(d) for d in range(10)] + ["off"]:
-    nixie = control_state("nixie_digit", {"tube": lambda e, lit=digit != "off": {**e, "faces": {**e["faces"],
-        "north": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit),
-        "south": glowing({"texture": "#digit", "uv": [0, 0, 6, 10]}, lit)}}})
-    MODELS[f"nixie_digit_{digit}"] = with_texture(nixie, "digit", f"create_new_era:block/controls/nixie_{digit}")
-
-
 for light in ("amber", "green", "red"):
     MODELS[f"panel_lamp_glow_{light}"] = glow_layer(f"panel_lamp_{light}", "lamp", ("up", "north", "south", "east", "west"))
-for digit in range(10):
-    MODELS[f"nixie_digit_glow_{digit}"] = glow_layer(f"nixie_digit_{digit}", "tube", ("north", "south"))
+
+
+# Nixie tube on a panel: Create's own nixie tube (its texture, its dark socket, its glass)
+# standing on the plate. The glass is translucent, so like Create's the model is a composite:
+# plate and socket cut out, tube translucent. The character inside is drawn by a renderer with
+# Create's NixieTubeRenderer.drawTube (PanelControlRenderer), so any letter glows like Create's.
+NIXIE_TEX = {**PANEL_TEX, "nixie": "create:block/nixie_tube"}
+_nixie_solid = model(NIXIE_TEX, panel(
+    box("socket", [5, 2, 5], [11, 5, 11], {"up": ("nixie", [6, 6, 12, 12]), "sides": ("nixie", [0, 10, 6, 13])}),
+)["elements"])
+_nixie_glass = box("tube", [5, 5, 5], [11, 14, 11], {"up": ("nixie", [6, 0, 12, 6]), "sides": ("nixie", [0, 1, 6, 10])})
+MODELS["nixie_digit"] = {
+    "credit": "Create: New Era", "loader": "neoforge:composite", "parent": "block/block",
+    "textures": {"particle": "create:block/nixie_tube"},
+    "children": {
+        "solid": {"render_type": "minecraft:cutout", **_nixie_solid},
+        "glass": {"render_type": "minecraft:translucent", "textures": NIXIE_TEX, "elements": [_nixie_glass]},
+    },
+}
+# the same in one piece, only for previews (tools/render can't read composites)
+PREVIEWS = {"nixie_digit_preview": model(NIXIE_TEX, _nixie_solid["elements"] + [_nixie_glass])}
 
 
 # Brass screen, front facing north. Screens next to each other (same facing) join:
@@ -434,6 +437,12 @@ def main():
     for name, m in MODELS.items():
         (OUT / f"{name}.json").write_text(json.dumps(m, indent=2) + "\n")
     print(f"{len(MODELS)} models written to {OUT}")
+    # python3 gen_models.py DIR: also the one-piece previews, under DIR/assets/create_new_era/models/block
+    if len(sys.argv) > 1:
+        preview = Path(sys.argv[1]) / "assets/create_new_era/models/block"
+        preview.mkdir(parents=True, exist_ok=True)
+        for name, m in PREVIEWS.items():
+            (preview / f"{name}.json").write_text(json.dumps(m, indent=2) + "\n")
 
 
 if __name__ == "__main__":

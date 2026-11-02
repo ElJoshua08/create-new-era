@@ -193,6 +193,11 @@ def render(assets, refs, size=384, yaw=0, pitch=30.0, zoom=1.0, center=(8, 8, 8)
                 region[mask, :3] = texel[mask, :3] * shade
                 region[mask, 3] = 1.0
                 depth[y0:y1 + 1, x0:x1 + 1][mask] = z[mask]
+                # translucent texels (glass) blend over what's already drawn behind them
+                a = texel[..., 3]
+                glass = inside & (a > 0.02) & (a <= 0.5) & (z < depth[y0:y1 + 1, x0:x1 + 1])
+                region[glass, :3] = region[glass, :3] * (1 - a[glass, None]) + texel[glass, :3] * shade * a[glass, None]
+                region[glass, 3] = np.maximum(region[glass, 3], a[glass])
     return Image.fromarray((color * 255).astype(np.uint8), "RGBA")
 
 
