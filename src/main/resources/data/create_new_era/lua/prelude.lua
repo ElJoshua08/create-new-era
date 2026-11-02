@@ -127,7 +127,7 @@ function bus.get(name)
         list[#list + 1] = { fn = fn, device = device }
     end
     -- a panel button: runs fn(device) each time it's pressed down
-    if device.isPressed then
+    if device.isPressed and not device.getKeyEvents then
         function device.onPress(a, b)
             local fn = a == device and b or a
             if type(fn) ~= "function" then

@@ -205,12 +205,30 @@ public final class Completions {
                     fn.signature(), translate.apply(fn.doc())));
         out.add(new Entry("onChange", Kind.FUNCTION, "onChange(function(value)\n  $0\nend)",
                 "onChange(fn(value, device))", changeDoc(d)));
-        if (d.methods().contains("isPressed"))
+        out.addAll(sugar(d));
+        return out;
+    }
+
+    /** The prelude's on* helpers this device gets; mirrors the conditions in prelude.lua. */
+    private static List<Entry> sugar(NetworkDevice d) {
+        List<Entry> out = new ArrayList<>();
+        boolean typewriter = d.methods().contains("getKeyEvents");
+        if (d.methods().contains("isPressed") && !typewriter)
             out.add(new Entry("onPress", Kind.FUNCTION, "onPress(function()\n  $0\nend)", "onPress(fn(device))",
                     translate.apply("create_new_era.api.on_press")));
-        if (d.methods().contains("getKey"))
+        if (typewriter) {
+            out.add(new Entry("onKeyDown", Kind.FUNCTION, "onKeyDown(function(key)\n  $0\nend)", "onKeyDown(fn(key, device))",
+                    translate.apply("create_new_era.api.on_key_down")));
+            out.add(new Entry("onKeyUp", Kind.FUNCTION, "onKeyUp(function(key)\n  $0\nend)", "onKeyUp(fn(key, device))",
+                    translate.apply("create_new_era.api.on_key_up")));
+            out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key, down)\n  $0\nend)", "onKey(fn(key, down, device))",
+                    translate.apply("create_new_era.api.on_key_any")));
+        } else if (d.methods().contains("getKey"))
             out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)", "onKey(fn(key, device))",
                     translate.apply("create_new_era.api.on_key")));
+        if (d.methods().contains("getLast"))
+            out.add(new Entry("onMessage", Kind.FUNCTION, "onMessage(function(message)\n  $0\nend)", "onMessage(fn(message, device))",
+                    translate.apply("create_new_era.api.on_message")));
         return out;
     }
 
@@ -239,6 +257,9 @@ public final class Completions {
                         return new Entry(fn.name(), Kind.FUNCTION, "", fn.signature(), translate.apply(fn.doc()));
                 if (method.equals("onChange"))
                     return new Entry("onChange", Kind.FUNCTION, "", "onChange(fn(value, device))", changeDoc(d));
+                for (Entry e : sugar(d))
+                    if (e.label().equals(method))
+                        return e;
             }
             for (Entry e : LuaApi.MEMBERS.getOrDefault(base, List.of()))
                 if (e.label().equals(method))
