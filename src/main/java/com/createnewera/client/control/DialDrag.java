@@ -41,8 +41,6 @@ public final class DialDrag {
     private static final double MAX_SPEED = 1.1;
     /** With Ctrl held, how much of the usual distance and speed the mouse moves it */
     private static final double FINE = 0.15;
-    /** The most marks the ring and bar draw: a range finer than this gets as many as fit */
-    private static final int MAX_MARKS = 31;
     /** How far past a notch's edge the mouse has to go before it clicks over to the next one, in steps */
     private static final float DETENT = 0.2f;
 
@@ -210,58 +208,23 @@ public final class DialDrag {
         int bar = AllGuiTextures.VALUE_SETTINGS_BAR.getWidth();
         for (int done = 0; done < length; done += bar)
             UIRenderHelper.drawCropped(g, x + 3 + done, y + 3, Math.min(bar, length - done), 8, 0, AllGuiTextures.VALUE_SETTINGS_BAR);
-        // a tick under the bar for each notch, or evenly spread ones for a fine range
-        int marks = Math.min(notches, MAX_MARKS - 1);
-        for (int i = 0; i <= marks; i++) {
-            int tx = x + 3 + 7 + Math.round((length - 14) * ((float) i / marks));
-            g.fill(tx, y + h + 1, tx + 1, y + h + (i == 0 || i == marks ? 4 : 3), 0xFF3A2411);
-        }
+        // Create's milestones in the bar, one per notch, when there are few enough to tell apart
+        if (notches <= DialTexture.MILESTONES)
+            for (int i = 0; i <= notches; i++) {
+                int mx = x + 3 + 7 + Math.round((length - 14) * ((float) i / notches));
+                AllGuiTextures milestone = notches <= 4 ? AllGuiTextures.VALUE_SETTINGS_WIDE_MILESTONE : AllGuiTextures.VALUE_SETTINGS_MILESTONE;
+                milestone.render(g, mx - milestone.getWidth() / 2, y + 3);
+            }
         int at = x + 3 + 7 + Math.round((length - 14) * ((float) step / notches));
         cursor(g, mc, at, y);
     }
 
-    /** The knob's dial: an arc, open at the bottom, a slider bent round the crosshair */
-    private static final int ARC_RADIUS = 24;
-    private static final int ARC_EDGE = 0xFF2A1A0C, ARC_EMPTY = 0xFF5A4030, ARC_LIT = 0xFFE4B763;
-    /** Up to this many notches get a mark each round the arc; finer ranges read as one smooth sweep */
-    private static final int ARC_MARKS = 24;
-
-    /** Where on the arc a fraction of the range sits: 0 at the bottom left, 1 at the bottom right. */
-    private static int[] onArc(int cx, int cy, double fraction, double radius) {
-        double a = Math.toRadians(-135 + 270 * fraction);
-        return new int[] {cx + (int) Math.round(radius * Math.sin(a)), cy - (int) Math.round(radius * Math.cos(a))};
-    }
-
-    /**
-     * The knob: a track bent into an arc round the crosshair, lit brass up to where it is, like
-     * the slider's bar. A range of a few notches marks each one outside the arc, so two or
-     * three positions read as positions; thousands read as one sweep. The value sits in the gap.
-     */
+    /** The knob: Create's value bar bent into an arc round the crosshair (DialTexture), the value under it. */
     private static void drawRing(GuiGraphics g, Minecraft mc, int cx, int cy) {
-        float at = (float) step / notches;
-        int samples = 360;
-        for (int pass = 0; pass < 2; pass++)
-            for (int i = 0; i <= samples; i++) {
-                float f = (float) i / samples;
-                int[] p = onArc(cx, cy, f, ARC_RADIUS);
-                if (pass == 0)
-                    g.fill(p[0] - 3, p[1] - 3, p[0] + 3, p[1] + 3, ARC_EDGE);
-                else
-                    g.fill(p[0] - 2, p[1] - 2, p[0] + 2, p[1] + 2, f <= at + 1e-4 ? ARC_LIT : ARC_EMPTY);
-            }
-        if (notches <= ARC_MARKS) {
-            int size = notches <= 4 ? 2 : 1; // two or three positions get bigger marks
-            for (int i = 0; i <= notches; i++) {
-                int[] p = onArc(cx, cy, (double) i / notches, ARC_RADIUS + 6 + size);
-                g.fill(p[0] - size - 1, p[1] - size - 1, p[0] + size + 1, p[1] + size + 1, ARC_EDGE);
-                g.fill(p[0] - size, p[1] - size, p[0] + size, p[1] + size, i <= step ? ARC_LIT : ARC_EMPTY);
-            }
-        }
-        // where it is: a bright stud on the track
-        int[] p = onArc(cx, cy, at, ARC_RADIUS);
-        g.fill(p[0] - 4, p[1] - 4, p[0] + 4, p[1] + 4, ARC_EDGE);
-        g.fill(p[0] - 3, p[1] - 3, p[0] + 3, p[1] + 3, 0xFFFFF0C0);
-        cursor(g, mc, cx, cy + ARC_RADIUS - 4);
+        int half = DialTexture.SIZE / 2;
+        g.blit(DialTexture.at(notches, step), cx - half, cy - half, 0, 0, DialTexture.SIZE, DialTexture.SIZE,
+                DialTexture.SIZE, DialTexture.SIZE);
+        cursor(g, mc, cx, cy + 25);
     }
 
     private static void brassFrame(GuiGraphics g, int x, int y, int w, int h) {
