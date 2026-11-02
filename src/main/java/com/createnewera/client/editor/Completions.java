@@ -30,6 +30,9 @@ public final class Completions {
     private static final Pattern MEMBER = Pattern.compile("([A-Za-z_]\\w*)\\s*([.:])\\s*(\\w*)$");
     private static final Pattern WORD = Pattern.compile("([A-Za-z_]\\w*)$");
     private static final Pattern IDENT = Pattern.compile("[A-Za-z_]\\w*");
+    /** {@code local terminal = require("terminal")}: the variable holds what that file returns */
+    private static final Pattern MODULE_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*require\\s*\\(?\\s*[\"']([\\w./\\-]+)[\"']");
+    private static final Pattern RETURNED = Pattern.compile("(?m)^return\\s+([A-Za-z_]\\w*)\\s*$");
     private static final Pattern FUNCTION_DEF = Pattern.compile("\\bfunction\\s+([A-Za-z_][\\w.:]*)|([A-Za-z_]\\w*)\\s*=\\s*function\\b");
 
     /**
@@ -47,12 +50,13 @@ public final class Completions {
      * @param beforeCursor the file from its start up to the cursor
      * @param document     the whole file, for names it defines
      * @param files        files on the computer, for require("...")
+     * @param source       a file's text by name (what's in its tab if it's open), to read the modules it requires
      * @param devices      the computer's network, nearest first, for device names and their methods
      * @param viewer       the player, to say which way each device lies from them
      * @param explicit     Ctrl+Space: suggest even with nothing typed
      */
-    public static Result complete(String beforeCursor, String document, List<String> files, List<NetworkDevice> devices,
-                                  Viewer viewer, boolean explicit) {
+    public static Result complete(String beforeCursor, String document, List<String> files, Function<String, String> source,
+                                  List<NetworkDevice> devices, Viewer viewer, boolean explicit) {
         int lineStart = beforeCursor.lastIndexOf('\n') + 1;
         String line = beforeCursor.substring(lineStart);
         Matcher m;
@@ -87,6 +91,8 @@ public final class Completions {
             if (members == null)
                 members = deviceMethods(document, base, devices);
             if (members == null)
+                members = moduleMembers(document, base, files, source);
+            if (members == null)
                 members = fieldsSeen(document, base);
             if (query.isEmpty() && members.isEmpty())
                 return Result.NONE;
@@ -98,6 +104,13 @@ public final class Completions {
         if (query.isEmpty() && !explicit)
             return Result.NONE;
         List<Entry> pool = new ArrayList<>(namesInDocument(document, query));
+        Matcher r = MODULE_VAR.matcher(document);
+        while (r.find()) {
+            String file = file(r.group(2), files);
+            pool.add(0, new Entry(r.group(1), Kind.MODULE, r.group(1), "require(\"" + r.group(2) + "\")", file == null
+                    ? translate.apply("create_new_era.editor.module_missing")
+                    : String.format(translate.apply("create_new_era.editor.module"), file)));
+        }
         pool.addAll(LuaApi.GLOBALS);
         return rank(line.length() - query.length(), query, pool);
     }
@@ -245,7 +258,8 @@ public final class Completions {
      * Signature help: inside a call's parentheses, what that function takes and does, like VS
      * Code's parameter hints. Null when the cursor isn't inside a call the editor knows.
      */
-    public static Entry signature(String beforeCursor, String document, List<NetworkDevice> devices) {
+    public static Entry signature(String beforeCursor, String document, List<String> files, Function<String, String> source,
+                                  List<NetworkDevice> devices) {
         String line = beforeCursor.substring(beforeCursor.lastIndexOf('\n') + 1);
         Matcher m = CALL_OPEN.matcher(line);
         if (m.find()) {
@@ -261,7 +275,10 @@ public final class Completions {
                     if (e.label().equals(method))
                         return e;
             }
-            for (Entry e : LuaApi.MEMBERS.getOrDefault(base, List.of()))
+            List<Entry> members = LuaApi.MEMBERS.get(base);
+            if (members == null)
+                members = moduleMembers(document, base, files, source);
+            for (Entry e : members == null ? List.<Entry>of() : members)
                 if (e.label().equals(method))
                     return e;
             return null;
@@ -274,6 +291,75 @@ public final class Completions {
         return null;
     }
 
+
+    /** The file require(module) loads, resolved the way the computer does: as named, or dots to slashes plus .lua. */
+    private static String file(String module, List<String> files) {
+        if (files.contains(module))
+            return module;
+        String withExtension = module.replace('.', '/') + ".lua";
+        return files.contains(withExtension) ? withExtension : null;
+    }
+
+    /**
+     * What a variable holding {@code require("x")} offers: the functions and fields x.lua puts on
+     * the table it returns, each with the comment written above it as its doc. Null if the
+     * variable isn't a required module.
+     */
+    private static List<Entry> moduleMembers(String document, String variable, List<String> files, Function<String, String> source) {
+        Matcher m = MODULE_VAR.matcher(document);
+        String module = null;
+        while (m.find())
+            if (m.group(1).equals(variable))
+                module = m.group(2);
+        if (module == null)
+            return null;
+        String name = file(module, files);
+        String text = name == null ? null : source.apply(name);
+        if (text == null)
+            return List.of();
+        Matcher r = RETURNED.matcher(text);
+        String table = null;
+        while (r.find())
+            table = r.group(1);
+        if (table == null)
+            return List.of();
+        String t = Pattern.quote(table);
+        Pattern def = Pattern.compile("(?m)^[ \\t]*(?:function\\s+" + t + "\\s*[.:]\\s*([A-Za-z_]\\w*)\\s*\\(([^)]*)\\)"
+                + "|" + t + "\\s*\\.\\s*([A-Za-z_]\\w*)\\s*=\\s*(function\\s*\\(([^)]*)\\))?)");
+        List<Entry> out = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        Matcher d = def.matcher(text);
+        while (d.find()) {
+            boolean fn = d.group(1) != null || d.group(4) != null;
+            String field = d.group(1) != null ? d.group(1) : d.group(3);
+            if (!seen.add(field))
+                continue;
+            String doc = commentAbove(text, d.start());
+            if (fn) {
+                String params = (d.group(1) != null ? d.group(2) : d.group(5)).trim().replaceAll("\\s*,\\s*", ", ");
+                out.add(new Entry(field, Kind.FUNCTION, field + (params.isEmpty() ? "()" : "($0)"),
+                        variable + "." + field + "(" + params + ")", doc, "", name, ""));
+            } else {
+                out.add(new Entry(field, Kind.FIELD, field, variable + "." + field, doc, "", name, ""));
+            }
+        }
+        return out;
+    }
+
+    /** The -- comment lines right above a definition, joined, as its doc. */
+    private static String commentAbove(String text, int at) {
+        List<String> lines = new ArrayList<>();
+        int end = text.lastIndexOf('\n', Math.max(0, at - 1));
+        while (end > 0) {
+            int start = text.lastIndexOf('\n', end - 1) + 1;
+            String line = text.substring(start, end).trim();
+            if (!line.startsWith("--") || line.startsWith("--[["))
+                break;
+            lines.add(0, line.replaceFirst("^-+\\s?", ""));
+            end = start - 1;
+        }
+        return String.join(" ", lines).trim();
+    }
 
     private static List<String> modules(List<String> files) {
         return files.stream().map(f -> f.endsWith(".lua") ? f.substring(0, f.length() - 4) : f).toList();

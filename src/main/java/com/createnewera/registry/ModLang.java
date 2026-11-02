@@ -52,6 +52,8 @@ public final class ModLang {
         lang("create_new_era.editor.device.ports_out", "Output port.");
         lang("create_new_era.editor.device.ports_in", "Input port.");
         lang("create_new_era.editor.device.reads", "Reads:");
+        lang("create_new_era.editor.module", "A module: what %s returns. Its functions are listed after a dot.");
+        lang("create_new_era.editor.module_missing", "No file on this computer by that name yet.");
         lang("create_new_era.editor.device.orders", "Orders:");
         // data bus
         lang("item.create_new_era.bus_port.tooltip.summary", "A _data port_ for the bus. Sticks to _any face_ of _any block_, Create machines included, without changing how the block works.");

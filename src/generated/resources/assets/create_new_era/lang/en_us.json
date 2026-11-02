@@ -240,6 +240,8 @@
   "create_new_era.editor.flows_soon": "Coming soon: what moves between your machines and programs, live.",
   "create_new_era.editor.in": "in",
   "create_new_era.editor.line_col": "Ln %s, Col %s",
+  "create_new_era.editor.module": "A module: what %s returns. Its functions are listed after a dot.",
+  "create_new_era.editor.module_missing": "No file on this computer by that name yet.",
   "create_new_era.editor.new_file": "name.lua",
   "create_new_era.editor.out": "out",
   "create_new_era.editor.panel.files": "Files (Ctrl+B)",

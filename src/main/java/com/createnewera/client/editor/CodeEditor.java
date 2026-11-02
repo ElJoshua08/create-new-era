@@ -3,7 +3,13 @@ package com.createnewera.client.editor;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.Nullable;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -41,6 +47,8 @@ public class CodeEditor {
     private final Font font;
     private final int maxLength;
     private List<String> lines = new ArrayList<>(List.of(""));
+    /** Names bound to require(...) in this file, coloured like the built-in libraries; null until worked out */
+    private @Nullable Set<String> libraries;
     private int row, col;
     /** Other end of the selection, or -1 when nothing is selected. */
     private int anchorRow = -1, anchorCol;
@@ -86,6 +94,7 @@ public class CodeEditor {
     }
 
     public void setText(String text) {
+        libraries = null;
         lines = new ArrayList<>(List.of(text.replace("\t", INDENT).replace("\r", "").split("\n", -1)));
         row = col = 0;
         anchorRow = -1;
@@ -110,6 +119,23 @@ public class CodeEditor {
 
     // ---- rendering ----
 
+    private void changed() {
+        libraries = null;
+        onChange.run();
+    }
+
+    private Set<String> libraries() {
+        if (libraries == null) {
+            libraries = new HashSet<>();
+            Matcher m = REQUIRED.matcher(getText());
+            while (m.find())
+                libraries.add(m.group(1));
+        }
+        return libraries;
+    }
+
+    private static final Pattern REQUIRED = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*require\\b");
+
     public void render(GuiGraphics g, int mouseX, int mouseY, boolean focused) {
         g.fill(x, y, x + GUTTER, y + height, GUTTER_BG);
         g.enableScissor(x, y, x + width, y + height);
@@ -119,6 +145,7 @@ public class CodeEditor {
         // highlighting state flows from the top, so run through the lines above the view too
         for (int r = 0; r < scrollRow && r < lines.size(); r++)
             state = LuaHighlighter.highlight(lines.get(r), new int[lines.get(r).length()], state);
+        Set<String> libraries = libraries();
 
         int textX = x + GUTTER + PAD;
         for (int i = 0; i <= visible && scrollRow + i < lines.size(); i++) {
@@ -138,7 +165,7 @@ public class CodeEditor {
             g.drawString(font, number, x + GUTTER - 3 - font.width(number), lineY, numberColor, false);
 
             int[] colors = new int[line.length()];
-            state = LuaHighlighter.highlight(line, colors, state);
+            state = LuaHighlighter.highlight(line, colors, state, libraries);
             int last = Math.min(line.length(), scrollCol + columns() + 1);
             for (int c = scrollCol; c < last; c++) {
                 char ch = line.charAt(c);
@@ -437,7 +464,7 @@ public class CodeEditor {
 
         rawInsert(text);
         scrollToCursor();
-        onChange.run();
+        changed();
     }
 
     /** Inserts at the cursor, replacing any selection, with no undo bookkeeping. */
@@ -511,7 +538,7 @@ public class CodeEditor {
         }
         dedentedRow = -1;
         scrollToCursor();
-        onChange.run();
+        changed();
     }
 
     // ---- saved state ----
@@ -555,7 +582,7 @@ public class CodeEditor {
             lines.set(r, INDENT + lines.get(r));
         anchorCol = anchorRow == s[0] ? s[1] + INDENT.length() : anchorCol + INDENT.length();
         col += INDENT.length();
-        onChange.run();
+        changed();
     }
 
     private void dedentLines() {
@@ -570,7 +597,7 @@ public class CodeEditor {
             if (r == anchorRow)
                 anchorCol = Math.max(0, anchorCol - remove);
         }
-        onChange.run();
+        changed();
     }
 
     private void duplicateLine() {
@@ -578,7 +605,7 @@ public class CodeEditor {
         lines.add(row + 1, lines.get(row));
         row++;
         scrollToCursor();
-        onChange.run();
+        changed();
     }
 
     private void toggleComment() {
@@ -601,7 +628,7 @@ public class CodeEditor {
             lines.set(r, indent + body);
         }
         col = Math.min(col, lines.get(row).length());
-        onChange.run();
+        changed();
     }
 
     private void pushUndo() {
@@ -632,7 +659,7 @@ public class CodeEditor {
         anchorRow = -1;
         lastEdit = EditKind.NONE;
         scrollToCursor();
-        onChange.run();
+        changed();
     }
 
     // ---- cursor helpers ----

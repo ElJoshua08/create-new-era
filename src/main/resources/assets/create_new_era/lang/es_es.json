@@ -189,6 +189,8 @@
   "create_new_era.editor.device.ports_out": "Puerto de salida.",
   "create_new_era.editor.device.ports_in": "Puerto de entrada.",
   "create_new_era.editor.device.reads": "Lee:",
+  "create_new_era.editor.module": "Un módulo: lo que devuelve %s. Pon un punto para ver sus funciones.",
+  "create_new_era.editor.module_missing": "Todavía no hay ningún archivo con ese nombre en este ordenador.",
   "create_new_era.editor.device.orders": "Ordena:",
   "create_new_era.api.kinetic.getSpeed": "Lo rápido que gira, en RPM. Negativo si gira al revés; 0 si está parado o sobrecargado.",
   "create_new_era.api.kinetic.isOverstressed": "true si su red cinética pide más estrés del que tiene, y por eso está parada.",

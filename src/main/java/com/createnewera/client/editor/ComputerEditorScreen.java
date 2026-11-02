@@ -577,9 +577,16 @@ public class ComputerEditorScreen extends Screen {
         var player = Minecraft.getInstance().player;
         var viewer = player == null ? new Completions.Viewer(Vec3.atCenterOf(pos), 0)
                 : new Completions.Viewer(player.getEyePosition(), player.getYRot());
-        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, snapshot.devices(), viewer, explicit);
+        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, this::source,
+                snapshot.devices(), viewer, explicit);
         selected = 0;
         listTop = 0;
+    }
+
+    /** A file's text as it is now: its tab's, unsaved edits included, or the disk's. */
+    private @Nullable String source(String name) {
+        CodeEditor tab = open.get(name);
+        return tab != null ? tab.getText() : disk.get(name);
     }
 
     private void moveSelection(int by) {
@@ -1043,7 +1050,7 @@ public class ComputerEditorScreen extends Screen {
         CodeEditor editor = editor();
         if (editor == null || nameDraft != null)
             return;
-        var help = Completions.signature(editor.textBeforeCursor(), editor.getText(), snapshot.devices());
+        var help = Completions.signature(editor.textBeforeCursor(), editor.getText(), fileOrder, this::source, snapshot.devices());
         if (help == null)
             return;
         List<FormattedCharSequence> sig = font.split(Component.literal(help.detail()), SIGNATURE_W - 8);

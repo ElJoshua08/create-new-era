@@ -14,13 +14,14 @@ public final class LuaHighlighter {
     public static final int NUMBER = 0xFFEF9A6A;
     public static final int COMMENT = 0xFF8F8F8F;
     public static final int BUILTIN = 0xFF7FB2E8;
+    public static final int CALL = 0xFFD9B8F2;
 
     private static final Set<String> KEYWORDS = Set.of(
             "and", "break", "do", "else", "elseif", "end", "for", "function", "goto", "if", "in",
             "local", "not", "or", "repeat", "return", "then", "until", "while");
     private static final Set<String> CONSTANTS = Set.of("true", "false", "nil");
     private static final Set<String> BUILTINS = Set.of(
-            "print", "sleep", "redstone", "rs", "os", "string", "table", "math", "coroutine", "bit32", "utf8",
+            "print", "sleep", "require", "bus", "redstone", "rs", "os", "string", "table", "math", "coroutine", "bit32", "utf8",
             "pairs", "ipairs", "next", "select", "type", "tostring", "tonumber", "error", "assert",
             "pcall", "xpcall", "setmetatable", "getmetatable", "rawget", "rawset", "rawequal", "rawlen", "load");
 
@@ -31,6 +32,14 @@ public final class LuaHighlighter {
 
     /** Colours each char of {@code line} into {@code colors}; returns the state for the next line. */
     public static State highlight(String line, int[] colors, State start) {
+        return highlight(line, colors, start, Set.of());
+    }
+
+    /**
+     * @param libraries names the file binds to require(...): coloured like the built-in libraries,
+     *                  since that's what they are
+     */
+    public static State highlight(String line, int[] colors, State start, Set<String> libraries) {
         int n = line.length();
         int i = 0;
         if (start.inComment || start.inString) {
@@ -83,9 +92,15 @@ public final class LuaHighlighter {
                 String word = line.substring(i, j);
                 // a field like foo.print isn't the builtin
                 boolean field = i > 0 && (line.charAt(i - 1) == '.' || line.charAt(i - 1) == ':');
+                int next = j;
+                while (next < n && line.charAt(next) == ' ')
+                    next++;
+                // called: name(...), name"text" or name{...}
+                boolean call = next < n && "(\"'{".indexOf(line.charAt(next)) >= 0;
                 int color = KEYWORDS.contains(word) ? KEYWORD
                         : CONSTANTS.contains(word) ? NUMBER
-                        : !field && BUILTINS.contains(word) ? BUILTIN
+                        : !field && (BUILTINS.contains(word) || libraries.contains(word)) ? BUILTIN
+                        : call ? CALL
                         : TEXT;
                 fill(colors, i, j, color);
                 i = j;
