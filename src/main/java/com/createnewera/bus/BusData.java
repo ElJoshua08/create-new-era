@@ -86,6 +86,18 @@ public class BusData extends SavedData {
         byChunk.computeIfAbsent(ChunkPos.asLong(port.pos()), k -> new HashSet<>()).add(port.id());
     }
 
+    /** Every chunk holding a part or the start of a cable. */
+    public Set<Long> chunks() {
+        Set<Long> out = new HashSet<>();
+        byChunk.forEach((chunk, ids) -> {
+            if (!ids.isEmpty())
+                out.add(chunk);
+        });
+        for (BusSpan span : spans.values())
+            out.add(ChunkPos.asLong(BlockPos.containing(span.points().get(0))));
+        return out;
+    }
+
     public @Nullable BusPort port(long id) {
         return ports.get(id);
     }

@@ -23,7 +23,7 @@ public final class Ships {
     private static boolean looked;
     private static Object companion;
     private static Method containing, containingClient, project, velocity, airVelocity, logicalPose, renderPose, orientation,
-            transformPosition, transformPositionInverse;
+            transformPosition, transformPositionInverse, inPlotGrid;
 
     /** The centre of the block, in the world, wherever its ship has taken it. */
     public static Vec3 position(Level level, BlockPos pos) {
@@ -96,6 +96,17 @@ public final class Ships {
         }
     }
 
+    /** Whether this chunk is in Sable's plot grid: the far-off place ships keep their blocks. */
+    public static boolean inPlot(Level level, net.minecraft.world.level.ChunkPos chunk) {
+        if (!ready())
+            return false;
+        try {
+            return (boolean) inPlotGrid.invoke(companion, level, chunk.x, chunk.z);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return false;
+        }
+    }
+
     /** How fast the block moves through the world, in blocks a second; through the air if {@code air}. */
     public static Vec3 velocity(Level level, BlockPos pos, boolean air) {
         if (!ready())
@@ -136,6 +147,7 @@ public final class Ships {
                 containing = api.getMethod("getContaining", Level.class, net.minecraft.core.Position.class);
                 containingClient = api.getMethod("getContainingClient", net.minecraft.core.Position.class);
                 project = api.getMethod("projectOutOfSubLevel", Level.class, Vec3.class);
+                inPlotGrid = api.getMethod("isInPlotGrid", Level.class, int.class, int.class);
                 velocity = api.getMethod("getVelocity", Level.class, Vec3.class);
                 airVelocity = api.getMethod("getVelocityRelativeToAir", Level.class, Vec3.class);
                 logicalPose = Class.forName("dev.ryanhcode.sable.companion.SubLevelAccess").getMethod("logicalPose");

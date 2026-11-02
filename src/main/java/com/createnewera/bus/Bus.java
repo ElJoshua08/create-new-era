@@ -336,7 +336,19 @@ public final class Bus {
     }
 
     private static void sync(ServerLevel level, ChunkPos chunk) {
-        PacketDistributor.sendToPlayersTrackingChunk(level, chunk, payload(level, chunk));
+        // a ship's plot isn't tracked the way the world is (Sable sends its chunks itself): everyone
+        // in the dimension hears about it, as the ship may sail by any of them
+        if (Ships.inPlot(level, chunk))
+            PacketDistributor.sendToPlayersInDimension(level, payload(level, chunk));
+        else
+            PacketDistributor.sendToPlayersTrackingChunk(level, chunk, payload(level, chunk));
+    }
+
+    /** Everything on ships in this level, for a player arriving in it: no chunk watching tells them. */
+    public static void sendShips(ServerPlayer player, ServerLevel level) {
+        for (long chunk : BusData.get(level).chunks())
+            if (Ships.inPlot(level, new ChunkPos(chunk)))
+                sendChunk(player, level, new ChunkPos(chunk));
     }
 
     public static void sendChunk(ServerPlayer player, ServerLevel level, ChunkPos chunk) {

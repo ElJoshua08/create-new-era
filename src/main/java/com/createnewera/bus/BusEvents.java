@@ -35,6 +35,14 @@ public final class BusEvents {
         gameBus.addListener(BusEvents::punch);
         gameBus.addListener(BusEvents::blockBroken);
         gameBus.addListener(BusEvents::chunkSent);
+        gameBus.addListener(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.class, event -> {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
+                Bus.sendShips(player, player.serverLevel());
+        });
+        gameBus.addListener(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent.class, event -> {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player)
+                Bus.sendShips(player, player.serverLevel());
+        });
     }
 
     /**

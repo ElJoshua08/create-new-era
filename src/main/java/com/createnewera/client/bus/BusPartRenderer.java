@@ -64,7 +64,10 @@ public final class BusPartRenderer {
         gameBus.addListener(BusPartRenderer::outline);
         gameBus.addListener(ClientPlayerNetworkEvent.LoggingOut.class, event -> ClientBusParts.clear());
         gameBus.addListener(ChunkEvent.Unload.class, event -> {
-            if (event.getLevel().isClientSide())
+            // a ship's chunks come and go as Sable sends them, but nobody would send us its parts
+            // again: those stay
+            if (event.getLevel().isClientSide() && event.getLevel() instanceof net.minecraft.world.level.Level level
+                    && !Ships.inPlot(level, event.getChunk().getPos()))
                 ClientBusParts.forget(event.getChunk().getPos().toLong());
         });
     }
