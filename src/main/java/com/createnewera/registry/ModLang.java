@@ -134,7 +134,7 @@ public final class ModLang {
         lang("block.create_new_era.port_hub.tooltip.behaviour1", "Click any of its sockets. Cables of _different colours_ still don't join through it; bare copper joins any.");
         // under engineer's goggles, and the knob and slider while they're dragged
         lang("create_new_era.dial.value", "Value: %s/%s");
-        lang("create_new_era.dial.hint", "Hold and drag to adjust");
+        lang("create_new_era.dial.hint", "Hold and drag to adjust · Ctrl for fine control");
         lang("create_new_era.goggles.cabled", "Cabled to the bus");
         lang("create_new_era.goggles.not_cabled", "No cable yet");
         lang("create_new_era.goggles.pressed", "Pressed");

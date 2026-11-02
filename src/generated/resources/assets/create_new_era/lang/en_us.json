@@ -230,7 +230,7 @@
   "create_new_era.console.restarted": "Restarted after the world loaded",
   "create_new_era.console.running": "Running",
   "create_new_era.console.stopped": "Stopped",
-  "create_new_era.dial.hint": "Hold and drag to adjust",
+  "create_new_era.dial.hint": "Hold and drag to adjust · Ctrl for fine control",
   "create_new_era.dial.value": "Value: %s/%s",
   "create_new_era.editor.bad_name": "Names can use letters, numbers, _ - . and /",
   "create_new_era.editor.console_empty": "print() output shows up here",

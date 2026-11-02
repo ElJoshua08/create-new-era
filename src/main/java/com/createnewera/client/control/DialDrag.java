@@ -39,6 +39,10 @@ public final class DialDrag {
     private static final double FULL_SWEEP = 420;
     /** However fast the mouse goes, the control moves at most this much of its range a second */
     private static final double MAX_SPEED = 1.1;
+    /** With Ctrl held, how much of the usual distance and speed the mouse moves it */
+    private static final double FINE = 0.15;
+    /** The most marks the ring and bar draw: a range finer than this gets as many as fit */
+    private static final int MAX_MARKS = 31;
     /** How far past a notch's edge the mouse has to go before it clicks over to the next one, in steps */
     private static final float DETENT = 0.2f;
 
@@ -108,8 +112,10 @@ public final class DialDrag {
             return;
         double x = mc.mouseHandler.xpos();
         long now = System.nanoTime();
-        double most = MAX_SPEED * (now - lastFrame) / 1e9;
-        raw = Mth.clamp(raw + (float) Mth.clamp((x - lastX) / FULL_SWEEP, -most, most), 0, 1);
+        // Ctrl for fine control: the same mouse moves it a fraction as far, and slower
+        double scale = net.minecraft.client.gui.screens.Screen.hasControlDown() ? FINE : 1;
+        double most = MAX_SPEED * scale * (now - lastFrame) / 1e9;
+        raw = Mth.clamp(raw + (float) Mth.clamp((x - lastX) / FULL_SWEEP * scale, -most, most), 0, 1);
         lastX = x;
         lastFrame = now;
         // it sits in a notch until the mouse has gone a little past its edge, like a geared dial
@@ -202,6 +208,12 @@ public final class DialDrag {
         int length = w - 6;
         UIRenderHelper.drawCropped(g, x + 3, y + 3, Math.min(AllGuiTextures.VALUE_SETTINGS_BAR.getWidth(), length), 8, 0,
                 AllGuiTextures.VALUE_SETTINGS_BAR);
+        // a tick under the bar for each notch, or evenly spread ones for a fine range
+        int marks = Math.min(notches, MAX_MARKS - 1);
+        for (int i = 0; i <= marks; i++) {
+            int tx = x + 3 + 7 + Math.round((length - 14) * ((float) i / marks));
+            g.fill(tx, y + h + 1, tx + 1, y + h + (i == 0 || i == marks ? 4 : 3), 0xFF3A2411);
+        }
         int at = x + 3 + 7 + Math.round((length - 14) * ((float) step / notches));
         cursor(g, mc, at, y);
     }
@@ -209,11 +221,14 @@ public final class DialDrag {
     /** The knob: its sixteen notches in a ring round the crosshair, the cursor on the one it's at. */
     private static void drawRing(GuiGraphics g, Minecraft mc, int cx, int cy) {
         int radius = 26;
-        for (int i = 0; i <= 15; i++) {
-            double a = Math.toRadians(-135 + 270 * i / 15.0);
+        // one mark per notch while they fit, else evenly spread marks, lit up to where it is
+        int marks = Math.min(notches, MAX_MARKS - 1);
+        float lit = (float) step / notches * marks;
+        for (int i = 0; i <= marks; i++) {
+            double a = Math.toRadians(-135 + 270.0 * i / marks);
             int x = cx + (int) Math.round(radius * Math.sin(a)), y = cy - (int) Math.round(radius * Math.cos(a));
             g.fill(x - 2, y - 2, x + 2, y + 2, 0xFF3A2411);
-            g.fill(x - 1, y - 1, x + 1, y + 1, i <= Math.round(15f * step / notches) ? 0xFFE4B763 : 0xFF6B5240);
+            g.fill(x - 1, y - 1, x + 1, y + 1, i <= lit + 1e-4 ? 0xFFE4B763 : 0xFF6B5240);
         }
         double a = Math.toRadians(-135 + 270.0 * step / notches);
         cursor(g, mc, cx + (int) Math.round(radius * Math.sin(a)), cy - (int) Math.round(radius * Math.cos(a)) - 7);
