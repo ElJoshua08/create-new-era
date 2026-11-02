@@ -7,6 +7,7 @@ import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusEvents;
 import com.createnewera.bus.BusPort;
 import com.createnewera.bus.PartGeometry;
+import com.createnewera.bus.Ships;
 import com.createnewera.bus.PortMode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -87,7 +88,10 @@ public final class BusPartRenderer {
 
         for (List<BusPort> chunk : ClientBusParts.chunks()) {
             for (BusPort part : chunk) {
-                if (part.pos().distToCenterSqr(camera) > RANGE * RANGE)
+                // on a ship the part lives in the ship's plot: drawn where the ship shows, turned with it
+                Ships.DrawnShip ship = Ships.drawn(Vec3.atCenterOf(part.pos()), event.getPartialTick().getGameTimeDeltaPartialTick(false));
+                Vec3 shown = ship == null ? Vec3.atCenterOf(part.pos()) : ship.toWorld(Vec3.atCenterOf(part.pos()));
+                if (shown.distanceToSqr(camera) > RANGE * RANGE)
                     continue;
                 if (part.kind() == BusPort.Kind.CONTROL || part.kind() == BusPort.Kind.HUB)
                     continue; // built into the control's plate, or drawn by the hub's own model
@@ -103,7 +107,13 @@ public final class BusPartRenderer {
                 });
                 BlockPos outside = part.pos().relative(part.face());
                 pose.pushPose();
-                pose.translate(outside.getX() - camera.x, outside.getY() - camera.y, outside.getZ() - camera.z);
+                if (ship != null) {
+                    Vec3 at = ship.toWorld(Vec3.atLowerCornerOf(outside));
+                    pose.translate(at.x - camera.x, at.y - camera.y, at.z - camera.z);
+                    pose.mulPose(new org.joml.Quaternionf(ship.orientation()));
+                } else {
+                    pose.translate(outside.getX() - camera.x, outside.getY() - camera.y, outside.getZ() - camera.z);
+                }
                 // the same turn the game gives a block model pointing up, so drawing matches PartGeometry
                 pose.translate(0.5, 0.5, 0.5);
                 pose.mulPose(rotation(part.face()).getRotation().getLeftRotation());
@@ -132,9 +142,18 @@ public final class BusPartRenderer {
             return;
         event.setCanceled(true);
         Vec3 camera = event.getCamera().getPosition();
-        AABB box = PartGeometry.box(part).move(-camera.x, -camera.y, -camera.z);
-        LevelRenderer.renderLineBox(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.lines()),
-                box, 0, 0, 0, 0.4f);
+        AABB box = PartGeometry.box(part);
+        PoseStack pose = event.getPoseStack();
+        pose.pushPose();
+        // on a ship: the box where the ship shows it, turned with the ship
+        Ships.DrawnShip ship = Ships.drawn(box.getCenter(), event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+        Vec3 center = box.getCenter(), shown = ship == null ? center : ship.toWorld(center);
+        pose.translate(shown.x - camera.x, shown.y - camera.y, shown.z - camera.z);
+        if (ship != null)
+            pose.mulPose(new org.joml.Quaternionf(ship.orientation()));
+        LevelRenderer.renderLineBox(pose, event.getMultiBufferSource().getBuffer(RenderType.lines()),
+                box.move(-center.x, -center.y, -center.z), 0, 0, 0, 0.4f);
+        pose.popPose();
     }
 
     private BusPartRenderer() {}

@@ -9,6 +9,7 @@ import com.createnewera.bus.Bus;
 import com.createnewera.bus.BusEvents;
 import com.createnewera.bus.BusPort;
 import com.createnewera.bus.BusSpan;
+import com.createnewera.bus.Ships;
 import com.createnewera.bus.CableRoute;
 import com.createnewera.bus.PartGeometry;
 import com.createnewera.cable.CableActions;
@@ -101,17 +102,27 @@ public final class CableRenderer {
         pose.pushPose();
         pose.translate(-camera.x, -camera.y, -camera.z);
 
+        float partial = event.getPartialTick().getGameTimeDeltaPartialTick(false);
         for (BusSpan span : ClientBusParts.spans()) {
-            if (span.points().get(0).distanceToSqr(camera) > RANGE * RANGE)
+            List<Vec3> line = CableShape.line(span, mc.level);
+            // a cable on a ship lives in the ship's plot: drawn where the ship shows
+            Ships.DrawnShip ship = Ships.drawn(span.points().get(0), partial);
+            if (ship != null)
+                line = line.stream().map(ship::toWorld).toList();
+            if (line.get(0).distanceToSqr(camera) > RANGE * RANGE)
                 continue;
-            tube(pose, consumer, mc.level, CableShape.line(span, mc.level), CableShape.radius(span), sprite(texture(span)), 0xFFFFFF);
+            tube(pose, consumer, mc.level, line, CableShape.radius(span), sprite(texture(span)), 0xFFFFFF);
         }
         preview(mc, pose, consumer);
         buffers.endBatch(RenderType.cutout());
 
         BusSpan hovered = hovered(mc, mc.player.blockInteractionRange());
         if (hovered != null) {
-            outline(pose, buffers.getBuffer(RenderType.lines()), CableShape.line(hovered, mc.level), CableShape.radius(hovered) + 0.01);
+            List<Vec3> line = CableShape.line(hovered, mc.level);
+            Ships.DrawnShip ship = Ships.drawn(hovered.points().get(0), partial);
+            if (ship != null)
+                line = line.stream().map(ship::toWorld).toList();
+            outline(pose, buffers.getBuffer(RenderType.lines()), line, CableShape.radius(hovered) + 0.01);
             buffers.endBatch(RenderType.lines());
         }
         pose.popPose();
@@ -240,7 +251,24 @@ public final class CableRenderer {
         Vec3 eye = mc.player.getEyePosition();
         if (mc.hitResult != null && mc.hitResult.getType() != HitResult.Type.MISS)
             reach = Math.min(reach, mc.hitResult.getLocation().distanceTo(eye));
-        return CableShape.pick(ClientBusParts.spans(), mc.level, eye, mc.player.getViewVector(1), reach);
+        Vec3 look = mc.player.getViewVector(1);
+        BusSpan best = null;
+        double bestT = reach;
+        for (BusSpan span : ClientBusParts.spans()) {
+            // a cable on a ship is kept in the ship's plot: look at it from there
+            Ships.DrawnShip ship = Ships.drawn(span.points().get(0), 1);
+            Vec3 from = eye, dir = look;
+            if (ship != null) {
+                from = ship.toPlot(eye);
+                dir = ship.toPlot(eye.add(look)).subtract(from).normalize();
+            }
+            double t = CableShape.hit(span, mc.level, from, dir, bestT);
+            if (t >= 0 && t <= bestT) {
+                best = span;
+                bestT = t;
+            }
+        }
+        return best;
     }
 
     private static void click(InputEvent.InteractionKeyMappingTriggered event) {

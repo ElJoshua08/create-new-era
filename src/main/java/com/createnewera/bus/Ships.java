@@ -22,7 +22,8 @@ import net.neoforged.fml.ModList;
 public final class Ships {
     private static boolean looked;
     private static Object companion;
-    private static Method containing, containingClient, project, velocity, airVelocity, logicalPose, renderPose, orientation;
+    private static Method containing, containingClient, project, velocity, airVelocity, logicalPose, renderPose, orientation,
+            transformPosition, transformPositionInverse;
 
     /** The centre of the block, in the world, wherever its ship has taken it. */
     public static Vec3 position(Level level, BlockPos pos) {
@@ -55,6 +56,43 @@ public final class Ships {
             return pose == null ? new Quaterniond() : new Quaterniond((Quaterniondc) orientation.invoke(pose));
         } catch (ReflectiveOperationException | RuntimeException e) {
             return new Quaterniond();
+        }
+    }
+
+    /**
+     * Client: how the ship holding this point (in its plot) is drawn this frame, to draw what we
+     * keep in the plot (ports, cables) where the ship shows; null off a ship.
+     */
+    public static @Nullable DrawnShip drawn(Vec3 point, float partialTick) {
+        if (!ready())
+            return null;
+        try {
+            Object ship = containingClient.invoke(companion, point);
+            if (ship == null)
+                return null;
+            Object pose = renderPose.invoke(ship, partialTick);
+            return new DrawnShip(pose, new Quaterniond((Quaterniondc) orientation.invoke(pose)));
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return null;
+        }
+    }
+
+    /** A ship as drawn this frame: where a point of its plot shows in the world, and how it's turned. */
+    public record DrawnShip(Object pose, Quaterniondc orientation) {
+        public Vec3 toPlot(Vec3 world) {
+            try {
+                return (Vec3) transformPositionInverse.invoke(pose, world);
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                return world;
+            }
+        }
+
+        public Vec3 toWorld(Vec3 plot) {
+            try {
+                return (Vec3) transformPosition.invoke(pose, plot);
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                return plot;
+            }
         }
     }
 
@@ -103,6 +141,8 @@ public final class Ships {
                 logicalPose = Class.forName("dev.ryanhcode.sable.companion.SubLevelAccess").getMethod("logicalPose");
                 renderPose = Class.forName("dev.ryanhcode.sable.companion.ClientSubLevelAccess").getMethod("renderPose", float.class);
                 orientation = Class.forName("dev.ryanhcode.sable.companion.math.Pose3dc").getMethod("orientation");
+                transformPosition = Class.forName("dev.ryanhcode.sable.companion.math.Pose3dc").getMethod("transformPosition", Vec3.class);
+                transformPositionInverse = Class.forName("dev.ryanhcode.sable.companion.math.Pose3dc").getMethod("transformPositionInverse", Vec3.class);
             } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
                 companion = null;
             }
