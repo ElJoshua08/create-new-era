@@ -409,5 +409,7 @@
   "create_new_era.goggles.altitude": "Altitud: %s",
   "create_new_era.goggles.attitude": "Cabeceo %s° · alabeo %s°",
   "create_new_era.goggles.heading": "Rumbo: %s°",
-  "create_new_era.goggles.speed": "Velocidad: %s bloques/s"
+  "create_new_era.goggles.speed": "Velocidad: %s bloques/s",
+  "create_new_era.api.block.setRedstone": "Da señal al bloque a través de sus puertos de entrada, como una palanca en cada una de sus caras: de 0 a 15, o true y false. Lo que acciona un embrague, invierte una caja de cambios, ajusta una transmisión o abre una puerta.",
+  "create_new_era.api.block.getRedstoneOutput": "La señal de redstone que le están dando sus puertos de entrada, de 0 a 15."
 }

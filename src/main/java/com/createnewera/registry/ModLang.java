@@ -129,6 +129,8 @@ public final class ModLang {
         lang("create_new_era.goggles.attitude", "Pitch %s\u00b0 \u00b7 roll %s\u00b0");
         lang("create_new_era.goggles.heading", "Heading: %s\u00b0");
         lang("create_new_era.goggles.speed", "Speed: %s blocks/s");
+        lang("create_new_era.api.block.setRedstone", "Powers the block through its input ports, like a lever on each of their faces: 0 to 15, or true and false. What turns a clutch, flips a gearshift, sets a transmission, opens a door.");
+        lang("create_new_era.api.block.getRedstoneOutput", "The redstone its input ports are giving it, 0 to 15.");
         lang("create_new_era.editor.module", "A module: what %s returns. Its functions are listed after a dot.");
         lang("create_new_era.editor.module_missing", "No file on this computer by that name yet.");
         lang("create_new_era.editor.device.orders", "Orders:");

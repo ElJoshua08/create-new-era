@@ -46,6 +46,65 @@ public class EndpointTests {
         return data.nameOf(abs, level.getBlockState(abs).getBlock());
     }
 
+    // an input port powers its block like a lever: a lamp lights, a clutch disengages
+    @GameTest(template = "empty5", timeoutTicks = 160)
+    public static void portsPowerTheirBlocks(GameTestHelper helper) {
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        helper.setBlock(new BlockPos(2, 1, 3), AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(new BlockPos(2, 1, 3));
+        motor.generatedSpeed.setValue(256);
+        BlockPos lamp = new BlockPos(0, 1, 0), clutch = new BlockPos(4, 1, 0);
+        helper.setBlock(lamp, Blocks.REDSTONE_LAMP);
+        helper.setBlock(clutch, AllBlocks.CLUTCH.getDefaultState());
+        var level = helper.getLevel();
+        String lampName = input(helper, lamp, 0), clutchName = input(helper, clutch, 1);
+        BrassComputerBlockEntity computer = helper.getBlockEntity(COMPUTER);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local lamp, clutch = bus.get('" + lampName + "'), bus.get('" + clutchName + "')",
+                "lamp.setRedstone(15)",
+                "clutch.setRedstone(true)",
+                "print('out', lamp.getRedstoneOutput(), clutch.getRedstoneOutput())",
+                "sleep(0.5)",
+                "lamp.setRedstone(0)",
+                "clutch.setRedstone(false)",
+                "print('off')",
+                "lamp.setRedstone(99)"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(6, () -> {
+            if (!level.getBlockState(helper.absolutePos(lamp)).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT))
+                helper.fail("the lamp should be lit by its port");
+            if (!level.getBlockState(helper.absolutePos(clutch)).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.POWERED))
+                helper.fail("the clutch should be powered by its port");
+        });
+        helper.runAfterDelay(60, () -> {
+            boolean said = computer.getConsole().stream().anyMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals("out\t15\t15"));
+            if (!said)
+                helper.fail("expected 'out 15 15' in " + computer.getConsole());
+            if (level.getBlockState(helper.absolutePos(lamp)).getValue(net.minecraft.world.level.block.RedstoneLampBlock.LIT))
+                helper.fail("the lamp should go out when its port stops");
+            if (level.getBlockState(helper.absolutePos(clutch)).getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.POWERED))
+                helper.fail("the clutch should be released");
+            // a wrong argument points at the program's own line, not the prelude's
+            boolean blamed = computer.getConsole().stream().anyMatch(l -> l.kind() == ConsoleLine.Kind.ERROR
+                    && l.text().contains("startup.lua:9") && l.text().contains("setRedstone"));
+            if (!blamed)
+                helper.fail("the error should point at startup.lua:9: " + computer.getConsole());
+            helper.succeed();
+        });
+    }
+
+    /** An input port on the block, cabled to the computer: something it gives orders to. */
+    private static String input(GameTestHelper helper, BlockPos at, int socket) {
+        var level = helper.getLevel();
+        BlockPos abs = helper.absolutePos(at);
+        BusPort port = Bus.placePart(level, abs, Direction.UP, 6, 6, BusPort.Kind.PORT, PortMode.IN);
+        if (port == null)
+            helper.fail("no port on " + at);
+        BusData data = BusData.get(level);
+        data.connect(data.portsAt(helper.absolutePos(COMPUTER)).get(socket).id(), port.id());
+        return data.nameOf(abs, level.getBlockState(abs).getBlock());
+    }
+
     // Aeronautics' sensors give programs what they measure
     @GameTest(template = "empty5", timeoutTicks = 120)
     public static void aeronauticsSensorsAreReadable(GameTestHelper helper) {

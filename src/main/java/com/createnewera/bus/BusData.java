@@ -44,9 +44,46 @@ public class BusData extends SavedData {
     /** chunk → ids of the parts in it */
     private final Map<Long, Set<Long>> byChunk = new HashMap<>();
     private long nextId = 1;
+    /** The redstone each input port gives the block it's on, by port id: see PortSignals */
+    private final Map<Long, Integer> signals = new HashMap<>();
+    /** The level this bus is for, once asked for: so PortSignals keeps up with it */
+    private @Nullable java.lang.ref.WeakReference<ServerLevel> level;
 
     public static BusData get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(new Factory<>(BusData::new, BusData::load, null), ID);
+        BusData data = level.getDataStorage().computeIfAbsent(new Factory<>(BusData::new, BusData::load, null), ID);
+        if (data.level == null) {
+            data.level = new java.lang.ref.WeakReference<>(level);
+            PortSignals.rebuild(level, data);
+        }
+        return data;
+    }
+
+    @Override
+    public void setDirty() {
+        super.setDirty();
+        ServerLevel at = level == null ? null : level.get();
+        if (at != null)
+            PortSignals.rebuild(at, this);
+    }
+
+    public Map<Long, Integer> signals() {
+        return java.util.Collections.unmodifiableMap(signals);
+    }
+
+    public int signal(long port) {
+        return signals.getOrDefault(port, 0);
+    }
+
+    /** @return whether it changed */
+    public boolean setSignal(long port, int strength) {
+        if (!ports.containsKey(port) || signal(port) == strength)
+            return false;
+        if (strength <= 0)
+            signals.remove(port);
+        else
+            signals.put(port, Math.min(15, strength));
+        setDirty();
+        return true;
     }
 
     // ---- ports ----
@@ -116,6 +153,7 @@ public class BusData extends SavedData {
      * @return the spans that went with it, or null if there was no such part
      */
     public @Nullable List<BusSpan> removePort(long id) {
+        signals.remove(id);
         BusPort removed = ports.remove(id);
         if (removed == null)
             return null;
@@ -180,6 +218,9 @@ public class BusData extends SavedData {
             into.ports.put(id, moved);
             into.index(moved);
             ids.put(part.id(), id);
+            Integer signal = signals.remove(part.id());
+            if (signal != null)
+                into.signals.put(id, signal);
             into.setDirty();
         }
         for (BusSpan span : List.copyOf(spans.values())) {
@@ -421,6 +462,8 @@ public class BusData extends SavedData {
             t.putString("Kind", p.kind().name());
             if (p.depth() > 0)
                 t.putDouble("Depth", p.depth());
+            if (signal(p.id()) > 0)
+                t.putByte("Signal", (byte) signal(p.id()));
             portList.add(t);
         }
         tag.put("Ports", portList);
@@ -467,6 +510,8 @@ public class BusData extends SavedData {
                         c.getByte("U"), c.getByte("V"), kind, c.getBoolean("Out") ? PortMode.OUT : PortMode.IN, c.getDouble("Depth"));
                 data.ports.put(port.id(), port);
                 data.index(port);
+                if (c.getByte("Signal") > 0)
+                    data.signals.put(port.id(), (int) c.getByte("Signal"));
             });
         }
         for (Tag t : tag.getList("Spans", Tag.TAG_COMPOUND)) {

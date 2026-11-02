@@ -105,10 +105,19 @@ function bus.get(name)
     for _, method in ipairs(info.methods) do
         device[method] = function(...)
             -- works as device.getSpeed() and as device:getSpeed()
+            local results
             if (...) == device then
-                return nativeBus.call(name, method, select(2, ...))
+                results = table.pack(pcall(nativeBus.call, name, method, select(2, ...)))
+            else
+                results = table.pack(pcall(nativeBus.call, name, method, ...))
             end
-            return nativeBus.call(name, method, ...)
+            -- a bad argument is the caller's mistake: point at their line, not this one
+            if not results[1] then
+                local message = results[2]
+                if type(message) == "string" then message = message:gsub("^prelude:%d+: ", "") end
+                error(message, 2)
+            end
+            return table.unpack(results, 2, results.n)
         end
     end
     -- runs fn(value, device) every time anything about the device changes, until the program

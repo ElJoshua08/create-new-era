@@ -64,6 +64,16 @@ final class BlockDrivers {
         api.read("getPosition", "", "{x, y, z}", args -> Map.of("x", pos.getX(), "y", pos.getY(), "z", pos.getZ()));
         api.read("getState", "", "{[property] = value}", args -> state(level.getBlockState(pos)));
         api.read("getRedstone", "", "number 0-15", args -> level.getBestNeighborSignal(pos));
+        // what turns a clutch, a gearshift, a transmission, a door: the port powers the block
+        api.order("setRedstone", "strength: 0-15 | boolean", "", args -> {
+            int strength = args.arg(1).type() == org.squiddev.cobalt.Constants.TBOOLEAN ? (args.arg(1).toBoolean() ? 15 : 0) : args.arg(1).checkInteger();
+            if (strength < 0 || strength > 15)
+                throw new LuaError("bad argument #1 to 'setRedstone' (0-15 or true/false expected, got " + strength + ")");
+            Bus.setRedstone(level, pos, strength);
+            return null;
+        });
+        // an order's companion: reading back what this program's ports are giving, through the same input port
+        api.order("getRedstoneOutput", "", "number 0-15", args -> Bus.redstoneOutput(level, pos));
         BlockState state = level.getBlockState(pos);
         if (state.hasProperty(BlockStateProperties.OPEN)) {
             api.family("openable");

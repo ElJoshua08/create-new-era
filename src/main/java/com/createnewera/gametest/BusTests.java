@@ -116,7 +116,7 @@ public class BusTests {
         BusData data = BusData.get(level);
         data.connect(pa.id(), pb.id());
         // names stay in the test world from run to run: a fresh one each time
-        String name = "deck_port_" + Long.toHexString(level.getGameTime());
+        String name = "deck_port_" + Long.toHexString(System.nanoTime());
         if (!data.rename(helper.absolutePos(a), name))
             helper.fail("couldn't name the port's block");
         try {

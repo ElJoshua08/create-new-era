@@ -331,6 +331,36 @@ public final class Bus {
         }
     }
 
+    /** The ports at a block that give it orders: they're also the ones that can power it. */
+    static List<BusPort> inputs(BusData data, BlockPos pos) {
+        return data.portsAt(pos).stream().filter(p -> p.kind() == BusPort.Kind.BRASS_PORT
+                || (p.kind() == BusPort.Kind.PORT && p.mode() == PortMode.IN)).toList();
+    }
+
+    /**
+     * Powers the block through its input ports, like a lever on each of their faces, and lets it
+     * react at once. @return whether it has an input port to do it through
+     */
+    public static boolean setRedstone(ServerLevel level, BlockPos pos, int strength) {
+        BusData data = BusData.get(level);
+        List<BusPort> inputs = inputs(data, pos);
+        boolean changed = false;
+        for (BusPort port : inputs)
+            changed |= data.setSignal(port.id(), strength);
+        if (changed)
+            for (BusPort port : inputs) {
+                BlockPos from = pos.relative(port.face());
+                level.neighborChanged(pos, level.getBlockState(from).getBlock(), from);
+            }
+        return !inputs.isEmpty();
+    }
+
+    /** The strongest signal the block's ports give it. */
+    public static int redstoneOutput(ServerLevel level, BlockPos pos) {
+        BusData data = BusData.get(level);
+        return inputs(data, pos).stream().mapToInt(p -> data.signal(p.id())).max().orElse(0);
+    }
+
     public static void sync(ServerLevel level, BlockPos pos) {
         sync(level, new ChunkPos(pos));
     }
