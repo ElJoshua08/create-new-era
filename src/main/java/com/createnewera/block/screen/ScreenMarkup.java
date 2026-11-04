@@ -62,8 +62,32 @@ public final class ScreenMarkup {
 
     /** Markup that doesn't make sense, said in a way a program's author can fix. */
     public static final class MarkupException extends Exception {
+        /** The line it's on, from 1, when the reader knows it */
+        public final int line;
+        /** The text that's wrong, for the editor to find and underline when the line isn't known */
+        public final String token;
+
         MarkupException(String message) {
+            this(message, -1, "");
+        }
+
+        MarkupException(String message, int line, String token) {
             super(message);
+            this.line = line;
+            this.token = token;
+        }
+
+        /** The line of {@code source} this is about, from 1, or 1 if it can't tell. */
+        public int lineIn(String source) {
+            if (line > 0)
+                return line;
+            if (!token.isEmpty()) {
+                String[] lines = source.split("\n", -1);
+                for (int i = 0; i < lines.length; i++)
+                    if (lines[i].contains(token))
+                        return i + 1;
+            }
+            return 1;
         }
     }
 
@@ -82,7 +106,7 @@ public final class ScreenMarkup {
             builder.setErrorHandler(null);
             doc = builder.parse(new InputSource(new StringReader(source)));
         } catch (SAXParseException e) {
-            throw new MarkupException("markup line " + e.getLineNumber() + ": " + e.getMessage());
+            throw new MarkupException("markup line " + e.getLineNumber() + ": " + e.getMessage(), e.getLineNumber(), "");
         } catch (Exception e) {
             throw new MarkupException("markup: " + e.getMessage());
         }
@@ -93,19 +117,19 @@ public final class ScreenMarkup {
     private static void check(Element e) throws MarkupException {
         Set<String> allowed = TAGS.get(e.getTagName());
         if (allowed == null)
-            throw new MarkupException("unknown tag <" + e.getTagName() + ">: use " + String.join(", ", TAGS.keySet()));
+            throw new MarkupException("unknown tag <" + e.getTagName() + ">: use " + String.join(", ", TAGS.keySet()), -1, "<" + e.getTagName());
         var attributes = e.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.item(i).getNodeName();
             if (!COMMON.contains(name) && !allowed.contains(name))
-                throw new MarkupException("<" + e.getTagName() + "> has no attribute \"" + name + "\"");
+                throw new MarkupException("<" + e.getTagName() + "> has no attribute \"" + name + "\"", -1, name + "=");
             String value = attributes.item(i).getNodeValue();
             if ((name.equals("color") || name.equals("background")) && ScreenPalette.of(value) < 0)
-                throw new MarkupException("unknown colour \"" + value + "\" on <" + e.getTagName() + ">");
+                throw new MarkupException("unknown colour \"" + value + "\" on <" + e.getTagName() + ">", -1, value);
             if (name.equals("align") && !Set.of("left", "center", "right").contains(value))
-                throw new MarkupException("align is left, center or right, not \"" + value + "\"");
+                throw new MarkupException("align is left, center or right, not \"" + value + "\"", -1, value);
             if (name.equals("size") && !Set.of("small", "big").contains(value))
-                throw new MarkupException("size is small or big, not \"" + value + "\"");
+                throw new MarkupException("size is small or big, not \"" + value + "\"", -1, value);
         }
         for (Element child : children(e))
             check(child);

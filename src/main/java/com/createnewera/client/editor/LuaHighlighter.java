@@ -62,6 +62,7 @@ public final class LuaHighlighter {
                     i = close;
                 } else {
                     fill(colors, i, n, COMMENT);
+                    annotation(line, colors, i);
                     return State.CODE;
                 }
             } else if (c == '[' && longOpenLevel(line, i) >= 0) {
@@ -109,6 +110,24 @@ public final class LuaHighlighter {
             }
         }
         return State.CODE;
+    }
+
+    private static final java.util.regex.Pattern ANNOTATION =
+            java.util.regex.Pattern.compile("---(@param|@type|@return)(?:\\s+([A-Za-z_]\\w*\\??))?(?:\\s+([\\w:.\\-]+))?");
+
+    /** A type annotation in a comment (---@param name type): the tag, the name and the type stand out. */
+    private static void annotation(String line, int[] colors, int start) {
+        var m = ANNOTATION.matcher(line);
+        if (!m.find(start) || m.start() != start)
+            return;
+        fill(colors, m.start(1), m.end(1), KEYWORD);
+        boolean param = m.group(1).equals("@param");
+        if (param && m.group(2) != null)
+            fill(colors, m.start(2), m.end(2), TEXT);
+        // ---@type x: the first word is the type
+        int typeGroup = param ? 3 : 2;
+        if (m.group(typeGroup) != null)
+            fill(colors, m.start(typeGroup), m.end(typeGroup), BUILTIN);
     }
 
     /** Level of a long bracket opening at {@code i} ([[ is 0, [=[ is 1), or -1. */

@@ -207,6 +207,13 @@ public final class ModLang {
         lang("create_new_era.markup.attribute.max", "The value of a full bar: 1 unless set.");
         lang("create_new_era.markup.attribute.height", "How many dots tall.");
         lang("create_new_era.markup.attribute.background", "The colour of the dots behind everything: dark unless set.");
+        lang("create_new_era.editor.check.no_function", "%s (%s) has no function %s");
+        lang("create_new_era.editor.check.no_member", "%s has no %s");
+        lang("create_new_era.editor.check.no_device", "nothing called \\\"%s\\\" on this computer's network");
+        lang("create_new_era.editor.check.no_type", "no %s on this computer's network");
+        lang("create_new_era.editor.annotation.param", "Says what a function's parameter is: ---@param log chat_log. The editor then knows its functions, suggests them and checks them.");
+        lang("create_new_era.editor.annotation.type", "Says what the variable on the next line is: ---@type chat_log over local log = ...");
+        lang("create_new_era.editor.annotation.return", "Says what a function gives back.");
         lang("create_new_era.editor.module", "A module: what %s returns. Its functions are listed after a dot.");
         lang("create_new_era.editor.module_missing", "No file on this computer by that name yet.");
         lang("create_new_era.editor.device.orders", "Orders:");

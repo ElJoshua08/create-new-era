@@ -59,6 +59,9 @@ public class CodeEditor {
     private int scrollRow, scrollCol;
     private int x, y, width, height;
     private int errorLine = -1;
+    /** What's wrong where, found while writing (Diagnostics): underlined, and said at the line's end */
+    private java.util.List<Diagnostics.Diagnostic> diagnostics = java.util.List.of();
+    private static final int ERROR_TEXT = 0xFFE87A6E, WARNING_TEXT = 0xFFE5C07B;
     private static final List<String> CLOSERS = List.of("end", "else", "until");
     /** Row the editor pulled back after a closing keyword, so it can undo that if the word keeps going. */
     private int dedentedRow = -1;
@@ -122,6 +125,36 @@ public class CodeEditor {
         scrollRow = Math.max(0, row - visibleRows() / 2);
     }
 
+    /**
+     * A line's problems, as VS Code's Error Lens shows them: a wavy line under the part that's
+     * wrong, and the message a little after the line's end, in red for errors, amber for warnings.
+     */
+    private void drawDiagnostics(GuiGraphics g, int r, String line, int textX, int lineY) {
+        boolean saidOne = false;
+        for (Diagnostics.Diagnostic d : diagnostics) {
+            if (d.line() != r + 1)
+                continue;
+            int color = d.error() ? ERROR_TEXT : WARNING_TEXT;
+            int from = Math.max(d.from(), scrollCol), to = Math.min(Math.max(d.to(), d.from() + 1), scrollCol + columns() + 1);
+            int baseY = lineY + LINE - 3;
+            for (int px = textX + (from - scrollCol) * CELL; px < textX + (to - scrollCol) * CELL; px++)
+                g.fill(px, baseY + ((px / 2) % 2), px + 1, baseY + ((px / 2) % 2) + 1, color);
+            if (saidOne)
+                continue;
+            saidOne = true;
+            int msgX = textX + (line.stripTrailing().length() - scrollCol + 3) * CELL;
+            int room = x + width - 4 - Math.max(msgX, textX);
+            if (room > 30) {
+                String message = font.plainSubstrByWidth(d.message(), room);
+                g.drawString(font, message, Math.max(msgX, textX), lineY, (color & 0xFFFFFF) | 0xC0000000, false);
+            }
+        }
+    }
+
+    public void setDiagnostics(java.util.List<Diagnostics.Diagnostic> diagnostics) {
+        this.diagnostics = diagnostics;
+    }
+
     /** Marks a line (1-based) with a red square in the gutter, or clears it with -1. */
     public void setErrorLine(int line) {
         errorLine = line;
@@ -177,6 +210,15 @@ public class CodeEditor {
                 g.fill(x + 2, lineY + 1, x + 6, lineY + 5, ERROR_MARK);
                 numberColor = ERROR_MARK;
             }
+            Diagnostics.Diagnostic said = null;
+            for (Diagnostics.Diagnostic d : diagnostics)
+                if (d.line() == r + 1 && (said == null || d.error() && !said.error()))
+                    said = d;
+            if (said != null && r + 1 != errorLine) {
+                int mark = said.error() ? ERROR_MARK : WARNING_TEXT;
+                g.fill(x + 2, lineY + 1, x + 6, lineY + 5, mark);
+                numberColor = mark;
+            }
             g.drawString(font, number, x + GUTTER - 3 - font.width(number), lineY, numberColor, false);
 
             int[] colors = new int[line.length()];
@@ -195,6 +237,7 @@ public class CodeEditor {
                 Component glyph = Component.literal(String.valueOf(ch)).withStyle(MONO);
                 g.drawString(font, glyph, cellX + (CELL - font.width(glyph)) / 2, lineY, colors[c], false);
             }
+            drawDiagnostics(g, r, line, textX, lineY);
         }
 
         if (focused && (Util.getMillis() / 500) % 2 == 0 && row >= scrollRow && row <= scrollRow + visible) {

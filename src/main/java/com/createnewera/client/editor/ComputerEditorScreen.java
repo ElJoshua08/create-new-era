@@ -268,6 +268,24 @@ public class ComputerEditorScreen extends Screen {
             saveAll();
         if (pendingDelete != null && Util.getMillis() - pendingDeleteAt > 3000)
             pendingDelete = null;
+        diagnose();
+    }
+
+    /** The open file's text when it was last checked, and which file, so it's checked again only when either changes */
+    private String checkedText;
+    private String checkedFile;
+
+    /** Checks the open file a moment after typing stops: what's wrong, underlined in the editor. */
+    private void diagnose() {
+        CodeEditor editor = editor();
+        if (editor == null || lastChange > 0 && Util.getMillis() - lastChange < 300)
+            return;
+        String text = editor.getText();
+        if (text.equals(checkedText) && active.equals(checkedFile))
+            return;
+        checkedText = text;
+        checkedFile = active;
+        editor.setDiagnostics(Diagnostics.of(active, text, fileOrder, this::source, snapshot.devices()));
     }
 
     @Override

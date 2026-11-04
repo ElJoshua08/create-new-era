@@ -58,6 +58,9 @@ public final class Completions {
             return argument;
         Matcher m;
 
+        Result typed = annotation(line, devices);
+        if (typed != null)
+            return typed;
         // nothing to suggest inside comments and strings (sides and file names were handled above)
         int[] colors = new int[line.length()];
         LuaHighlighter.State state = LuaHighlighter.State.CODE;
@@ -237,11 +240,146 @@ public final class Completions {
             if (m.group(1).equals(variable))
                 name = m.group(2);
         if (name == null)
-            return null;
+            return ofType(annotatedType(document, variable), devices);
         for (NetworkDevice d : devices)
             if (d.name().equals(name))
                 return d;
         return null;
+    }
+
+    /** {@code ---@param chatLog chat_log}: a function's parameter given a type, as in LuaLS */
+    private static final Pattern PARAM_TYPE = Pattern.compile("---@param\\s+([A-Za-z_]\\w*)\\??\\s+([\\w:.\\-]+)");
+    /** {@code ---@type chat_log} over {@code local log = ...} */
+    private static final Pattern LOCAL_TYPE = Pattern.compile("---@type\\s+([\\w:.\\-]+)[^\\n]*\\n\\s*(?:local\\s+)?([A-Za-z_]\\w*)");
+    /** Lua's own types, which name no device */
+    private static final Set<String> LUA_TYPES = Set.of("string", "number", "integer", "boolean", "table", "function", "nil", "any",
+            "device", "thread", "userdata");
+
+    /** The type the file gives a variable with an annotation, or null. */
+    private static String annotatedType(String document, String variable) {
+        String type = null;
+        Matcher m = PARAM_TYPE.matcher(document);
+        while (m.find())
+            if (m.group(1).equals(variable))
+                type = m.group(2);
+        m = LOCAL_TYPE.matcher(document);
+        while (m.find())
+            if (m.group(2).equals(variable))
+                type = m.group(1);
+        return type;
+    }
+
+    /** The nearest device on the network a type names: by its name, its block id, or the id's path ("chat_log"). */
+    private static NetworkDevice ofType(String type, List<NetworkDevice> devices) {
+        if (type == null || LUA_TYPES.contains(type))
+            return null;
+        for (NetworkDevice d : devices)
+            if (d.name().equals(type) || d.type().equals(type) || d.type().endsWith(":" + type))
+                return d;
+        return null;
+    }
+
+    /** The kinds of device on the network, for annotations: each block's id path once. */
+    private static List<Entry> deviceTypes(List<NetworkDevice> devices) {
+        List<Entry> out = new ArrayList<>();
+        Set<String> seen = new HashSet<>();
+        for (NetworkDevice d : devices) {
+            String path = d.type().substring(d.type().indexOf(':') + 1);
+            if (seen.add(path))
+                out.add(new Entry(path, Kind.MODULE, path, d.type(), translate.apply(d.typeKey()), translate.apply(d.typeKey()), "", ""));
+        }
+        for (String t : List.of("string", "number", "boolean", "table", "function"))
+            out.add(new Entry(t, Kind.KEYWORD, t, "Lua type", ""));
+        return out;
+    }
+
+    private static final Pattern ANNOTATION_TYPE = Pattern.compile("---@(?:param\\s+[A-Za-z_]\\w*\\??|type|return)\\s+([\\w:.\\-]*)$");
+    private static final Pattern ANNOTATION_TAG = Pattern.compile("---@(\\w*)$");
+
+    /** Suggestions inside a type annotation, or null if the cursor isn't in one. */
+    private static Result annotation(String line, List<NetworkDevice> devices) {
+        Matcher m = ANNOTATION_TYPE.matcher(line);
+        if (m.find())
+            return rank(line.length() - m.group(1).length(), m.group(1), deviceTypes(devices));
+        m = ANNOTATION_TAG.matcher(line);
+        if (m.find())
+            return rank(line.length() - m.group(1).length(), m.group(1), List.of(
+                    new Entry("param", Kind.KEYWORD, "param $0", "---@param name type", translate.apply("create_new_era.editor.annotation.param")),
+                    new Entry("type", Kind.KEYWORD, "type $0", "---@type type", translate.apply("create_new_era.editor.annotation.type")),
+                    new Entry("return", Kind.KEYWORD, "return $0", "---@return type", translate.apply("create_new_era.editor.annotation.return"))));
+        return null;
+    }
+
+    private static final Pattern CALL = Pattern.compile("([A-Za-z_]\\w*)\\s*[.:]\\s*([A-Za-z_]\\w*)\\s*\\(");
+    private static final Pattern BUS_GET = Pattern.compile("\\bbus\\s*[.:]\\s*(?:get|info)\\s*\\(\\s*[\"'](\\w+)[\"']");
+
+    /**
+     * Warnings about devices and modules: a function a device or module doesn't have, a device
+     * name nothing on the network has, a type annotation naming no device there.
+     */
+    public static List<Diagnostics.Diagnostic> diagnose(String document, List<String> files, Function<String, String> source,
+                                                        List<NetworkDevice> devices) {
+        List<Diagnostics.Diagnostic> out = new ArrayList<>();
+        String code = blankStringsAndComments(document);
+        Matcher m = CALL.matcher(code);
+        while (m.find()) {
+            String variable = m.group(1), method = m.group(2);
+            NetworkDevice d = deviceIn(document, variable, devices);
+            if (d != null) {
+                boolean known = method.equals("onChange") || d.functions().stream().anyMatch(f -> f.name().equals(method))
+                        || sugar(d).stream().anyMatch(e -> e.label().equals(method));
+                if (!known)
+                    out.add(at(document, m.start(2), m.end(2), String.format(translate.apply("create_new_era.editor.check.no_function"),
+                            d.name(), translate.apply(d.typeKey()), method), false));
+                continue;
+            }
+            List<Entry> members = moduleMembers(document, variable, files, source);
+            if (members != null && !members.isEmpty() && members.stream().noneMatch(e -> e.label().equals(method)))
+                out.add(at(document, m.start(2), m.end(2), String.format(translate.apply("create_new_era.editor.check.no_member"),
+                        variable, method), false));
+        }
+        if (!devices.isEmpty()) {
+            m = BUS_GET.matcher(document);
+            while (m.find()) {
+                String name = m.group(1);
+                if (code.charAt(m.start()) != ' ' && devices.stream().noneMatch(d -> d.name().equals(name)))
+                    out.add(at(document, m.start(1), m.end(1), String.format(translate.apply("create_new_era.editor.check.no_device"), name), false));
+            }
+            for (Pattern p : List.of(PARAM_TYPE, LOCAL_TYPE)) {
+                m = p.matcher(document);
+                while (m.find()) {
+                    int group = p == PARAM_TYPE ? 2 : 1;
+                    String type = m.group(group);
+                    if (!LUA_TYPES.contains(type) && ofType(type, devices) == null)
+                        out.add(at(document, m.start(group), m.end(group),
+                                String.format(translate.apply("create_new_era.editor.check.no_type"), type), false));
+                }
+            }
+        }
+        return out;
+    }
+
+    private static Diagnostics.Diagnostic at(String document, int from, int to, String message, boolean error) {
+        int lineStart = document.lastIndexOf('\n', from - 1) + 1;
+        int line = (int) document.substring(0, from).chars().filter(c -> c == '\n').count() + 1;
+        return new Diagnostics.Diagnostic(line, from - lineStart, to - lineStart, message, error);
+    }
+
+    /** The file with its strings and comments blanked out, every character where it was. */
+    private static String blankStringsAndComments(String document) {
+        StringBuilder out = new StringBuilder(document.length());
+        LuaHighlighter.State state = LuaHighlighter.State.CODE;
+        String[] lines = document.split("\n", -1);
+        for (int l = 0; l < lines.length; l++) {
+            String line = lines[l];
+            int[] colors = new int[line.length()];
+            state = LuaHighlighter.highlight(line, colors, state);
+            for (int i = 0; i < line.length(); i++)
+                out.append(colors[i] == LuaHighlighter.STRING || colors[i] == LuaHighlighter.COMMENT ? ' ' : line.charAt(i));
+            if (l < lines.length - 1)
+                out.append('\n');
+        }
+        return out.toString();
     }
 
     /** A call still open at the cursor: {@code base.method(args so far} or {@code function(args so far} */

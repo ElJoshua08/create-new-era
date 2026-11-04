@@ -487,5 +487,12 @@
   "create_new_era.markup.attribute.value": "Lo llena que está la barra, de 0 a max.",
   "create_new_era.markup.attribute.max": "El valor de la barra llena: 1 si no lo pones.",
   "create_new_era.markup.attribute.height": "Cuántos puntos de alto.",
-  "create_new_era.markup.attribute.background": "El color de los puntos de fondo: oscuro si no lo pones."
+  "create_new_era.markup.attribute.background": "El color de los puntos de fondo: oscuro si no lo pones.",
+  "create_new_era.editor.check.no_function": "%s (%s) no tiene la función %s",
+  "create_new_era.editor.check.no_member": "%s no tiene %s",
+  "create_new_era.editor.check.no_device": "no hay nada llamado \"%s\" en la red de este ordenador",
+  "create_new_era.editor.check.no_type": "no hay ningún %s en la red de este ordenador",
+  "create_new_era.editor.annotation.param": "Dice qué es un parámetro de una función: ---@param log chat_log. Así el editor conoce sus funciones, las sugiere y las comprueba.",
+  "create_new_era.editor.annotation.type": "Dice qué es la variable de la línea siguiente: ---@type chat_log encima de local log = ...",
+  "create_new_era.editor.annotation.return": "Dice qué devuelve una función."
 }

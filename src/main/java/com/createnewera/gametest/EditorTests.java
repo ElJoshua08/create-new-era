@@ -97,6 +97,31 @@ public class EditorTests {
         helper.succeed();
     }
 
+    // what's wrong is found while writing: Lua that won't compile, a function a typed parameter's device lacks, bad markup
+    @GameTest(template = EMPTY)
+    public static void problemsAreFoundWhileWriting(GameTestHelper helper) {
+        var log = new NetworkDevice("chat_log", "create_new_era:chat_log", "", BlockPos.ZERO, 2, true, true,
+                List.of(new NetworkDevice.Fn("say", "text: string", "", "", false, List.of())));
+        List<NetworkDevice> devices = List.of(log);
+
+        var syntax = com.createnewera.client.editor.Diagnostics.of("startup.lua", "if x then\n  print(1)\n", List.of(), n -> null, devices);
+        helper.assertTrue(syntax.stream().anyMatch(d -> d.error()), "an if without end should be an error: " + syntax);
+
+        String module = "local Chat = {}\n---@param chatLog chat_log\nfunction Chat.print(msg, chatLog)\n  chatLog.sayy(msg)\nend\nreturn Chat";
+        var typed = com.createnewera.client.editor.Diagnostics.of("chat.lua", module, List.of(), n -> null, devices);
+        helper.assertTrue(typed.stream().anyMatch(d -> !d.error() && d.line() == 4 && d.from() == 10), "sayy should be flagged on line 4: " + typed);
+        String writing = "---@param chatLog chat_log\nfunction f(msg, chatLog)\n  chatLog.";
+        helper.assertTrue(offered(writing, devices).stream().anyMatch(o -> o.startsWith("say")), "a typed parameter offers its device's functions");
+        check(helper, offered("---@param chatLog cha", devices), "chat_log", "types offered in an annotation");
+        var missing = com.createnewera.client.editor.Diagnostics.of("startup.lua", "local p = bus.get('press')", List.of(), n -> null, devices);
+        helper.assertTrue(missing.stream().anyMatch(d -> d.from() == 19 && d.to() == 24), "a device name nothing has should be underlined: " + missing);
+
+        var markup = com.createnewera.client.editor.Diagnostics.of("farm.screen", "<screen>\n  <title>FARM</title>\n  <blink/>\n</screen>",
+                List.of(), n -> null, devices);
+        helper.assertTrue(markup.size() == 1 && markup.get(0).line() == 3 && markup.get(0).error(), "<blink> should be an error on line 3: " + markup);
+        helper.succeed();
+    }
+
     private static List<String> markup(String code) {
         return Completions.completeMarkup(code, false).items().stream().map(m -> m.entry().insert()).toList();
     }
