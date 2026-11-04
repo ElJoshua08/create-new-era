@@ -225,6 +225,12 @@ def draw_cap(c, x, y, ramp):
 
 
 LAMP_OFF = ["#1a1310", "#2a1f19", "#3a2d24", "#4a3a2e"]
+# A lit lamp's glass, brighter than the plain ramps: shader packs light a block by the colour of
+# its pixels (IrisBlockIdsMixin gives lamps a torch's rules, red at full; the green one an end
+# rod's, past a brightness), so the lit glass has to clear those and the plate mustn't.
+LAMP_AMBER = ["#7a3f08", "#d27a12", "#ffb32e", "#ffe08a"]
+LAMP_RED = ["#5a1414", "#a8241a", "#ff4630", "#ff9a7a"]
+LAMP_GREEN = ["#2f6b3a", "#5aa84a", "#c8ffa8", "#ecffe0"]
 
 
 def draw_speaker():
@@ -294,7 +300,7 @@ def draw_control_states():
         c.img.save(out / f"gauge_{value}.png")
 
     # lamp: the cap on top (4x4 at 0,0) and its side (4x3 at 0,4), lit or dark
-    for name, ramp in [("off", LAMP_OFF), ("amber", AMBER), ("green", PHOSPHOR), ("red", RED)]:
+    for name, ramp in [("off", LAMP_OFF), ("amber", LAMP_AMBER), ("green", LAMP_GREEN), ("red", LAMP_RED)]:
         c = Canvas(16, 16)
         draw_cap(c, 0, 0, ramp)
         if name != "off":
