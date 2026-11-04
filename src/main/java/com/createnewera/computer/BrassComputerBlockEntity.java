@@ -165,6 +165,12 @@ public class BrassComputerBlockEntity extends KineticBlockEntity {
                 String problem = files.write(name, argument);
                 if (problem != null)
                     log(ConsoleLine.Kind.ERROR, name + ": " + problem);
+                // screens showing this file show what was saved, at once
+                else if (level != null && name.endsWith(com.createnewera.block.screen.ScreenDriver.EXTENSION)) {
+                    String markup = com.createnewera.block.screen.BrassScreenBlockEntity.fileSaved(level, worldPosition, name, argument);
+                    if (markup != null)
+                        log(ConsoleLine.Kind.ERROR, name + ": " + markup);
+                }
                 setChanged();
             }
             case DELETE -> {

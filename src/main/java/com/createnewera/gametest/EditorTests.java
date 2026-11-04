@@ -89,7 +89,16 @@ public class EditorTests {
         String fnCode = "local count = 0\n-- Adds one.\nlocal function bump(n) count = count + n end\nbu";
         var bump = Completions.complete(fnCode, fnCode, List.of(), n -> null, List.of(), null, true).items().get(0).entry();
         helper.assertTrue(bump.detail().equals("function bump(n)") && bump.doc().equals("Adds one."), "bump: " + bump.detail() + " / " + bump.doc());
+        // in a .screen file: tags after <, their attributes, the values an attribute takes
+        check(helper, markup("<ti"), "title>", "tags after <");
+        check(helper, markup("<row>\n  <bar v"), "value=\"", "a bar's attributes");
+        check(helper, markup("<title color=\"li"), "lime", "colours in quotes");
+        check(helper, markup("<value align='"), "right", "align's values");
         helper.succeed();
+    }
+
+    private static List<String> markup(String code) {
+        return Completions.completeMarkup(code, false).items().stream().map(m -> m.entry().insert()).toList();
     }
 
     private static void check(GameTestHelper helper, List<String> offered, String expected, String what) {

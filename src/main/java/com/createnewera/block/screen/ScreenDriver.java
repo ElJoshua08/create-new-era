@@ -23,15 +23,23 @@ public final class ScreenDriver {
         api.family("screen");
 
         // ---- markup ----
-        api.order("show", "markup: string", "", args -> {
+        api.order("show", "file: string", "", args -> {
             Drawing d = drawing(level, pos);
+            String what = args.arg(1).checkString();
             try {
-                d.controller.show(d.pane, args.arg(1).checkString());
+                if (what.strip().startsWith("<")) {
+                    d.controller.show(d.pane, what, null, null); // markup written in the program itself
+                } else {
+                    BlockPos computer = DeviceDrivers.CALLER.get();
+                    String file = file(level, computer, what);
+                    d.controller.show(d.pane, files(level, computer).read(file), file, computer);
+                }
             } catch (ScreenMarkup.MarkupException e) {
                 throw new LuaError(e.getMessage());
             }
             return null;
         });
+        api.choices("show", List.of(SCREEN_FILES));
         api.order("set", "id: string, value", "", args -> {
             Drawing d = drawing(level, pos);
             LuaValue value = args.arg(2);
@@ -136,6 +144,27 @@ public final class ScreenDriver {
             api.choices(fn, 4, colors);
         for (String fn : List.of("drawCircle", "fillCircle", "drawText"))
             api.choices(fn, 3, colors);
+    }
+
+    /** In choices: the computer's .screen files, filled in by the editor */
+    public static final String SCREEN_FILES = "@screen_files";
+    public static final String EXTENSION = ".screen";
+
+    private static com.createnewera.computer.ComputerFiles files(ServerLevel level, BlockPos computer) throws LuaError {
+        if (computer == null || !(level.getBlockEntity(computer) instanceof com.createnewera.computer.BrassComputerBlockEntity c))
+            throw new LuaError("only a computer's program can show its files");
+        return c.getFiles();
+    }
+
+    /** The screen file a program names: as written, or with .screen added. */
+    private static String file(ServerLevel level, BlockPos computer, String name) throws LuaError {
+        var files = files(level, computer);
+        if (files.read(name) != null)
+            return name;
+        if (files.read(name + EXTENSION) != null)
+            return name + EXTENSION;
+        throw new LuaError("no file \"" + name + "\" on this computer: make one in the editor, say " + name
+                + (name.endsWith(EXTENSION) ? "" : EXTENSION));
     }
 
     /** What onChange notices: a touch, or a click on a button. */

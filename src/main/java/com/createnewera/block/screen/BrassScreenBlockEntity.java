@@ -40,6 +40,9 @@ public class BrassScreenBlockEntity extends BlockEntity {
 
     /** The markup shown, if any, and the values the program has given its elements since */
     private @Nullable String markup;
+    /** The file the markup came from and the computer it's on, so saving the file shows it again */
+    private @Nullable String markupFile;
+    private @Nullable BlockPos markupComputer;
     private final Map<String, String> values = new LinkedHashMap<>();
     private List<ScreenMarkup.Button> buttons = List.of();
 
@@ -82,12 +85,50 @@ public class BrassScreenBlockEntity extends BlockEntity {
         ripple = false;
     }
 
-    /** Lays new markup out over the whole pane. */
-    public void show(ScreenPane pane, String source) throws ScreenMarkup.MarkupException {
+    /** Lays new markup out over the whole pane; from a computer's file if {@code file} isn't null. */
+    public void show(ScreenPane pane, String source, @Nullable String file, @Nullable BlockPos computer) throws ScreenMarkup.MarkupException {
         ScreenMarkup.parse(source); // a mistake throws before anything changes
         markup = source;
+        markupFile = file;
+        markupComputer = computer == null ? null : computer.immutable();
         values.clear();
         relayout(pane);
+        if (file != null)
+            SHOWING_FILES.add(this);
+    }
+
+    /** Screens showing a computer's file, so saving it in the editor shows it again */
+    private static final java.util.Set<BrassScreenBlockEntity> SHOWING_FILES =
+            java.util.Collections.newSetFromMap(new java.util.WeakHashMap<>());
+
+    /**
+     * A computer's file was saved: every screen showing it lays the new markup out, keeping
+     * the values its program set. @return what's wrong with the markup, if anything
+     */
+    public static @Nullable String fileSaved(Level level, BlockPos computer, String file, String text) {
+        String problem = null;
+        for (BrassScreenBlockEntity screen : java.util.List.copyOf(SHOWING_FILES)) {
+            if (screen.isRemoved() || screen.level != level || !file.equals(screen.markupFile) || !computer.equals(screen.markupComputer))
+                continue;
+            ScreenPane pane = ScreenPane.of(level, screen.worldPosition);
+            if (pane == null || !pane.origin().equals(screen.worldPosition))
+                continue;
+            try {
+                ScreenMarkup.parse(text);
+                screen.markup = text;
+                screen.relayout(pane);
+            } catch (ScreenMarkup.MarkupException e) {
+                problem = e.getMessage();
+            }
+        }
+        return problem;
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide && markupFile != null)
+            SHOWING_FILES.add(this);
     }
 
     /** Changes one element of the markup shown, by id, and lays it out again. */
@@ -113,6 +154,8 @@ public class BrassScreenBlockEntity extends BlockEntity {
     /** Forgets the markup: what a program draws next is all there is. */
     public void forgetMarkup() {
         markup = null;
+        markupFile = null;
+        markupComputer = null;
         values.clear();
         buttons = List.of();
     }
@@ -216,6 +259,10 @@ public class BrassScreenBlockEntity extends BlockEntity {
         writeDots(tag);
         if (markup != null) {
             tag.putString("Markup", markup);
+            if (markupFile != null && markupComputer != null) {
+                tag.putString("MarkupFile", markupFile);
+                tag.putLong("MarkupComputer", markupComputer.asLong());
+            }
             CompoundTag set = new CompoundTag();
             values.forEach(set::putString);
             tag.put("Values", set);
@@ -254,6 +301,8 @@ public class BrassScreenBlockEntity extends BlockEntity {
             dots = null;
         }
         markup = tag.contains("Markup") ? tag.getString("Markup") : null;
+        markupFile = tag.contains("MarkupFile") ? tag.getString("MarkupFile") : null;
+        markupComputer = tag.contains("MarkupComputer") ? BlockPos.of(tag.getLong("MarkupComputer")) : null;
         values.clear();
         CompoundTag set = tag.getCompound("Values");
         for (String key : set.getAllKeys())

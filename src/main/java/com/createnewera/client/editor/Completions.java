@@ -104,6 +104,72 @@ public final class Completions {
     }
 
     /** Plain values: no detail pane, it would only cover the signature with "sound" or "side". */
+    private static final Pattern MARKUP_VALUE = Pattern.compile("([A-Za-z]+)\\s*=\\s*([\"'])([^\"']*)$");
+    private static final Pattern MARKUP_ATTRIBUTE = Pattern.compile("\\s([A-Za-z]*)$");
+    /** Tags that hold other tags, laid out over lines; tags with nothing inside */
+    private static final Set<String> CONTAINERS = Set.of("screen", "row", "column"), EMPTY_TAGS = Set.of("bar", "divider", "spacer");
+
+    /**
+     * Suggestions in a screen's markup (a .screen file): after a {@code <} the tags, inside a tag
+     * the attributes it takes, inside an attribute's quotes the values it can have.
+     */
+    public static Result completeMarkup(String beforeCursor, boolean explicit) {
+        int open = beforeCursor.lastIndexOf('<'), close = beforeCursor.lastIndexOf('>');
+        int lineStart = beforeCursor.lastIndexOf('\n') + 1;
+        int col = beforeCursor.length() - lineStart;
+        if (open <= close) {
+            if (!explicit)
+                return Result.NONE;
+            // nothing open: Ctrl+Space offers the tags, brackets and all
+            List<Entry> tags = new ArrayList<>();
+            for (String tag : com.createnewera.block.screen.ScreenMarkup.TAGS.keySet())
+                tags.add(tagEntry(tag, "<"));
+            return rank(col, "", tags);
+        }
+        String inside = beforeCursor.substring(open + 1);
+        if (inside.matches("/?[A-Za-z]*")) {
+            boolean closing = inside.startsWith("/");
+            String query = closing ? inside.substring(1) : inside;
+            List<Entry> tags = new ArrayList<>();
+            for (String tag : com.createnewera.block.screen.ScreenMarkup.TAGS.keySet())
+                tags.add(closing ? new Entry(tag, Kind.KEYWORD, tag + ">", "</" + tag + ">", translate.apply("create_new_era.markup.tag." + tag))
+                        : tagEntry(tag, ""));
+            return rank(col - query.length(), query, tags);
+        }
+        String tag = inside.split("[\\s/>]", 2)[0];
+        Matcher m = MARKUP_VALUE.matcher(inside);
+        if (m.find()) {
+            List<String> choices = switch (m.group(1)) {
+                case "color", "background" -> com.createnewera.block.screen.ScreenPalette.names();
+                case "align" -> List.of("left", "center", "right");
+                case "size" -> List.of("small", "big");
+                default -> List.of();
+            };
+            return choices.isEmpty() ? Result.NONE : rank(col - m.group(3).length(), m.group(3), values(choices));
+        }
+        m = MARKUP_ATTRIBUTE.matcher(inside);
+        if (m.find() && com.createnewera.block.screen.ScreenMarkup.TAGS.containsKey(tag)) {
+            List<Entry> attributes = new ArrayList<>();
+            List<String> names = new ArrayList<>(List.of("id", "color", "align", "size"));
+            names.addAll(com.createnewera.block.screen.ScreenMarkup.TAGS.get(tag));
+            for (String name : names)
+                attributes.add(new Entry(name, Kind.FIELD, name + "=\"$0\"", tag + " " + name,
+                        translate.apply("create_new_era.markup.attribute." + name)));
+            if (m.group(1).isEmpty() && !explicit && !inside.endsWith(" "))
+                return Result.NONE;
+            return rank(col - m.group(1).length(), m.group(1), attributes);
+        }
+        return Result.NONE;
+    }
+
+    /** A tag as a suggestion, written out with its closing tag, the cursor where its contents go. */
+    private static Entry tagEntry(String tag, String bracket) {
+        String insert = CONTAINERS.contains(tag) ? bracket + tag + ">\n  $0\n</" + tag + ">"
+                : EMPTY_TAGS.contains(tag) ? bracket + tag + (tag.equals("bar") ? " value=\"$0\"/>" : "$0/>")
+                : bracket + tag + ">$0</" + tag + ">";
+        return new Entry(tag, Kind.KEYWORD, insert, "<" + tag + ">", translate.apply("create_new_era.markup.tag." + tag));
+    }
+
     private static List<Entry> values(List<String> names) {
         return names.stream().map(n -> new Entry(n, Kind.VALUE, n, "", "")).toList();
     }
@@ -279,6 +345,7 @@ public final class Completions {
                 case com.createnewera.bus.DeviceDrivers.ITEMS -> out.addAll(named(net.minecraft.core.registries.BuiltInRegistries.ITEM));
                 case com.createnewera.bus.DeviceDrivers.FLUIDS -> out.addAll(named(net.minecraft.core.registries.BuiltInRegistries.FLUID));
                 case com.createnewera.bus.DeviceDrivers.PLAYERS -> out.addAll(values(players.get()));
+                case com.createnewera.block.screen.ScreenDriver.SCREEN_FILES -> out.addAll(values(screenFiles.get()));
                 case com.createnewera.bus.DeviceDrivers.BOOLEAN -> {
                     out.add(new Entry("true", Kind.CONSTANT, "true", "boolean", ""));
                     out.add(new Entry("false", Kind.CONSTANT, "false", "boolean", ""));
@@ -288,6 +355,9 @@ public final class Completions {
         }
         return out;
     }
+
+    /** The computer's .screen files, for show(" ; the editor plugs in its list. */
+    public static java.util.function.Supplier<List<String>> screenFiles = List::of;
 
     /** The players online, for tell(" ; the editor plugs in the client's list. */
     public static java.util.function.Supplier<List<String>> players = List::of;

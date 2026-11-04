@@ -47,6 +47,8 @@ public class CodeEditor {
     private final Font font;
     private final int maxLength;
     private List<String> lines = new ArrayList<>(List.of(""));
+    /** A screen's markup (a .screen file) rather than Lua: coloured and indented as tags */
+    private boolean markup;
     /** Names bound to require(...) in this file, coloured like the built-in libraries; null until worked out */
     private @Nullable Set<String> libraries;
     private int row, col;
@@ -91,6 +93,14 @@ public class CodeEditor {
 
     public String getText() {
         return String.join("\n", lines);
+    }
+
+    public void setMarkup(boolean markup) {
+        this.markup = markup;
+    }
+
+    public boolean isMarkup() {
+        return markup;
     }
 
     public void setText(String text) {
@@ -142,9 +152,14 @@ public class CodeEditor {
 
         int visible = visibleRows();
         LuaHighlighter.State state = LuaHighlighter.State.CODE;
+        MarkupHighlighter.State markupState = MarkupHighlighter.State.TEXT;
         // highlighting state flows from the top, so run through the lines above the view too
-        for (int r = 0; r < scrollRow && r < lines.size(); r++)
-            state = LuaHighlighter.highlight(lines.get(r), new int[lines.get(r).length()], state);
+        for (int r = 0; r < scrollRow && r < lines.size(); r++) {
+            if (markup)
+                markupState = MarkupHighlighter.highlight(lines.get(r), new int[lines.get(r).length()], markupState);
+            else
+                state = LuaHighlighter.highlight(lines.get(r), new int[lines.get(r).length()], state);
+        }
         Set<String> libraries = libraries();
 
         int textX = x + GUTTER + PAD;
@@ -165,7 +180,10 @@ public class CodeEditor {
             g.drawString(font, number, x + GUTTER - 3 - font.width(number), lineY, numberColor, false);
 
             int[] colors = new int[line.length()];
-            state = LuaHighlighter.highlight(line, colors, state, libraries);
+            if (markup)
+                markupState = MarkupHighlighter.highlight(line, colors, markupState);
+            else
+                state = LuaHighlighter.highlight(line, colors, state, libraries);
             int last = Math.min(line.length(), scrollCol + columns() + 1);
             for (int c = scrollCol; c < last; c++) {
                 char ch = line.charAt(c);
@@ -574,6 +592,12 @@ public class CodeEditor {
         String line = lines.get(row);
         String indent = indentOf(line);
         String before = line.substring(0, col).strip();
+        if (markup) {
+            // inside a tag that was opened on this line and not closed: the next line goes in a level
+            boolean opensTag = before.matches(".*<[A-Za-z][^<>]*[^/]>") && !before.matches(".*</[A-Za-z][^<>]*>");
+            insert("\n" + (opensTag ? indent + INDENT : indent), EditKind.OTHER);
+            return;
+        }
         boolean opens = before.endsWith(" then") || before.equals("then") || before.endsWith(" do") || before.equals("do")
                 || before.equals("else") || before.equals("repeat") || before.endsWith("{")
                 || before.endsWith("(") || before.matches(".*\\bfunction\\b.*\\)\\s*$");

@@ -162,15 +162,18 @@ public class EndpointTests {
             for (int y = 2; y < 4; y++)
                 helper.setBlock(new BlockPos(x, y, 0), screen);
         String name = brassPort(helper, new BlockPos(0, 2, 0), Direction.SOUTH, 0);
+        // the layout in a file of its own, the program only showing it
+        computer.getFiles().write("farm.screen", String.join("\n",
+                "<screen>",
+                "  <title>FARM</title>",
+                "  <row><label>IRON</label><value id='iron' align='right'>0</value></row>",
+                "  <button id='go'>GO</button>",
+                "</screen>"));
         computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
                 "local s = bus.get('" + name + "')",
                 "local size = s.getSize()",
                 "print('size', size.width, size.height)",
-                "s.show([[",
-                "  <title>FARM</title>",
-                "  <row><label>IRON</label><value id='iron' align='right'>0</value></row>",
-                "  <button id='go'>GO</button>",
-                "]])",
+                "s.show('farm')",
                 "s.set('iron', 42)",
                 "print('get', s.get('iron'))",
                 "print('bad', pcall(s.show, '<blink>no</blink>'))",
@@ -195,6 +198,22 @@ public class EndpointTests {
         });
         helper.runAfterDelay(70, () -> {
             expectLine(helper, computer, "clicked go");
+            // saving the file in the editor shows it again, keeping what the program set
+            computer.handleAction(null, com.createnewera.network.EditorActionPayload.Action.SAVE, "farm.screen", String.join("\n",
+                    "<screen color='lime'>",
+                    "  <title>FARM 2</title>",
+                    "  <row><label>IRON</label><value id='iron' align='right'>0</value></row>",
+                    "</screen>"));
+            var pane = com.createnewera.block.screen.ScreenPane.of(helper.getLevel(), helper.absolutePos(new BlockPos(0, 2, 0)));
+            var controller = (com.createnewera.block.screen.BrassScreenBlockEntity) helper.getLevel().getBlockEntity(pane.origin());
+            try {
+                if (!"42".equals(controller.get("iron")))
+                    helper.fail("the value the program set should survive saving the file, got " + controller.get("iron"));
+            } catch (com.createnewera.block.screen.ScreenMarkup.MarkupException e) {
+                helper.fail(e.getMessage());
+            }
+            if (controller.shown().get(0, 0) != com.createnewera.block.screen.ScreenPalette.of("lime"))
+                helper.fail("the saved file's lime title should show");
             helper.succeed();
         });
     }

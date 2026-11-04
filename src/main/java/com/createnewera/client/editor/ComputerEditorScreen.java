@@ -144,6 +144,7 @@ public class ComputerEditorScreen extends Screen {
     private void openFile(String name) {
         if (!open.containsKey(name)) {
             CodeEditor editor = new CodeEditor(Minecraft.getInstance().font, ComputerFiles.MAX_FILE);
+            editor.setMarkup(name.endsWith(com.createnewera.block.screen.ScreenDriver.EXTENSION));
             editor.setText(disk.getOrDefault(name, ""));
             editor.setOnChange(() -> lastChange = Util.getMillis());
             open.put(name, editor);
@@ -394,7 +395,7 @@ public class ComputerEditorScreen extends Screen {
         boolean typed = editor().charTyped(ch);
         if (typed) {
             // keep suggesting while a word, a member access, a string argument or a path is being typed
-            if (Character.isLetterOrDigit(ch) || "_.:\"'/(, -".indexOf(ch) >= 0)
+            if (Character.isLetterOrDigit(ch) || "_.:\"'/(, -<=".indexOf(ch) >= 0)
                 refreshCompletion(false);
             else
                 closeCompletion();
@@ -586,8 +587,9 @@ public class ComputerEditorScreen extends Screen {
         var player = Minecraft.getInstance().player;
         var viewer = player == null ? new Completions.Viewer(Vec3.atCenterOf(pos), 0)
                 : new Completions.Viewer(player.getEyePosition(), player.getYRot());
-        completion = Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, this::source,
-                snapshot.devices(), viewer, explicit);
+        Completions.screenFiles = () -> fileOrder.stream().filter(f -> f.endsWith(com.createnewera.block.screen.ScreenDriver.EXTENSION)).toList();
+        completion = editor.isMarkup() ? Completions.completeMarkup(editor.textBeforeCursor(), explicit)
+                : Completions.complete(editor.textBeforeCursor(), editor.getText(), fileOrder, this::source, snapshot.devices(), viewer, explicit);
         selected = 0;
         listTop = 0;
     }
@@ -1087,7 +1089,7 @@ public class ComputerEditorScreen extends Screen {
     /** Inside a call's parentheses: what the function takes and does, above the line being written. */
     private void renderSignature(GuiGraphics g) {
         CodeEditor editor = editor();
-        if (editor == null || nameDraft != null)
+        if (editor == null || nameDraft != null || editor.isMarkup())
             return;
         var help = Completions.signature(editor.textBeforeCursor(), editor.getText(), fileOrder, this::source, snapshot.devices());
         if (help == null)
