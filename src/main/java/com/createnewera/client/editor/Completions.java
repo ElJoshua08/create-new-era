@@ -79,6 +79,8 @@ public final class Completions {
             if (members == null)
                 members = moduleMembers(document, base, files, source);
             if (members == null)
+                members = returnedFields(document, base, devices);
+            if (members == null)
                 members = fieldsSeen(document, base);
             if (query.isEmpty() && members.isEmpty())
                 return Result.NONE;
@@ -352,6 +354,9 @@ public final class Completions {
         } else if (d.methods().contains("getKey"))
             out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)", "onKey(fn(key, device))",
                     translate.apply("create_new_era.api.on_key")));
+        if (d.methods().contains("getLastClick"))
+            out.add(new Entry("onClick", Kind.FUNCTION, "onClick(\"$0\", function(player)\n  \nend)", "onClick(id, fn(player, device))",
+                    translate.apply("create_new_era.api.on_click")));
         if (d.methods().contains("getLastTouch"))
             out.add(new Entry("onTouch", Kind.FUNCTION, "onTouch(function(x, y, player)\n  $0\nend)", "onTouch(fn(x, y, player, device))",
                     translate.apply("create_new_era.api.on_touch")));
@@ -482,6 +487,40 @@ public final class Completions {
     }
 
     /** Fields written after base. somewhere in the file, for tables the API doesn't know. */
+    /** {@code local size = screen.getSize()}: the variable holds what a device function returned */
+    private static final Pattern RETURNED_VAR = Pattern.compile("([A-Za-z_]\\w*)\\s*=\\s*([A-Za-z_]\\w*)\\s*[.:]\\s*([A-Za-z_]\\w*)\\s*\\(");
+
+    /**
+     * The fields of a table a device function gave the variable, from what it says it returns:
+     * "{width, height}" offers width and height. Null if the variable isn't one of those.
+     */
+    private static List<Entry> returnedFields(String document, String variable, List<NetworkDevice> devices) {
+        Matcher m = RETURNED_VAR.matcher(document);
+        NetworkDevice.Fn from = null;
+        while (m.find()) {
+            if (!m.group(1).equals(variable))
+                continue;
+            NetworkDevice d = deviceIn(document, m.group(2), devices);
+            if (d != null)
+                for (NetworkDevice.Fn fn : d.functions())
+                    if (fn.name().equals(m.group(3)))
+                        from = fn;
+        }
+        if (from == null)
+            return null;
+        String returns = from.returns().strip();
+        // a single table of named fields, not a list of them ("{{key, down}, ...}") or a map ("{[property] = value}")
+        if (!returns.startsWith("{") || returns.startsWith("{{") || returns.contains("[") || !returns.contains("}"))
+            return null;
+        List<Entry> out = new ArrayList<>();
+        for (String field : returns.substring(1, returns.indexOf('}')).split(",")) {
+            String name = field.strip();
+            if (IDENT.matcher(name).matches())
+                out.add(new Entry(name, Kind.FIELD, name, variable + "." + name, translate.apply(from.doc())));
+        }
+        return out.isEmpty() ? null : out;
+    }
+
     private static List<Entry> fieldsSeen(String document, String base) {
         Set<String> seen = new HashSet<>();
         List<Entry> out = new ArrayList<>();
