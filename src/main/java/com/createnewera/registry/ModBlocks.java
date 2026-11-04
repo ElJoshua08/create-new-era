@@ -94,6 +94,7 @@ public final class ModBlocks {
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW).sound(SoundType.NETHERITE_BLOCK).requiresCorrectToolForDrops())
             .transform(TagGen.pickaxeOnly())
             .blockstate(ModBlocks::screenBlockstate)
+            .onRegister(com.simibubi.create.foundation.data.CreateRegistrate.connectedTextures(com.createnewera.block.screen.ScreenCasingCT::new))
             .lang("Brass Screen")
             .item().model(ModBlocks::blockItemModel).build()
             .register();

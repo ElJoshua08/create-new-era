@@ -41,9 +41,9 @@ public final class NewEraPonderScenes {
         scene.idle(5);
 
         BlockPos computer = util.grid().at(2, 1, 2);
-        BlockPos lamp = util.grid().at(1, 1, 2);
-        BlockPos lever = util.grid().at(3, 1, 2);
-        Vec3 front = util.vector().blockSurface(computer, Direction.SOUTH);
+        BlockPos lamp = util.grid().at(3, 1, 2);
+        BlockPos lever = util.grid().at(1, 1, 2);
+        Vec3 front = util.vector().blockSurface(computer, Direction.NORTH);
 
         scene.world().showSection(util.select().position(computer), Direction.DOWN);
         scene.idle(15);
@@ -54,15 +54,15 @@ public final class NewEraPonderScenes {
                 .pointAt(front);
         scene.idle(80);
 
-        scene.world().showSection(util.select().fromTo(2, 1, 0, 2, 1, 1), Direction.SOUTH);
+        scene.world().showSection(util.select().fromTo(2, 1, 3, 2, 1, 4), Direction.NORTH);
         scene.idle(10);
-        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 0, 2, 1, 2), 64);
+        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 2, 2, 1, 4), 64);
         scene.effects().rotationSpeedIndicator(computer);
         scene.overlay().showText(90)
                 .attachKeyFrame()
                 .text("It runs on rotational force through its back. The faster it spins, the faster programs run")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 1), Direction.UP));
+                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 3), Direction.UP));
         scene.idle(100);
         scene.overlay().showText(70)
                 .colored(PonderPalette.RED)
@@ -79,7 +79,7 @@ public final class NewEraPonderScenes {
                 .pointAt(front);
         scene.idle(90);
 
-        scene.world().showSection(util.select().position(lamp), Direction.EAST);
+        scene.world().showSection(util.select().position(lamp), Direction.WEST);
         scene.idle(15);
         scene.world().modifyBlock(computer, s -> s.setValue(BrassComputerBlock.RUNNING, true), false);
         scene.overlay().showText(90)
@@ -97,7 +97,7 @@ public final class NewEraPonderScenes {
         }
         scene.idle(10);
 
-        scene.world().showSection(util.select().position(lever), Direction.WEST);
+        scene.world().showSection(util.select().position(lever), Direction.EAST);
         scene.idle(15);
         scene.overlay().showControls(util.vector().topOf(lever), Pointing.DOWN, 30).rightClick();
         scene.idle(7);
@@ -142,13 +142,13 @@ public final class NewEraPonderScenes {
                         .attachKeyFrame()
                         .text("Screens facing the same way join into one display")
                         .placeNearTarget()
-                        .pointAt(util.vector().blockSurface(pos, Direction.SOUTH));
+                        .pointAt(util.vector().blockSurface(pos, Direction.NORTH));
         }
         scene.idle(60);
 
         // the pane's top left, as the camera sees it: its pixels live there
         BlockPos topLeft = util.grid().at(3, 2, 2);
-        Vec3 glass = util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.SOUTH);
+        Vec3 glass = util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.NORTH);
         showMarkup(scene, util, topLeft, "0");
         scene.overlay().showText(100)
                 .attachKeyFrame()
@@ -173,12 +173,12 @@ public final class NewEraPonderScenes {
                 .pointAt(glass);
         scene.idle(100);
 
-        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.SOUTH), Pointing.DOWN, 40).rightClick();
+        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.NORTH), Pointing.DOWN, 40).rightClick();
         scene.idle(10);
         scene.overlay().showText(90)
                 .text("Right-clicking a button on the screen runs whatever the program gave screen.onClick")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.NORTH));
         scene.idle(100);
     }
 
@@ -204,8 +204,8 @@ public final class NewEraPonderScenes {
     private static void joinScreens(SceneBuilder scene, SceneBuildingUtil util, int[][] order, int shown) {
         for (int i = 0; i < shown; i++) {
             int x = order[i][0], y = order[i][1];
-            // facing south, the viewer's left is west (-x)
-            boolean left = isShown(order, shown, x - 1, y), right = isShown(order, shown, x + 1, y);
+            // facing north, towards the camera: the screen's left is east (+x)
+            boolean left = isShown(order, shown, x + 1, y), right = isShown(order, shown, x - 1, y);
             boolean up = isShown(order, shown, x, y + 1), down = isShown(order, shown, x, y - 1);
             scene.world().modifyBlock(util.grid().at(x, y, 2), s -> s
                     .setValue(BrassScreenBlock.LEFT, left).setValue(BrassScreenBlock.RIGHT, right)
@@ -227,14 +227,14 @@ public final class NewEraPonderScenes {
         scene.idle(5);
 
         BlockPos barrel = util.grid().at(2, 1, 2);
-        BlockPos side = util.grid().at(1, 1, 2);
+        BlockPos side = util.grid().at(2, 1, 1);
         BlockPos top = util.grid().at(2, 2, 2);
         scene.world().showSection(util.select().position(barrel), Direction.DOWN);
         scene.idle(15);
 
-        scene.overlay().showControls(util.vector().blockSurface(barrel, Direction.WEST), Pointing.RIGHT, 30).rightClick();
+        scene.overlay().showControls(util.vector().blockSurface(barrel, Direction.NORTH), Pointing.DOWN, 30).rightClick();
         scene.idle(7);
-        scene.world().showSection(util.select().position(side), Direction.EAST);
+        scene.world().showSection(util.select().position(side), Direction.SOUTH);
         scene.idle(10);
         scene.world().showSection(util.select().position(top), Direction.DOWN);
         scene.idle(10);
@@ -242,12 +242,12 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("Universal Adapters stick to whichever face you click, on any block")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(side, Direction.WEST));
+                .pointAt(util.vector().blockSurface(side, Direction.NORTH));
         scene.idle(90);
 
         scene.overlay().showText(90)
                 .colored(PonderPalette.BLUE)
-                .text("Coming soon: each adapter puts the block it touches on the data bus, with its speed, stress, items and fluids")
+                .text("It doesn't do anything yet. Until it does, a Data Port puts a block on the bus")
                 .placeNearTarget()
                 .pointAt(util.vector().topOf(top));
         scene.idle(100);
@@ -275,7 +275,7 @@ public final class NewEraPonderScenes {
 
         scene.overlay().showText(90)
                 .colored(PonderPalette.BLUE)
-                .text("Coming soon: instead of spinning, it turns to the exact angle a program asks for")
+                .text("It isn't wired up yet. When it is, it will turn to the exact angle a program asks for instead of spinning")
                 .placeNearTarget()
                 .pointAt(util.vector().topOf(2, 2, 2));
         scene.world().rotateSection(arm, 0, 90, 0, 30);
@@ -294,11 +294,11 @@ public final class NewEraPonderScenes {
 
         scene.world().showSection(util.select().fromTo(1, 1, 2, 3, 1, 2), Direction.DOWN);
         scene.idle(5);
-        scene.world().showSection(util.select().fromTo(1, 1, 3, 3, 3, 3), Direction.DOWN);
+        scene.world().showSection(util.select().fromTo(1, 1, 3, 3, 2, 3), Direction.DOWN);
         scene.idle(15);
 
-        BlockPos button = util.grid().at(1, 2, 2);
-        scene.overlay().showControls(util.vector().topOf(1, 1, 2), Pointing.DOWN, 30).rightClick();
+        BlockPos button = util.grid().at(3, 2, 2);
+        scene.overlay().showControls(util.vector().topOf(3, 1, 2), Pointing.DOWN, 30).rightClick();
         scene.idle(7);
         scene.world().showSection(util.select().fromTo(1, 2, 2, 3, 2, 2), Direction.DOWN);
         scene.idle(10);
@@ -309,10 +309,10 @@ public final class NewEraPonderScenes {
                 .pointAt(util.vector().topOf(button));
         scene.idle(90);
 
-        scene.world().showSection(util.select().fromTo(1, 1, 1, 3, 1, 1), Direction.NORTH);
+        scene.world().showSection(util.select().fromTo(1, 1, 1, 3, 1, 1), Direction.SOUTH);
         scene.idle(15);
-        BlockPos knob = util.grid().at(1, 1, 1);
-        scene.overlay().showControls(util.vector().blockSurface(knob, Direction.SOUTH), Pointing.DOWN, 50).rightClick();
+        BlockPos knob = util.grid().at(3, 1, 1);
+        scene.overlay().showControls(util.vector().blockSurface(knob, Direction.NORTH), Pointing.DOWN, 50).rightClick();
         for (int notch = 2; notch <= 12; notch += 2) {
             int n = notch;
             scene.world().modifyBlockEntityNBT(util.select().position(knob), PanelControlBlockEntity.class, nbt -> {
@@ -327,7 +327,7 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("Turn a knob or slide a slider by holding right-click and moving the mouse sideways. Hold Ctrl for finer steps")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(knob, Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(knob, Direction.NORTH));
         scene.idle(100);
 
         BlockPos lamp = util.grid().at(2, 1, 1);
@@ -337,14 +337,14 @@ public final class NewEraPonderScenes {
                 .colored(PonderPalette.GREEN)
                 .text("Every control has its own connection: cable it to a computer and programs can read it or drive it")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(lamp, Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(lamp, Direction.NORTH));
         scene.idle(100);
 
-        scene.world().showSection(util.select().fromTo(1, 4, 3, 3, 4, 3), Direction.DOWN);
+        scene.world().showSection(util.select().fromTo(1, 3, 3, 3, 3, 3), Direction.DOWN);
         scene.idle(15);
         String word = "HI!";
         for (int i = 0; i < 3; i++) {
-            BlockPos tube = util.grid().at(1 + i, 4, 3);
+            BlockPos tube = util.grid().at(3 - i, 3, 3);
             String glyph = word.substring(i, i + 1);
             scene.world().modifyBlock(tube, s -> s.setValue(NixieDigitBlock.LIT, true), false);
             scene.world().modifyBlockEntityNBT(util.select().position(tube), PanelControlBlockEntity.class, nbt -> {
@@ -357,16 +357,16 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("Nixie tubes side by side make one display. Cable any of them and nixie.setText(\"HI!\") lights the whole row")
                 .placeNearTarget()
-                .pointAt(util.vector().topOf(util.grid().at(2, 4, 3)));
+                .pointAt(util.vector().topOf(util.grid().at(2, 3, 3)));
         scene.idle(110);
 
-        scene.overlay().showControls(util.vector().topOf(util.grid().at(3, 2, 2)), Pointing.DOWN, 30)
+        scene.overlay().showControls(util.vector().topOf(util.grid().at(1, 2, 2)), Pointing.DOWN, 30)
                 .rightClick().withItem(AllItems.WRENCH.asStack());
         scene.idle(7);
         scene.overlay().showText(70)
                 .text("A Wrench turns them round")
                 .placeNearTarget()
-                .pointAt(util.vector().topOf(util.grid().at(3, 2, 2)));
+                .pointAt(util.vector().topOf(util.grid().at(1, 2, 2)));
         scene.idle(80);
     }
 
@@ -378,15 +378,15 @@ public final class NewEraPonderScenes {
         scene.idle(5);
 
         BlockPos computer = util.grid().at(2, 1, 2), chest = util.grid().at(0, 1, 2), barrel = util.grid().at(4, 1, 2);
-        scene.world().showSection(util.select().fromTo(2, 1, 0, 2, 1, 2), Direction.DOWN);
-        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 0, 2, 1, 2), 64);
+        scene.world().showSection(util.select().fromTo(2, 1, 2, 2, 1, 4), Direction.DOWN);
+        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 2, 2, 1, 4), 64);
         scene.idle(10);
         scene.world().showSection(util.select().position(chest), Direction.DOWN);
         scene.idle(15);
 
-        // a data port on the chest's south face, and the computer's own port on its west side
-        BusPort onChest = new BusPort(1, chest, Direction.SOUTH, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
-        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.SOUTH), Pointing.DOWN, 30)
+        // a data port on the chest's front, and the computer's own port on its side facing it
+        BusPort onChest = new BusPort(1, chest, Direction.NORTH, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
+        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.NORTH), Pointing.DOWN, 30)
                 .rightClick().withItem(ModItems.BUS_PORT.asStack());
         scene.idle(7);
         show(scene, new BusElement(List.of(onChest), List.of()));
@@ -394,7 +394,7 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("Data ports stick to any face of any block. That block is now a device programs can reach")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(chest, Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(chest, Direction.NORTH));
         scene.idle(100);
 
         BusPort onComputer = new BusPort(2, computer, Direction.WEST, 6, 6, BusPort.Kind.PORT, PortMode.IN);
@@ -419,7 +419,7 @@ public final class NewEraPonderScenes {
 
         scene.world().showSection(util.select().position(barrel), Direction.DOWN);
         scene.idle(15);
-        BusPort brass = new BusPort(3, barrel, Direction.SOUTH, 6, 6, BusPort.Kind.BRASS_PORT, PortMode.OUT);
+        BusPort brass = new BusPort(3, barrel, Direction.NORTH, 6, 6, BusPort.Kind.BRASS_PORT, PortMode.OUT);
         BusPort east = new BusPort(4, computer, Direction.EAST, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
         show(scene, new BusElement(List.of(brass), List.of(new BusSpan(2, 3, 4, net.minecraft.world.item.DyeColor.LIME,
                 BusSpan.Casing.NONE, true, List.of(PartGeometry.anchor(brass), PartGeometry.anchor(east))))));
@@ -427,16 +427,16 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("A Brass Port reads a block and gives it orders through the same port. Dye a cable to keep separate networks apart")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(barrel, Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(barrel, Direction.NORTH));
         scene.idle(110);
 
-        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.SOUTH), Pointing.DOWN, 30)
+        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.NORTH), Pointing.DOWN, 30)
                 .rightClick().withItem(AllItems.WRENCH.asStack());
         scene.idle(7);
         scene.overlay().showText(90)
                 .text("A plain port does one thing. A Wrench flips it: out lets programs read the block, in lets them give it orders")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(chest, Direction.SOUTH));
+                .pointAt(util.vector().blockSurface(chest, Direction.NORTH));
         scene.idle(100);
     }
 
@@ -454,21 +454,21 @@ public final class NewEraPonderScenes {
                 .attachKeyFrame()
                 .text("The altimeter, gyroscope, compass and airspeed indicator read the ship they're built into")
                 .placeNearTarget()
-                .pointAt(util.vector().topOf(util.grid().at(1, 2, 2)));
+                .pointAt(util.vector().topOf(util.grid().at(3, 2, 2)));
         scene.idle(110);
 
         scene.overlay().showText(100)
                 .attachKeyFrame()
                 .text("Twelve o'clock on each dial is the way the ship flies: away from you on a desk, into the wall on a wall")
                 .placeNearTarget()
-                .pointAt(util.vector().topOf(util.grid().at(3, 2, 2)));
+                .pointAt(util.vector().topOf(util.grid().at(1, 2, 2)));
         scene.idle(110);
 
         scene.overlay().showText(100)
                 .colored(PonderPalette.BLUE)
                 .text("Programs read the same numbers: getAltitude(), getPitch(), getHeading(), getSpeed()...")
                 .placeNearTarget()
-                .pointAt(util.vector().topOf(util.grid().at(4, 2, 2)));
+                .pointAt(util.vector().topOf(util.grid().at(0, 2, 2)));
         scene.idle(110);
     }
 

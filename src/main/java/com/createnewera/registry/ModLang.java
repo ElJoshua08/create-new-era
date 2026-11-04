@@ -416,12 +416,12 @@ public final class ModLang {
         lang("block.create_new_era.universal_adapter.tooltip.summary", "Meant to put a block's _kinetics_, _items_ and _fluids_ on the bus. For now a data port does that job.");
         lang("block.create_new_era.universal_adapter.tooltip.condition1", "When placed");
         lang("block.create_new_era.universal_adapter.tooltip.behaviour1", "Sticks to the face you click, on any side of a machine.");
-        lang("block.create_new_era.universal_adapter.tooltip.condition2", "Coming soon");
+        lang("block.create_new_era.universal_adapter.tooltip.condition2", "Not yet");
         lang("block.create_new_era.universal_adapter.tooltip.behaviour2", "It doesn't do anything yet. Use a _Data Port_.");
         lang("block.create_new_era.bearing_servo.tooltip.summary", "Turns a _contraption_ to an exact angle when told to, instead of spinning.");
         lang("block.create_new_era.bearing_servo.tooltip.condition1", "When placed");
         lang("block.create_new_era.bearing_servo.tooltip.behaviour1", "Faces you, like Create's _bearings_.");
-        lang("block.create_new_era.bearing_servo.tooltip.condition2", "Coming soon");
+        lang("block.create_new_era.bearing_servo.tooltip.condition2", "Not yet");
         lang("block.create_new_era.bearing_servo.tooltip.behaviour2", "Programs will set its angle in degrees: gimbals, turrets, flaps. Not wired up yet.");
         lang("item.create_new_era.control_plate.tooltip.summary", "The andesite base every _panel control_ is built on.");
         lang("item.create_new_era.control_plate.tooltip.condition1", "Crafting");

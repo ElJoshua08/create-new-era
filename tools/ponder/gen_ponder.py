@@ -31,21 +31,22 @@ def casing():
 
 
 SCENES = {
-    # computer faces the camera (south); its left is west, its right is east; driven from behind
+    # Ponder's camera looks at the north and west faces, so everything faces north, towards it.
+    # Seen from there, +x is on the left. The computer is driven from behind (south).
     "computer/intro": ((5, 3, 5), {
-        (2, 1, 0): ("create:creative_motor", {"facing": "south"}),
-        (2, 1, 1): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
-        (2, 1, 2): (M + "brass_computer", {"facing": "south", "running": "false"}),
-        (1, 1, 2): ("minecraft:redstone_lamp", {"lit": "false"}),
-        (3, 1, 2): ("minecraft:lever", {"face": "floor", "facing": "east", "powered": "false"}),
+        (2, 1, 4): ("create:creative_motor", {"facing": "north"}),
+        (2, 1, 3): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
+        (2, 1, 2): (M + "brass_computer", {"facing": "north", "running": "false"}),
+        (3, 1, 2): ("minecraft:redstone_lamp", {"lit": "false"}),
+        (1, 1, 2): ("minecraft:lever", {"face": "floor", "facing": "west", "powered": "false"}),
     }),
     # lone screens: the scene joins them up as they appear, like placing them would
     "screen/join": ((5, 4, 5), {
-        (x, y, 2): screen() for x in (1, 2, 3) for y in (1, 2)
+        (x, y, 2): screen("north") for x in (1, 2, 3) for y in (1, 2)
     }),
     "adapter/attach": ((5, 3, 5), {
         (2, 1, 2): ("minecraft:barrel", {"facing": "up", "open": "false"}),
-        (1, 1, 2): part("universal_adapter", "west"),
+        (2, 1, 1): part("universal_adapter", "north"),
         (2, 2, 2): part("universal_adapter", "up"),
     }),
     "servo/intro": ((5, 4, 5), {
@@ -54,33 +55,34 @@ SCENES = {
         (2, 2, 2): ("minecraft:oak_planks", {}),
         (3, 2, 2): ("minecraft:oak_planks", {}),
     }),
-    # a desk: controls on the top and the front, a row of nixies on the wall behind
+    # a desk: a counter with controls on top and on its front, a back wall with nixies along the top
     "controls/desk": ((5, 5, 5), {
         **{(x, 1, 2): casing() for x in (1, 2, 3)},
-        **{(x, y, 3): casing() for x in (1, 2, 3) for y in (1, 2, 3)},
-        (1, 2, 2): part("panel_button", "up"),
+        **{(x, y, 3): casing() for x in (1, 2, 3) for y in (1, 2)},
+        (3, 2, 2): part("panel_button", "up"),
         (2, 2, 2): part("panel_switch", "up"),
-        (3, 2, 2): part("panel_slider", "up"),
-        (1, 1, 1): part("panel_knob", "south"),
-        (2, 1, 1): part("panel_lamp", "south"),
-        (3, 1, 1): part("panel_keypad", "south"),
-        **{(x, 4, 3): (M + "nixie_digit", {"facing": "up", "reads": "south", "lit": "false"}) for x in (1, 2, 3)},
+        (1, 2, 2): part("panel_slider", "up"),
+        (3, 1, 1): part("panel_knob", "north"),
+        (2, 1, 1): part("panel_lamp", "north"),
+        (1, 1, 1): part("panel_keypad", "north"),
+        **{(x, 3, 3): (M + "nixie_digit", {"facing": "up", "reads": "north", "lit": "false"}) for x in (1, 2, 3)},
     }),
-    # a computer driven from behind, a chest to its left and a barrel to its right, for ports and cables
+    # a computer driven from behind, a chest on its right (west) and a barrel on its left (east)
     "bus/network": ((5, 3, 5), {
-        (2, 1, 0): ("create:creative_motor", {"facing": "south"}),
-        (2, 1, 1): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
-        (2, 1, 2): (M + "brass_computer", {"facing": "south", "running": "false"}),
-        (0, 1, 2): ("minecraft:chest", {"facing": "south", "type": "single", "waterlogged": "false"}),
+        (2, 1, 4): ("create:creative_motor", {"facing": "north"}),
+        (2, 1, 3): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
+        (2, 1, 2): (M + "brass_computer", {"facing": "north", "running": "false"}),
+        (0, 1, 2): ("minecraft:chest", {"facing": "north", "type": "single", "waterlogged": "false"}),
         (4, 1, 2): ("minecraft:barrel", {"facing": "up", "open": "false"}),
     }),
-    # a flight deck: four instruments on a row of casing, read from the south
+    # a flight deck: instruments along a brass counter, read from the north, a lamp in the middle
     "instruments/flight": ((5, 3, 5), {
         **{(x, 1, 2): ("create:brass_casing", {}) for x in (0, 1, 2, 3, 4)},
-        (0, 2, 2): (M + "panel_altimeter", {"facing": "up", "reads": "south"}),
-        (1, 2, 2): (M + "panel_gyroscope", {"facing": "up", "reads": "south"}),
-        (3, 2, 2): (M + "panel_compass", {"facing": "up", "reads": "south"}),
-        (4, 2, 2): (M + "panel_airspeed", {"facing": "up", "reads": "south"}),
+        (4, 2, 2): (M + "panel_altimeter", {"facing": "up", "reads": "north"}),
+        (3, 2, 2): (M + "panel_gyroscope", {"facing": "up", "reads": "north"}),
+        (2, 2, 2): (M + "panel_lamp", {"facing": "up", "light": "green"}),
+        (1, 2, 2): (M + "panel_compass", {"facing": "up", "reads": "north"}),
+        (0, 2, 2): (M + "panel_airspeed", {"facing": "up", "reads": "north"}),
     }),
 }
 

@@ -27,5 +27,6 @@ public class CreateNewEraClient {
         DeviceHighlight.register(NeoForge.EVENT_BUS);
         PanelControlRenderer.register(modEventBus);
         DialDrag.register(NeoForge.EVENT_BUS);
+        com.createnewera.client.DevPonderShots.register(NeoForge.EVENT_BUS);
     }
 }
