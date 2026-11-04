@@ -86,8 +86,6 @@ public final class BusPartRenderer {
         PoseStack pose = event.getPoseStack();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         VertexConsumer consumer = buffers.getBuffer(RenderType.cutout());
-        var modelRenderer = mc.getBlockRenderer().getModelRenderer();
-        var models = mc.getModelManager();
 
         for (List<BusPort> chunk : ClientBusParts.chunks()) {
             for (BusPort part : chunk) {
@@ -100,14 +98,6 @@ public final class BusPartRenderer {
                     continue; // built into the control's plate, or drawn by the hub's own model
                 // a computer's own ports are drawn by its side panels: only their lamp goes on top
                 boolean builtIn = Bus.builtIn(mc.level.getBlockState(part.pos()), part);
-                BakedModel model = models.getModel(switch (part.kind()) {
-                    case PORT -> builtIn ? (part.mode() == PortMode.IN ? LAMP_IN : LAMP_OUT)
-                            : part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
-                    case EXPANSION -> EXPANSION;
-                    case SPLICE -> SPLICE;
-                    case BRASS_PORT -> BRASS_PORT;
-                    case CONTROL, HUB -> SPLICE; // never reached: skipped above
-                });
                 BlockPos outside = part.pos().relative(part.face());
                 pose.pushPose();
                 if (ship != null) {
@@ -117,18 +107,36 @@ public final class BusPartRenderer {
                 } else {
                     pose.translate(outside.getX() - camera.x, outside.getY() - camera.y, outside.getZ() - camera.z);
                 }
-                // the same turn the game gives a block model pointing up, so drawing matches PartGeometry
-                pose.translate(0.5, 0.5, 0.5);
-                pose.mulPose(rotation(part.face()).getRotation().getLeftRotation());
-                pose.translate(-0.5, -0.5, -0.5);
-                pose.translate(part.u() / 16.0, -part.depth() / 16, part.v() / 16.0);
-                int light = LevelRenderer.getLightColor(mc.level, outside);
-                modelRenderer.renderModel(pose.last(), consumer, null, model, 1, 1, 1, light, OverlayTexture.NO_OVERLAY,
-                        ModelData.EMPTY, RenderType.cutout());
+                drawPart(pose, consumer, part, builtIn, LevelRenderer.getLightColor(mc.level, outside));
                 pose.popPose();
             }
         }
         buffers.endBatch(RenderType.cutout());
+    }
+
+    /**
+     * A part's model, in the pose's coordinates with the origin at the corner of the block space
+     * just outside the face it's on (the world's, or a Ponder scene's).
+     */
+    public static void drawPart(PoseStack pose, VertexConsumer consumer, BusPort part, boolean builtIn, int light) {
+        var models = Minecraft.getInstance().getModelManager();
+        BakedModel model = models.getModel(switch (part.kind()) {
+            case PORT -> builtIn ? (part.mode() == PortMode.IN ? LAMP_IN : LAMP_OUT)
+                    : part.mode() == PortMode.IN ? PORT_IN : PORT_OUT;
+            case EXPANSION -> EXPANSION;
+            case SPLICE -> SPLICE;
+            case BRASS_PORT -> BRASS_PORT;
+            case CONTROL, HUB -> SPLICE;
+        });
+        pose.pushPose();
+        // the same turn the game gives a block model pointing up, so drawing matches PartGeometry
+        pose.translate(0.5, 0.5, 0.5);
+        pose.mulPose(rotation(part.face()).getRotation().getLeftRotation());
+        pose.translate(-0.5, -0.5, -0.5);
+        pose.translate(part.u() / 16.0, -part.depth() / 16, part.v() / 16.0);
+        Minecraft.getInstance().getBlockRenderer().getModelRenderer().renderModel(pose.last(), consumer, null, model, 1, 1, 1,
+                light, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.cutout());
+        pose.popPose();
     }
 
     /** The x/y rotation a blockstate gives a model pointing up to face {@code face}. */

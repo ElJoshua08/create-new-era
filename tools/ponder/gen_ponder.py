@@ -54,7 +54,7 @@ SCENES = {
         (2, 2, 2): ("minecraft:oak_planks", {}),
         (3, 2, 2): ("minecraft:oak_planks", {}),
     }),
-    # a desk: controls on the top, on the front, and on the wall behind
+    # a desk: controls on the top and the front, a row of nixies on the wall behind
     "controls/desk": ((5, 5, 5), {
         **{(x, 1, 2): casing() for x in (1, 2, 3)},
         **{(x, y, 3): casing() for x in (1, 2, 3) for y in (1, 2, 3)},
@@ -62,10 +62,25 @@ SCENES = {
         (2, 2, 2): part("panel_switch", "up"),
         (3, 2, 2): part("panel_slider", "up"),
         (1, 1, 1): part("panel_knob", "south"),
+        (2, 1, 1): part("panel_lamp", "south"),
         (3, 1, 1): part("panel_keypad", "south"),
-        (1, 3, 2): part("panel_lamp", "south"),
-        (2, 3, 2): part("nixie_digit", "south"),
-        (3, 3, 2): part("panel_gauge", "south"),
+        **{(x, 4, 3): (M + "nixie_digit", {"facing": "up", "reads": "south", "lit": "false"}) for x in (1, 2, 3)},
+    }),
+    # a computer driven from behind, a chest to its left and a barrel to its right, for ports and cables
+    "bus/network": ((5, 3, 5), {
+        (2, 1, 0): ("create:creative_motor", {"facing": "south"}),
+        (2, 1, 1): ("create:shaft", {"axis": "z", "waterlogged": "false"}),
+        (2, 1, 2): (M + "brass_computer", {"facing": "south", "running": "false"}),
+        (0, 1, 2): ("minecraft:chest", {"facing": "south", "type": "single", "waterlogged": "false"}),
+        (4, 1, 2): ("minecraft:barrel", {"facing": "up", "open": "false"}),
+    }),
+    # a flight deck: four instruments on a row of casing, read from the south
+    "instruments/flight": ((5, 3, 5), {
+        **{(x, 1, 2): ("create:brass_casing", {}) for x in (0, 1, 2, 3, 4)},
+        (0, 2, 2): (M + "panel_altimeter", {"facing": "up", "reads": "south"}),
+        (1, 2, 2): (M + "panel_gyroscope", {"facing": "up", "reads": "south"}),
+        (3, 2, 2): (M + "panel_compass", {"facing": "up", "reads": "south"}),
+        (4, 2, 2): (M + "panel_airspeed", {"facing": "up", "reads": "south"}),
     }),
 }
 

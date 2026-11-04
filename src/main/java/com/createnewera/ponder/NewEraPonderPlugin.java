@@ -17,7 +17,11 @@ public class NewEraPonderPlugin implements PonderPlugin {
     private static final ItemProviderEntry<?, ?>[] CONTROLS = {
             ModItems.CONTROL_PLATE, ModBlocks.PANEL_BUTTON, ModBlocks.PANEL_SWITCH, ModBlocks.PANEL_KNOB,
             ModBlocks.PANEL_SLIDER, ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE,
-            ModBlocks.PANEL_KEYPAD};
+            ModBlocks.PANEL_KEYPAD, ModBlocks.PANEL_SPEAKER};
+    private static final ItemProviderEntry<?, ?>[] BUS = {
+            ModItems.BUS_PORT, ModItems.BRASS_PORT, ModItems.CABLE_SPOOL, ModItems.CABLE_SPLICE, ModBlocks.PORT_HUB};
+    private static final ItemProviderEntry<?, ?>[] INSTRUMENTS = {
+            ModBlocks.PANEL_ALTIMETER, ModBlocks.PANEL_GYROSCOPE, ModBlocks.PANEL_COMPASS, ModBlocks.PANEL_AIRSPEED};
 
     @Override
     public String getModId() {
@@ -32,6 +36,9 @@ public class NewEraPonderPlugin implements PonderPlugin {
         scenes.forComponents(ModBlocks.UNIVERSAL_ADAPTER).addStoryBoard("adapter/attach", NewEraPonderScenes::adapter, TAG);
         scenes.forComponents(ModBlocks.BEARING_SERVO).addStoryBoard("servo/intro", NewEraPonderScenes::servo, TAG);
         scenes.forComponents(CONTROLS).addStoryBoard("controls/desk", NewEraPonderScenes::controls, TAG);
+        scenes.forComponents(BUS).addStoryBoard("bus/network", NewEraPonderScenes::bus, TAG);
+        scenes.forComponents(ModBlocks.BRASS_COMPUTER).addStoryBoard("bus/network", NewEraPonderScenes::bus, TAG);
+        scenes.forComponents(INSTRUMENTS).addStoryBoard("instruments/flight", NewEraPonderScenes::instruments, TAG);
     }
 
     @Override
@@ -40,7 +47,7 @@ public class NewEraPonderPlugin implements PonderPlugin {
                 .addToIndex()
                 .item(ModBlocks.BRASS_COMPUTER.get())
                 .title("Create: New Era")
-                .description("Computers, screens and panel controls for programming your contraptions")
+                .description("Computers, data cables, screens and panel controls for running your factory from code")
                 .register();
 
         PonderTagRegistrationHelper<ItemProviderEntry<?, ?>> tags = helper.withKeyFunction(RegistryEntry::getId);
@@ -49,5 +56,9 @@ public class NewEraPonderPlugin implements PonderPlugin {
                 .add(ModBlocks.UNIVERSAL_ADAPTER).add(ModBlocks.BEARING_SERVO);
         for (ItemProviderEntry<?, ?> control : CONTROLS)
             tags.addToTag(TAG).add(control);
+        for (ItemProviderEntry<?, ?> part : BUS)
+            tags.addToTag(TAG).add(part);
+        for (ItemProviderEntry<?, ?> instrument : INSTRUMENTS)
+            tags.addToTag(TAG).add(instrument);
     }
 }

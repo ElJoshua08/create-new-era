@@ -331,6 +331,16 @@ public class BrassScreenBlockEntity extends BlockEntity {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    /** What a pane shows, as players receive it: for Ponder scenes, which have no server to draw them. */
+    public static CompoundTag shownTag(ScreenCanvas canvas, boolean ripple) {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("Width", canvas.width());
+        tag.putInt("Height", canvas.height());
+        tag.putByteArray("Dots", pack(canvas.dots()));
+        tag.putBoolean("Ripple", ripple);
+        return tag;
+    }
+
     /** Deflated: a screen is mostly runs of the same colour, so it packs small. */
     private static byte[] pack(byte[] raw) {
         Deflater deflater = new Deflater(Deflater.BEST_SPEED);

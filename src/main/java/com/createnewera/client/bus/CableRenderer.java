@@ -174,6 +174,11 @@ public final class CableRenderer {
      * A square tube along the line. Each piece runs a little past its ends, so the bends of a
      * surface cable close up without mitring.
      */
+    /** A cable as laid, in the pose's coordinates (the world's, or a Ponder scene's). */
+    public static void drawSpan(PoseStack pose, VertexConsumer out, Level level, BusSpan span) {
+        tube(pose, out, level, CableShape.line(span, level), CableShape.radius(span), sprite(texture(span)), 0xFFFFFF);
+    }
+
     private static void tube(PoseStack pose, VertexConsumer out, Level level, List<Vec3> line, double r,
                              TextureAtlasSprite sprite, int tint) {
         PoseStack.Pose last = pose.last();

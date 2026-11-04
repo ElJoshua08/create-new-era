@@ -1,6 +1,20 @@
 package com.createnewera.ponder;
 
+import java.util.List;
+
 import com.createnewera.block.BrassScreenBlock;
+import com.createnewera.block.control.NixieDigitBlock;
+import com.createnewera.block.control.PanelControlBlockEntity;
+import com.createnewera.block.control.PanelLampBlock;
+import com.createnewera.block.screen.BrassScreenBlockEntity;
+import com.createnewera.block.screen.ScreenCanvas;
+import com.createnewera.block.screen.ScreenMarkup;
+import com.createnewera.block.screen.ScreenPane;
+import com.createnewera.bus.BusPort;
+import com.createnewera.bus.BusSpan;
+import com.createnewera.bus.PartGeometry;
+import com.createnewera.bus.PortMode;
+import com.createnewera.registry.ModItems;
 import com.createnewera.computer.BrassComputerBlock;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.ponder.CreateSceneBuilder;
@@ -126,30 +140,64 @@ public final class NewEraPonderScenes {
             if (i == 1)
                 scene.overlay().showText(70)
                         .attachKeyFrame()
-                        .text("Brass Screens facing the same way join into one display")
+                        .text("Screens facing the same way join into one display")
                         .placeNearTarget()
                         .pointAt(util.vector().blockSurface(pos, Direction.SOUTH));
         }
         scene.idle(60);
 
-        scene.overlay().showText(90)
-                .attachKeyFrame()
-                .text("The brass frame between them disappears, so any rectangle reads as a single pane")
-                .placeNearTarget()
-                .pointAt(util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.SOUTH));
-        scene.idle(100);
-
+        // the pane's top left, as the camera sees it: its pixels live there
+        BlockPos topLeft = util.grid().at(3, 2, 2);
+        Vec3 glass = util.vector().blockSurface(util.grid().at(2, 2, 2), Direction.SOUTH);
+        showMarkup(scene, util, topLeft, "0");
         scene.overlay().showText(100)
-                .text("Every block holds 48 by 48 flip pixels that turn over when they change. Square plates or round discs: pick one in the client config")
+                .attachKeyFrame()
+                .text("Every screen is a grid of 24 by 24 flip dots. When the picture changes, each dot turns over to show its new colour")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(util.grid().at(1, 1, 2), Direction.SOUTH));
+                .pointAt(glass);
         scene.idle(110);
 
-        scene.overlay().showText(70)
+        scene.overlay().showText(110)
+                .attachKeyFrame()
                 .colored(PonderPalette.BLUE)
-                .text("Coming soon: programs will draw on them")
-                .independent(40);
-        scene.idle(80);
+                .text("Lay a screen out in a .screen file on the computer, with tags like title, row, value, bar and button, then show it: screen.show(\"farm\")")
+                .placeNearTarget()
+                .pointAt(glass);
+        scene.idle(120);
+
+        showMarkup(scene, util, topLeft, "1234");
+        scene.overlay().showText(90)
+                .attachKeyFrame()
+                .text("screen.set(\"iron\", 1234) changes one part. Only the dots that need to turn over do")
+                .placeNearTarget()
+                .pointAt(glass);
+        scene.idle(100);
+
+        scene.overlay().showControls(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.SOUTH), Pointing.DOWN, 40).rightClick();
+        scene.idle(10);
+        scene.overlay().showText(90)
+                .text("Right-clicking a button on the screen runs whatever the program gave screen.onClick")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(util.grid().at(2, 1, 2), Direction.SOUTH));
+        scene.idle(100);
+    }
+
+    /** Lays the farm screen out on the pane, as a program showing farm.screen would, and turns the dots. */
+    private static void showMarkup(SceneBuilder scene, SceneBuildingUtil util, BlockPos topLeft, String iron) {
+        int w = (3 * 16 - 2 * ScreenPane.FRAME) * ScreenPane.DENSITY, h = (2 * 16 - 2 * ScreenPane.FRAME) * ScreenPane.DENSITY;
+        ScreenCanvas canvas = new ScreenCanvas(new byte[w * h], w, h);
+        try {
+            ScreenMarkup.draw(ScreenMarkup.parse("""
+                    <screen>
+                      <title>IRON FARM</title>
+                      <row><label>Iron</label><value align="right">%s</value></row>
+                      <bar value="0.7"/>
+                    </screen>""".formatted(iron)), canvas);
+        } catch (ScreenMarkup.MarkupException e) {
+            return;
+        }
+        var tag = BrassScreenBlockEntity.shownTag(canvas, true);
+        scene.world().modifyBlockEntityNBT(util.select().position(topLeft), BrassScreenBlockEntity.class, nbt -> nbt.merge(tag));
     }
 
     /** Sets the joins of the first {@code shown} screens as if they'd been placed in that order. */
@@ -256,36 +304,182 @@ public final class NewEraPonderScenes {
         scene.idle(10);
         scene.overlay().showText(80)
                 .attachKeyFrame()
-                .text("Panel controls sit on whichever face you click...")
+                .text("Panel controls go on whatever face you click: tops, walls, even ceilings")
                 .placeNearTarget()
                 .pointAt(util.vector().topOf(button));
         scene.idle(90);
 
-        scene.world().showSection(util.select().fromTo(1, 3, 2, 3, 3, 2), Direction.NORTH);
-        scene.idle(5);
         scene.world().showSection(util.select().fromTo(1, 1, 1, 3, 1, 1), Direction.NORTH);
-        scene.idle(10);
-        scene.overlay().showText(80)
-                .text("...tops, walls, even ceilings. Mix them to build a control desk")
+        scene.idle(15);
+        BlockPos knob = util.grid().at(1, 1, 1);
+        scene.overlay().showControls(util.vector().blockSurface(knob, Direction.SOUTH), Pointing.DOWN, 50).rightClick();
+        for (int notch = 2; notch <= 12; notch += 2) {
+            int n = notch;
+            scene.world().modifyBlockEntityNBT(util.select().position(knob), PanelControlBlockEntity.class, nbt -> {
+                nbt.putDouble("min", 0);
+                nbt.putDouble("max", 15);
+                nbt.putDouble("step", 1);
+                nbt.putInt("position", n);
+            });
+            scene.idle(5);
+        }
+        scene.overlay().showText(90)
+                .attachKeyFrame()
+                .text("Turn a knob or slide a slider by holding right-click and moving the mouse sideways. Hold Ctrl for finer steps")
                 .placeNearTarget()
-                .pointAt(util.vector().blockSurface(util.grid().at(2, 3, 2), Direction.SOUTH));
-        scene.idle(90);
+                .pointAt(util.vector().blockSurface(knob, Direction.SOUTH));
+        scene.idle(100);
+
+        BlockPos lamp = util.grid().at(2, 1, 1);
+        scene.world().modifyBlock(lamp, s -> s.setValue(PanelLampBlock.LIGHT, PanelLampBlock.Light.GREEN), false);
+        scene.overlay().showText(90)
+                .attachKeyFrame()
+                .colored(PonderPalette.GREEN)
+                .text("Every control has its own connection: cable it to a computer and programs can read it or drive it")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(lamp, Direction.SOUTH));
+        scene.idle(100);
+
+        scene.world().showSection(util.select().fromTo(1, 4, 3, 3, 4, 3), Direction.DOWN);
+        scene.idle(15);
+        String word = "HI!";
+        for (int i = 0; i < 3; i++) {
+            BlockPos tube = util.grid().at(1 + i, 4, 3);
+            String glyph = word.substring(i, i + 1);
+            scene.world().modifyBlock(tube, s -> s.setValue(NixieDigitBlock.LIT, true), false);
+            scene.world().modifyBlockEntityNBT(util.select().position(tube), PanelControlBlockEntity.class, nbt -> {
+                nbt.putString("glyph", glyph);
+                nbt.putString("color", "orange");
+            });
+            scene.idle(4);
+        }
+        scene.overlay().showText(100)
+                .attachKeyFrame()
+                .text("Nixie tubes side by side make one display. Cable any of them and nixie.setText(\"HI!\") lights the whole row")
+                .placeNearTarget()
+                .pointAt(util.vector().topOf(util.grid().at(2, 4, 3)));
+        scene.idle(110);
 
         scene.overlay().showControls(util.vector().topOf(util.grid().at(3, 2, 2)), Pointing.DOWN, 30)
                 .rightClick().withItem(AllItems.WRENCH.asStack());
         scene.idle(7);
         scene.overlay().showText(70)
-                .attachKeyFrame()
-                .text("Turn them with the Wrench")
+                .text("A Wrench turns them round")
                 .placeNearTarget()
                 .pointAt(util.vector().topOf(util.grid().at(3, 2, 2)));
         scene.idle(80);
+    }
+
+    public static void bus(SceneBuilder builder, SceneBuildingUtil util) {
+        CreateSceneBuilder scene = new CreateSceneBuilder(builder);
+        scene.title("data_bus", "Wiring machines to a computer");
+        scene.configureBasePlate(0, 0, 5);
+        scene.showBasePlate();
+        scene.idle(5);
+
+        BlockPos computer = util.grid().at(2, 1, 2), chest = util.grid().at(0, 1, 2), barrel = util.grid().at(4, 1, 2);
+        scene.world().showSection(util.select().fromTo(2, 1, 0, 2, 1, 2), Direction.DOWN);
+        scene.world().setKineticSpeed(util.select().fromTo(2, 1, 0, 2, 1, 2), 64);
+        scene.idle(10);
+        scene.world().showSection(util.select().position(chest), Direction.DOWN);
+        scene.idle(15);
+
+        // a data port on the chest's south face, and the computer's own port on its west side
+        BusPort onChest = new BusPort(1, chest, Direction.SOUTH, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
+        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.SOUTH), Pointing.DOWN, 30)
+                .rightClick().withItem(ModItems.BUS_PORT.asStack());
+        scene.idle(7);
+        show(scene, new BusElement(List.of(onChest), List.of()));
+        scene.overlay().showText(90)
+                .attachKeyFrame()
+                .text("Data ports stick to any face of any block. That block is now a device programs can reach")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(chest, Direction.SOUTH));
+        scene.idle(100);
+
+        BusPort onComputer = new BusPort(2, computer, Direction.WEST, 6, 6, BusPort.Kind.PORT, PortMode.IN);
+        Vec3 from = PartGeometry.anchor(onChest), to = PartGeometry.anchor(onComputer);
+        scene.overlay().showControls(util.vector().blockSurface(computer, Direction.WEST), Pointing.DOWN, 30)
+                .rightClick().withItem(ModItems.CABLE_SPOOL.asStack());
+        scene.idle(7);
+        show(scene, new BusElement(List.of(), List.of(new BusSpan(1, 1, 2, null, BusSpan.Casing.NONE, true, List.of(from, to)))));
+        scene.overlay().showText(100)
+                .attachKeyFrame()
+                .text("A Cable Spool joins two ports: click one, then the other. The computer has ports of its own on each side")
+                .placeNearTarget()
+                .pointAt(from.lerp(to, 0.5));
+        scene.idle(110);
 
         scene.overlay().showText(100)
                 .colored(PonderPalette.BLUE)
-                .text("Coming soon: programs read buttons, switches, knobs, sliders and keypads, and drive lamps, nixie digits and gauges")
-                .independent(40);
+                .text("In a program: local chest = bus.get(\"chest\"), then chest.getItems(), chest.pushItems(...) and the rest")
+                .placeNearTarget()
+                .pointAt(util.vector().topOf(computer));
         scene.idle(110);
+
+        scene.world().showSection(util.select().position(barrel), Direction.DOWN);
+        scene.idle(15);
+        BusPort brass = new BusPort(3, barrel, Direction.SOUTH, 6, 6, BusPort.Kind.BRASS_PORT, PortMode.OUT);
+        BusPort east = new BusPort(4, computer, Direction.EAST, 6, 6, BusPort.Kind.PORT, PortMode.OUT);
+        show(scene, new BusElement(List.of(brass), List.of(new BusSpan(2, 3, 4, net.minecraft.world.item.DyeColor.LIME,
+                BusSpan.Casing.NONE, true, List.of(PartGeometry.anchor(brass), PartGeometry.anchor(east))))));
+        scene.overlay().showText(100)
+                .attachKeyFrame()
+                .text("A Brass Port reads a block and gives it orders through the same port. Dye a cable to keep separate networks apart")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(barrel, Direction.SOUTH));
+        scene.idle(110);
+
+        scene.overlay().showControls(util.vector().blockSurface(chest, Direction.SOUTH), Pointing.DOWN, 30)
+                .rightClick().withItem(AllItems.WRENCH.asStack());
+        scene.idle(7);
+        scene.overlay().showText(90)
+                .text("A plain port does one thing. A Wrench flips it: out lets programs read the block, in lets them give it orders")
+                .placeNearTarget()
+                .pointAt(util.vector().blockSurface(chest, Direction.SOUTH));
+        scene.idle(100);
+    }
+
+    public static void instruments(SceneBuilder scene, SceneBuildingUtil util) {
+        scene.title("panel_instruments", "Flight instruments");
+        scene.configureBasePlate(0, 0, 5);
+        scene.showBasePlate();
+        scene.idle(5);
+
+        scene.world().showSection(util.select().fromTo(0, 1, 2, 4, 1, 2), Direction.DOWN);
+        scene.idle(10);
+        scene.world().showSection(util.select().fromTo(0, 2, 2, 4, 2, 2), Direction.DOWN);
+        scene.idle(15);
+        scene.overlay().showText(100)
+                .attachKeyFrame()
+                .text("The altimeter, gyroscope, compass and airspeed indicator read the ship they're built into")
+                .placeNearTarget()
+                .pointAt(util.vector().topOf(util.grid().at(1, 2, 2)));
+        scene.idle(110);
+
+        scene.overlay().showText(100)
+                .attachKeyFrame()
+                .text("Twelve o'clock on each dial is the way the ship flies: away from you on a desk, into the wall on a wall")
+                .placeNearTarget()
+                .pointAt(util.vector().topOf(util.grid().at(3, 2, 2)));
+        scene.idle(110);
+
+        scene.overlay().showText(100)
+                .colored(PonderPalette.BLUE)
+                .text("Programs read the same numbers: getAltitude(), getPitch(), getHeading(), getSpeed()...")
+                .placeNearTarget()
+                .pointAt(util.vector().topOf(util.grid().at(4, 2, 2)));
+        scene.idle(110);
+    }
+
+    /** Ports or cables appearing in the scene, fading in like blocks. */
+    private static void show(SceneBuilder scene, BusElement element) {
+        scene.addInstruction(new net.createmod.ponder.foundation.instruction.FadeIntoSceneInstruction<BusElement>(10, Direction.DOWN, element) {
+            @Override
+            protected Class<BusElement> getElementClass() {
+                return BusElement.class;
+            }
+        });
     }
 
     private NewEraPonderScenes() {}
