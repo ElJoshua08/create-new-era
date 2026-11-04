@@ -280,8 +280,11 @@ final class BlockDrivers {
         }
 
         Typewriter.add(api, level, be);
-        if (be != null)
+        if (be != null) {
             AeronauticsSensors.add(api, be);
+            ShipControls.add(api, level, pos, be);
+            CreateMachines.add(api, be);
+        }
 
         // ---- this mod's own ----
         if (be instanceof ChatLogBlockEntity log) {
@@ -388,6 +391,8 @@ final class BlockDrivers {
         if (be instanceof ChatLogBlockEntity log)
             return log.heard();
         Object sensor = AeronauticsSensors.snapshot(be);
+        if (sensor == null)
+            sensor = ShipControls.snapshot(level, pos, be);
         return sensor != null ? sensor : Typewriter.snapshot(be);
     }
 

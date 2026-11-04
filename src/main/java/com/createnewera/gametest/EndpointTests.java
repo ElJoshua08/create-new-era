@@ -21,6 +21,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -89,6 +90,133 @@ public class EndpointTests {
                     && l.text().contains("startup.lua:9") && l.text().contains("setRedstone"));
             if (!blamed)
                 helper.fail("the error should point at startup.lua:9: " + computer.getConsole());
+            helper.succeed();
+        });
+    }
+
+    private static BrassComputerBlockEntity poweredComputer(GameTestHelper helper) {
+        helper.setBlock(COMPUTER, ModBlocks.BRASS_COMPUTER.getDefaultState().setValue(BrassComputerBlock.HORIZONTAL_FACING, Direction.NORTH));
+        helper.setBlock(new BlockPos(2, 1, 3), AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.NORTH));
+        CreativeMotorBlockEntity motor = helper.getBlockEntity(new BlockPos(2, 1, 3));
+        motor.generatedSpeed.setValue(256);
+        return helper.getBlockEntity(COMPUTER);
+    }
+
+    /** A brass port on one face of the block, cabled to the computer. */
+    private static String brassPort(GameTestHelper helper, BlockPos at, Direction face, int socket) {
+        var level = helper.getLevel();
+        BlockPos abs = helper.absolutePos(at);
+        BusPort port = Bus.placePart(level, abs, face, 6, 6, BusPort.Kind.BRASS_PORT, PortMode.OUT);
+        if (port == null)
+            helper.fail("no port on " + at + " " + face);
+        BusData data = BusData.get(level);
+        data.connect(data.portsAt(helper.absolutePos(COMPUTER)).get(socket).id(), port.id());
+        return data.nameOf(abs, level.getBlockState(abs).getBlock());
+    }
+
+    private static void expectLine(GameTestHelper helper, BrassComputerBlockEntity computer, String line) {
+        if (computer.getConsole().stream().noneMatch(l -> l.kind() == ConsoleLine.Kind.OUTPUT && l.text().equals(line)))
+            helper.fail("expected '" + line + "' in " + computer.getConsole());
+    }
+
+    // Create's machines from a program: a bearing builds and drops its contraption, a sequencer takes a step
+    @GameTest(template = "empty5", timeoutTicks = 200)
+    public static void createMachinesTakeOrders(GameTestHelper helper) {
+        var computer = poweredComputer(helper);
+        BlockPos motor = new BlockPos(0, 1, 0), bearing = new BlockPos(0, 2, 0), sequencer = new BlockPos(4, 1, 0);
+        helper.setBlock(motor, AllBlocks.CREATIVE_MOTOR.getDefaultState().setValue(CreativeMotorBlock.FACING, Direction.UP));
+        ((CreativeMotorBlockEntity) helper.getBlockEntity(motor)).generatedSpeed.setValue(16);
+        helper.setBlock(bearing, AllBlocks.MECHANICAL_BEARING.getDefaultState()
+                .setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING, Direction.UP));
+        helper.setBlock(new BlockPos(0, 3, 0), Blocks.OAK_PLANKS);
+        helper.setBlock(sequencer, AllBlocks.SEQUENCED_GEARSHIFT.getDefaultState());
+        String b = brassPort(helper, bearing, Direction.NORTH, 0), s = brassPort(helper, sequencer, Direction.UP, 1);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local b, s = bus.get('" + b + "'), bus.get('" + s + "')",
+                "b.assemble()",
+                "sleep(0.5)",
+                "print('bearing', b.isAssembled())",
+                "b.disassemble()",
+                "sleep(0.2)",
+                "print('dropped', b.isAssembled())",
+                "s.rotate(90, 'fast')",
+                "print('sequencer', s.isRunning())"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(80, () -> {
+            expectLine(helper, computer, "bearing\ttrue");
+            expectLine(helper, computer, "dropped\tfalse");
+            expectLine(helper, computer, "sequencer\ttrue");
+            if (!helper.getLevel().getBlockState(helper.absolutePos(new BlockPos(0, 3, 0))).is(Blocks.OAK_PLANKS))
+                helper.fail("the planks should be back as a block");
+            helper.succeed();
+        });
+    }
+
+    // the physics assembler makes a ship when a program says so, after the tick, as its lever does
+    @GameTest(template = "empty5", timeoutTicks = 200)
+    public static void programsBuildShips(GameTestHelper helper) {
+        var assembler = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("simulated", "physics_assembler"));
+        if (assembler == Blocks.AIR) {
+            helper.succeed();
+            return;
+        }
+        var computer = poweredComputer(helper);
+        // on the floor of a plank: it builds the ship from the block it's stuck to
+        BlockPos at = new BlockPos(0, 2, 0);
+        helper.setBlock(new BlockPos(0, 1, 0), Blocks.OAK_PLANKS);
+        BlockState state = assembler.defaultBlockState();
+        for (var property : state.getProperties())
+            if (property.getName().equals("face") && property instanceof net.minecraft.world.level.block.state.properties.EnumProperty<?> face)
+                state = state.setValue((net.minecraft.world.level.block.state.properties.EnumProperty) face,
+                        net.minecraft.world.level.block.state.properties.AttachFace.FLOOR);
+        helper.setBlock(at, state);
+        String a = brassPort(helper, at, Direction.NORTH, 0);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local a = bus.get('" + a + "')",
+                "print('before', a.isAssembled())",
+                "a.assemble()",
+                "sleep(0.1)",
+                "print('error', a.getError())"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(40, () -> {
+            expectLine(helper, computer, "before\tfalse");
+            if (helper.getLevel().getBlockState(helper.absolutePos(at)).is(assembler))
+                helper.fail("the assembler should have gone into a ship: " + computer.getConsole());
+            helper.succeed();
+        });
+    }
+
+    // Aeronautics' controls from a program: throttle, wheel, optical sensor
+    @GameTest(template = "empty5", timeoutTicks = 200)
+    public static void shipControlsTakeOrders(GameTestHelper helper) {
+        java.util.function.Function<String, net.minecraft.world.level.block.Block> sim = id -> net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                .get(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("simulated", id));
+        if (sim.apply("throttle_lever") == Blocks.AIR) {
+            helper.succeed();
+            return;
+        }
+        var computer = poweredComputer(helper);
+        BlockPos throttle = new BlockPos(0, 1, 0), wheel = new BlockPos(4, 1, 0), optical = new BlockPos(0, 1, 4);
+        helper.setBlock(throttle, sim.apply("throttle_lever"));
+        helper.setBlock(wheel, sim.apply("steering_wheel"));
+        helper.setBlock(optical, sim.apply("optical_sensor"));
+        String t = brassPort(helper, throttle, Direction.DOWN, 0), w = brassPort(helper, wheel, Direction.DOWN, 1),
+                o = brassPort(helper, optical, Direction.DOWN, 2);
+        computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
+                "local t, w, o = bus.get('" + t + "'), bus.get('" + w + "'), bus.get('" + o + "')",
+                "t.setValue(7)",
+                "w.setAngle(30)",
+                "o.setRange(12)",
+                "sleep(0.2)",
+                "print('throttle', t.getValue())",
+                "print('wheel', w.getTargetAngle() <= 30, w.getMaxAngle() ~= nil)",
+                "print('optical', o.getRange())"));
+        computer.start("create_new_era.console.running");
+        helper.runAfterDelay(60, () -> {
+            expectLine(helper, computer, "throttle\t7");
+            expectLine(helper, computer, "wheel\ttrue\ttrue");
+            expectLine(helper, computer, "optical\t12");
             helper.succeed();
         });
     }
