@@ -1,7 +1,5 @@
 package com.createnewera.block.screen;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,45 +11,78 @@ import com.createnewera.bus.DeviceDrivers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.item.DyeColor;
 
 /**
- * What programs draw on a pane of Brass Screens with, through any of its screens: pixels,
- * rectangles, lines, circles and text, in any colour, (1, 1) at the top left. Everything clips
- * at the edges; what's drawn shows at the end of the tick.
+ * What programs do with a pane of Brass Screens, through any of its screens. Mostly: show some
+ * markup (ScreenMarkup) and then set the elements it gave an id, and hear its buttons. For what
+ * markup can't lay out, a radar say, they can draw on its flip dots straight: dots, rectangles,
+ * lines, circles, text, (1, 1) at the top left, in the dots' colours (ScreenPalette).
  */
 public final class ScreenDriver {
-    /** The colours a colour argument can be named by: the dyes. */
-    public static final List<String> COLORS = Arrays.stream(DyeColor.values()).map(DyeColor::getSerializedName).toList();
-
     public static void methods(DeviceDrivers.Api api, ServerLevel level, BlockPos pos) {
         api.family("screen");
+
+        // ---- markup ----
+        api.order("show", "markup: string", "", args -> {
+            Drawing d = drawing(level, pos);
+            try {
+                d.controller.show(d.pane, args.arg(1).checkString());
+            } catch (ScreenMarkup.MarkupException e) {
+                throw new LuaError(e.getMessage());
+            }
+            return null;
+        });
+        api.order("set", "id: string, value", "", args -> {
+            Drawing d = drawing(level, pos);
+            LuaValue value = args.arg(2);
+            String text = value.type() == Constants.TNUMBER ? number(value.checkDouble()) : value.toString();
+            try {
+                d.controller.set(d.pane, args.arg(1).checkString(), text);
+            } catch (ScreenMarkup.MarkupException e) {
+                throw new LuaError(e.getMessage());
+            }
+            return null;
+        });
+        api.read("get", "id: string", "string | nil", args -> {
+            try {
+                return drawing(level, pos).controller.get(args.arg(1).checkString());
+            } catch (ScreenMarkup.MarkupException e) {
+                throw new LuaError(e.getMessage());
+            }
+        });
+        api.read("getLastClick", "", "{id, player, count} | nil", args -> {
+            BrassScreenBlockEntity c = drawing(level, pos).controller;
+            return c.clicks() == 0 ? null : Map.of("id", c.clicked(), "player", c.clickedBy(), "count", c.clicks());
+        });
+        api.read("getLastTouch", "", "{x, y, player, count} | nil", args -> {
+            BrassScreenBlockEntity c = drawing(level, pos).controller;
+            return c.touches() == 0 ? null : Map.of("x", c.touchX() + 1, "y", c.touchY() + 1, "player", c.touchedBy(), "count", c.touches());
+        });
+
+        // ---- size ----
         api.read("getSize", "", "{width, height}", args -> {
             ScreenPane pane = pane(level, pos);
             return Map.of("width", pane.width(), "height", pane.height());
         });
-        api.read("getWidth", "", "pixels", args -> pane(level, pos).width());
-        api.read("getHeight", "", "pixels", args -> pane(level, pos).height());
-        api.read("getCharSize", "", "{width, height}", args -> Map.of("width", ScreenFont.WIDTH, "height", ScreenFont.HEIGHT));
-        api.read("getPixel", "x: number, y: number", "colour 0xRRGGBB", args -> {
-            Drawing d = drawing(level, pos);
-            return d.canvas.get(args.arg(1).checkInteger() - 1, args.arg(2).checkInteger() - 1);
-        });
-        api.read("getLastTouch", "", "{x, y, player, count} | nil", args -> {
-            BrassScreenBlockEntity controller = drawing(level, pos).controller;
-            return controller.touches() == 0 ? null : Map.of("x", controller.touchX() + 1, "y", controller.touchY() + 1,
-                    "player", controller.touchedBy(), "count", controller.touches());
-        });
-        api.read("getTextWidth", "text: string, scale?: number", "pixels",
+        api.read("getWidth", "", "dots", args -> pane(level, pos).width());
+        api.read("getHeight", "", "dots", args -> pane(level, pos).height());
+        api.read("getTextWidth", "text: string, scale?: number", "dots",
                 args -> ScreenCanvas.textWidth(args.arg(1).checkString(), scale(args.arg(2))));
+        api.read("getColors", "", "{\"amber\", \"red\", ...}", args -> ScreenPalette.names());
 
-        api.order("clear", "colour?: name | 0xRRGGBB", "", args -> {
+        // ---- drawing on the dots ----
+        api.read("getDot", "x: number, y: number", "colour name", args -> {
             Drawing d = drawing(level, pos);
-            d.canvas.fill(args.arg(1).isNil() ? 0 : color(args.arg(1)));
+            return ScreenPalette.names().get(d.canvas.get(args.arg(1).checkInteger() - 1, args.arg(2).checkInteger() - 1));
+        });
+        api.order("clear", "colour?", "", args -> {
+            Drawing d = drawing(level, pos);
+            d.controller.forgetMarkup();
+            d.canvas.fill(args.arg(1).isNil() ? ScreenPalette.DARK : color(args.arg(1)));
             d.done();
             return null;
         });
-        api.order("setPixel", "x: number, y: number, colour", "", args -> {
+        api.order("setDot", "x: number, y: number, colour", "", args -> {
             Drawing d = drawing(level, pos);
             d.canvas.set(args.arg(1).checkInteger() - 1, args.arg(2).checkInteger() - 1, color(args.arg(3)));
             d.done();
@@ -90,31 +121,33 @@ public final class ScreenDriver {
             d.done();
             return null;
         });
-        api.order("drawText", "x: number, y: number, text: string, colour?, scale?: number", "width in pixels", args -> {
+        api.order("drawText", "x: number, y: number, text: string, colour?, scale?: number", "width in dots", args -> {
             Drawing d = drawing(level, pos);
             int width = d.canvas.text(args.arg(1).checkInteger() - 1, args.arg(2).checkInteger() - 1, args.arg(3).checkString(),
-                    args.arg(4).isNil() ? 0xFFFFFF : color(args.arg(4)), scale(args.arg(5)));
+                    args.arg(4).isNil() ? ScreenPalette.AMBER : color(args.arg(4)), scale(args.arg(5)));
             d.done();
             return width;
         });
-        // where a colour goes, the editor offers the dyes
-        api.choices("clear", COLORS);
-        api.choices("setPixel", 2, COLORS);
+
+        List<String> colors = ScreenPalette.names();
+        api.choices("clear", colors);
+        api.choices("setDot", 2, colors);
         for (String fn : List.of("fillRect", "drawRect", "drawLine"))
-            api.choices(fn, 4, COLORS);
+            api.choices(fn, 4, colors);
         for (String fn : List.of("drawCircle", "fillCircle", "drawText"))
-            api.choices(fn, 3, COLORS);
+            api.choices(fn, 3, colors);
     }
 
-    /** What onChange notices: a touch. */
+    /** What onChange notices: a touch, or a click on a button. */
     public static Object snapshot(ServerLevel level, BlockPos pos) {
         ScreenPane pane = ScreenPane.of(level, pos);
-        return pane != null && level.getBlockEntity(pane.origin()) instanceof BrassScreenBlockEntity c ? c.touches() : 0L;
+        return pane != null && level.getBlockEntity(pane.origin()) instanceof BrassScreenBlockEntity c
+                ? List.of(c.touches(), c.clicks()) : List.of();
     }
 
-    private record Drawing(BrassScreenBlockEntity controller, ScreenCanvas canvas) {
+    private record Drawing(ScreenPane pane, BrassScreenBlockEntity controller, ScreenCanvas canvas) {
         void done() {
-            controller.changed();
+            controller.drawn();
         }
     }
 
@@ -129,29 +162,26 @@ public final class ScreenDriver {
         ScreenPane pane = pane(level, pos);
         if (!(level.getBlockEntity(pane.origin()) instanceof BrassScreenBlockEntity controller))
             throw new LuaError("the screen is gone");
-        return new Drawing(controller, controller.canvas(pane));
+        return new Drawing(pane, controller, controller.canvas(pane));
     }
 
     private static int scale(LuaValue value) throws LuaError {
-        return value.isNil() ? 1 : Math.clamp(value.checkInteger(), 1, 16);
+        return value.isNil() ? 1 : Math.clamp(value.checkInteger(), 1, 8);
     }
 
-    /** A colour: 0xRRGGBB, "#RRGGBB" or "#RGB", or a dye's name. */
+    /** A number as a program would print it. */
+    private static String number(double v) {
+        return v == Math.rint(v) && Math.abs(v) < 1e15 ? Long.toString((long) v) : Double.toString(v);
+    }
+
+    /** A dot colour: a name ("amber", "red"...), "#RRGGBB" or 0xRRGGBB to the nearest. */
     static int color(LuaValue value) throws LuaError {
         if (value.type() == Constants.TNUMBER)
-            return value.checkInteger() & 0xFFFFFF;
-        String name = value.checkString().toLowerCase(java.util.Locale.ROOT).strip();
-        if (name.startsWith("#")) {
-            String hex = name.substring(1);
-            if (hex.length() == 3)
-                hex = new String(new char[] {hex.charAt(0), hex.charAt(0), hex.charAt(1), hex.charAt(1), hex.charAt(2), hex.charAt(2)});
-            if (hex.matches("[0-9a-f]{6}"))
-                return Integer.parseInt(hex, 16);
-        }
-        DyeColor dye = DyeColor.byName(name, null);
-        if (dye != null)
-            return dye.getTextColor();
-        throw new LuaError("bad colour \"" + value.checkString() + "\" (a dye's name, \"#RRGGBB\" or 0xRRGGBB expected)");
+            return ScreenPalette.nearest(value.checkInteger() & 0xFFFFFF);
+        int c = ScreenPalette.of(value.checkString());
+        if (c < 0)
+            throw new LuaError("bad colour \"" + value.checkString() + "\" (" + String.join(", ", ScreenPalette.names()) + ", or \"#RRGGBB\")");
+        return c;
     }
 
     private ScreenDriver() {}

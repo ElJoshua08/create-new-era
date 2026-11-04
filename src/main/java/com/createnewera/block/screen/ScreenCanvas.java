@@ -1,27 +1,29 @@
 package com.createnewera.block.screen;
 
+import java.util.Arrays;
+
 /**
- * Drawing into a screen's pixels: a row-major array of 0xRRGGBB, (0, 0) at the top left.
- * Everything clips at the edges, so a program can draw past them freely.
+ * Drawing into a screen's flip dots: a row-major array of palette colours (ScreenPalette), (0, 0)
+ * at the top left. Everything clips at the edges, so programs and layouts can draw past them.
  */
-public record ScreenCanvas(int[] pixels, int width, int height) {
+public record ScreenCanvas(byte[] dots, int width, int height) {
     public void set(int x, int y, int color) {
         if (x >= 0 && y >= 0 && x < width && y < height)
-            pixels[y * width + x] = color;
+            dots[y * width + x] = (byte) color;
     }
 
     public int get(int x, int y) {
-        return x >= 0 && y >= 0 && x < width && y < height ? pixels[y * width + x] : 0;
+        return x >= 0 && y >= 0 && x < width && y < height ? dots[y * width + x] : ScreenPalette.DARK;
     }
 
     public void fill(int color) {
-        java.util.Arrays.fill(pixels, color);
+        Arrays.fill(dots, (byte) color);
     }
 
     public void fillRect(int x, int y, int w, int h, int color) {
         int x0 = Math.max(0, x), y0 = Math.max(0, y), x1 = Math.min(width, x + w), y1 = Math.min(height, y + h);
         for (int j = y0; j < y1; j++)
-            java.util.Arrays.fill(pixels, j * width + x0, j * width + Math.max(x0, x1), color);
+            Arrays.fill(dots, j * width + x0, j * width + Math.max(x0, x1), (byte) color);
     }
 
     public void drawRect(int x, int y, int w, int h, int color) {
@@ -65,7 +67,7 @@ public record ScreenCanvas(int[] pixels, int width, int height) {
     }
 
     /**
-     * Text in the screen font, each pixel {@code scale} times over; new lines start under the
+     * Text in the screen font, each dot {@code scale} times over; new lines start under the
      * first. @return how wide its longest line is
      */
     public int text(int x, int y, String text, int color, int scale) {
@@ -74,7 +76,7 @@ public record ScreenCanvas(int[] pixels, int width, int height) {
             if (cp == '\n') {
                 widest = Math.max(widest, cx - x);
                 cx = x;
-                y += ScreenFont.HEIGHT * scale;
+                y += lineHeight(scale);
                 continue;
             }
             boolean[] glyph = ScreenFont.glyph(cp);
@@ -98,5 +100,10 @@ public record ScreenCanvas(int[] pixels, int width, int height) {
             }
         }
         return Math.max(widest, line);
+    }
+
+    /** A line of text and the gap under it. */
+    public static int lineHeight(int scale) {
+        return (ScreenFont.HEIGHT + 1) * scale;
     }
 }

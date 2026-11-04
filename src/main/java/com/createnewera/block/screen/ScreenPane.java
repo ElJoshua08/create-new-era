@@ -14,16 +14,16 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * The pane a screen is part of: the screens around it facing the same way, joined into one
- * rectangle, as seen from the front. Its pixels belong to its top-left block (the controller):
- * four to each of Minecraft's pixels, across the glass inside the outer brass frame.
+ * rectangle, as seen from the front. Its flip dots belong to its top-left block (the controller):
+ * two to each of Minecraft's pixels, across the glass inside the outer brass frame.
  *
  * @param origin  the top-left block, as seen from the front
  * @param columns blocks across
  * @param rows    blocks down
  */
 public record ScreenPane(BlockPos origin, Direction facing, int columns, int rows) {
-    /** Screen pixels to one of Minecraft's: a block's pixel is four by four of them */
-    public static final int DENSITY = 4;
+    /** Flip dots to one of Minecraft's pixels each way: 24 by 24 on a screen's glass */
+    public static final int DENSITY = 2;
     /** The brass frame round the pane's edge, in Minecraft's pixels */
     public static final int FRAME = 2;
     /** The biggest pane, in blocks each way: past it the screens split into panes of their own */
@@ -75,7 +75,7 @@ public record ScreenPane(BlockPos origin, Direction facing, int columns, int row
         return offset.getX() * axis.getStepX() + offset.getZ() * axis.getStepZ();
     }
 
-    /** Pixels across: the glass between the outer frame. */
+    /** Dots across: the glass between the outer frame. */
     public int width() {
         return (columns * 16 - 2 * FRAME) * DENSITY;
     }

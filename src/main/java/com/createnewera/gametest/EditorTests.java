@@ -74,6 +74,11 @@ public class EditorTests {
         check(helper, offered("redstone.setOutput(", devices), "\"front\"", "sides");
         check(helper, offered("bus.get(", devices), "\"speaker\"", "devices by name");
         check(helper, offered("bus.get(\"wit", devices), "switch", "a name found by its middle");
+        // a table a function returned offers its fields
+        List<NetworkDevice> screens = List.of(new NetworkDevice("screen", "test", "", BlockPos.ZERO, 2, true, true,
+                List.of(new NetworkDevice.Fn("getSize", "", "{width, height}", "", true, List.of()))));
+        String sized = "local screen = bus.get('screen')\nlocal size = screen.getSize()\nsize.";
+        helper.assertTrue(offered(sized, screens).containsAll(List.of("width", "height")), "size. offered " + offered(sized, screens));
         // a variable says what it is: a device what it does, anything else the line that sets it
         var speaker = Completions.complete(vars + "spe", vars + "spe", List.of(), n -> null, devices, null, true).items().stream()
                 .map(m -> m.entry()).filter(e -> e.label().equals("speaker")).findFirst().orElse(null);

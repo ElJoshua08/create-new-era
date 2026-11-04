@@ -10,11 +10,14 @@ import com.createnewera.CreateNewEra;
 
 /**
  * The font screens write with: Monocraft, the editor's font, as a bitmap (gen_screen_font.py),
- * so the server can draw text into a screen's pixels itself. Six pixels a character, twelve a
- * line, from U+0020 to U+00FF; anything else shows as '?'.
+ * so the server can draw text into a screen's flip dots itself: six dots a character, from
+ * U+0020 to U+00FF (anything else shows as '?'). A line is the ten rows from accents down to
+ * the tails of g and y, the font's own twelve less the very top and bottom.
  */
 public final class ScreenFont {
-    public static final int WIDTH = 6, HEIGHT = 12;
+    public static final int WIDTH = 6, HEIGHT = 10;
+    /** The sheet's cells are twelve rows; a line starts at its second */
+    private static final int CELL_HEIGHT = 12, TOP = 1;
     private static final int FIRST = 0x20, LAST = 0xFF, COLUMNS = 16;
     private static boolean[][] glyphs;
 
@@ -33,7 +36,7 @@ public final class ScreenFont {
         try (InputStream in = ScreenFont.class.getResourceAsStream("/data/create_new_era/screen_font.png")) {
             BufferedImage sheet = ImageIO.read(in);
             for (int i = 0; i < glyphs.length; i++) {
-                int ox = (i % COLUMNS) * WIDTH, oy = (i / COLUMNS) * HEIGHT;
+                int ox = (i % COLUMNS) * WIDTH, oy = (i / COLUMNS) * CELL_HEIGHT + TOP;
                 for (int y = 0; y < HEIGHT; y++)
                     for (int x = 0; x < WIDTH; x++)
                         glyphs[i][y * WIDTH + x] = (sheet.getRGB(ox + x, oy + y) >>> 24) > 127;

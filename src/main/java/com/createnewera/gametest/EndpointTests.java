@@ -152,44 +152,49 @@ public class EndpointTests {
         });
     }
 
-    // two screens side by side are one pane: a program draws on it, a player's click reaches onTouch
+    // four screens are one pane of flip dots: a program lays markup out on it, sets a value, hears a button
     @GameTest(template = "empty5", timeoutTicks = 160)
-    public static void screensDrawAndHearTouches(GameTestHelper helper) {
+    public static void screensShowMarkupAndHearButtons(GameTestHelper helper) {
         var computer = poweredComputer(helper);
         BlockState screen = ModBlocks.BRASS_SCREEN.getDefaultState().setValue(com.createnewera.block.HorizontalMachineBlock.FACING, Direction.NORTH);
-        // facing north, the viewer's left is east: the block at x 1 is the pane's top left
-        helper.setBlock(new BlockPos(0, 2, 0), screen);
-        helper.setBlock(new BlockPos(1, 2, 0), screen);
+        // facing north, the viewer's left is east: the block at x 1, y 3 is the pane's top left
+        for (int x = 0; x < 2; x++)
+            for (int y = 2; y < 4; y++)
+                helper.setBlock(new BlockPos(x, y, 0), screen);
         String name = brassPort(helper, new BlockPos(0, 2, 0), Direction.SOUTH, 0);
         computer.setProgram(ComputerFiles.STARTUP, String.join("\n",
                 "local s = bus.get('" + name + "')",
                 "local size = s.getSize()",
                 "print('size', size.width, size.height)",
-                "s.clear('blue')",
-                "s.fillRect(1, 1, 10, 10, '#ff0000')",
-                "print('text', s.drawText(2, 20, 'Hola', 0xFFFFFF))",
-                "print('pixel', s.getPixel(5, 5) == 0xFF0000, s.getPixel(50, 40) == s.getPixel(100, 40))",
-                "s.onTouch(function(x, y, player) print('touch', x, y) end)"));
+                "s.show([[",
+                "  <title>FARM</title>",
+                "  <row><label>IRON</label><value id='iron' align='right'>0</value></row>",
+                "  <button id='go'>GO</button>",
+                "]])",
+                "s.set('iron', 42)",
+                "print('get', s.get('iron'))",
+                "print('bad', pcall(s.show, '<blink>no</blink>'))",
+                "s.onClick('go', function(player) print('clicked go') end)"));
         computer.start("create_new_era.console.running");
         helper.runAfterDelay(30, () -> {
-            expectLine(helper, computer, "size\t112\t48");
-            expectLine(helper, computer, "text\t24");
-            expectLine(helper, computer, "pixel\ttrue\ttrue");
+            expectLine(helper, computer, "size\t56\t56");
+            expectLine(helper, computer, "get\t42");
+            if (computer.getConsole().stream().noneMatch(l -> l.text().startsWith("bad\tfalse") && l.text().contains("unknown tag <blink>")))
+                helper.fail("a wrong tag should be refused, saying which: " + computer.getConsole());
             var pane = com.createnewera.block.screen.ScreenPane.of(helper.getLevel(), helper.absolutePos(new BlockPos(0, 2, 0)));
-            if (!pane.origin().equals(helper.absolutePos(new BlockPos(1, 2, 0))))
-                helper.fail("the pane's top left should be the east screen, it's " + pane.origin());
+            if (!pane.origin().equals(helper.absolutePos(new BlockPos(1, 3, 0))))
+                helper.fail("the pane's top left should be the east, upper screen, it's " + pane.origin());
             var controller = (com.createnewera.block.screen.BrassScreenBlockEntity) helper.getLevel().getBlockEntity(pane.origin());
-            if (controller.shown() == null || controller.shown().get(0, 0) != 0xFF0000)
-                helper.fail("the pixels should be on the pane's top-left screen");
-            // a click in the middle of the west screen's glass, on its front (north) face
-            BlockPos west = helper.absolutePos(new BlockPos(0, 2, 0));
-            var hit = new net.minecraft.world.phys.BlockHitResult(new net.minecraft.world.phys.Vec3(west.getX() + 0.5, west.getY() + 0.5, west.getZ()),
-                    Direction.NORTH, west, false);
-            helper.getLevel().getBlockState(west).useWithoutItem(helper.getLevel(), helper.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE), hit);
+            if (controller.shown() == null || controller.shown().get(0, 0) != com.createnewera.block.screen.ScreenPalette.AMBER)
+                helper.fail("the title's band should be amber at the top left");
+            // a click on the button: the lower east screen, a quarter in from its left and four pixels down
+            BlockPos lower = helper.absolutePos(new BlockPos(1, 2, 0));
+            var hit = new net.minecraft.world.phys.BlockHitResult(
+                    new net.minecraft.world.phys.Vec3(lower.getX() + 0.25, lower.getY() + 0.75, lower.getZ()), Direction.NORTH, lower, false);
+            helper.getLevel().getBlockState(lower).useWithoutItem(helper.getLevel(), helper.makeMockPlayer(net.minecraft.world.level.GameType.CREATIVE), hit);
         });
         helper.runAfterDelay(70, () -> {
-            // the middle of the west (right-hand) screen: 16 + 8 of the pane's pixels in, less the frame, times 4
-            expectLine(helper, computer, "touch\t89\t25");
+            expectLine(helper, computer, "clicked go");
             helper.succeed();
         });
     }

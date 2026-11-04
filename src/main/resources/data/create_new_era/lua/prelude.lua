@@ -202,6 +202,30 @@ function bus.get(name)
             end)
         end
     end
+    -- a screen's markup: runs fn(player, device) each time its button with that id is pressed
+    if device.getLastClick then
+        function device.onClick(...)
+            local args = table.pack(...)
+            -- works as device.onClick(id, fn) and as device:onClick(id, fn)
+            local first = args[1] == device and 2 or 1
+            local id, fn = args[first], args[first + 1]
+            if type(id) ~= "string" then
+                error("bad argument #1 to 'onClick' (a button's id expected, got " .. type(id) .. ")", 2)
+            end
+            if type(fn) ~= "function" then
+                error("bad argument #2 to 'onClick' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            local last = device.getLastClick()
+            local seen = last and last.count or 0
+            device.onChange(function(_, d)
+                local click = d.getLastClick()
+                if click and click.count > seen then
+                    seen = click.count
+                    if click.id == id then fn(click.player, d) end
+                end
+            end)
+        end
+    end
     -- a chat log: runs fn(message, device) for every message it hears: {player, text, time}
     if device.getLast then
         function device.onMessage(a, b)

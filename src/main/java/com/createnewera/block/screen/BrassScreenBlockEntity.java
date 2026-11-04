@@ -1,11 +1,16 @@
 package com.createnewera.block.screen;
 
 import java.io.ByteArrayOutputStream;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
 import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Element;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -20,57 +25,137 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * A Brass Screen. The top-left screen of a pane (ScreenPane) holds the whole pane's pixels;
- * the others only point at it. Programs draw into the pixels on the server; once a tick, if
- * anything changed, they go to the players nearby, compressed, and are saved with the world.
+ * A Brass Screen. The top-left screen of a pane (ScreenPane) holds the whole pane's flip dots,
+ * a palette colour each; the others only point at it. Programs lay markup out on it, or draw
+ * on it, on the server; once a tick, if anything changed, the dots go to the players nearby,
+ * compressed, and each player's screen turns them over (BrassScreenRenderer).
  */
 public class BrassScreenBlockEntity extends BlockEntity {
-    /** The pane's pixels, 0xRRGGBB, or null before anything has been drawn */
-    private int @Nullable [] pixels;
+    /** The pane's dots, palette colours (ScreenPalette), or null before anything was shown */
+    private byte @Nullable [] dots;
     private int width, height;
     private boolean dirty;
-    /** The last touch: where, by whom, and a number that grows with each, for onTouch */
-    private int touchX, touchY;
-    private String touchedBy = "";
-    private long touches;
+    /** Whether the last change was a layout: the dots turn in a ripple, not all at once */
+    private boolean ripple;
 
-    /** Client only: bumped when new pixels arrive, so the renderer knows to upload them */
+    /** The markup shown, if any, and the values the program has given its elements since */
+    private @Nullable String markup;
+    private final Map<String, String> values = new LinkedHashMap<>();
+    private List<ScreenMarkup.Button> buttons = List.of();
+
+    private int touchX, touchY;
+    private String touchedBy = "", clicked = "", clickedBy = "";
+    private long touches, clicks;
+
+    /** Client only: bumped when new dots arrive, so the renderer starts turning them */
     public int version;
 
     public BrassScreenBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
-    /** The pixels to draw into, sized to the pane now, kept as they were where the pane still covers them. */
+    /** The dots to draw on, sized to the pane now, kept as they were where the pane still covers them. */
     public ScreenCanvas canvas(ScreenPane pane) {
         int w = pane.width(), h = pane.height();
-        if (pixels == null || width != w || height != h) {
-            int[] resized = new int[w * h];
-            if (pixels != null)
+        if (dots == null || width != w || height != h) {
+            byte[] resized = new byte[w * h];
+            if (dots != null)
                 for (int y = 0; y < Math.min(h, height); y++)
-                    System.arraycopy(pixels, y * width, resized, y * w, Math.min(w, width));
-            pixels = resized;
+                    System.arraycopy(dots, y * width, resized, y * w, Math.min(w, width));
+            dots = resized;
             width = w;
             height = h;
-            changed();
+            if (markup != null)
+                redraw(new ScreenCanvas(dots, width, height));
+            dirty = true;
         }
-        return new ScreenCanvas(pixels, width, height);
+        return new ScreenCanvas(dots, width, height);
     }
 
     public @Nullable ScreenCanvas shown() {
-        return pixels == null ? null : new ScreenCanvas(pixels, width, height);
+        return dots == null ? null : new ScreenCanvas(dots, width, height);
     }
 
-    /** Something was drawn: send it at the end of the tick. */
-    public void changed() {
+    /** A program drew straight on the dots: they turn at once. */
+    public void drawn() {
         dirty = true;
+        ripple = false;
     }
 
+    /** Lays new markup out over the whole pane. */
+    public void show(ScreenPane pane, String source) throws ScreenMarkup.MarkupException {
+        ScreenMarkup.parse(source); // a mistake throws before anything changes
+        markup = source;
+        values.clear();
+        relayout(pane);
+    }
+
+    /** Changes one element of the markup shown, by id, and lays it out again. */
+    public void set(ScreenPane pane, String id, String value) throws ScreenMarkup.MarkupException {
+        if (markup == null)
+            throw new ScreenMarkup.MarkupException("nothing is shown: show some markup first");
+        if (ScreenMarkup.byId(ScreenMarkup.parse(markup), id) == null)
+            throw new ScreenMarkup.MarkupException("no element with id \"" + id + "\" in what's shown");
+        values.put(id, value);
+        relayout(pane);
+    }
+
+    /** What an element of the markup shown says now: its text, or a bar's value. */
+    public @Nullable String get(String id) throws ScreenMarkup.MarkupException {
+        if (markup == null)
+            return null;
+        Element e = ScreenMarkup.byId(element(), id);
+        if (e == null)
+            return null;
+        return e.getTagName().equals("bar") ? e.getAttribute("value") : e.getTextContent().strip();
+    }
+
+    /** Forgets the markup: what a program draws next is all there is. */
+    public void forgetMarkup() {
+        markup = null;
+        values.clear();
+        buttons = List.of();
+    }
+
+    private void relayout(ScreenPane pane) {
+        redraw(canvas(pane));
+        dirty = true;
+        ripple = true;
+    }
+
+    private void redraw(ScreenCanvas canvas) {
+        try {
+            buttons = ScreenMarkup.draw(element(), canvas);
+        } catch (ScreenMarkup.MarkupException e) {
+            buttons = List.of();
+        }
+    }
+
+    /** The markup with the program's values put in. */
+    private Element element() throws ScreenMarkup.MarkupException {
+        Element root = ScreenMarkup.parse(markup);
+        for (var value : values.entrySet()) {
+            Element e = ScreenMarkup.byId(root, value.getKey());
+            if (e != null)
+                ScreenMarkup.set(e, value.getValue());
+        }
+        return root;
+    }
+
+    /** A player pressed the glass at this dot: a touch, and a click if it's on a button. */
     public void touched(int x, int y, String player) {
         touchX = x;
         touchY = y;
         touchedBy = player;
         touches++;
+        if (markup != null && buttons.isEmpty() && dots != null)
+            redraw(new ScreenCanvas(dots, width, height)); // after a load: find the buttons again
+        for (ScreenMarkup.Button button : buttons)
+            if (button.contains(x, y)) {
+                clicked = button.id();
+                clickedBy = player;
+                clicks++;
+            }
         setChanged();
     }
 
@@ -90,6 +175,23 @@ public class BrassScreenBlockEntity extends BlockEntity {
         return touches;
     }
 
+    public String clicked() {
+        return clicked;
+    }
+
+    public String clickedBy() {
+        return clickedBy;
+    }
+
+    public long clicks() {
+        return clicks;
+    }
+
+    /** Client: whether the dots that just arrived turn in a ripple */
+    public boolean ripples() {
+        return ripple;
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, BrassScreenBlockEntity screen) {
         if (!screen.dirty)
             return;
@@ -98,45 +200,8 @@ public class BrassScreenBlockEntity extends BlockEntity {
         level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
-        if (pixels != null) {
-            tag.putInt("Width", width);
-            tag.putInt("Height", height);
-            tag.putByteArray("Pixels", pack(pixels));
-        }
-        if (touches > 0) {
-            tag.putLong("Touches", touches);
-            tag.putInt("TouchX", touchX);
-            tag.putInt("TouchY", touchY);
-            tag.putString("TouchedBy", touchedBy);
-        }
-    }
-
-    @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("Pixels")) {
-            int w = tag.getInt("Width"), h = tag.getInt("Height");
-            int[] read = unpack(tag.getByteArray("Pixels"), w * h);
-            if (read != null) {
-                pixels = read;
-                width = w;
-                height = h;
-            }
-        } else {
-            pixels = null;
-        }
-        touches = tag.getLong("Touches");
-        touchX = tag.getInt("TouchX");
-        touchY = tag.getInt("TouchY");
-        touchedBy = tag.getString("TouchedBy");
-        version++;
-    }
-
-    /** Client: lets go of the texture a pane drew with when its top-left screen goes (BrassScreenRenderer plugs it in). */
-    public static java.util.function.Consumer<BlockPos> clientRemoved = pos -> {};
+    /** Client: lets go of the textures a pane drew with when a screen goes (BrassScreenRenderer plugs it in). */
+    public static Consumer<BlockPos> clientRemoved = pos -> {};
 
     @Override
     public void setRemoved() {
@@ -146,8 +211,70 @@ public class BrassScreenBlockEntity extends BlockEntity {
     }
 
     @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        writeDots(tag);
+        if (markup != null) {
+            tag.putString("Markup", markup);
+            CompoundTag set = new CompoundTag();
+            values.forEach(set::putString);
+            tag.put("Values", set);
+        }
+        tag.putLong("Touches", touches);
+        tag.putInt("TouchX", touchX);
+        tag.putInt("TouchY", touchY);
+        tag.putString("TouchedBy", touchedBy);
+        tag.putLong("Clicks", clicks);
+        tag.putString("Clicked", clicked);
+        tag.putString("ClickedBy", clickedBy);
+    }
+
+    private void writeDots(CompoundTag tag) {
+        if (dots == null)
+            return;
+        tag.putInt("Width", width);
+        tag.putInt("Height", height);
+        tag.putByteArray("Dots", pack(dots));
+        tag.putBoolean("Ripple", ripple);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("Dots")) {
+            int w = tag.getInt("Width"), h = tag.getInt("Height");
+            byte[] read = unpack(tag.getByteArray("Dots"), w * h);
+            if (read != null) {
+                dots = read;
+                width = w;
+                height = h;
+            }
+            ripple = tag.getBoolean("Ripple");
+        } else {
+            dots = null;
+        }
+        markup = tag.contains("Markup") ? tag.getString("Markup") : null;
+        values.clear();
+        CompoundTag set = tag.getCompound("Values");
+        for (String key : set.getAllKeys())
+            values.put(key, set.getString(key));
+        buttons = List.of();
+        touches = tag.getLong("Touches");
+        touchX = tag.getInt("TouchX");
+        touchY = tag.getInt("TouchY");
+        touchedBy = tag.getString("TouchedBy");
+        clicks = tag.getLong("Clicks");
+        clicked = tag.getString("Clicked");
+        clickedBy = tag.getString("ClickedBy");
+        version++;
+    }
+
+    /** Players only need the dots, not the markup behind them. */
+    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveWithoutMetadata(registries);
+        CompoundTag tag = new CompoundTag();
+        writeDots(tag);
+        return tag;
     }
 
     @Override
@@ -155,14 +282,8 @@ public class BrassScreenBlockEntity extends BlockEntity {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
-    /** Three bytes a pixel, deflated: a drawing is mostly runs of the same colour, so it packs small. */
-    private static byte[] pack(int[] pixels) {
-        byte[] raw = new byte[pixels.length * 3];
-        for (int i = 0; i < pixels.length; i++) {
-            raw[i * 3] = (byte) (pixels[i] >> 16);
-            raw[i * 3 + 1] = (byte) (pixels[i] >> 8);
-            raw[i * 3 + 2] = (byte) pixels[i];
-        }
+    /** Deflated: a screen is mostly runs of the same colour, so it packs small. */
+    private static byte[] pack(byte[] raw) {
         Deflater deflater = new Deflater(Deflater.BEST_SPEED);
         deflater.setInput(raw);
         deflater.finish();
@@ -174,8 +295,8 @@ public class BrassScreenBlockEntity extends BlockEntity {
         return out.toByteArray();
     }
 
-    private static int @Nullable [] unpack(byte[] packed, int count) {
-        byte[] raw = new byte[count * 3];
+    private static byte @Nullable [] unpack(byte[] packed, int count) {
+        byte[] raw = new byte[count];
         Inflater inflater = new Inflater();
         inflater.setInput(packed);
         try {
@@ -191,9 +312,6 @@ public class BrassScreenBlockEntity extends BlockEntity {
         } finally {
             inflater.end();
         }
-        int[] pixels = new int[count];
-        for (int i = 0; i < count; i++)
-            pixels[i] = (raw[i * 3] & 255) << 16 | (raw[i * 3 + 1] & 255) << 8 | (raw[i * 3 + 2] & 255);
-        return pixels;
+        return raw;
     }
 }
