@@ -352,6 +352,9 @@ public final class Completions {
         } else if (d.methods().contains("getKey"))
             out.add(new Entry("onKey", Kind.FUNCTION, "onKey(function(key)\n  $0\nend)", "onKey(fn(key, device))",
                     translate.apply("create_new_era.api.on_key")));
+        if (d.methods().contains("getLastTouch"))
+            out.add(new Entry("onTouch", Kind.FUNCTION, "onTouch(function(x, y, player)\n  $0\nend)", "onTouch(fn(x, y, player, device))",
+                    translate.apply("create_new_era.api.on_touch")));
         if (d.methods().contains("getLast"))
             out.add(new Entry("onMessage", Kind.FUNCTION, "onMessage(function(message)\n  $0\nend)", "onMessage(fn(message, device))",
                     translate.apply("create_new_era.api.on_message")));

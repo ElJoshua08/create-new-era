@@ -184,6 +184,24 @@ function bus.get(name)
             watchKeys("onKey", type(fn) == "function" and function(key, d, down) fn(key, down, d) end or fn)
         end
     end
+    -- a screen: runs fn(x, y, player, device) for every touch on it, x and y in its pixels
+    if device.getLastTouch then
+        function device.onTouch(a, b)
+            local fn = a == device and b or a
+            if type(fn) ~= "function" then
+                error("bad argument #1 to 'onTouch' (function expected, got " .. type(fn) .. ")", 2)
+            end
+            local last = device.getLastTouch()
+            local seen = last and last.count or 0
+            device.onChange(function(_, d)
+                local touch = d.getLastTouch()
+                if touch and touch.count > seen then
+                    seen = touch.count
+                    fn(touch.x, touch.y, touch.player, d)
+                end
+            end)
+        end
+    end
     -- a chat log: runs fn(message, device) for every message it hears: {player, text, time}
     if device.getLast then
         function device.onMessage(a, b)

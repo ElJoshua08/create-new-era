@@ -447,5 +447,21 @@
   "create_new_era.api.optical_sensor.setRange": "Pone hasta dónde llega su haz, en bloques.",
   "create_new_era.api.propeller.getThrust": "Con cuánta fuerza empuja ahora a su barco.",
   "create_new_era.api.propeller.getAirflow": "Cuánto aire mueve ahora.",
-  "create_new_era.api.propeller.isActive": "Si está girando y empujando."
+  "create_new_era.api.propeller.isActive": "Si está girando y empujando.",
+  "create_new_era.api.screen.getSize": "Cuántos píxeles tiene todo el panel de pantallas unidas: {width = ..., height = ...}. Cada pantalla suma 64 por lado.",
+  "create_new_era.api.screen.getWidth": "Cuántos píxeles de ancho tiene el panel.",
+  "create_new_era.api.screen.getHeight": "Cuántos píxeles de alto tiene el panel.",
+  "create_new_era.api.screen.getCharSize": "Lo que ocupa un carácter de texto, en píxeles a escala 1: {width = 6, height = 12}.",
+  "create_new_era.api.screen.getPixel": "El color de un píxel, como 0xRRGGBB. (1, 1) es la esquina de arriba a la izquierda.",
+  "create_new_era.api.screen.getLastTouch": "Dónde se pulsó el panel por última vez y quién: {x, y, player, count}, o nil.",
+  "create_new_era.api.screen.getTextWidth": "Lo ancho que quedaría un texto, en píxeles, a esa escala.",
+  "create_new_era.api.screen.clear": "Llena todo el panel de un color, negro si no le das ninguno.",
+  "create_new_era.api.screen.setPixel": "Pinta un píxel. (1, 1) es la esquina de arriba a la izquierda.",
+  "create_new_era.api.screen.fillRect": "Rellena un rectángulo desde (x, y), de ese ancho y alto.",
+  "create_new_era.api.screen.drawRect": "Dibuja el borde de un rectángulo desde (x, y), de ese ancho y alto.",
+  "create_new_era.api.screen.drawLine": "Dibuja una línea de (x1, y1) a (x2, y2).",
+  "create_new_era.api.screen.drawCircle": "Dibuja el borde de un círculo alrededor de (x, y).",
+  "create_new_era.api.screen.fillCircle": "Dibuja un círculo relleno alrededor de (x, y).",
+  "create_new_era.api.screen.drawText": "Escribe un texto con su esquina de arriba a la izquierda en (x, y), en blanco si no le das color, cada píxel scale veces más grande. \\n empieza una línea nueva. Devuelve lo ancho que quedó.",
+  "create_new_era.api.on_touch": "Ejecuta tu función cada vez que un jugador pulsa la pantalla, con dónde (x, y, en sus píxeles) y quién."
 }

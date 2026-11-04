@@ -3,6 +3,8 @@ package com.createnewera.registry;
 import static com.createnewera.CreateNewEra.REGISTRATE;
 
 import com.createnewera.block.control.PanelControlBlockEntity;
+import com.createnewera.block.screen.BrassScreenBlockEntity;
+import com.createnewera.client.render.BrassScreenRenderer;
 import com.createnewera.chat.ChatLogBlockEntity;
 import com.createnewera.client.control.PanelControlRenderer;
 import com.createnewera.client.render.BrassComputerRenderer;
@@ -27,6 +29,13 @@ public final class ModBlockEntities {
                     ModBlocks.PANEL_LAMP, ModBlocks.NIXIE_DIGIT, ModBlocks.PANEL_GAUGE, ModBlocks.PANEL_KEYPAD, ModBlocks.PANEL_SPEAKER,
                     ModBlocks.PANEL_ALTIMETER, ModBlocks.PANEL_GYROSCOPE, ModBlocks.PANEL_COMPASS, ModBlocks.PANEL_AIRSPEED)
             .renderer(() -> PanelControlRenderer::new)
+            .register();
+
+    /** Every Brass Screen; the top-left one of a pane holds the pane's pixels. */
+    public static final BlockEntityEntry<BrassScreenBlockEntity> BRASS_SCREEN = REGISTRATE
+            .blockEntity("brass_screen", BrassScreenBlockEntity::new)
+            .validBlocks(ModBlocks.BRASS_SCREEN)
+            .renderer(() -> BrassScreenRenderer::new)
             .register();
 
     public static final BlockEntityEntry<ChatLogBlockEntity> CHAT_LOG = REGISTRATE

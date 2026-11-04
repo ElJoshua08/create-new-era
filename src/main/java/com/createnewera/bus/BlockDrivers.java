@@ -287,6 +287,8 @@ final class BlockDrivers {
         }
 
         // ---- this mod's own ----
+        if (state.getBlock() instanceof com.createnewera.block.BrassScreenBlock)
+            com.createnewera.block.screen.ScreenDriver.methods(api, level, pos);
         if (be instanceof ChatLogBlockEntity log) {
             api.family("chat_log");
             api.read("getMessages", "count?: number", "{{player, text, time}, ...}", args -> {
@@ -390,6 +392,8 @@ final class BlockDrivers {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof ChatLogBlockEntity log)
             return log.heard();
+        if (be instanceof com.createnewera.block.screen.BrassScreenBlockEntity)
+            return com.createnewera.block.screen.ScreenDriver.snapshot(level, pos);
         Object sensor = AeronauticsSensors.snapshot(be);
         if (sensor == null)
             sensor = ShipControls.snapshot(level, pos, be);
