@@ -1,6 +1,6 @@
 ---
 title: El editor
-description: Archivos, pestañas, sugerencias, la consola y los atajos.
+description: Archivos, pestañas, sugerencias, problemas encontrados mientras escribes, la consola y los atajos.
 ---
 
 Haz clic derecho en un ordenador de latón para abrir su editor: una ventanita con pestañas de archivos, una consola y sugerencias mientras escribes.
@@ -11,10 +11,10 @@ Con la llave inglesa de Create en la mano, el clic derecho gira el ordenador en 
 
 - La **barra de título** tiene **Ejecutar** y **Parar**. Arrástrala para mover la ventana; haz doble clic en ella, o usa su botón, para maximizarla.
 - Las **pestañas** de los archivos abiertos están encima del código.
-- El **código** tiene resaltado de sintaxis de Lua y números de línea.
+- El **código** se escribe en [Monocraft](https://github.com/IdreesInc/Monocraft), una fuente monoespaciada dibujada al estilo de Minecraft, con resaltado de sintaxis de Lua y números de línea.
 - La **barra de estado** muestra el estado del programa (en marcha con el archivo y las RPM, parado, o en ámbar **En pausa: necesita rotación** / **En pausa: sobreestresado**) y la línea y columna del cursor.
 - La **consola** está debajo del código. Arrastra el separador de encima para cambiar su altura.
-- El **panel lateral** se elige en la barra del borde derecho de la ventana: **Archivos**, **Redstone** (lo que entra y sale por cada lado, en directo) y **Flujos**, que de momento es un hueco reservado. Pincha en el icono activo o pulsa <kbd>Ctrl</kbd>+<kbd>B</kbd> para ocultarlo, y arrastra su borde para cambiar su tamaño.
+- El **panel lateral** se elige en la barra del borde derecho de la ventana: **Archivos**, **Redstone** (lo que entra y sale por cada lado, en directo) y **Flujos**. Flujos aún no está hecho: solo muestra un dibujito y «Próximamente». Pincha en el icono activo o pulsa <kbd>Ctrl</kbd>+<kbd>B</kbd> para ocultar el panel, y arrastra su borde para cambiar su tamaño.
 
 Arrastra cualquier borde de la ventana para cambiar su tamaño. La posición y el tamaño de la ventana, los dos separadores y el panel abierto se recuerdan en `config/create_new_era-editor.properties`.
 
@@ -28,22 +28,64 @@ Arrastra cualquier borde de la ventana para cambiar su tamaño. La posición y e
 
 Los archivos se guardan solos 1,5 segundos después de que dejes de escribir, cuando cierras su pestaña o el editor, y cuando pulsas Ejecutar. <kbd>Ctrl</kbd>+<kbd>S</kbd> guarda en el momento.
 
+Un archivo que acaba en `.screen` es una disposición de pantalla, no Lua. El editor lo colorea y lo completa como marcado; mira [Archivos .screen](#archivos-screen) más abajo.
+
 ## Ejecutar
 
 **Ejecutar** (<kbd>Ctrl</kbd>+<kbd>R</kbd>) guarda todos los archivos abiertos y ejecuta el de la pestaña activa. **Parar** (<kbd>Ctrl</kbd>+<kbd>T</kbd>) termina el programa y apaga sus salidas de redstone. Si pinchas en un error de la consola, se abre el archivo que nombra en esa línea.
 
+## Problemas mientras escribes
+
+Un momento después de que dejes de escribir, el editor revisa el archivo abierto, como hace Error Lens en VS Code. Cada problema lleva una línea ondulada bajo la parte que está mal, una marca en el margen y su mensaje escrito tras el final de la línea: en rojo los errores, en ámbar los avisos.
+
+Encuentra:
+
+- **Lua que no compila**, como error: un `if` sin su `end`, un paréntesis suelto. Lo comprueba el propio compilador del ordenador, así que el mensaje es el mismo que daría Ejecutar.
+- **Una función que un dispositivo no tiene**, como aviso: `press.getSpeeed()` dice `mechanical_press (Prensa mecánica) no tiene la función getSpeeed`.
+- **Una función que un módulo no tiene**: tras `local util = require("util")`, llamar a `util.nope()` dice `util no tiene nope`.
+- **Un nombre de dispositivo que nada tiene en la red**, dentro de `bus.get("…")`.
+- **Una anotación de tipo que no nombra ningún dispositivo de la red** (mira más abajo).
+- **Marcado que una pantalla no acepta**, en un archivo `.screen`: XML que no se puede leer, una etiqueta desconocida, un atributo que la etiqueta no tiene, un color o un valor de `align` que no conoce. Solo se muestra el primero.
+
+Las comprobaciones de dispositivos necesitan la red del ordenador, así que solo se hacen cuando llega al menos a un dispositivo.
+
+## Parámetros con tipo
+
+El editor sabe lo que guarda una variable cuando se le da valor con `bus.get("…")`. El parámetro de una función no tiene esa línea, así que se lo puedes decir con un comentario, como en LuaLS:
+
+```lua title="chat.lua"
+local Chat = {}
+
+---@param log chat_log
+function Chat.announce(log, text)
+  log.say(text)
+end
+
+return Chat
+```
+
+Tras `---@param log chat_log`, al escribir `log.` te ofrece las funciones del chat log, y si escribes mal una, la subraya. `---@type` hace lo mismo con la variable de la línea siguiente:
+
+```lua
+---@type panel_lamp
+local lamp = someTable.lamp
+```
+
+El tipo es el nombre de un dispositivo, su id de bloque (`create_new_era:chat_log`) o lo que va tras los dos puntos (`chat_log`). El editor usa el dispositivo más cercano de la red que encaje, así que tiene que haber uno de ese tipo conectado. Al escribir tras `---@` te ofrece `param`, `type` y `return`, y tras el nombre de un parámetro, los tipos de dispositivo que hay en la red y los tipos propios de Lua (`string`, `number`, `boolean`, `table`, `function`).
+
 ## Sugerencias
 
-Al escribir un nombre o un `.` se abre una lista de sugerencias, y <kbd>Ctrl</kbd>+<kbd>Espacio</kbd> la abre en cualquier sitio. Muévete con las flechas o <kbd>RePág</kbd>/<kbd>AvPág</kbd>, acepta con <kbd>Tab</kbd> o <kbd>Enter</kbd> y cierra con <kbd>Esc</kbd>. El recuadro junto a la lista muestra la firma y una línea sobre lo que hace. La búsqueda es difusa: `gai` encuentra `getAnalogInput`.
+Al escribir un nombre o un `.` se abre una lista de sugerencias, y <kbd>Ctrl</kbd>+<kbd>Espacio</kbd> la abre en cualquier sitio. Muévete con las flechas o <kbd>RePág</kbd>/<kbd>AvPág</kbd>, acepta con <kbd>Tab</kbd> o <kbd>Enter</kbd> y cierra con <kbd>Esc</kbd>. El recuadro junto a la lista muestra la firma y lo que hace.
+
+La búsqueda encuentra un nombre por cualquier parte. Primero salen los que empiezan por lo que has escrito, luego los que lo contienen en cualquier sitio, y luego los que tienen sus letras en orden: `kn` encuentra `panel_knob_2`, `bell` encuentra `minecraft:block.bell.use` y `gai` encuentra `getAnalogInput`. Las letras que coinciden salen resaltadas.
 
 Lo que te sugiere depende de dónde está el cursor:
 
 - Globales y librerías (`print`, `redstone`, `bus`, `math`…), y después de `redstone.`, `string.` y las demás librerías, sus funciones.
-- Nombres de lados dentro de las comillas de una llamada de redstone: `rs.getInput("` ofrece `front`, `back`, etc.
-- Nombres de dispositivos dentro de `bus.get("`, del más cercano al más lejano, con el tipo, la distancia y lo que puedes hacer con cada uno. Al elegir uno, además, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor, para que lo encuentres.
-- Después de una variable que guarda un dispositivo (`local press = bus.get("mechanical_press")`, y luego `press.`), las funciones de ese dispositivo y `onChange`.
-- Nombres de archivo dentro de `require("`.
-- Variables y funciones del archivo que estás editando, y campos que hayas usado en tus propias tablas.
+- Después de una variable que guarda un dispositivo (`local press = bus.get("mechanical_press")`, y luego `press.`), las funciones de ese dispositivo, `onChange` y sus ayudas propias: `onPress` en un pulsador, `onKey` en un teclado, `onMessage` en un chat log, `onClick` y `onTouch` en una pantalla, `onKeyDown` y `onKeyUp` en una máquina de escribir.
+- Después de una variable que guarda una tabla que devolvió una función de un dispositivo, los campos de esa tabla. Con `local size = screen.getSize()`, al escribir `size.` te ofrece `width` y `height`.
+- Después de una variable que guarda un módulo (`local util = require("util")`), las funciones y campos que ese archivo pone en la tabla que devuelve. El editor lee el archivo, con lo que no hayas guardado de su pestaña incluido, y muestra el comentario de encima de cada función como su descripción. Los nombres de módulo se colorean como las librerías.
+- Variables y funciones del archivo que estás editando, y campos que hayas usado en tus propias tablas. Cada una dice qué es: una función, sus parámetros y el comentario de encima; un dispositivo, qué es y qué hace; cualquier otra variable, la línea que le da valor por primera vez.
 - Palabras clave, y snippets que escriben un bloque entero:
 
 | Snippet | Escribe |
@@ -60,6 +102,41 @@ Lo que te sugiere depende de dónde está el cursor:
 
 Dentro de comentarios y de cadenas normales no sale nada.
 
+### Argumentos
+
+Dentro de los paréntesis de una llamada, el editor te ofrece los valores que puede tomar ese argumento, hayas escrito la comilla o no. Sin comilla, al elegir un valor también escribe las comillas.
+
+| Dónde | Qué ofrece |
+| --- | --- |
+| `rs.getInput(`, `rs.setOutput(`… | Los seis lados |
+| `bus.get(` | Los dispositivos de la red (más abajo) |
+| `require(` | Los archivos de este ordenador |
+| `playSound(` de un altavoz | Todos los sonidos del juego |
+| `count(` y otras funciones que piden un objeto o un fluido | Todos los ids de objetos o fluidos, con su nombre al lado |
+| `tell(` de un chat log | Los jugadores conectados |
+| `show(` de una pantalla | Los archivos `.screen` de este ordenador |
+| Un dispositivo que pide otro dispositivo | Los dispositivos de la red |
+| Un argumento booleano | `true` y `false` |
+| Un argumento con un conjunto fijo de valores | Esos valores: `"amber"`, `"green"`, `"red"`, `"off"` de un piloto |
+
+Mientras el cursor está dentro de una llamada, un recuadro muestra la firma y la descripción de esa función, sea de un dispositivo, de una librería o de tus módulos.
+
+### Dispositivos
+
+Dentro de `bus.get("`, la lista muestra los dispositivos de la red, del más cercano al más lejano. Cada fila lleva el nombre del dispositivo, su tipo de bloque, a cuántos metros está y una flecha que apunta hacia él desde donde miras: ↑ justo delante, → a tu derecha, ⇡ o ⇣ cuando está casi justo encima o debajo. El recuadro de al lado dice qué puertos tiene, qué puedes leer, qué órdenes puedes darle y sus coordenadas.
+
+Al elegir un dispositivo, además, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor, para que lo encuentres.
+
+## Archivos .screen
+
+Un archivo `.screen` guarda una disposición para una [pantalla de latón](./screens-panels.mdx). En él, el editor colorea el marcado en vez de Lua, y sugiere:
+
+- tras `<`, las etiquetas (`screen`, `title`, `row`, `column`, `label`, `value`, `text`, `bar`, `button`, `divider`, `spacer`), escritas con su etiqueta de cierre;
+- dentro de una etiqueta, los atributos que acepta;
+- dentro de las comillas de un atributo, los valores que puede tener: colores, `left`, `center`, `right`…
+
+El marcado que la pantalla no acepta se subraya mientras escribes. Al guardar el archivo se actualizan en el acto todas las pantallas que lo muestran; si el marcado está mal, la consola dice por qué en rojo.
+
 ## Atajos de teclado
 
 | Teclas | Qué hace |
@@ -72,6 +149,8 @@ Dentro de comentarios y de cadenas normales no sale nada.
 | <kbd>Ctrl</kbd>+<kbd>W</kbd> | Cierra la pestaña |
 | <kbd>Ctrl</kbd>+<kbd>Tab</kbd> | Pestaña siguiente (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd>: anterior) |
 | <kbd>Ctrl</kbd>+<kbd>B</kbd> | Muestra u oculta el panel lateral |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Línea nueva debajo, esté donde esté el cursor en esta, aunque haya sugerencias abiertas |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> | Línea nueva encima |
 | <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Deshacer |
 | <kbd>Ctrl</kbd>+<kbd>Y</kbd> o <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Rehacer |
 | <kbd>Ctrl</kbd>+<kbd>D</kbd> | Duplica la línea |

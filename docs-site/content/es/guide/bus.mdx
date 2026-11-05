@@ -1,6 +1,6 @@
 ---
 title: El bus de datos
-description: Puertos de datos, cables y empalmes, y cómo encuentra un ordenador lo que hay en su red.
+description: Puertos de datos, puertos de latón, hubs de puertos y empalmes, y cómo encuentra un ordenador lo que hay en su red.
 ---
 
 El bus de datos es la forma que tiene un ordenador de llegar a las máquinas de su alrededor. Pegas **puertos de datos** en los bloques que quieras usar, los unes al ordenador con **cable**, y el programa puede leer y controlar esos bloques por su nombre.
@@ -13,48 +13,65 @@ Un puerto no cambia el bloque en el que está. Un cofre con un puerto sigue sien
 
 Haz clic derecho en cualquier cara de cualquier bloque con un puerto de datos: se pega donde pinchaste, como un minibloque pequeño en esa cara. En una cara caben varios puertos. Si golpeas un puerto, lo quitas y lo recuperas; el bloque de debajo se queda.
 
-Un puerto puede ir en uno de dos sentidos:
+En un bloque más pequeño que un cubo entero, como una losa, un sensor o una máquina de Create con un lado fino, el puerto se apoya en la superficie real del bloque donde pinchaste, no flotando en el borde de su espacio.
 
-- **Salida**, luz ámbar. El bloque publica lo que hace, así que los programas pueden **leerlo**: velocidad, estrés, objetos, fluidos. Un puerto nuevo empieza como salida.
-- **Entrada**, luz verde. El bloque acepta órdenes, así que los programas pueden **controlarlo**: cambiar la velocidad de un motor.
+Un puerto de datos de cobre puede ir en uno de dos sentidos:
+
+- **Salida**, luz ámbar. Los programas pueden **leer** el bloque: velocidad, estrés, objetos, fluidos, su estado. Un puerto nuevo empieza como salida.
+- **Entrada**, luz verde. Los programas pueden **darle órdenes**: cambiar la velocidad de un motor, abrir una puerta, darle señal de redstone.
 
 Haz clic derecho en un puerto con la llave inglesa de Create para cambiarlo entre salida y entrada. Agachado, la llave lo quita.
 
-Un bloque que necesita las dos cosas, como un motor creativo que quieres leer y ajustar, lleva dos puertos: uno de salida y otro de entrada.
+## Puertos de datos de latón
+
+Un **puerto de datos de latón** se lee y recibe órdenes por el mismo puerto. No hay modo que elegir, y la llave inglesa no lo cambia; agachado con la llave, o golpeándolo, lo quitas. Es el puerto que conviene cuando un bloque necesita las dos cosas, como un motor creativo que quieres leer y ajustar.
+
+<Recipe id="brass_port" />
+
+## Un cable por puerto
+
+Cada puerto acepta **un** cable. Un segundo se rechaza con *Ese puerto ya tiene su cable: para juntar varios, usa un hub de puertos*. Así que un dispositivo es el final de una línea: para unir varios dispositivos, lleva sus cables a un **hub de puertos** o a un **empalme**.
+
+## Hubs de puertos
+
+El **hub de puertos** es un bloque de latón con cuatro tomas en cada cara, 24 en total, unidas entre sí por dentro. Lleva el cable de cada dispositivo a una toma y todos quedan en la misma red.
+
+Cada toma acepta un cable. El hub separa los colores igual que un empalme: un cable rojo y uno azul en el mismo hub no se unen, y el cobre sin teñir se une con todos (mira [Cables](./cables.mdx#colores)). Las tomas vienen con el hub; no se pueden quitar, y el hub no es un dispositivo, así que no sale en `bus.list()`.
+
+<Recipe id="port_hub" />
 
 ## Los puertos del propio ordenador
 
-Todos los ordenadores de latón traen cuatro puertos, dos en cada lado, en un panel de latón. Siempre están ahí, la llave no los quita y giran con el ordenador. El cable va directo a ellos.
+Todos los ordenadores de latón traen cuatro puertos, dos en cada lado, en un panel de latón. Siempre están ahí, no se pueden quitar y giran con el ordenador. Cada uno acepta un cable, como cualquier otro puerto.
 
-Para poner más puertos en un ordenador, añade una **ampliación de puertos**. Cada una deja al ordenador llevar cuatro puertos más, hasta tres ampliaciones, así que un ordenador puede tener 16 puertos en total. Los puertos extra van en cualquier parte del ordenador que no tape uno de sus huecos.
-
-<Recipe id="port_expansion" />
-
-Te harán falta puertos extra cuando un ordenador hable con redes de colores distintos, porque cada puerto acepta un solo color de cable (mira [Cables](./cables.mdx#colores)). Un mismo puerto acepta todos los cables que quieras.
+Un ordenador no puede tener más puertos propios. Las ampliaciones de puertos ya no están: no tienen receta ni salen en la pestaña de creativo, aunque las que ya estén puestas en un ordenador siguen funcionando. Para llegar a más dispositivos, lleva un cable del ordenador a un hub de puertos y júntalos ahí.
 
 ## Empalmes
 
 <Recipe id="cable_splice" />
 
-Un empalme de cable une cables a mitad de recorrido. Se pega a una cara como un puerto, pero no es un dispositivo: no sale nada en `bus.list()` por él. Úsalo para sacar una rama de un cable, o para sujetar a una pared un tramo largo a mitad de camino.
+Un empalme de cable une cables a mitad de recorrido. Se pega a una cara como un puerto, pero no es un dispositivo: no sale nada en `bus.list()` por él. A diferencia de un puerto, un empalme acepta todos los cables que quieras. Úsalo para sacar una rama de un cable, o para sujetar a una pared un tramo largo a mitad de camino.
+
+## Controles de panel
+
+Los controles de panel (botones, lámparas, perillas, indicadores, instrumentos de vuelo y los demás) traen una conexión en su placa. Haz clic en cualquier parte del control con una bobina y el cable entra en él; no hace falta poner puerto. Un control se lee y recibe órdenes por esa única conexión, y acepta un cable. Mira [Pantallas y paneles](./screens-panels.mdx).
 
 ## Cómo se forma una red
 
-Una red es todo lo que alcanzas siguiendo los cables desde los puertos del ordenador. Los cables van entre puertos y empalmes, y el puerto de un dispositivo deja pasar la red: ordenador → puerto del motor → puerto del cofre funciona, y el programa ve tanto el motor como el cofre.
-
-Cada bloque de la red con al menos un puerto es un **dispositivo**. Lo que el programa puede hacer con él depende de sus puertos:
+Una red es todo lo que alcanzas siguiendo los cables desde los puertos del ordenador, pasando por empalmes y hubs de puertos. Cada bloque de la red con un puerto es un **dispositivo**. Lo que el programa puede hacer con él depende de sus puertos:
 
 | Puertos en la red | El programa puede |
 | --- | --- |
-| uno de salida | leerlo |
-| uno de entrada | darle órdenes |
+| uno de cobre en salida | leerlo |
+| uno de cobre en entrada | darle órdenes |
 | uno de cada | las dos cosas |
+| uno de latón, o la conexión propia de un control de panel | las dos cosas |
 
 El ordenador no se lista a sí mismo. Dos ordenadores en la misma red se ven el uno al otro como dispositivos.
 
 ## Nombres de los dispositivos
 
-El nombre de un dispositivo es el id de su bloque sin el espacio de nombres: un cofre es `chest`, un motor creativo es `creative_motor`. Si el nombre ya está cogido, se le añade un número: `chest_2`, `chest_3`. El nombre se asigna la primera vez que un ordenador ve el bloque y se queda con ese bloque hasta que se rompe. Todavía no se pueden renombrar dispositivos dentro del juego.
+El nombre de un dispositivo es el id de su bloque sin el espacio de nombres: un cofre es `chest`, un motor creativo es `creative_motor`, la Throttle Lever de Aeronautics es `throttle_lever`. Si el nombre ya está cogido, se le añade un número: `chest_2`, `chest_3`. El nombre se asigna la primera vez que un ordenador ve el bloque y se queda con ese bloque hasta que se rompe, también cuando Aeronautics lo convierte en parte de un barco. Todavía no se pueden renombrar dispositivos dentro del juego.
 
 La forma más rápida de ver los nombres es preguntar:
 
@@ -64,10 +81,10 @@ for _, d in ipairs(bus.list()) do
 end
 ```
 
-O escribe `bus.get("` en el editor: las sugerencias listan todos los dispositivos, del más cercano al más lejano. Al elegir uno, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor.
+`bus.list()` da los dispositivos del más cercano al más lejano. O escribe `bus.get("` en el editor: las sugerencias listan todos los dispositivos, del más cercano al más lejano. Al elegir uno, ese bloque queda resaltado en el mundo durante diez segundos después de cerrar el editor.
 
 Romper un bloque quita sus puertos y los suelta como objetos. El bloque sale de la red y su nombre queda libre.
 
 ## Siguiente
 
-[Dispositivos](./devices.mdx) enseña qué puedes hacer con cada tipo de bloque. [Cables](./cables.mdx) explica cómo tender, teñir y revestir cable.
+[Dispositivos](./devices.mdx) enseña qué puedes hacer con cada tipo de bloque. [Cables](./cables.mdx) explica cómo tender, teñir y revestir cable. [Barcos](./ships.mdx) explica cómo pilotar barcos de Aeronautics desde un programa.

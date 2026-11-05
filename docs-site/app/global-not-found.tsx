@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { jetbrains, monocraft, plex } from '@/components/fonts';
+import { withBase } from '@/lib/shared';
 import './global.css';
 
 export const metadata: Metadata = { title: 'Not found · Create: New Era docs' };
@@ -16,7 +17,7 @@ export default function GlobalNotFound() {
         <main className="max-w-md text-center">
           {/* biome-ignore lint/performance/noImgElement: pixel-art icon in a static export */}
           <img
-            src="/img/blocks/brass_computer_off.png"
+            src={withBase('/img/blocks/brass_computer_off.png')}
             alt=""
             width={120}
             height={120}
@@ -25,10 +26,10 @@ export default function GlobalNotFound() {
           <h1 className="mt-6 text-2xl font-semibold">No page here</h1>
           <p className="mt-2 text-fd-muted-foreground">Esta página no existe.</p>
           <p className="mt-6 flex justify-center gap-3 text-sm">
-            <a className="press rounded-lg border px-3.5 py-2 hover:bg-fd-accent" href="/en/">
+            <a className="press rounded-lg border px-3.5 py-2 hover:bg-fd-accent" href={withBase('/en/')}>
               English docs
             </a>
-            <a className="press rounded-lg border px-3.5 py-2 hover:bg-fd-accent" href="/es/">
+            <a className="press rounded-lg border px-3.5 py-2 hover:bg-fd-accent" href={withBase('/es/')}>
               Documentación en español
             </a>
           </p>

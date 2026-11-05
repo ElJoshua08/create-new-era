@@ -26,7 +26,7 @@ Textures, models and lang are copied too: press F3+T in game. Recipes and other 
 
 - Branch from `main`, one focused change per pull request. A bug fix and a refactor are two PRs.
 - Keep the diff to what the change needs; don't reformat files you didn't otherwise touch.
-- If you change behaviour, update the README, the docs in `website/docs/` and the in-game tooltip/Ponder text that describe it.
+- If you change behaviour, update the README, the docs in `docs-site/content/` (English and Spanish), the landing page in `site/` if it mentions it, and the in-game tooltip/Ponder text that describe it.
 
 ### Commits
 

@@ -11,7 +11,7 @@ import { join } from 'node:path';
 const repo = join(import.meta.dirname, '..', '..');
 const recipeDir = join(repo, 'src/main/resources/data/create_new_era/recipe');
 const modTextures = join(repo, 'src/main/resources/assets/create_new_era/textures/item');
-const renders = join(repo, 'website/img/items');
+const renders = join(repo, 'site/public/img/items');
 const out = join(import.meta.dirname, '..', 'public/img/items');
 const vanilla = process.env.VANILLA_ASSETS;
 const create = process.env.CREATE_ASSETS;
@@ -42,6 +42,12 @@ const names = {
   'create:hand_crank': ['Hand Crank', 'Manivela'],
   'create:nixie_tube': ['Nixie Tube', 'Tubo Nixie'],
   'create:speedometer': ['Speedometer', 'Velocímetro'],
+  'create:propeller': ['Propeller', 'Hélice'],
+  'minecraft:paper': ['Paper', 'Papel'],
+  'minecraft:book': ['Book', 'Libro'],
+  'minecraft:clock': ['Clock', 'Reloj'],
+  'minecraft:compass': ['Compass', 'Brújula'],
+  'minecraft:note_block': ['Note Block', 'Bloque musical'],
 };
 
 function nameOf(id) {

@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { REPO, routes, ui, type Lang } from '../i18n/routes';
+import { REPO, FALLBACK, routes, ui, type Lang } from '../i18n/routes';
 
 interface Props {
   lang: Lang;
@@ -11,49 +11,47 @@ const soon = ui[lang].soon;
 const copy = {
   en: {
     title: 'What’s next',
-    description: 'What is coming to Create: New Era after the first pre-release: drawing on screens, wireless towers, the Flows panel, the spool winder and more.',
-    lede: 'The first pre-release has the computer, the data bus and the blocks to build with. Here’s what’s being built after it. None of this is in the current download yet.',
+    description: 'What is coming to Create: New Era next: wireless towers, the Flows panel, focus mode, the spool winder and a survival progression.',
+    lede: 'The pre-release already has the computer, the data bus, screens your programs draw on and a control desk they read. Here’s what’s being built next. None of this is in the current download yet.',
     nextTitle: 'Next up',
     next: [
-      ['brass_screen', 'Drawing on screens', 'Programs paint on Brass Screens pixel by pixel, with a small UI library for dashboards that look good without much code.'],
-      ['panel_gauge', 'Panel controls in your programs', 'Buttons, switches, knobs, sliders and keypads report to your code. Lamps, nixie digits and gauges show whatever it tells them.'],
       ['bus_port', 'Wireless towers and antennas', 'Reach machines across the map without running a cable all the way there.'],
-      ['brass_computer', 'The Flows panel', 'A side panel in the editor that shows the data moving between your machines and your program as it happens.'],
-      ['port_expansion', 'Focus mode', 'A placement mode for putting ports exactly where you want them on crowded machines.'],
-      ['cable_spool', 'The spool winder', 'A machine that winds cable onto spools, so cabling has its own place in survival progression.'],
-      ['panel_keypad', 'Linked Typewriter support', 'Type into a running program from a Linked Typewriter.'],
+      ['brass_computer', 'The Flows panel', 'A side panel in the editor that shows the data moving between your machines and your program as it happens. The panel is there today, still empty.'],
+      ['port_hub', 'Focus mode', 'A placement mode for putting ports exactly where you want them on crowded machines.'],
+      ['cable_spool', 'The spool winder', 'A machine that winds cable onto spools, so cabling has its own place in survival. For now a spool comes full from its recipe and can’t be refilled.'],
+      ['control_plate', 'Survival recipes', 'Recipes that fit a survival progression. Some of the current ones are placeholders.'],
     ],
     laterTitle: 'Further out',
     later: [
-      ['bearing_servo', 'Aeronautics', 'The Bearing Servo turns a contraption to an exact angle on command, for gimbals, turrets and flaps on Create: Aeronautics ships. Sensors and drones would follow.'],
+      ['universal_adapter', 'Universal Adapter', 'A block that puts whatever it touches on the bus. It’s in the creative tab already, but doesn’t do anything yet.'],
+      ['bearing_servo', 'Bearing Servo', 'Turns a contraption to an exact angle on command, for gimbals, turrets and flaps. Also placed but not working yet.'],
       ['control_plate', 'Visual programming', 'Programs built from nodes, for people who would rather not write Lua.'],
     ],
-    shippedTitle: 'Already in 0.1.0-alpha.1',
-    shipped: 'Brass Computer and editor · Lua with redstone · data ports, expansions and cables · drivers for kinetics, items and fluids · Brass Screens that join · panel controls · Ponder scenes',
+    shippedTitle: `Already in ${FALLBACK.tag}`,
+    shipped: 'Brass Computer and editor · Lua with redstone · data ports, port hubs and cables · drivers for Create’s and Minecraft’s blocks · Brass Screens programs draw on · panel controls programs read and drive · panel speaker · chat log and Linked Typewriter · flight controls and instruments for Aeronautics ships · Ponder scenes',
     follow: 'Follow along on GitHub',
     download: 'Get the pre-release',
   },
   es: {
     title: 'Lo que viene',
-    description: 'Lo que llega a Create: New Era después del primer prelanzamiento: dibujar en pantallas, torres inalámbricas, el panel de flujos, la bobinadora y más.',
-    lede: 'El primer prelanzamiento trae el ordenador, el bus de datos y los bloques para construir. Esto es lo que se está haciendo después. Nada de esto está todavía en la descarga actual.',
+    description: 'Lo que llega a Create: New Era: torres inalámbricas, el panel de flujos, el modo enfoque, la bobinadora y una progresión de supervivencia.',
+    lede: 'El prelanzamiento ya trae el ordenador, el bus de datos, pantallas en las que dibujan tus programas y un pupitre de control que leen. Esto es lo que se está haciendo ahora. Nada de esto está todavía en la descarga actual.',
     nextTitle: 'Lo siguiente',
     next: [
-      ['brass_screen', 'Dibujar en las pantallas', 'Los programas pintan en las pantallas de latón píxel a píxel, con una pequeña librería para hacer paneles de control que se vean bien sin mucho código.'],
-      ['panel_gauge', 'Los controles de panel en tus programas', 'Pulsadores, interruptores, mandos, deslizadores y teclados le cuentan a tu código lo que pasa. Pilotos, dígitos nixie e indicadores muestran lo que él les diga.'],
       ['bus_port', 'Torres y antenas inalámbricas', 'Llega a máquinas al otro lado del mapa sin tender un cable hasta allí.'],
-      ['brass_computer', 'El panel de flujos', 'Un panel lateral en el editor que enseña los datos que van y vienen entre tus máquinas y tu programa, en el momento.'],
-      ['port_expansion', 'Modo enfoque', 'Un modo de colocación para poner los puertos justo donde quieres en máquinas con poco sitio.'],
-      ['cable_spool', 'La bobinadora', 'Una máquina que enrolla cable en bobinas, para que el cableado tenga su sitio en la progresión de supervivencia.'],
-      ['panel_keypad', 'Compatibilidad con la Linked Typewriter', 'Escribe en un programa en marcha desde una Linked Typewriter.'],
+      ['brass_computer', 'El panel de flujos', 'Un panel lateral en el editor que enseña los datos que van y vienen entre tus máquinas y tu programa, en el momento. El panel ya está, pero vacío.'],
+      ['port_hub', 'Modo enfoque', 'Un modo de colocación para poner los puertos justo donde quieres en máquinas con poco sitio.'],
+      ['cable_spool', 'La bobinadora', 'Una máquina que enrolla cable en bobinas, para que el cableado tenga su sitio en supervivencia. De momento la bobina sale llena de su receta y no se puede rellenar.'],
+      ['control_plate', 'Recetas de supervivencia', 'Recetas que encajen en una progresión de supervivencia. Algunas de las actuales son provisionales.'],
     ],
     laterTitle: 'Más adelante',
     later: [
-      ['bearing_servo', 'Aeronautics', 'El servo de rodamiento gira un artefacto hasta un ángulo exacto cuando se lo pides, para cardanes, torretas y alerones en barcos de Create: Aeronautics. Después vendrían sensores y drones.'],
+      ['universal_adapter', 'Adaptador universal', 'Un bloque que pone en el bus lo que toque. Ya está en la pestaña de creativo, pero todavía no hace nada.'],
+      ['bearing_servo', 'Servo de rodamiento', 'Gira un artefacto hasta un ángulo exacto cuando se lo pides, para cardanes, torretas y alerones. También se puede colocar, pero aún no funciona.'],
       ['control_plate', 'Programación visual', 'Programas hechos con nodos, para quien prefiera no escribir Lua.'],
     ],
-    shippedTitle: 'Ya en la 0.1.0-alpha.1',
-    shipped: 'Ordenador de latón y editor · Lua con redstone · puertos de datos, ampliaciones y cables · drivers para cinética, objetos y fluidos · pantallas de latón que se juntan · controles de panel · escenas de Ponder',
+    shippedTitle: `Ya en la ${FALLBACK.tag}`,
+    shipped: 'Ordenador de latón y editor · Lua con redstone · puertos de datos, hubs de puertos y cables · drivers para los bloques de Create y de Minecraft · pantallas de latón en las que dibujan los programas · controles de panel que los programas leen y manejan · altavoz de panel · chat log y Linked Typewriter · mandos e instrumentos de vuelo para naves de Aeronautics · escenas de Ponder',
     follow: 'Síguelo en GitHub',
     download: 'Descarga el prelanzamiento',
   },

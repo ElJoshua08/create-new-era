@@ -1,6 +1,6 @@
 ---
 title: The editor
-description: Files, tabs, suggestions, the console and shortcuts.
+description: Files, tabs, suggestions, problems found while you type, the console and shortcuts.
 ---
 
 Right-click a Brass Computer to open its editor: a small window with file tabs, a console and suggestions as you type.
@@ -11,10 +11,10 @@ With Create's wrench in your hand, right-clicking turns the computer instead. Th
 
 - The **title bar** has **Run** and **Stop**. Drag it to move the window; double-click it, or use its button, to maximise.
 - **Tabs** for the open files sit above the code.
-- The **code** has Lua syntax highlighting and line numbers.
+- The **code** is written in [Monocraft](https://github.com/IdreesInc/Monocraft), a monospaced font drawn in Minecraft's style, with Lua syntax highlighting and line numbers.
 - The **status bar** shows the program's state (running with the file and RPM, stopped, or in amber **Paused: needs rotation** / **Paused: overstressed**) and the cursor's line and column.
 - The **console** is under the code. Drag the divider above it to change its height.
-- The **side panel** is picked from the bar on the window's right edge: **Files**, **Redstone** (what comes in and goes out on each side, live) and **Flows**, which is a placeholder for now. Click the active icon or press <kbd>Ctrl</kbd>+<kbd>B</kbd> to hide it, and drag its edge to resize it.
+- The **side panel** is picked from the bar on the window's right edge: **Files**, **Redstone** (what comes in and goes out on each side, live) and **Flows**. Flows isn't built yet: it only shows a small picture and "Coming soon". Click the active icon or press <kbd>Ctrl</kbd>+<kbd>B</kbd> to hide the panel, and drag its edge to resize it.
 
 Drag any edge of the window to resize it. The window's position and size, both dividers and the open panel are remembered in `config/create_new_era-editor.properties`.
 
@@ -28,22 +28,64 @@ Drag any edge of the window to resize it. The window's position and size, both d
 
 Files save by themselves 1.5 seconds after you stop typing, when you close their tab or the editor, and when you press Run. <kbd>Ctrl</kbd>+<kbd>S</kbd> saves right away.
 
+A file ending in `.screen` is a screen layout, not Lua. The editor colours and completes it as markup; see [.screen files](#screen-files) below.
+
 ## Running
 
 **Run** (<kbd>Ctrl</kbd>+<kbd>R</kbd>) saves every open file and runs the file in the active tab. **Stop** (<kbd>Ctrl</kbd>+<kbd>T</kbd>) ends the program and turns its redstone outputs off. Clicking an error in the console opens the file it names at that line.
 
+## Problems while you type
+
+A moment after you stop typing, the editor checks the open file, the way VS Code's Error Lens does. A problem gets a wavy line under the part that's wrong, a mark in the gutter, and its message written after the end of the line: red for errors, amber for warnings.
+
+It finds:
+
+- **Lua that won't compile**, as an error: an `if` without its `end`, a stray bracket. The computer's own compiler does the checking, so the message is the one Run would give.
+- **A function a device doesn't have**, as a warning: `press.getSpeeed()` says `mechanical_press (Mechanical Press) has no function getSpeeed`.
+- **A function a module doesn't have**: after `local util = require("util")`, calling `util.nope()` says `util has no nope`.
+- **A device name nothing on the network has**, inside `bus.get("…")`.
+- **A type annotation naming no device on the network** (see below).
+- **Markup a screen won't take**, in a `.screen` file: XML that doesn't parse, an unknown tag, an attribute the tag doesn't have, a colour or `align` value it doesn't know. Only the first one is shown.
+
+The device checks need the computer's network, so they only run when it reaches at least one device.
+
+## Typed parameters
+
+The editor knows what a variable holds when it's set from `bus.get("…")`. A function's parameter has no such line, so you can tell it with a comment, as in LuaLS:
+
+```lua title="chat.lua"
+local Chat = {}
+
+---@param log chat_log
+function Chat.announce(log, text)
+  log.say(text)
+end
+
+return Chat
+```
+
+After `---@param log chat_log`, typing `log.` offers the chat log's functions, and a misspelt one is underlined. `---@type` does the same for the variable on the next line:
+
+```lua
+---@type panel_lamp
+local lamp = someTable.lamp
+```
+
+The type is a device's name, its block id (`create_new_era:chat_log`), or the part after the colon (`chat_log`). The editor uses the nearest device on the network that matches, so one of that kind has to be connected. Typing after `---@` offers `param`, `type` and `return`, and after a parameter name it offers the kinds of device on the network and Lua's own types (`string`, `number`, `boolean`, `table`, `function`).
+
 ## Suggestions
 
-A list of suggestions opens as you type a name or a `.`, and <kbd>Ctrl</kbd>+<kbd>Space</kbd> opens it anywhere. Move with the arrow keys or <kbd>PgUp</kbd>/<kbd>PgDn</kbd>, accept with <kbd>Tab</kbd> or <kbd>Enter</kbd>, close with <kbd>Esc</kbd>. The pane beside the list shows the signature and a line about what it does. Matching is fuzzy: `gai` finds `getAnalogInput`.
+A list of suggestions opens as you type a name or a `.`, and <kbd>Ctrl</kbd>+<kbd>Space</kbd> opens it anywhere. Move with the arrow keys or <kbd>PgUp</kbd>/<kbd>PgDn</kbd>, accept with <kbd>Tab</kbd> or <kbd>Enter</kbd>, close with <kbd>Esc</kbd>. The pane beside the list shows the signature and what it does.
+
+Matching finds a name by any part of it. A name that starts with what you typed comes first, then one that contains it anywhere, then one with its letters in order: `kn` finds `panel_knob_2`, `bell` finds `minecraft:block.bell.use`, and `gai` finds `getAnalogInput`. The matched letters are highlighted.
 
 What you get depends on where the cursor is:
 
 - Globals and libraries (`print`, `redstone`, `bus`, `math`…), and after `redstone.`, `string.` and the other libraries, their functions.
-- Side names inside the quotes of a redstone call: `rs.getInput("` offers `front`, `back` and so on.
-- Device names inside `bus.get("`, nearest first, with each device's type, distance and what you can do with it. Picking one also outlines that block in the world for ten seconds after you close the editor, so you can find it.
-- After a variable that holds a device (`local press = bus.get("mechanical_press")`, then `press.`), that device's functions and `onChange`.
-- File names inside `require("`.
-- Variables and functions from the file you're editing, and fields you've used on your own tables.
+- After a variable that holds a device (`local press = bus.get("mechanical_press")`, then `press.`), that device's functions, `onChange` and the device's own helpers: `onPress` on a button, `onKey` on a keypad, `onMessage` on a chat log, `onClick` and `onTouch` on a screen, `onKeyDown` and `onKeyUp` on a typewriter.
+- After a variable that holds a table a device function returned, that table's fields. With `local size = screen.getSize()`, typing `size.` offers `width` and `height`.
+- After a variable that holds a module (`local util = require("util")`), the functions and fields that file puts on the table it returns. The editor reads the file, unsaved changes in its tab included, and shows the comment above each function as its description. Module names are coloured like the built-in libraries.
+- Variables and functions from the file you're editing, and fields you've used on your own tables. Each says what it is: a function shows its parameters and the comment above it, a device what it is and does, and any other variable the line that first sets it.
 - Keywords, and snippets that write a whole block:
 
 | Snippet | Writes |
@@ -60,6 +102,41 @@ What you get depends on where the cursor is:
 
 Nothing pops up inside comments or ordinary strings.
 
+### Arguments
+
+Inside a call's brackets, the editor offers the values that argument can take, with the quote typed or not. Without a quote, picking a value writes the quotes too.
+
+| Where | What it offers |
+| --- | --- |
+| `rs.getInput(`, `rs.setOutput(`… | The six sides |
+| `bus.get(` | The devices on the network (below) |
+| `require(` | The files on this computer |
+| A speaker's `playSound(` | Every sound in the game |
+| `count(`, and other functions that take an item or fluid | Every item or fluid id, with its name beside it |
+| A chat log's `tell(` | The players online |
+| A screen's `show(` | The `.screen` files on this computer |
+| A device that wants another device | The devices on the network |
+| An argument that's a boolean | `true` and `false` |
+| An argument with a fixed set of values | Those values: a lamp's `"amber"`, `"green"`, `"red"`, `"off"` |
+
+While the cursor is inside a call, a box shows that function's signature and description, for device functions, library functions and your modules' functions alike.
+
+### Devices
+
+Inside `bus.get("`, the list shows the devices on the network, nearest first. Each row has the device's name, its kind of block, how far it is in metres and an arrow pointing the way to it from where you're looking: ↑ straight ahead, → to your right, ⇡ or ⇣ when it's mostly straight above or below. The pane beside it says which ports it has, what you can read and what orders you can give, and its coordinates.
+
+Picking a device also outlines that block in the world for ten seconds after you close the editor, so you can find it.
+
+## .screen files
+
+A `.screen` file holds a layout for a [Brass Screen](./screens-panels.mdx). In one, the editor colours the markup instead of Lua, and suggests:
+
+- after `<`, the tags (`screen`, `title`, `row`, `column`, `label`, `value`, `text`, `bar`, `button`, `divider`, `spacer`), written out with their closing tag;
+- inside a tag, the attributes it takes;
+- inside an attribute's quotes, the values it can have: colours, `left`, `center`, `right`…
+
+Markup the screen won't take is underlined as you type. Saving the file updates every screen showing it at once; if the markup is wrong, the console says why in red.
+
 ## Keyboard shortcuts
 
 | Keys | What it does |
@@ -72,6 +149,8 @@ Nothing pops up inside comments or ordinary strings.
 | <kbd>Ctrl</kbd>+<kbd>W</kbd> | Close the tab |
 | <kbd>Ctrl</kbd>+<kbd>Tab</kbd> | Next tab (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Tab</kbd>: previous) |
 | <kbd>Ctrl</kbd>+<kbd>B</kbd> | Show or hide the side panel |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | New line below, wherever the cursor is on this one, even with suggestions open |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd> | New line above |
 | <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Undo |
 | <kbd>Ctrl</kbd>+<kbd>Y</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Redo |
 | <kbd>Ctrl</kbd>+<kbd>D</kbd> | Duplicate the line |

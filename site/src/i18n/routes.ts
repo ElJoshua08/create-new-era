@@ -1,5 +1,5 @@
 export type Lang = 'en' | 'es';
-export type Page = 'home' | 'computer' | 'bus' | 'screens' | 'roadmap' | 'download';
+export type Page = 'home' | 'computer' | 'bus' | 'screens' | 'roadmap' | 'download' | 'notFound';
 
 export const routes: Record<Page, Record<Lang, string>> = {
   home: { en: '/', es: '/es/' },
@@ -8,13 +8,15 @@ export const routes: Record<Page, Record<Lang, string>> = {
   screens: { en: '/screens-and-panels/', es: '/es/pantallas-y-paneles/' },
   roadmap: { en: '/whats-next/', es: '/es/lo-que-viene/' },
   download: { en: '/download/', es: '/es/descargar/' },
+  notFound: { en: '/404.html', es: '/es/404/' },
 };
 
-export const DOCS = 'https://docs.create-new-era.tryberyl.dev';
+// the docs site, built separately and served by the same Caddy under /docs/
+export const DOCS = '/docs';
 export const REPO = 'https://github.com/ElJoshua08/create-new-era';
 export const FALLBACK = {
-  tag: '0.1.0-alpha.1',
-  url: 'https://github.com/ElJoshua08/create-new-era/releases/download/v0.1.0-alpha.1/create_new_era-0.1.0-alpha.1.jar',
+  tag: '0.1.0-alpha.3',
+  url: 'https://github.com/ElJoshua08/create-new-era/releases/download/v0.1.0-alpha.3/create_new_era-0.1.0-alpha.3.jar',
 };
 
 export const ui = {

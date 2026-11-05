@@ -9,7 +9,7 @@ Los programas funcionan sobre [Cobalt](https://github.com/cc-tweaked/Cobalt), la
 
 | Función | Qué hace |
 | --- | --- |
-| `print(...)` | Escribe sus argumentos en la consola en una línea, cada uno pasado a texto con `tostring` y separados por tabuladores. |
+| `print(...)` | Escribe sus argumentos en la consola en una línea, separados por tabuladores. Las tablas muestran lo que tienen, como `{speed = 64, stress = {capacity = 2048, used = 512}}`, hasta unos pocos niveles; las funciones salen como `<function>`. |
 | `sleep(seconds)` | Espera ese tiempo en tiempo de juego, redondeado hacia arriba a ticks enteros. `sleep()` y `sleep(0)` esperan un tick. Cualquier cosa que no sea un número da error. |
 | `require(name)` | Ejecuta una vez otro archivo de este ordenador y devuelve lo que devolvió. Mira [Archivos y require](./files.mdx). |
 
@@ -62,50 +62,29 @@ Los campos de una entrada de `bus.list()`:
 
 `bus.get` devuelve una tabla con `name`, `type` y una función para cada cosa que sabe hacer ese tipo de bloque. Puedes llamarlas con punto o con dos puntos; `motor.getSpeed()` y `motor:getSpeed()` funcionan igual.
 
-Para leer hace falta un puerto de **salida** en el dispositivo, y para darle órdenes uno de **entrada**. Si llamas a una función que los puertos no permiten, el programa se para con un mensaje que dice qué puerto falta, por ejemplo `creative_motor.setSpeed needs an input port on creative_motor`.
+Para leer hace falta un puerto de **salida** en el dispositivo, y para darle órdenes uno de **entrada**. Un puerto de datos de latón y la conexión propia de un control de panel hacen las dos cosas. Si llamas a una función que los puertos no permiten, el programa se para con un mensaje que dice qué puerto falta, por ejemplo `creative_motor.setSpeed needs an input port on creative_motor`. Los errores de las funciones de dispositivos, como un argumento que no vale, señalan la línea de tu programa que hizo la llamada.
 
-### Todo lo que gira
+Lo que sabe hacer cada tipo de bloque está en [Dispositivos](./devices.mdx). Las sugerencias del editor muestran la misma lista para el dispositivo que guarda una variable, con una línea sobre cada función.
 
-Cualquier bloque cinético de Create: ejes, cajas de engranajes, motores, prensas, ventiladores y otros ordenadores de latón.
+### read y onChange
 
-| Función | Puerto | Devuelve |
-| --- | --- | --- |
-| `getSpeed()` | salida | Velocidad en RPM, negativa en el otro sentido. 0 si está sobreestresado. |
-| `isOverstressed()` | salida | `true` cuando su red está sobreestresada. |
-| `getStress()` | salida | Una tabla `{ used = …, capacity = … }` de toda su red cinética, en SU. Las dos a 0 si no está en ninguna red. |
-
-Un motor creativo o un controlador de velocidad rotacional tienen además:
-
-| Función | Puerto | Qué hace |
-| --- | --- | --- |
-| `getTargetSpeed()` | salida | La velocidad a la que está puesto, en RPM. |
-| `setSpeed(rpm)` | entrada | Cambia esa velocidad, como si tocaras su valor a mano. Un número entero, limitado entre -256 y 256. |
-
-### Todo lo que guarda objetos
-
-Cofres, barriles, los almacenes y depósitos de Create, y cualquier otro bloque con inventario de objetos.
-
-| Función | Puerto | Devuelve |
-| --- | --- | --- |
-| `items()` | salida | Una tabla de id de objeto a cantidad total: `{ ["minecraft:iron_ingot"] = 5 }`. |
-| `count(id)` | salida | Cuántos tiene de ese objeto, 0 si ninguno. |
-| `getSlots()` | salida | Cuántas ranuras tiene. |
-
-### Todo lo que guarda fluidos
-
-Los tanques de fluidos de Create, las cubetas y cualquier otro bloque con un tanque de fluido.
-
-| Función | Puerto | Devuelve |
-| --- | --- | --- |
-| `fluids()` | salida | Una lista con una tabla por tanque: `{ name = "minecraft:water", amount = 1000, capacity = 8000 }`. Las cantidades van en milicubos; un tanque vacío tiene `name = ""`. |
-
-Un bloque puede ser de más de un tipo. Una cubeta guarda objetos y fluidos, así que tiene los dos grupos de funciones.
-
-### onChange
+Todo dispositivo con funciones tiene también `read()`: todo lo que se puede leer de él en un solo valor. En una máquina es una tabla con lo que le toque de esto: `speed`, `overstressed`, `stress`, `targetSpeed`, `items`, `fluids` y `state` (su estado de bloque). En un control de panel es el valor del propio control: el `true` o `false` de un pulsador, el número de un mando.
 
 | Función | Qué hace |
 | --- | --- |
-| `device.onChange(fn)` | Ejecuta `fn(device)` cada vez que cambia algo legible del dispositivo, hasta que el programa termine. |
+| `device.onChange(fn)` | Ejecuta `fn(value, device)` cada vez que cambia algo del dispositivo, hasta que el programa termine. `value` es lo que da `read()`. |
+
+Algunos dispositivos tienen ayudas hechas sobre `onChange`:
+
+| Ayuda | En | Ejecuta |
+| --- | --- | --- |
+| `onPress(fn)` | un pulsador de panel | `fn(device)` cada vez que se pulsa |
+| `onKey(fn)` | un teclado de panel | `fn(key, device)` por cada tecla, de `"0"` a `"9"`, `"*"` o `"#"` |
+| `onKeyDown(fn)`, `onKeyUp(fn)` | una Linked Typewriter | `fn(key, device)` cuando cada tecla baja o sube |
+| `onKey(fn)` | una Linked Typewriter | `fn(key, down, device)` para las dos |
+| `onMessage(fn)` | un chat log | `fn(message, device)` por cada mensaje, `{player, text, time}` |
+| `onClick(id, fn)` | una pantalla de latón | `fn(player, device)` cuando se pulsa el botón con ese id |
+| `onTouch(fn)` | una pantalla de latón | `fn(x, y, player, device)` por cada toque, en sus puntos |
 
 Mira [Reaccionar a los cambios](./devices.mdx#reaccionar-a-los-cambios).
 

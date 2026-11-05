@@ -43,7 +43,7 @@ Un programa termina de una de tres maneras:
 - Da un error. La consola muestra el mensaje en rojo y las salidas se quedan como estaban.
 - Pulsas **Parar**. El programa termina y todas las salidas de redstone se apagan.
 
-Un programa con [handlers de `onChange`](./devices.mdx#reaccionar-a-los-cambios) no termina cuando acaba su código principal: sigue escuchando hasta que lo paras o da un error.
+Un programa con [handlers de `onChange`](./devices.mdx), o ayudas hechas con él como `onPress` y `onMessage`, no termina cuando acaba su código principal: sigue escuchando hasta que lo paras o da un error.
 
 Cuando se carga el mundo, o vuelve a cargarse el chunk, un ordenador que estaba en marcha arranca su programa otra vez desde arriba. Las variables no se guardan. Vuelve a arrancar el último archivo que ejecutaste, que no tiene por qué ser `startup.lua`.
 
@@ -55,7 +55,9 @@ La parte de atrás suele llevar el eje, así que la redstone va casi siempre por
 
 ## Sus propios puertos
 
-El ordenador trae cuatro puertos de datos de serie: dos en cada lado, en un panel de latón. Lo conectan al [bus de datos](./bus.mdx). No se pueden quitar; usar la llave inglesa en uno gira el ordenador, igual que en cualquier otra parte de él. Giran con el ordenador cuando lo rotas.
+El ordenador trae cuatro puertos de datos de serie: dos en cada lado, en un panel de latón. Lo conectan al [bus de datos](./bus.mdx). No se pueden quitar: agacharte con la llave inglesa en uno recoge el ordenador, como con cualquier bloque de Create. Giran con el ordenador cuando lo rotas.
+
+Cada puerto lleva un solo cable. Para llegar a más máquinas, tira un cable hasta un [hub de puertos](./bus.mdx#hubs-de-puertos) y junta allí los demás, o une cables en un empalme.
 
 ## El tiempo
 
@@ -65,4 +67,4 @@ En cada tick, cada ordenador en marcha recibe un trozo del tiempo del servidor s
 
 ## La consola
 
-Debajo del código, la consola muestra lo que escribe `print`, las líneas de estado (**Ejecutando**, **Parado**, **Programa terminado**, **Reiniciado al cargar el mundo**) y los errores en rojo. Los errores empiezan con el archivo y la línea, como `lib/pid.lua:12:`; si pinchas en uno, se abre ese archivo en esa línea. La consola guarda las últimas 100 líneas, y se guardan con el ordenador.
+Debajo del código, la consola muestra lo que escribe `print`, las líneas de estado (**Ejecutando**, **Parado**, **Programa terminado**, **Reiniciado al cargar el mundo**) y los errores en rojo. Los errores empiezan con el archivo y la línea, como `lib/pid.lua:12:`; si pinchas en uno, se abre ese archivo en esa línea. La salida del programa se dibuja con la fuente monoespaciada del editor, y los tabuladores se alinean en columnas de cuatro, así que `print(a, b)` forma una tabla que se lee bien. La consola guarda las últimas 100 líneas, y se guardan con el ordenador.

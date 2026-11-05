@@ -1,14 +1,17 @@
 import Link from 'next/link';
-import { Download } from '@/components/download';
+import { Download, ReleaseVersion } from '@/components/download';
 import { i18n } from '@/lib/i18n';
+import { withBase } from '@/lib/shared';
 
 const copy = {
   en: {
     eyebrow: 'Documentation',
     title: 'Create: New Era',
     lead: 'An addon for Create 6 on NeoForge 1.21.1. Brass Computers run Lua while a shaft turns them, and reach your machines through data ports and cables.',
-    status:
-      'This is 0.1.0-alpha.1, the first pre-release. Everything here works in creative. Survival progression isn’t done yet: the cable spool comes full from its recipe and some recipes are placeholders.',
+    status: [
+      'This is ',
+      ', an alpha pre-release. Everything here works in creative. Survival progression isn’t done yet: the cable spool comes full from its recipe and recipes will change.',
+    ],
     install: 'How to install',
     guide: {
       title: 'Guide',
@@ -39,8 +42,10 @@ const copy = {
     eyebrow: 'Documentación',
     title: 'Create: New Era',
     lead: 'Un addon para Create 6 en NeoForge 1.21.1. Los ordenadores de latón ejecutan Lua mientras un eje los hace girar, y llegan a tus máquinas con puertos y cables de datos.',
-    status:
-      'Esta es la 0.1.0-alpha.1, la primera versión previa. Todo lo de aquí funciona en creativo. La progresión en supervivencia aún no está: la bobina de cable sale llena de su receta y algunas recetas son provisionales.',
+    status: [
+      'Esta es la ',
+      ', una versión previa alfa. Todo lo de aquí funciona en creativo. La progresión en supervivencia aún no está: la bobina de cable sale llena de su receta y las recetas van a cambiar.',
+    ],
     install: 'Cómo instalarlo',
     guide: {
       title: 'Guía',
@@ -90,7 +95,7 @@ function Section({
           <p className="mt-1 text-sm text-fd-muted-foreground">{section.who}</p>
         </div>
         {/* biome-ignore lint/performance/noImgElement: pixel-art render in a static export */}
-        <img src={image} alt="" width={48} height={48} className="pixelated size-12 shrink-0" />
+        <img src={withBase(image)} alt="" width={48} height={48} className="pixelated size-12 shrink-0" />
       </div>
       <ul className="mt-5 flex flex-col">
         {section.links.map(([label, path]) => (
@@ -141,7 +146,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         </div>
         {/* biome-ignore lint/performance/noImgElement: pixel-art render in a static export */}
         <img
-          src="/img/blocks/brass_computer_shaft.png"
+          src={withBase('/img/blocks/brass_computer_shaft.png')}
           alt=""
           width={260}
           height={260}
@@ -150,7 +155,9 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
       </div>
 
       <p className="mt-10 max-w-[760px] rounded-xl border border-[color-mix(in_oklab,var(--copper-3)_45%,transparent)] bg-[color-mix(in_oklab,var(--copper-3)_9%,transparent)] px-4 py-3 text-sm leading-relaxed">
-        {t.status}
+        {t.status[0]}
+        <ReleaseVersion />
+        {t.status[1]}
       </p>
 
       <div className="mt-10 grid gap-5 md:grid-cols-2">

@@ -47,6 +47,10 @@ print("got a pulse")
 
 `sleep(0)` waits one tick, so a loop like this costs almost nothing while it waits.
 
+## Redstone far away
+
+The six sides only reach the blocks next to the computer. To power a block anywhere on the [data bus](./bus.mdx), give it an input port and call `setRedstone`: `bus.get("clutch").setRedstone(true)` powers it as a lever on each of its input ports' faces would, and `setRedstone(0)` to `setRedstone(15)` sets the strength. Any block with functions can also tell you the strongest signal reaching it with `getRedstone()`. See [Devices](./devices.mdx#redstone-through-a-port).
+
 ## Examples
 
 [Examples](./examples.mdx) has whole redstone programs: copying a signal from one side to another, counting pulses, fading an analog output.

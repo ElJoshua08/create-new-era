@@ -1,5 +1,6 @@
+import { posix } from 'node:path';
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page';
-import { createRelativeLink } from 'fumadocs-ui/mdx';
+import defaultMdxComponents from 'fumadocs-ui/mdx';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getMDXComponents } from '@/components/mdx';
@@ -26,7 +27,7 @@ export default async function Page({ params }: Props) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={getMDXComponents(lang, { a: createRelativeLink(source, page) })} />
+        <MDX components={getMDXComponents(lang, { a: relativeLink(page) })} />
       </DocsBody>
       <div className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t pt-5 text-sm text-fd-muted-foreground">
         <a
@@ -43,6 +44,23 @@ export default async function Page({ params }: Props) {
       </div>
     </DocsPage>
   );
+}
+
+// Links like ./bus.mdx#port-hubs to the page's URL. Fumadocs' createRelativeLink can't find them:
+// with the 'dir' i18n parser page paths start with the language (en/guide/bus.mdx) and its lookup
+// doesn't expect that, so it hands the .mdx link back untouched.
+function relativeLink(page: NonNullable<ReturnType<typeof source.getPage>>) {
+  const pages = source.getPages(page.locale);
+  // biome-ignore lint/correctness/noComponentHookFactories: the factory only binds the page, like createRelativeLink
+  return function RelativeLink({ href, ...props }: React.ComponentProps<'a'>) {
+    let resolved = href;
+    if (href && (href.startsWith('./') || href.startsWith('../'))) {
+      const [file, hash] = href.split('#', 2);
+      const target = pages.find((p) => p.path === posix.join(posix.dirname(page.path), file));
+      if (target) resolved = hash ? `${target.url}#${hash}` : target.url;
+    }
+    return <defaultMdxComponents.a href={resolved} {...props} />;
+  };
 }
 
 export function generateStaticParams() {

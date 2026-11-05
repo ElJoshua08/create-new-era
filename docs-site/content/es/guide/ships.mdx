@@ -1,0 +1,145 @@
+---
+title: Barcos
+description: Pilotar barcos de Create Aeronautics desde un programa, con sus mandos, sus sensores y los instrumentos de vuelo de panel.
+---
+
+Con **Create: Aeronautics** instalado, un programa puede pilotar un barco: poner los gases, girar el timón, montar el barco y aterrizarlo, leer adónde va y cómo vuela. Create: New Era no necesita Aeronautics para funcionar; sin él, los bloques de Aeronautics simplemente no están, y los instrumentos de vuelo del final de esta página leen como si estuvieran en tierra firme.
+
+Todo lo de esta página funciona por el [bus de datos](./bus.mdx) como siempre: pon un puerto en el bloque, llévale cable al ordenador y búscalo con `bus.get` por su nombre. Los bloques de Aeronautics se llaman según su id: `throttle_lever`, `steering_wheel`, `physics_assembler`, `navigation_table`, `optical_sensor`, `altitude_sensor`, `gimbal_sensor`, `velocity_sensor`, `propeller_bearing`. Con un puerto de latón no tienes que pensar hacia dónde mira el puerto.
+
+Aeronautics no está traducido al español, así que sus bloques se llaman en el juego con su nombre en inglés.
+
+## Puertos y cables en un barco
+
+Cuando Aeronautics monta un barco con sus bloques, los puertos, cables, empalmes y hubs de esos bloques van con él, y los dispositivos conservan sus nombres. Cuando el barco se desmonta, vuelven abajo con los bloques. Un cable con un extremo en el barco y el otro en tierra se quita.
+
+En un barco en vuelo, los puertos y cables se dibujan donde está el barco, y apuntarlos, resaltarlos y golpearlos funciona ahí también. Pon también el ordenador en el barco, y toda la red vuela con él.
+
+## Throttle Lever
+
+La palanca de gases.
+
+| Función | Puerto | Hace |
+| --- | --- | --- |
+| `getValue()` | salida | dónde está puesta, como la señal que da: 0-15 |
+| `setValue(value)` | entrada | la pone para dar esa señal, 0-15, como lo haría un jugador |
+| `getMinValue()`, `getMaxValue()` | salida | 0 y 15 |
+
+Una palanca invertida se tiene en cuenta: `setValue(15)` siempre significa una señal de 15.
+
+## Steering Wheel
+
+El timón.
+
+| Función | Puerto | Hace |
+| --- | --- | --- |
+| `getAngle()` | salida | cuánto está girado ahora, en grados |
+| `getTargetAngle()` | salida | el ángulo hacia el que está girando |
+| `getMaxAngle()` | salida | cuánto gira como mucho hacia cada lado, según esté puesto en el timón |
+| `setAngle(degrees)` | entrada | lo gira a ese ángulo, como lo harían las manos de un jugador |
+
+El timón no pasa de su límite y llega a su ritmo, así que `getAngle()` va un momento por detrás de `getTargetAngle()`.
+
+## Physics Assembler
+
+El ensamblador que convierte bloques en barco.
+
+| Función | Puerto | Hace |
+| --- | --- | --- |
+| `isAssembled()` | salida | si sus bloques son ahora un barco |
+| `getError()` | salida | por qué falló el último intento de montar el barco, o nil |
+| `assemble()` | entrada | hace un barco con los bloques unidos a él, como al tirar de su palanca |
+| `disassemble()` | entrada | aterriza el barco y devuelve sus bloques al mundo |
+
+Las dos cosas pasan al final del tick, no en mitad de la línea de tu programa, así que un ordenador en el barco que monta sigue funcionando. Dale un momento antes de comprobarlo:
+
+```lua
+local assembler = bus.get("physics_assembler")
+assembler.assemble()
+sleep(0.1)
+if not assembler.isAssembled() then
+  print("no se pudo montar:", assembler.getError())
+end
+```
+
+## Navigation Table
+
+La mesa de navegación.
+
+| Función | Da |
+| --- | --- |
+| `hasTarget()` | si el mapa o la brújula que tiene apunta a algún sitio |
+| `getTarget()` | adónde apunta: `{x, y, z}`, o nil |
+| `getDistance()` | a cuántos bloques está el objetivo |
+| `getRelativeAngle()` | cuánto se aparta el objetivo de la línea recta hacia delante, en grados |
+
+Todas leen, así que basta con un puerto de salida.
+
+## Optical Sensor
+
+El sensor óptico.
+
+| Función | Puerto | Hace |
+| --- | --- | --- |
+| `hasHit()` | salida | si su rayo da en un bloque dentro de su alcance |
+| `getDistance()` | salida | a qué distancia está ese bloque |
+| `getBlock()` | salida | el id del bloque en el que da, o nil |
+| `getRange()` | salida | hasta dónde llega el rayo |
+| `setRange(blocks)` | entrada | pone hasta dónde llega el rayo |
+
+## Hélices
+
+Los rodamientos de hélice y las hélices pequeñas de Aeronautics tienen `getThrust()` (cuánto empuja ahora a su barco), `getAirflow()` (cuánto aire mueve) e `isActive()` (si está girando y empujando). Un rodamiento de hélice también es un rodamiento y un bloque cinético, así que tiene `isAssembled()`, `assemble()`, `getSpeed()` y lo demás de [Dispositivos](./devices.mdx#máquinas-que-giran).
+
+## Sensores
+
+Los sensores de Aeronautics le dan al programa los números que miden, no solo la redstone que sacan de ellos. Solo leen.
+
+| Sensor | Funciones |
+| --- | --- |
+| Altitude Sensor | `getAltitude()`: su altura en el mundo, en bloques; `getAirPressure()`: 1 en el fondo del mundo, bajando hacia 0; `getSignal()`: 0-15, según esté puesto en su pantalla |
+| Gimbal Sensor | `getPitch()`, `getRoll()` en grados; `getAngles()`: `{pitch, roll}`; `getPower(side)`: la señal que sale por `"up"`, `"down"`, `"north"`, `"south"`, `"east"` o `"west"` |
+| Velocity Sensor | `getSpeed()`: bloques por segundo en la dirección a la que apunta, negativo hacia atrás; `getSignal()`: de -15 a 15 |
+
+## Instrumentos de vuelo
+
+Este mod añade cuatro instrumentos de panel que leen el barco del que forman parte. Son controles de panel, así que el cable entra directo en ellos, sin puerto. Las doce de la esfera apuntan hacia donde vuela el barco: puesto en un pupitre, lejos de ti; colgado en una pared, hacia dentro de la pared. Fuera de un barco leen como si estuvieran en tierra firme: nivelados, quietos y con rumbo hacia donde apuntan las doce.
+
+Cada uno se fabrica con una placa de control y una lámina de latón en cualquier orden, más un reloj (altímetro), un mecanismo de precisión (giroscopio), una brújula (brújula) o una hélice de Create (anemómetro).
+
+| Instrumento | Funciones | `read()` y `onChange` dan |
+| --- | --- | --- |
+| Altímetro de panel | `getAltitude()`, `getHeightAboveGround()`, `getVerticalSpeed()` en bloques por segundo | su altitud |
+| Giroscopio de panel | `getPitch()` (morro arriba positivo), `getRoll()` (lado derecho abajo positivo), `getHeading()`, `getAttitude()`: `{pitch, roll, heading}` | `{pitch, roll, heading}` |
+| Brújula de panel | `getHeading()`: 0 norte, 90 este, 180 sur, 270 oeste; `getDirection()`: `"north"`, `"north_east"`... | su rumbo |
+| Anemómetro de panel | `getSpeed()` respecto al mundo, `getAirspeed()` respecto al aire, `getVelocity()`: `{x, y, z}`, `getMaxSpeed()`, `setMaxSpeed(speed)` | su velocidad |
+
+Las velocidades van en bloques por segundo, los ángulos en grados. La aguja del anemómetro llega al rojo a 40 bloques por segundo hasta que un programa ponga otra velocidad tope.
+
+La aguja larga del altímetro da una vuelta cada 100 bloques, la corta cada 1000. El giroscopio es un horizonte artificial: su bola se inclina y sube con el barco.
+
+## Un piloto automático
+
+Para un barco cuya palanca de gases mueve su sustentación: mantiene una altitud de 150 y gira hacia el objetivo de la mesa de navegación. Cambia los nombres por los que te salgan con `bus.list()`.
+
+```lua
+local throttle = bus.get("throttle_lever")
+local wheel = bus.get("steering_wheel")
+local nav = bus.get("navigation_table")
+local altimeter = bus.get("panel_altimeter")
+
+altimeter.onChange(function(altitude)
+  if altitude < 148 then throttle.setValue(15)
+  elseif altitude > 152 then throttle.setValue(4)
+  else throttle.setValue(9)
+  end
+end)
+
+nav.onChange(function()
+  if not nav.hasTarget() then return end
+  local turn = math.max(-1, math.min(1, nav.getRelativeAngle() / 45))
+  wheel.setAngle(turn * wheel.getMaxAngle())
+end)
+```
+
+Si el barco gira alejándose del objetivo, cambia el signo de `turn`. Las lecturas de los instrumentos se redondean a una décima para `onChange`, así que no lo despierta cada temblor. La mesa de navegación lo despierta cuando cambia el objetivo o el ángulo hacia él cambia un grado.

@@ -1,0 +1,149 @@
+---
+title: Screen markup
+description: Lay out a Brass Screen from a few tags in a .screen file, then change its values and hear its buttons.
+---
+
+Most screens are a status board or a small menu: a title, some numbers, a bar, a couple of buttons. Instead of drawing those dot by dot, you describe them with a few tags, the way a web page is written in HTML, and the screen lays them out. The look is built in: there's no stylesheet, so every screen keeps the same style.
+
+A program shows the layout once, then changes the parts it gave an `id`. The screen lays itself out again and flips only the dots that changed.
+
+## A first screen
+
+In the computer's editor, make a file called `farm.screen` and write:
+
+```xml
+<screen>
+  <title>IRON FARM</title>
+  <row><label>IRON</label><value id="iron" align="right">0</value></row>
+  <bar id="load" value="0.7"/>
+  <row><button id="start">START</button><button id="stop">STOP</button></row>
+</screen>
+```
+
+Then the program, in `startup.lua`:
+
+```lua
+local screen = bus.get("brass_screen")
+local chest = bus.get("chest")
+
+screen.show("farm")
+
+screen.onClick("start", function(player)
+  print(player .. " pressed START")
+end)
+
+while true do
+  local iron = chest.count("minecraft:iron_ingot")
+  screen.set("iron", iron)
+  screen.set("load", iron / 1728)
+  sleep(1)
+end
+```
+
+`show("farm")` finds `farm` or `farm.screen` on the computer. The screen shows the title in a band across the top, the iron count on the right of its row, a bar 70% full, and two buttons sharing the last row.
+
+The screen needs to be on the bus with a Brass Data Port, as on [Screens and panels](./screens-panels.mdx#putting-a-screen-on-the-bus).
+
+## .screen files
+
+A file whose name ends in `.screen` is a layout. The editor treats it as markup, not Lua:
+
+- tags, attributes and values are coloured;
+- typing `<` suggests the tags, and inside a tag it suggests the attributes that tag takes and the values they can have;
+- a mistake is underlined while you write, like an error in a program;
+- inside `show("`, the suggestions list the computer's `.screen` files.
+
+**Saving the file shows it again at once** on every screen that's showing it, without restarting the program. Values the program set with `set` are kept. If the saved markup has a mistake, the screens keep what they had and the console says what's wrong in red.
+
+Only a program on the computer that has the file can show it.
+
+You can also write markup straight in the program. Any text that starts with `<` is taken as markup rather than a file name:
+
+```lua
+screen.show("<title>HELLO</title><label>All good</label>")
+```
+
+The `<screen>` around everything can be left out, as here.
+
+## Tags
+
+Elements are stacked from the top, one under another, two dots apart, with two dots of space round the edge of the pane.
+
+| Tag | What it is |
+| --- | --- |
+| `<screen>` | The whole screen, the root. Takes `color` (the ink for everything inside, amber unless set) and `background` (dark unless set). |
+| `<title>` | A heading: a band of the ink colour across the top, its text cut out of it. |
+| `<row>` | Puts what's inside side by side. |
+| `<column>` | Puts what's inside one under another. Use it inside a row to make columns. |
+| `<label>` | A line of text that stays as written. |
+| `<value>` | A line of text a program changes: give it an `id` and call `set(id, value)`. |
+| `<text>` | A line of text, like `label`. |
+| `<bar>` | A progress bar: a frame filled as far as `value` goes, from 0 to `max` (1 unless set). |
+| `<button>` | A label in a box. Give it an `id` and a program hears it with `onClick`. |
+| `<divider>` | A thin line across, to separate parts. |
+| `<spacer>` | Empty room: `height` dots tall (4 unless set), or a share of a row. |
+
+In a row, text takes the room it needs, and buttons, bars, columns, dividers and spacers share what's left equally. Text with `align="right"` goes to the right end of the row, in order.
+
+## Attributes
+
+Every tag takes these:
+
+| Attribute | Values |
+| --- | --- |
+| `id` | A name for the element, for `set`, `get` and `onClick`. |
+| `color` | Its colour, and the colour of everything inside it: `amber`, a dye's name (`lime`, `red`, `light_blue`…), `dark`, or `"#RRGGBB"` (the nearest a dot can show). |
+| `align` | `left`, `center` or `right`. |
+| `size` | `big` doubles the text; `small` is the usual size. |
+
+And some tags take their own: `background` on `<screen>`, `value` and `max` on `<bar>`, `height` on `<spacer>`.
+
+The colours are the same 18 a dot can show; see [Colours](./screens-panels.mdx#colours).
+
+## Mistakes
+
+Every tag and attribute is checked before anything is shown. An unknown tag, an attribute the tag doesn't take, a colour that doesn't exist, an `align` or `size` that isn't one of its values, or a tag that isn't closed: `show` stops the program with a message that says which, and the screen keeps what it had.
+
+```lua
+print(pcall(screen.show, "<blink>no</blink>"))
+-- false   unknown tag <blink>: use screen, title, row, column, label, value, text, bar, button, divider, spacer
+```
+
+## Changing what's shown
+
+| Function | What it does |
+| --- | --- |
+| `show(file)` | Shows a `.screen` file of this computer on the whole pane, by name with or without `.screen`. Text starting with `<` is shown as markup. |
+| `set(id, value)` | Changes one element by its id: a bar's value, anything else's text. Numbers are written the way `print` writes them, so `42` and not `42.0`. |
+| `get(id)` | What an element says now, as a string: its text, or a bar's value. `nil` if nothing is shown or no element has that id. |
+
+`set` stops the program if nothing is shown yet, or if no element has that id.
+
+A program's values stay with the screen. They survive the program stopping, the world reloading and the file being saved again. Showing a file again with `show` starts over from the file's own values.
+
+If you add or take away screens from the pane, the layout fits the new size the next time the program sets a value or shows it again.
+
+## Buttons
+
+Pressing a button is a right-click on it. Only buttons with an `id` can be heard.
+
+```lua
+screen.onClick("stop", function(player)
+  bus.get("panel_lamp").set("red")
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `onClick(id, fn)` | Runs `fn(player, device)` each time a player presses the button with that id, until the program stops. |
+| `getLastClick()` | The last button pressed: `{ id = …, player = …, count = … }`, or `nil` before the first. `count` goes up by one with every click. |
+
+A press on a button is also a touch, so `onTouch` hears it too.
+
+## The ripple
+
+When a layout is shown or changed, the dots that change turn over in a ripple that crosses the pane from left to right, each dot a little out of step with its neighbours. Dots a program draws with the drawing functions turn at once.
+
+## Markup and drawing together
+
+The drawing functions on [Screens and panels](./screens-panels.mdx#drawing) work on top of a layout: what you draw stays until the layout is laid out again by the next `set` or `show`. `clear()` wipes the screen and forgets the layout, so after it only what you draw is there.

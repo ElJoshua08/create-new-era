@@ -47,6 +47,10 @@ print("ha llegado un pulso")
 
 `sleep(0)` espera un tick, así que un bucle así casi no cuesta nada mientras espera.
 
+## Redstone a distancia
+
+Los seis lados solo llegan a los bloques pegados al ordenador. Para alimentar un bloque en cualquier parte del [bus de datos](./bus.mdx), ponle un puerto de entrada y llama a `setRedstone`: `bus.get("clutch").setRedstone(true)` lo alimenta como lo haría una palanca en la cara de cada uno de sus puertos de entrada, y de `setRedstone(0)` a `setRedstone(15)` fija la fuerza. Cualquier bloque con funciones te dice también la señal más fuerte que le llega con `getRedstone()`. Mira [Dispositivos](./devices.mdx).
+
 ## Ejemplos
 
 En [Ejemplos](./examples.mdx) hay programas completos de redstone: copiar una señal de un lado a otro, contar pulsos, subir poco a poco una salida analógica.

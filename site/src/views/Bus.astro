@@ -23,15 +23,15 @@ const dyes = [
 const copy = {
   en: {
     title: 'The data bus',
-    description: 'Data ports that stick to any block, cables you lay with a spool, and drivers that let Lua programs read and control Create machines.',
+    description: 'Data ports that stick to any block, cables you lay with a spool, and drivers that let Lua programs read and control Create machines, Minecraft blocks and Aeronautics ships.',
     lede: 'Small ports on your machines, cables between them, and a computer that can see everything on the line.',
-    alt: 'A Brass Computer with a port expansion on top, cabled to a fluid tank, an item vault and an encased fan.',
+    alt: 'A Brass Computer cabled from both ports on its side to a fluid tank and an encased fan, and the fan cabled on to an item vault.',
     ports: {
       title: 'A port fits on anything',
       text: [
         'A data port goes on any face of any block, Create machines included, and the block keeps working exactly as before.',
-        'As an output, with an amber light, it lets programs read the block. Turn it with a wrench and it becomes an input, with a green light, so programs can give the block orders.',
-        'The Brass Computer has four ports of its own, already in the sockets on its sides. A port expansion adds four more, and a computer takes up to three.',
+        'A copper port is an output, with an amber light, that lets programs read the block. Turn it with a wrench and it becomes an input, with a green light, so programs can give the block orders. A brass data port does both at once.',
+        'Each port takes one cable. The Brass Computer has four of its own, two in the panel on each side. To reach more machines, run a cable to a port hub: 24 sockets joined inside, where a whole network meets.',
       ],
     },
     cables: {
@@ -46,10 +46,13 @@ const copy = {
       title: 'What a program can do with a machine',
       intro: 'Each kind of machine brings its own functions. A program finds machines with bus.list(), nearest first, or by name with bus.get().',
       rows: [
-        ['Anything that turns', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) and getTargetSpeed() on machines with a speed setting, like the Creative Motor'],
+        ['Any block', 'getRedstone(), setRedstone(level), read()', 'Redstone through an input port drives clutches, gearshifts and transmissions'],
+        ['Anything that turns', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) on motors; bearings, pistons and the sequenced gearshift take orders too'],
         ['Inventories', 'items(), count(item), getSlots()', 'Chests, vaults, depots and anything else that holds items'],
-        ['Tanks', 'fluids()', 'The name, amount and capacity of every tank in the block'],
-        ['Any device', 'onChange(fn)', 'Runs your function each time the device changes. The program keeps listening after its main code ends.'],
+        ['Tanks', 'fluids(), pushFluid(), pullFluid()', 'The name, amount and capacity of every tank in the block'],
+        ['Chat log and Linked Typewriter', 'getMessages(), say(text), onKey(fn)', 'Read the chat and talk in it; every key on a linked typewriter reaches the program'],
+        ['Aeronautics ships', 'Throttle, steering, sensors, instruments', 'Programs read where a ship is and fly it'],
+        ['Any device', 'onChange(fn)', 'Runs fn(value, device) each time the device changes. The program keeps listening after its main code ends.'],
       ],
       head: ['Machine', 'Functions', 'Notes'],
     },
@@ -67,15 +70,15 @@ const copy = {
   },
   es: {
     title: 'El bus de datos',
-    description: 'Puertos de datos que se pegan a cualquier bloque, cables que tiendes con una bobina y drivers para que tus programas en Lua lean y controlen máquinas de Create.',
+    description: 'Puertos de datos que se pegan a cualquier bloque, cables que tiendes con una bobina y drivers para que tus programas en Lua lean y controlen máquinas de Create, bloques de Minecraft y naves de Aeronautics.',
     lede: 'Pequeños puertos en tus máquinas, cables entre ellos y un ordenador que ve todo lo que hay en la línea.',
-    alt: 'Un ordenador de latón con una ampliación de puertos encima, cableado a un depósito de fluidos, una bóveda de objetos y un ventilador revestido.',
+    alt: 'Un ordenador de latón cableado desde los dos puertos de su lado a un depósito de fluidos y a un ventilador revestido, y el ventilador cableado a su vez a una bóveda de objetos.',
     ports: {
       title: 'Un puerto va en cualquier cosa',
       text: [
         'Un puerto de datos se pone en cualquier cara de cualquier bloque, máquinas de Create incluidas, y el bloque sigue funcionando exactamente igual.',
-        'En salida, con la luz ámbar, deja que los programas lean el bloque. Gíralo con la llave inglesa y pasa a entrada, con la luz verde, para que los programas le den órdenes.',
-        'El ordenador de latón trae cuatro puertos propios, ya puestos en los huecos de sus lados. Cada ampliación de puertos añade cuatro más, y un ordenador admite hasta tres.',
+        'Un puerto de cobre es de salida, con la luz ámbar, y deja que los programas lean el bloque. Gíralo con la llave inglesa y pasa a entrada, con la luz verde, para que los programas le den órdenes. Un puerto de datos de latón hace las dos cosas a la vez.',
+        'Cada puerto admite un cable. El ordenador de latón trae cuatro propios, dos en el panel de cada lado. Para llegar a más máquinas, lleva un cable a un hub de puertos: 24 tomas unidas por dentro donde se junta toda una red.',
       ],
     },
     cables: {
@@ -90,10 +93,13 @@ const copy = {
       title: 'Qué puede hacer un programa con una máquina',
       intro: 'Cada tipo de máquina trae sus funciones. Un programa encuentra las máquinas con bus.list(), de la más cercana a la más lejana, o por su nombre con bus.get().',
       rows: [
-        ['Todo lo que gira', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) y getTargetSpeed() en máquinas con ajuste de velocidad, como el motor creativo'],
+        ['Cualquier bloque', 'getRedstone(), setRedstone(nivel), read()', 'La redstone que entra por un puerto de entrada mueve embragues, cajas de cambios y transmisiones'],
+        ['Todo lo que gira', 'getSpeed(), isOverstressed(), getStress()', 'setSpeed(rpm) en los motores; los rodamientos, los pistones y la caja de cambios secuenciada también reciben órdenes'],
         ['Inventarios', 'items(), count(objeto), getSlots()', 'Cofres, bóvedas, depósitos y cualquier cosa que guarde objetos'],
-        ['Tanques', 'fluids()', 'El nombre, la cantidad y la capacidad de cada tanque del bloque'],
-        ['Cualquier dispositivo', 'onChange(fn)', 'Ejecuta tu función cada vez que el dispositivo cambia. El programa sigue escuchando aunque su código principal haya terminado.'],
+        ['Tanques', 'fluids(), pushFluid(), pullFluid()', 'El nombre, la cantidad y la capacidad de cada tanque del bloque'],
+        ['Chat log y Linked Typewriter', 'getMessages(), say(texto), onKey(fn)', 'Lee el chat y habla en él; cada tecla de una typewriter enlazada llega al programa'],
+        ['Naves de Aeronautics', 'Acelerador, timón, sensores, instrumentos', 'Los programas saben dónde está una nave y la pilotan'],
+        ['Cualquier dispositivo', 'onChange(fn)', 'Llama a fn(valor, dispositivo) cada vez que el dispositivo cambia. El programa sigue escuchando aunque su código principal haya terminado.'],
       ],
       head: ['Máquina', 'Funciones', 'Notas'],
     },
@@ -118,16 +124,16 @@ const listCode =
 end
 
 local tanque = bus.get("fluid_tank")
-tanque.onChange(function(t)
-  print("agua:", t.fluids()[1].amount)
+tanque.onChange(function()
+  print("agua:", tanque.fluids()[1].amount)
 end)`
     : `for _, d in ipairs(bus.list()) do
   print(d.name, d.type, d.distance)
 end
 
 local tank = bus.get("fluid_tank")
-tank.onChange(function(t)
-  print("water:", t.fluids()[1].amount)
+tank.onChange(function()
+  print("water:", tank.fluids()[1].amount)
 end)`;
 ---
 

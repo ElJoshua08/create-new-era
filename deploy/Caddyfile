@@ -3,10 +3,63 @@
 	auto_https off
 }
 
+# The landing page at /, the docs under /docs/. Beryl terminates TLS in front of this.
 :80 {
-	root * /srv
 	encode zstd gzip
-	file_server
-	@assets path /assets/* /fonts/* /img/*
-	header @assets Cache-Control "public, max-age=3600"
+
+	# The old site's docs were flat .html files under /docs/; send them to the same page in the new docs.
+	@olddevindex path /docs/dev/ /docs/dev/index.html
+	redir @olddevindex /docs/en/dev/ 301
+	@olddev path_regexp dev ^/docs/dev/([a-z-]+)\.html$
+	redir @olddev /docs/en/dev/{re.dev.1}/ 301
+	@olddocs path_regexp old ^/docs/([a-z-]+)\.html$
+	map {re.old.1} {docpage} {
+		index       "guide/"
+		install     "guide/install/"
+		computer    "guide/computer/"
+		editor      "guide/editor/"
+		files       "guide/files/"
+		lua         "guide/lua/"
+		examples    "guide/examples/"
+		config      "guide/config/"
+		blocks      "guide/devices/"
+		planned     "guide/roadmap/"
+		default     ""
+	}
+	redir @olddocs /docs/en/{docpage} 301
+	redir /docs /docs/ 301
+
+	handle_path /docs/* {
+		root * /srv/docs
+		file_server
+		# Next puts content hashes in every asset name, so they can be kept for good.
+		@hashed path /_next/static/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+	}
+
+	handle {
+		root * /srv/site
+		file_server
+		# Astro hashes bundled CSS/JS under /_astro/; images and scenes keep their names.
+		@hashed path /_astro/*
+		header @hashed Cache-Control "public, max-age=31536000, immutable"
+		@assets path /img/* /fonts/* /gui/* /scenes/*
+		header @assets Cache-Control "public, max-age=3600"
+	}
+
+	handle_errors 404 {
+		@docs path /docs/*
+		handle @docs {
+			root * /srv/docs
+			rewrite * /404.html
+			file_server
+		}
+		handle {
+			root * /srv/site
+			@es path /es/*
+			rewrite @es /es/404/index.html
+			rewrite * /404.html
+			file_server
+		}
+	}
 }

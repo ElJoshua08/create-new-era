@@ -20,6 +20,10 @@ Una `/` en el nombre mete el archivo en una carpeta: `lib/pid.lua`. Los nombres 
 
 **Ejecutar** arranca el archivo de la pestaña activa y el ordenador se lo apunta. Cuando se carga el mundo, vuelve a arrancar ese mismo archivo. Un ordenador nuevo ejecuta `startup.lua`.
 
+## Disposiciones de pantalla
+
+Un archivo que acaba en `.screen` guarda una disposición para una pantalla de latón, escrita en marcado y no en Lua. Vive en el disco como cualquier otro archivo y cuenta para los mismos límites. Un programa la muestra por su nombre con el `show` de la pantalla, y al guardarla en el editor se actualizan todas las pantallas que la muestran. Mira [Pantallas y paneles](./screens-panels.mdx).
+
 ## Cargar un módulo
 
 `require(name)` ejecuta otro archivo del mismo ordenador y devuelve lo que ese archivo devolvió. Primero busca el nombre tal cual. Si no hay un archivo así, convierte los puntos en carpetas y añade `.lua`:

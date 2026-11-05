@@ -5,13 +5,13 @@ import { jetbrains, monocraft, plex } from '@/components/fonts';
 import { Provider } from '@/components/provider';
 import { i18n } from '@/lib/i18n';
 import { translations } from '@/lib/layout.shared';
-import { appName, siteUrl } from '@/lib/shared';
+import { appName, siteUrl, withBase } from '@/lib/shared';
 import '../global.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: { default: `${appName} docs`, template: `%s · ${appName}` },
-  icons: { icon: '/img/items/create_new_era_brass_computer.png' },
+  icons: { icon: withBase('/img/items/create_new_era_brass_computer.png') },
 };
 
 export const viewport: Viewport = {

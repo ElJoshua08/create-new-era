@@ -77,17 +77,18 @@ async function wall(root: HTMLElement) {
   const view = await SceneView.load(canvas, '/scenes/wall');
   canvas.hidden = false;
   if (still) still.style.visibility = 'hidden';
-  const COLS = 48 * 4;
-  const ROWS = 48 * 3;
+  // 4×3 screens: 32 dots a block less the 8 the outer frame keeps, as in the game
+  const COLS = 32 * 4 - 8;
+  const ROWS = 32 * 3 - 8;
   const screen = new FlipScreen(COLS, ROWS);
   const face = view.meta.faces.screen;
   let joined = true;
 
   // something to look at before anyone draws: a factory line counter
-  screen.text('CREATE', 12, 14, 4);
-  screen.text('NEW ERA', 12, 52, 4);
-  for (let x = 12; x < COLS - 12; x += 3) screen.set(x, 92);
-  [10, 14, 9, 18, 22, 17, 25, 28, 24, 31, 34, 30, 36, 38].forEach((h, i) => screen.rect(12 + i * 12, 130 - h, 8, h));
+  screen.text('CREATE', 6, 6, 3);
+  screen.text('NEW ERA', 6, 32, 2);
+  for (let x = 6; x < COLS - 6; x += 2) screen.set(x, 52);
+  [6, 9, 5, 11, 14, 10, 16, 18, 15, 20, 22, 19, 24, 25].forEach((h, i) => screen.rect(6 + i * 8, 82 - h, 5, h));
   screen.snap();
 
   const toggles = [...root.querySelectorAll<HTMLButtonElement>('[data-join]')];

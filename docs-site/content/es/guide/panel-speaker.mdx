@@ -1,0 +1,65 @@
+---
+title: Altavoz de panel
+description: Reproduce sonidos del juego y notas desde un programa, y haz que diga texto en voz alta.
+---
+
+El altavoz de panel es una rejilla de altavoz sobre una placa de control. Los programas reproducen por él cualquier sonido del juego, tocan notas como un bloque musical o le hacen decir texto en voz alta. Se pone en la cara que pinchas, como los demás [controles de panel](./screens-panels.mdx#controles-de-panel), y el cable va directamente a su placa. Su nombre de dispositivo es `panel_speaker`.
+
+La receta está en la página de [Recetas](./recipes.mdx#controles-de-panel).
+
+```lua
+local altavoz = bus.get("panel_speaker")
+altavoz.playSound("minecraft:block.bell.use")
+altavoz.playNote("bell", 12)
+altavoz.speak("La granja de hierro está llena")
+```
+
+## Sonidos
+
+`playSound(sonido, volumen?, tono?)` reproduce cualquier sonido que conozca el juego, por su id: `"minecraft:block.bell.use"`, `"minecraft:entity.experience_orb.pickup"`, `"create:whistle"`… En el editor, las sugerencias dentro de `playSound("` muestran todos los sonidos.
+
+| Argumento | Valores |
+| --- | --- |
+| `sonido` | Un id de sonido. Un sonido que ningún mod registra suena igual si lo tiene un paquete de recursos. |
+| `volumen` | De 0 a 4, 1 si no lo pones. Con volumen 1 se oye a 16 bloques. |
+| `tono` | De 0.5 a 2, 1 si no lo pones. 1 es tal como se grabó. |
+
+## Notas
+
+`playNote(instrumento, nota, volumen?)` toca una nota como lo haría un bloque musical.
+
+| Argumento | Valores |
+| --- | --- |
+| `instrumento` | Un instrumento de bloque musical: `"harp"`, `"basedrum"`, `"snare"`, `"hat"`, `"bass"`, `"flute"`, `"bell"`, `"guitar"`, `"chime"`, `"xylophone"`, `"iron_xylophone"`, `"cow_bell"`, `"didgeridoo"`, `"bit"`, `"banjo"`, `"pling"`. |
+| `nota` | De 0 a 24, los mismos 25 pasos de un bloque musical. 12 es el centro. |
+| `volumen` | De 0 a 4, 3 si no lo pones, tan alto como un bloque musical. |
+
+Una melodía corta:
+
+```lua
+local altavoz = bus.get("panel_speaker")
+for _, nota in ipairs({ 6, 10, 13, 18 }) do
+  altavoz.playNote("chime", nota)
+  sleep(0.25)
+end
+```
+
+Los sonidos y las notas suenan con el volumen de **Tocadiscos/Bloques musicales** de los ajustes de sonido de cada jugador.
+
+## Voz
+
+`speak(texto)` dice el texto en voz alta a todos los jugadores a menos de 48 bloques, con la voz de síntesis de su propio ordenador, la misma que usa el narrador de Minecraft. El texto sale también encima de su barra de objetos, así que quien no tenga voz puede leerlo. Un texto de más de 256 caracteres se corta ahí.
+
+```lua
+local altavoz = bus.get("panel_speaker")
+local teclado = bus.get("panel_keypad")
+teclado.onKey(function(tecla)
+  altavoz.speak(tecla)
+end)
+```
+
+En Linux, la voz de Minecraft necesita `libflite`. Sin ella, el altavoz prueba `espeak-ng`, `espeak` y luego `spd-say` (speech-dispatcher), el que esté instalado. Si no hay ninguno, el texto solo sale en pantalla. Cada jugador oye las frases una a una, en orden.
+
+## Leerlo
+
+Un altavoz solo reproduce: `read()` da `nil`, y `onChange` nunca se ejecuta con él.

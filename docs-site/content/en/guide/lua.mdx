@@ -9,7 +9,7 @@ Programs run on [Cobalt](https://github.com/cc-tweaked/Cobalt), the Lua 5.2 VM f
 
 | Function | What it does |
 | --- | --- |
-| `print(...)` | Writes its arguments to the console as one line, each turned to text with `tostring` and separated by tabs. |
+| `print(...)` | Writes its arguments to the console as one line, separated by tabs. Tables show what's in them, like `{speed = 64, stress = {capacity = 2048, used = 512}}`, up to a few levels deep; functions show as `<function>`. |
 | `sleep(seconds)` | Waits that long in game time, rounded up to whole ticks. `sleep()` and `sleep(0)` wait one tick. Anything but a number is an error. |
 | `require(name)` | Runs another file on this computer once and returns what it returned. See [Files and require](./files.mdx). |
 
@@ -62,50 +62,29 @@ The fields of a `bus.list()` entry:
 
 `bus.get` returns a table with `name`, `type`, and a function for everything that kind of block can do. Call them with a dot or a colon; `motor.getSpeed()` and `motor:getSpeed()` both work.
 
-Reading needs an **output** port on the device, giving orders needs an **input** port. Calling a function the ports don't allow stops the program with a message that says which port is missing, for example `creative_motor.setSpeed needs an input port on creative_motor`.
+Reading needs an **output** port on the device, giving orders needs an **input** port. A brass data port and a panel control's own connection do both. Calling a function the ports don't allow stops the program with a message that says which port is missing, for example `creative_motor.setSpeed needs an input port on creative_motor`. Errors from device functions, like a bad argument, point at the line of your program that made the call.
 
-### Anything that turns
+What each kind of block can do is listed in [Devices](./devices.mdx). The editor's suggestions show the same list for the device a variable holds, with a line about each function.
 
-Every Create kinetic block: shafts, gearboxes, motors, presses, fans, and other Brass Computers.
+### read and onChange
 
-| Function | Port | Returns |
-| --- | --- | --- |
-| `getSpeed()` | output | Speed in RPM, negative for the other direction. 0 when overstressed. |
-| `isOverstressed()` | output | `true` when its network is overstressed. |
-| `getStress()` | output | A table `{ used = …, capacity = … }` for its whole kinetic network, in SU. Both 0 if it isn't on a network. |
-
-A Creative Motor or a Rotation Speed Controller also has:
-
-| Function | Port | What it does |
-| --- | --- | --- |
-| `getTargetSpeed()` | output | The speed it's set to, in RPM. |
-| `setSpeed(rpm)` | input | Sets that speed, as if you'd changed its value box by hand. A whole number, clamped to -256 to 256. |
-
-### Anything that holds items
-
-Chests, barrels, Create's vaults and depots, and any other block with an item inventory.
-
-| Function | Port | Returns |
-| --- | --- | --- |
-| `items()` | output | A table from item id to the total count: `{ ["minecraft:iron_ingot"] = 5 }`. |
-| `count(id)` | output | How many of that item it holds, 0 if none. |
-| `getSlots()` | output | How many slots it has. |
-
-### Anything that holds fluids
-
-Create's fluid tanks, basins and any other block with a fluid tank.
-
-| Function | Port | Returns |
-| --- | --- | --- |
-| `fluids()` | output | A list with one table per tank: `{ name = "minecraft:water", amount = 1000, capacity = 8000 }`. Amounts are in millibuckets; an empty tank has `name = ""`. |
-
-A block can be more than one kind. A basin holds items and fluids, so it has both sets.
-
-### onChange
+Every device that has functions also has `read()`: everything readable about it in one value. For a machine it's a table with whichever of these apply: `speed`, `overstressed`, `stress`, `targetSpeed`, `items`, `fluids` and `state` (its block state). For a panel control it's the control's own value: a button's `true` or `false`, a knob's number.
 
 | Function | What it does |
 | --- | --- |
-| `device.onChange(fn)` | Runs `fn(device)` every time something readable about the device changes, until the program stops. |
+| `device.onChange(fn)` | Runs `fn(value, device)` every time anything about the device changes, until the program stops. `value` is what `read()` gives. |
+
+Some devices get helpers built on `onChange`:
+
+| Helper | On | Runs |
+| --- | --- | --- |
+| `onPress(fn)` | a panel button | `fn(device)` each time it's pressed down |
+| `onKey(fn)` | a panel keypad | `fn(key, device)` for each key, `"0"` to `"9"`, `"*"` or `"#"` |
+| `onKeyDown(fn)`, `onKeyUp(fn)` | a linked typewriter | `fn(key, device)` as each key goes down or comes up |
+| `onKey(fn)` | a linked typewriter | `fn(key, down, device)` for both |
+| `onMessage(fn)` | a chat log | `fn(message, device)` for each message, `{player, text, time}` |
+| `onClick(id, fn)` | a Brass Screen | `fn(player, device)` when the button with that id is pressed |
+| `onTouch(fn)` | a Brass Screen | `fn(x, y, player, device)` for each touch, in its dots |
 
 See [Reacting to changes](./devices.mdx#reacting-to-changes).
 

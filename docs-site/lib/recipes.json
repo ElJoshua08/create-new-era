@@ -48,6 +48,12 @@
       "icon": "/img/items/create_new_era_brass_computer.png",
       "mod": "create_new_era"
     },
+    "create_new_era:brass_port": {
+      "en": "Brass Data Port",
+      "es": "Puerto de datos de latón",
+      "icon": "/img/items/create_new_era_brass_port.png",
+      "mod": "create_new_era"
+    },
     "create_new_era:brass_screen": {
       "en": "Brass Screen",
       "es": "Pantalla de latón",
@@ -90,6 +96,24 @@
       "icon": "/img/items/create_new_era_cable_spool.png",
       "mod": "create_new_era"
     },
+    "minecraft:paper": {
+      "en": "Paper",
+      "es": "Papel",
+      "icon": "/img/items/minecraft_paper.png",
+      "mod": "minecraft"
+    },
+    "minecraft:book": {
+      "en": "Book",
+      "es": "Libro",
+      "icon": "/img/items/minecraft_book.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:chat_log": {
+      "en": "Chat Log",
+      "es": "Chat log",
+      "icon": "/img/items/create_new_era_chat_log.png",
+      "mod": "create_new_era"
+    },
     "create_new_era:control_plate": {
       "en": "Control Plate",
       "es": "Placa de control",
@@ -103,9 +127,33 @@
       "mod": "create"
     },
     "create_new_era:nixie_digit": {
-      "en": "Nixie Digit",
-      "es": "Dígito nixie",
+      "en": "Panel Nixie Tube",
+      "es": "Tubo nixie de panel",
       "icon": "/img/items/create_new_era_nixie_digit.png",
+      "mod": "create_new_era"
+    },
+    "create:propeller": {
+      "en": "Propeller",
+      "es": "Hélice",
+      "icon": "/img/items/create_propeller.png",
+      "mod": "create"
+    },
+    "create_new_era:panel_airspeed": {
+      "en": "Panel Airspeed Indicator",
+      "es": "Anemómetro de panel",
+      "icon": "/img/items/create_new_era_panel_airspeed.png",
+      "mod": "create_new_era"
+    },
+    "minecraft:clock": {
+      "en": "Clock",
+      "es": "Reloj",
+      "icon": "/img/items/minecraft_clock.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_altimeter": {
+      "en": "Panel Altimeter",
+      "es": "Altímetro de panel",
+      "icon": "/img/items/create_new_era_panel_altimeter.png",
       "mod": "create_new_era"
     },
     "minecraft:stone_button": {
@@ -126,6 +174,18 @@
       "icon": "/img/items/create_new_era_panel_button.png",
       "mod": "create_new_era"
     },
+    "minecraft:compass": {
+      "en": "Compass",
+      "es": "Brújula",
+      "icon": "/img/items/minecraft_compass.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_compass": {
+      "en": "Panel Compass",
+      "es": "Brújula de panel",
+      "icon": "/img/items/create_new_era_panel_compass.png",
+      "mod": "create_new_era"
+    },
     "create:speedometer": {
       "en": "Speedometer",
       "es": "Velocímetro",
@@ -136,6 +196,12 @@
       "en": "Panel Gauge",
       "es": "Indicador de aguja",
       "icon": "/img/items/create_new_era_panel_gauge.png",
+      "mod": "create_new_era"
+    },
+    "create_new_era:panel_gyroscope": {
+      "en": "Panel Gyroscope",
+      "es": "Giroscopio de panel",
+      "icon": "/img/items/create_new_era_panel_gyroscope.png",
       "mod": "create_new_era"
     },
     "create_new_era:panel_keypad": {
@@ -180,6 +246,18 @@
       "icon": "/img/items/create_new_era_panel_slider.png",
       "mod": "create_new_era"
     },
+    "minecraft:note_block": {
+      "en": "Note Block",
+      "es": "Bloque musical",
+      "icon": "/img/items/minecraft_note_block.png",
+      "mod": "minecraft"
+    },
+    "create_new_era:panel_speaker": {
+      "en": "Panel Speaker",
+      "es": "Altavoz de panel",
+      "icon": "/img/items/create_new_era_panel_speaker.png",
+      "mod": "create_new_era"
+    },
     "minecraft:lever": {
       "en": "Lever",
       "es": "Palanca",
@@ -192,10 +270,10 @@
       "icon": "/img/items/create_new_era_panel_switch.png",
       "mod": "create_new_era"
     },
-    "create_new_era:port_expansion": {
-      "en": "Port Expansion",
-      "es": "Ampliación de puertos",
-      "icon": "/img/items/create_new_era_port_expansion.png",
+    "create_new_era:port_hub": {
+      "en": "Port Hub",
+      "es": "Hub de puertos",
+      "icon": "/img/items/create_new_era_port_hub.png",
       "mod": "create_new_era"
     },
     "minecraft:blue_dye": {
@@ -247,6 +325,16 @@
       "result": "create_new_era:brass_computer",
       "count": 1,
       "mirrored": false
+    },
+    "brass_port": {
+      "type": "shapeless",
+      "ingredients": [
+        "create:brass_sheet",
+        "create:electron_tube",
+        "create:precision_mechanism"
+      ],
+      "result": "create_new_era:brass_port",
+      "count": 2
     },
     "brass_screen": {
       "type": "shaped",
@@ -307,6 +395,29 @@
       "count": 1,
       "mirrored": true
     },
+    "chat_log": {
+      "type": "shaped",
+      "grid": [
+        [
+          null,
+          "minecraft:paper",
+          null
+        ],
+        [
+          "create:electron_tube",
+          "create:brass_casing",
+          "create:electron_tube"
+        ],
+        [
+          null,
+          "minecraft:book",
+          null
+        ]
+      ],
+      "result": "create_new_era:chat_log",
+      "count": 1,
+      "mirrored": true
+    },
     "control_plate": {
       "type": "shapeless",
       "ingredients": [
@@ -326,6 +437,26 @@
       "result": "create_new_era:nixie_digit",
       "count": 1
     },
+    "panel_airspeed": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:brass_sheet",
+        "create:propeller"
+      ],
+      "result": "create_new_era:panel_airspeed",
+      "count": 1
+    },
+    "panel_altimeter": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:brass_sheet",
+        "minecraft:clock"
+      ],
+      "result": "create_new_era:panel_altimeter",
+      "count": 1
+    },
     "panel_button": {
       "type": "shapeless",
       "ingredients": [
@@ -336,6 +467,16 @@
       "result": "create_new_era:panel_button",
       "count": 1
     },
+    "panel_compass": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:brass_sheet",
+        "minecraft:compass"
+      ],
+      "result": "create_new_era:panel_compass",
+      "count": 1
+    },
     "panel_gauge": {
       "type": "shapeless",
       "ingredients": [
@@ -343,6 +484,16 @@
         "create:speedometer"
       ],
       "result": "create_new_era:panel_gauge",
+      "count": 1
+    },
+    "panel_gyroscope": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "create:brass_sheet",
+        "create:precision_mechanism"
+      ],
+      "result": "create_new_era:panel_gyroscope",
       "count": 1
     },
     "panel_keypad": {
@@ -385,6 +536,16 @@
       "result": "create_new_era:panel_slider",
       "count": 1
     },
+    "panel_speaker": {
+      "type": "shapeless",
+      "ingredients": [
+        "create_new_era:control_plate",
+        "minecraft:note_block",
+        "create:copper_sheet"
+      ],
+      "result": "create_new_era:panel_speaker",
+      "count": 1
+    },
     "panel_switch": {
       "type": "shapeless",
       "ingredients": [
@@ -394,15 +555,28 @@
       "result": "create_new_era:panel_switch",
       "count": 1
     },
-    "port_expansion": {
-      "type": "shapeless",
-      "ingredients": [
-        "create:brass_sheet",
-        "create:electron_tube",
-        "create:precision_mechanism"
+    "port_hub": {
+      "type": "shaped",
+      "grid": [
+        [
+          "create:electron_tube",
+          "create:precision_mechanism",
+          "create:electron_tube"
+        ],
+        [
+          "create:electron_tube",
+          "create:brass_casing",
+          "create:electron_tube"
+        ],
+        [
+          "create:electron_tube",
+          "create:precision_mechanism",
+          "create:electron_tube"
+        ]
       ],
-      "result": "create_new_era:port_expansion",
-      "count": 1
+      "result": "create_new_era:port_hub",
+      "count": 1,
+      "mirrored": true
     },
     "spool_dyeing": {
       "type": "shaped",

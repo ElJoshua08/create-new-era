@@ -1,35 +1,121 @@
 ---
 title: Devices
-description: Reading machines, giving them orders and reacting when they change.
+description: What a program can do with each block on the bus, from chests and motors to doors, bearings, chat logs and typewriters.
 ---
 
-`bus.get(name)` gives you a table for one device. Its functions depend on what the block is; the full list is in the [Lua API reference](./lua.mdx#devices). This page shows them at work.
+`bus.get(name)` gives you a table for one device. Its functions depend on what the block is: anything that turns, anything that holds items or fluids, and some blocks of Create's, Minecraft's and Aeronautics' own. Every block with a port gets a few functions, whatever it is. The editor lists each device's functions with what they do when you type `device.`.
 
-## Reading
+## Reading and giving orders
 
-Reading needs an output port (amber) on the device.
+Functions that **read** need an output port (amber) on the device. Functions that **give orders** need an input port (green). A brass port, or a panel control's own connection, does both. See [The data bus](./bus.mdx#data-ports).
+
+Calling a function the ports don't allow stops the program and says which port is missing:
+
+```
+startup.lua:3: rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller
+```
+
+Wrench the port to turn it the other way, add a second port, or use a brass port. A function the block doesn't have at all is simply missing from its table: `device.setSpeed` on a chest is nil.
+
+## Errors point at your line
+
+When a device function fails, the error names the line of your program that called it, not the mod's own code. A wrong argument says what was expected:
+
+```lua
+local lamp = bus.get("redstone_lamp")
+lamp.setRedstone(99)
+```
+
+```
+startup.lua:2: bad argument #1 to 'setRedstone' (0-15 or true/false expected, got 99)
+```
+
+A device that isn't on the network says `no device named 'chest_9' on this computer's network`.
+
+## Tables
+
+Many functions give back a table. `print` shows what's in it:
 
 ```lua
 local motor = bus.get("creative_motor")
-print(motor.getSpeed())          -- 64
+print(motor.getStress())     -- {capacity = ..., used = ...}
+print(motor.getPosition())   -- {x = 12, y = 64, z = -30}
+```
+
+Read the fields by name, `motor.getStress().used`, or loop over lists with `ipairs`. The editor knows the fields of the tables device functions return, so typing `stress.` after `local stress = motor.getStress()` offers `used` and `capacity`.
+
+## Every block
+
+These work on any block with a port.
+
+| Function | Port | Gives |
+| --- | --- | --- |
+| `getName()` | output | its name on the bus, the one `bus.get` takes |
+| `getType()` | output | its block id, e.g. `"create:mechanical_press"` |
+| `getPosition()` | output | `{x, y, z}` |
+| `getState()` | output | its block state: `{facing = "north", powered = false, ...}` |
+| `getRedstone()` | output | the strongest redstone signal reaching it, 0-15 |
+| `setRedstone(strength)` | input | powers it, 0-15 or `true`/`false` |
+| `getRedstoneOutput()` | input | the signal its input ports are giving it, 0-15 |
+| `read()` | output | everything readable about it in one table |
+
+Blocks that open (doors, trapdoors, fence gates) also have `isOpen()` and `setOpen(open)`. A door opens both its halves. Blocks that light up (furnaces, lamps, candles) have `isLit()`.
+
+```lua
+local door = bus.get("oak_door")
+door.setOpen(true)
+print(door.isOpen(), door.getState().half)   -- true  lower
+```
+
+## Redstone through a port
+
+`setRedstone` powers the block through each of its input ports, like a lever on the face the port is on. That's how a program works a Create clutch or gearshift, a door, a redstone lamp, a piston: anything that reacts to redstone.
+
+```lua
+local clutch = bus.get("clutch")
+clutch.setRedstone(true)   -- the clutch disengages
+sleep(2)
+clutch.setRedstone(false)  -- and engages again
+```
+
+The block reacts at once. The signal stays when the program stops, and is saved with the world, until a program sets it again. Only input ports and brass ports give it; an output port doesn't.
+
+## Machines that turn
+
+Anything kinetic: shafts, gearboxes, motors, presses, fans, saws...
+
+```lua
+local motor = bus.get("creative_motor")
+print(motor.getSpeed())          -- 64, negative when it turns the other way
 print(motor.isOverstressed())    -- false
 
 local stress = motor.getStress()
 print(stress.used .. " / " .. stress.capacity .. " SU")
 ```
 
+A Creative Motor and a Rotation Speed Controller also have `getTargetSpeed()`, `getMinValue()` (-256), `getMaxValue()` (256) and, with an input port, `setSpeed(rpm)`:
+
+```lua
+local controller = bus.get("rotation_speed_controller")
+controller.setSpeed(-128)  -- whole numbers from -256 to 256
+```
+
+## Items and fluids
+
 Inventories give counts by item id:
 
 ```lua
 local chest = bus.get("chest")
 print(chest.count("minecraft:iron_ingot"))
+print(chest.getSlots())                -- 27
+print(chest.getSlot(1))                -- {count = 12, max = 64, name = "minecraft:iron_ingot"}, or nil
 
 for id, n in pairs(chest.items()) do
   print(id, n)
 end
 ```
 
-Tanks give one entry per tank:
+Slots count from 1. Tanks give one entry per tank:
 
 ```lua
 local tank = bus.get("fluid_tank")
@@ -38,26 +124,144 @@ for _, t in ipairs(tank.fluids()) do
 end
 ```
 
-## Giving orders
+With an input port, a device can move items and fluids to or from another device on the same network, by name:
 
-Orders need an input port (green). For now the one order is the speed of a Creative Motor or a Rotation Speed Controller:
+| Function | Does |
+| --- | --- |
+| `pushItems(to, count?, item?)` | moves up to `count` items (64 if left out) into `to`, only `item` if given |
+| `pullItems(from, count?, item?)` | the same the other way |
+| `pushFluid(to, amount?, fluid?)` | pours up to `amount` mB (1000 if left out) into `to` |
+| `pullFluid(from, amount?, fluid?)` | the same the other way |
+
+Each returns how much moved. Only the device you call needs an input port; the other just has to be on the network.
 
 ```lua
-local controller = bus.get("rotation_speed_controller")
-controller.setSpeed(-128)  -- whole numbers from -256 to 256
+local moved = bus.get("chest").pushItems("chest_2", 5, "minecraft:iron_ingot")
+print("moved", moved)   -- moved 5
 ```
 
-If the port is an output, this stops with `rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller`. Wrench the port to turn it into an input, or add a second port.
+## Create's blocks
+
+| Block | Functions |
+| --- | --- |
+| Blaze Burner | `getHeat()`: `"none"`, `"smouldering"`, `"fading"`, `"kindled"` or `"seething"`; `getFuelTime()` in ticks |
+| Mechanical Press | `isPressing()` |
+| Mechanical Mixer | `isMixing()` |
+| Speedometer, Stressometer | `getDial()`: where the needle points, 0 to 1 |
+| Nixie Tube | `getText()`; `setText(text)` and `clear()` (input) work on the whole row of tubes |
+| Train Station | `getStationName()`, `hasTrain()`, `getTrainName()` (nil without a train) |
+| Display Board | `getLineCount()`, `getMaxChars()`; `setLine(line, text)` (input), lines from 1 |
+
+Bearings (mechanical, windmill, and Aeronautics' propeller bearings) and the machines that push contraptions (pistons, pulleys, gantry carriages) build and take apart what they move, as clicking them does:
+
+| Block | Read | Orders |
+| --- | --- | --- |
+| Bearings | `isAssembled()`, `getAngle()` in degrees, `getRotationSpeed()` in degrees a tick | `assemble()`, `disassemble()` |
+| Pistons, pulleys, gantries | `isAssembled()`, `getExtension()` in blocks | `assemble()`, `disassemble()` |
+| Sequenced Gearshift | `isRunning()` | `rotate(degrees, speed?)`, `move(blocks, speed?)` |
+
+`assemble()` happens on the machine's next tick, and only if it can, as with a click. The sequenced gearshift runs one step and stops: `rotate(90)` turns what's after it 90°, `move(3)` turns it enough to move a piston, pulley or gantry three blocks. A negative number goes back; `"fast"` as the second argument doubles the speed (`"normal"` otherwise).
+
+```lua
+local bearing = bus.get("mechanical_bearing")
+bearing.assemble()
+sleep(0.5)
+print(bearing.isAssembled(), bearing.getAngle())
+
+local seq = bus.get("sequenced_gearshift")
+seq.rotate(90, "fast")
+while seq.isRunning() do sleep(0.1) end
+```
+
+## Minecraft's blocks
+
+| Block | Functions |
+| --- | --- |
+| Furnace, smoker, blast furnace | `isBurning()`, `getCookProgress()` 0 to 1, `getBurnTime()` in ticks |
+| Note block | `getNote()` 0-24; `setNote(note)` and `play()` (input) |
+| Bell | `ring()` (input), returns whether it rang |
+| Sign | `getText()`: its four front lines; `setText(line1, line2, line3, line4)` (input), lines left out are cleared |
+| Lectern | `hasBook()`, `getPage()` from 1 |
+| Beehive, bee nest | `getHoney()` 0-5, `getBees()` |
+| Composter | `getFill()` 0-8 |
+
+```lua
+local sign = bus.get("oak_sign")
+sign.setText("Iron", tostring(bus.get("chest").count("minecraft:iron_ingot")))
+```
+
+## Chat log
+
+The **Chat Log** is a block that hears every chat message in its dimension and can write to chat. Put a port on it. It keeps the last 50 messages, and goggles show the last few.
+
+| Function | Port | Does |
+| --- | --- | --- |
+| `getMessages(count?)` | output | the last messages, oldest first, each `{player, text, time}`; all 50 if left out |
+| `getLast()` | output | the newest message, or nil |
+| `say(text)` | input | says it in chat as `[chat_log] text`, to everyone within 128 blocks |
+| `tell(player, text)` | input | whispers it to one player, wherever they are; returns whether they're online |
+| `onMessage(fn)` | output | runs `fn(message, device)` for every message it hears |
+
+`time` is the game time it was said, in ticks. With a brass port it can do all of these:
+
+```lua
+local log = bus.get("chat_log")
+log.onMessage(function(m)
+  if m.text == "!iron" then
+    log.tell(m.player, "iron: " .. bus.get("chest").count("minecraft:iron_ingot"))
+  end
+end)
+```
+
+<Recipe id="chat_log" />
+
+## Linked Typewriter
+
+With Create: Aeronautics installed, its **Linked Typewriter** works on the bus. A program hears every key pressed on it while someone types, not only the keys bound to a frequency, however quickly they come. Its functions only read, so an output port is enough.
+
+| Function | Gives |
+| --- | --- |
+| `getPressedKeys()` | the keys held now, by name: `{"w", "space"}` |
+| `isPressed(key)` | whether that key is held |
+| `isInUse()` | whether someone is typing on it |
+| `getUser()` | who's typing, or nil |
+| `getTyped()` | the text typed into it, the last 256 characters; backspace takes one off |
+| `getKeyEvents(since?)` | each key that went down or up after event number `since`, oldest first: `{key, down, seq}`; it keeps the last 64 |
+| `onKeyDown(fn)` | runs `fn(key, device)` as each key goes down |
+| `onKeyUp(fn)` | runs `fn(key, device)` as each key comes up |
+| `onKey(fn)` | runs `fn(key, down, device)` for both |
+
+Keys are named `"a"` to `"z"`, `"0"` to `"9"`, `"space"`, `"enter"`, `"backspace"`, `"tab"`, `"escape"`, `"up"`, `"down"`, `"left"`, `"right"`, `"left_shift"`, `"right_shift"`, `"left_control"`, `"right_control"`, `"left_alt"`, `"right_alt"`, `"f1"` to `"f12"`, and punctuation as itself: `","`, `"."`, `"/"`, `";"`, `"'"`, `"["`, `"]"`, `"\\"`, `"-"`, `"="`, `` "`" ``. Others come as `"key_"` and a number. Letters are always lower case.
+
+```lua
+local keys = bus.get("linked_typewriter")
+local motor = bus.get("creative_motor")
+
+keys.onKeyDown(function(key)
+  if key == "w" then motor.setSpeed(128)
+  elseif key == "s" then motor.setSpeed(-128)
+  elseif key == "enter" then print(keys.getTyped())
+  end
+end)
+
+keys.onKeyUp(function(key)
+  if key == "w" or key == "s" then motor.setSpeed(0) end
+end)
+```
+
+The rest of Aeronautics' blocks are on the [Ships](./ships.mdx) page.
 
 ## Reacting to changes
 
-`device.onChange(fn)` runs `fn` whenever something you could read from the device changes: its speed, whether it's overstressed, its set speed, its items or its fluids. The device is passed in, so one function can serve several devices.
+`device.onChange(fn)` runs `fn(value, device)` whenever something you could read from the device changes. `value` is what `device.read()` gives at that moment, and the device is passed too, so one function can serve several devices.
+
+For a machine, `read()` is one table with whatever it has: `speed`, `overstressed`, `stress`, `targetSpeed`, `items`, `fluids` and `state` (its block state). For a panel control it's the control's value: a switch's on or off, a slider's position.
 
 ```lua
 local chest = bus.get("chest")
 
-chest.onChange(function(c)
-  local iron = c.count("minecraft:iron_ingot")
+chest.onChange(function(state)
+  local iron = state.items["minecraft:iron_ingot"] or 0
   rs.setOutput("top", iron < 64)
 end)
 
@@ -66,13 +270,17 @@ print("watching the chest")
 
 This program prints once and then waits. Because it has a handler, it doesn't finish when the last line runs: it keeps listening until you press **Stop** or it errors. Between changes it costs nothing.
 
+What counts as a change: its speed, whether it's overstressed, its set speed, its items, its fluids, its block state (a door opening, a lamp lighting, a note block's note), a chat log hearing a message, a key on a typewriter, a sensor's reading moving by a tenth.
+
 Some details:
 
 - Changes are checked once per tick. If a chest changes three times in one tick, the handler runs once.
 - Each change starts a fresh run of the handler, alongside the main code and any other handlers. A handler can `sleep`.
-- A device that leaves the network, because its block broke or a cable was cut, counts as a change too. Calling its functions after that is an error, so check with `pcall` if that can happen.
+- A device that leaves the network, because its block broke or a cable was cut, counts as a change too. `value` is nil then, and calling its functions is an error, so check with `pcall` if that can happen.
 - Stress used and capacity aren't watched. Poll `getStress()` with a loop if you need it.
 - An error in any handler stops the whole program.
+
+`onMessage`, `onKeyDown`, `onKeyUp` and `onKey` are built on `onChange`, and so are a panel button's `onPress`, a keypad's `onKey` and a screen's `onTouch` and `onClick`.
 
 ## Polling instead
 

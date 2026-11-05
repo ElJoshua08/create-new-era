@@ -30,8 +30,8 @@ async function latest(): Promise<Release | null> {
   return null;
 }
 
-export function Download({ lang }: { lang?: string }) {
-  const t = text[lang === 'es' ? 'es' : 'en'];
+// the release the download button offers: the build's own version until GitHub answers
+function useRelease(): Release {
   const [release, setRelease] = useState<Release>({ ...fallbackRelease, prerelease: true });
 
   useEffect(() => {
@@ -45,6 +45,17 @@ export function Download({ lang }: { lang?: string }) {
       cancelled = true;
     };
   }, []);
+  return release;
+}
+
+/** The version the download button offers, as text: "0.1.0-alpha.3". */
+export function ReleaseVersion() {
+  return <>{useRelease().tag.replace(/^v/, '')}</>;
+}
+
+export function Download({ lang }: { lang?: string }) {
+  const t = text[lang === 'es' ? 'es' : 'en'];
+  const release = useRelease();
 
   return (
     <span className="not-prose inline-flex flex-wrap items-center gap-x-4 gap-y-2">

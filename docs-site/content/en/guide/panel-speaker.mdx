@@ -1,0 +1,65 @@
+---
+title: Panel Speaker
+description: Play game sounds and notes from a program, and have it speak text aloud.
+---
+
+The Panel Speaker is a speaker grille on a Control Plate. Programs play any sound in the game through it, play notes like a note block, or have it say text aloud. It goes on whatever face you click, like the other [panel controls](./screens-panels.mdx#panel-controls), and a cable goes straight into its plate. Its device name is `panel_speaker`.
+
+The recipe is on the [Recipes](./recipes.mdx#panel-controls) page.
+
+```lua
+local speaker = bus.get("panel_speaker")
+speaker.playSound("minecraft:block.bell.use")
+speaker.playNote("bell", 12)
+speaker.speak("Iron farm is full")
+```
+
+## Sounds
+
+`playSound(sound, volume?, pitch?)` plays any sound the game knows, by its id: `"minecraft:block.bell.use"`, `"minecraft:entity.experience_orb.pickup"`, `"create:whistle"`… In the editor, the suggestions inside `playSound("` list every sound.
+
+| Argument | Values |
+| --- | --- |
+| `sound` | A sound id. A sound no mod registers still plays if a resource pack has it. |
+| `volume` | 0 to 4, 1 if left out. Volume 1 carries 16 blocks. |
+| `pitch` | 0.5 to 2, 1 if left out. 1 is as recorded. |
+
+## Notes
+
+`playNote(instrument, note, volume?)` plays a note as a note block would.
+
+| Argument | Values |
+| --- | --- |
+| `instrument` | A note block instrument: `"harp"`, `"basedrum"`, `"snare"`, `"hat"`, `"bass"`, `"flute"`, `"bell"`, `"guitar"`, `"chime"`, `"xylophone"`, `"iron_xylophone"`, `"cow_bell"`, `"didgeridoo"`, `"bit"`, `"banjo"`, `"pling"`. |
+| `note` | 0 to 24, the same 25 steps a note block has. 12 is the middle. |
+| `volume` | 0 to 4, 3 if left out, as loud as a note block. |
+
+A short tune:
+
+```lua
+local speaker = bus.get("panel_speaker")
+for _, note in ipairs({ 6, 10, 13, 18 }) do
+  speaker.playNote("chime", note)
+  sleep(0.25)
+end
+```
+
+Sounds and notes play in the **Jukebox/Note Blocks** volume of each player's sound settings.
+
+## Speech
+
+`speak(text)` says the text aloud to every player within 48 blocks, with their own computer's text-to-speech voice, the same voice Minecraft's narrator uses. The text also shows above their hotbar, so players without a voice still read it. Text longer than 256 characters is cut off there.
+
+```lua
+local speaker = bus.get("panel_speaker")
+local pad = bus.get("panel_keypad")
+pad.onKey(function(key)
+  speaker.speak(key)
+end)
+```
+
+On Linux, Minecraft's voice needs `libflite`. Without it the speaker tries `espeak-ng`, `espeak` and then `spd-say` (speech-dispatcher), whichever is installed. If none is, the text only shows on screen. Each player hears lines one at a time, in order.
+
+## Reading it
+
+A speaker only plays: `read()` gives `nil`, and `onChange` never runs for it.

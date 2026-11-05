@@ -8,7 +8,7 @@ El cable de datos viene en una **bobina de cable**. Una bobina lleva 64 metros; 
 <Recipe id="cable_spool" />
 
 <Callout title="La supervivencia no está terminada" type="warn">
-  En esta versión la bobina sale llena de su receta y no hay forma de rellenarla. La bobinadora que enrollará cobre en ella llega más adelante. En creativo, tender cable no gasta nada.
+  En esta versión la bobina sale llena de su receta y no hay forma de rellenarla, salvo cortando cable que ya tendiste. La bobinadora que enrollará cobre en ella llega más adelante. En creativo, tender cable no gasta nada.
 </Callout>
 
 ## Tender un cable
@@ -16,12 +16,12 @@ El cable de datos viene en una **bobina de cable**. Una bobina lleva 64 metros; 
 <Steps>
 <Step>
 
-Con la bobina en la mano, haz clic derecho en un puerto o un empalme. La barra de acción dice **Cable empezado**, y un cable te sigue desde esa pieza.
+Con la bobina en la mano, haz clic derecho en un puerto, un empalme, una toma de un hub de puertos o un control de panel. La barra de acción dice **Cable empezado**, y un cable te sigue desde esa pieza.
 
 </Step>
 <Step>
 
-Haz clic derecho en un segundo puerto o empalme. El cable queda colgando entre los dos, y la barra de acción dice cuántos metros ha gastado.
+Haz clic derecho en una segunda. El cable queda colgando entre las dos, y la barra de acción dice cuántos metros ha gastado.
 
 </Step>
 </Steps>
@@ -30,13 +30,17 @@ Para soltar un cable que has empezado, haz clic derecho otra vez en la misma pie
 
 Los dos extremos tienen que estar en la misma dimensión, y puedes empezar en un puerto pegado a un cofre o a una máquina sin abrirlo.
 
+Los puertos, las tomas de un hub y los controles de panel aceptan **un cable cada uno**. Los empalmes aceptan todos los que quieras. Para juntar muchos cables, usa un [hub de puertos](./bus.mdx#hubs-de-puertos).
+
 ## Colgando o por las caras
 
-Un segundo clic normal cuelga el cable en línea recta por el aire, con un poco de comba. Los cables colgantes llegan hasta **24 bloques** y gastan su longitud más un 5 % por la comba.
+Un segundo clic normal cuelga el cable en línea recta por el aire, con un poco de comba. Los cables colgantes llegan hasta **24 bloques** y gastan su longitud más un 5 % por la comba. Donde la comba se hundiría en un bloque, como un suelo entre dos puertos bajos, el cable se apoya en él.
 
-**Agáchate en el segundo clic** para llevar el cable pegado a las caras de los bloques de por medio: por el suelo, subiendo paredes, doblando esquinas. La bobina busca el camino más corto por caras sólidas, de hasta 64 bloques de recorrido.
+**Agáchate en el segundo clic** para llevar el cable pegado a las caras de los bloques de por medio: por el suelo, subiendo paredes, doblando esquinas. La bobina busca el camino más corto por caras sólidas, de hasta 64 bloques de recorrido, y tensa el cable a lo largo de cada cara en vez de pasarlo por el centro de cada bloque.
 
-Mientras apuntas, una vista previa muestra por dónde iría el cable, colgando o pegado según vayas agachado o no. Se pone en rojo cuando el cable no puede ir ahí: demasiado lejos, sin camino, choque de colores o no queda cable suficiente. Las longitudes se redondean hacia arriba a metros enteros.
+Mientras apuntas, una vista previa muestra por dónde iría el cable, colgando o pegado según vayas agachado o no. Se pone en rojo cuando el cable no puede ir ahí: demasiado lejos, sin camino, choque de colores, una pieza que ya tiene su cable o no queda cable suficiente. Las longitudes se redondean hacia arriba a metros enteros.
+
+Un cable que va a un control de panel sale de la placa del control por el lado que mira hacia el otro extremo.
 
 ## Cuando no se puede tender
 
@@ -47,6 +51,7 @@ La barra de acción dice por qué:
 | Demasiado lejos para colgar un cable (24 bloques como mucho) | Cuélgalo pasando por un empalme, o agáchate para llevarlo por las caras. |
 | No hay camino por las caras entre los dos | Las caras donde están las dos piezas no están unidas por superficie libre, o el camino pasa de 64. |
 | Esa pieza ya tiene cable de otro color | Mira [Colores](#colores). |
+| Ese puerto ya tiene su cable: para juntar varios, usa un hub de puertos | Un puerto acepta un cable. Usa un hub o un empalme. |
 | Esos dos ya están unidos | Ya hay un cable entre esas dos piezas. |
 | Elige otra pieza | Has pinchado en la pieza donde empezó el cable. |
 | Hacen falta N m, la bobina tiene M m | No queda cable suficiente en la bobina. |
@@ -55,10 +60,11 @@ La barra de acción dice por qué:
 
 Los cables se pueden teñir, y los cables teñidos mantienen las redes separadas. La regla:
 
-- Una pieza (un puerto o un empalme) coge el color del primer cable teñido que se le conecta. A partir de ahí solo acepta cables de ese color, o de cobre sin teñir.
+- Una pieza (un puerto, un empalme o una toma de un hub) coge el color del cable teñido que se le conecta. Un empalme, que acepta varios, desde entonces solo acepta cables de ese color, o de cobre sin teñir.
 - El cable de cobre sin teñir se conecta a cualquier cosa.
+- Un hub de puertos une sus tomas por dentro de la misma manera: un cable rojo y uno azul en el mismo hub siguen separados, y un cable sin teñir en el hub une los dos.
 
-Así, una red roja y una azul que comparten pared nunca se mezclan, mientras ninguna pieza lleve las dos. Un cable sin teñir entre una pieza roja y una azul sí las une, porque el cobre sin teñir conecta con cualquier color.
+Así, una red roja y una azul que comparten pared, empalme o hub nunca se mezclan, mientras no haya nada sin teñir entre ellas. Un cable sin teñir entre una pieza roja y una azul sí las une, porque el cobre sin teñir conecta con cualquier color.
 
 Hay dos formas de conseguir cable de color:
 
@@ -75,6 +81,12 @@ Haz clic derecho en un cable tendido con un revestimiento de andesita, latón o 
 
 Golpea un cable para cortarlo. El cable vuelve a una bobina del mismo color de tu inventario, tanto como quepa; si estaba revestido, también recuperas el revestimiento.
 
-Quitar un puerto corta todos los cables conectados a él, y romper el bloque en el que está también.
+Con el clic central en un cable coges una bobina de su color, como al coger un bloque. Con el clic central en un puerto o un empalme coges esa pieza.
+
+Quitar un puerto corta el cable conectado a él, y romper el bloque en el que está también.
 
 Cuando giras un ordenador con la llave inglesa, los cables que cuelgan de sus propios puertos siguen a los puertos. Los cables pegados a las caras ya no encajan en su recorrido, así que se cortan.
+
+## En barcos
+
+Cuando Create: Aeronautics monta un barco, los puertos y cables de sus bloques van con él, y vuelven cuando se desmonta. Un cable con un solo extremo en el barco se quita. Mira [Barcos](./ships.mdx#puertos-y-cables-en-un-barco).

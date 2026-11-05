@@ -20,6 +20,10 @@ A `/` in a name puts the file in a folder: `lib/pid.lua`. Names can't start with
 
 **Run** starts the file in the active tab and the computer remembers it. When the world loads, that same file restarts. A new computer runs `startup.lua`.
 
+## Screen layouts
+
+A file ending in `.screen` holds a layout for a Brass Screen, written in markup rather than Lua. It lives on the disk like any other file and counts towards the same limits. A program shows it by name with the screen's `show`, and saving it in the editor updates every screen showing it. See [Screens and panels](./screens-panels.mdx).
+
 ## Loading a module
 
 `require(name)` runs another file on the same computer and returns whatever that file returned. It looks for the name exactly as written first. If there's no such file, it turns dots into folders and adds `.lua`:

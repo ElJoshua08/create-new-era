@@ -15,6 +15,6 @@
 - [ ] `./gradlew runData` run and the generated files committed (if lang, models, blockstates, loot or tags changed)
 - [ ] Assets changed through the scripts in `tools/`, not by hand, and they fit Create's style
 - [ ] New lang keys added to `es_es.json` too
-- [ ] README / `website/docs/` / tooltips / Ponder updated if behaviour changed
+- [ ] README / `docs-site/content/` (en + es) / `site/` / tooltips / Ponder updated if behaviour changed
 - [ ] Commits have imperative subjects and explain the why
 - [ ] I release this contribution under The Unlicense

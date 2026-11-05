@@ -1,0 +1,61 @@
+---
+import Base from '../layouts/Base.astro';
+import { DOCS, routes, type Lang } from '../i18n/routes';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const copy = {
+  en: {
+    title: 'Page not found',
+    description: 'This page doesn’t exist.',
+    lede: 'Nothing on this page. It may have moved when the site was rebuilt.',
+    home: 'Back to the start',
+    docs: 'Search the docs',
+  },
+  es: {
+    title: 'Página no encontrada',
+    description: 'Esta página no existe.',
+    lede: 'Aquí no hay nada. Puede que se moviera al rehacer la web.',
+    home: 'Volver al inicio',
+    docs: 'Buscar en los docs',
+  },
+}[lang];
+---
+
+<Base lang={lang} page="notFound" title={copy.title} description={copy.description}>
+  <section class="section--tight">
+    <div class="wrap notfound">
+      <p class="code">404</p>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.lede}</p>
+      <p class="links">
+        <a class="btn btn--brass" href={routes.home[lang]}>{copy.home}</a>
+        <a class="more" href={`${DOCS}/${lang}/`}>{copy.docs}</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+  }
+  .code {
+    font-family: 'Monocraft', monospace;
+    color: var(--brass, #e4b763);
+    font-size: 1.25rem;
+  }
+  .links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+</style>

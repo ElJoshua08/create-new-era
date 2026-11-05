@@ -43,7 +43,7 @@ A program ends in one of three ways:
 - It hits an error. The console shows the message in red, and the outputs stay as they were.
 - You press **Stop**. The program ends and every redstone output turns off.
 
-A program with [`onChange` handlers](./devices.mdx#reacting-to-changes) doesn't finish when its main code ends: it keeps listening until you stop it or it errors.
+A program with [`onChange` handlers](./devices.mdx), or helpers built on it like `onPress` and `onMessage`, doesn't finish when its main code ends: it keeps listening until you stop it or it errors.
 
 When the world loads, or the chunk loads again, a computer that was running starts its program over from the top. Variables are not kept. It restarts the file you last ran, which isn't always `startup.lua`.
 
@@ -55,7 +55,9 @@ The back usually holds the shaft, so redstone mostly goes through the other five
 
 ## Its own ports
 
-The computer has four data ports built in: two on each side, set into a brass panel. They connect it to the [data bus](./bus.mdx). You can't remove them; wrenching one turns the computer, like wrenching anywhere else on it. They turn with the computer when you rotate it.
+The computer has four data ports built in: two on each side, set into a brass panel. They connect it to the [data bus](./bus.mdx). You can't take them off: sneaking with a wrench on one picks the computer up, as with any Create block. They turn with the computer when you rotate it.
+
+Each port takes one cable. To reach more machines than that, run a cable to a [Port Hub](./bus.mdx#port-hubs) and bring the others together there, or join cables at a splice.
 
 ## Time
 
@@ -65,4 +67,4 @@ Every tick, each running computer gets a slice of server time sized by its speed
 
 ## The console
 
-Under the code, the console shows what `print` writes, status lines (**Running**, **Stopped**, **Program finished**, **Restarted after the world loaded**) and errors in red. Errors start with the file and line, like `lib/pid.lua:12:`; clicking one opens that file at that line. The console keeps the last 100 lines, and they're saved with the computer.
+Under the code, the console shows what `print` writes, status lines (**Running**, **Stopped**, **Program finished**, **Restarted after the world loaded**) and errors in red. Errors start with the file and line, like `lib/pid.lua:12:`; clicking one opens that file at that line. Program output is drawn in the editor's monospaced font, and tabs line up in columns of four, so `print(a, b)` makes a table you can read. The console keeps the last 100 lines, and they're saved with the computer.

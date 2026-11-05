@@ -5,8 +5,8 @@ description: Every block and item in the mod and how to make it, straight from t
 
 These come from the recipe files in the mod, so they match the game. Hover a slot to see the item's name; the list under each recipe names every ingredient and the mod it comes from.
 
-<Callout title="Placeholders" type="warn">
-  Survival progression isn't finished in 0.1.0-alpha.1. Some of these recipes will change, and the spool winder isn't in yet.
+<Callout title="Not final" type="warn">
+  Survival progression isn't finished. These recipes work, but they will change, and the spool winder isn't in yet: the cable spool comes full from its recipe.
 </Callout>
 
 ## Computer
@@ -21,9 +21,15 @@ These come from the recipe files in the mod, so they match the game. Hover a slo
 
 <Recipe id="bus_port" />
 
-### Port Expansion
+### Brass Data Port
 
-<Recipe id="port_expansion" />
+Read and given orders through the same port, so it has no input or output to pick.
+
+<Recipe id="brass_port" />
+
+### Port Hub
+
+<Recipe id="port_hub" />
 
 ### Cable Splice
 
@@ -73,7 +79,7 @@ The base every control is built on.
 
 <Recipe id="panel_lamp" />
 
-### Nixie Digit
+### Panel Nixie Tube
 
 <Recipe id="nixie_digit" />
 
@@ -85,14 +91,48 @@ The base every control is built on.
 
 <Recipe id="panel_keypad" />
 
+### Panel Speaker
+
+<Recipe id="panel_speaker" />
+
+## Flight instruments
+
+They read the ship they're built into, so they need Create: Aeronautics to show anything.
+
+### Panel Altimeter
+
+<Recipe id="panel_altimeter" />
+
+### Panel Gyroscope
+
+<Recipe id="panel_gyroscope" />
+
+### Panel Compass
+
+<Recipe id="panel_compass" />
+
+### Panel Airspeed Indicator
+
+<Recipe id="panel_airspeed" />
+
+## Other
+
+### Chat Log
+
+<Recipe id="chat_log" />
+
 ## Not working yet
 
-These can be made and placed, but do nothing in this version. See [Screens and panels](./screens-panels.mdx).
+These can be made and placed, but do nothing in this version.
 
 ### Universal Adapter
+
+Meant to put a block's kinetics, items and fluids on the bus. A data port does that today.
 
 <Recipe id="universal_adapter" />
 
 ### Bearing Servo
+
+Meant to turn a contraption to an exact angle on command.
 
 <Recipe id="bearing_servo" />

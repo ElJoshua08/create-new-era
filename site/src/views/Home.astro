@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import DownloadButton from '../components/DownloadButton.astro';
 import SceneStage from '../components/SceneStage.astro';
-import { routes, ui, type Lang } from '../i18n/routes';
+import { routes, ui, FALLBACK, type Lang } from '../i18n/routes';
 
 interface Props {
   lang: Lang;
@@ -28,7 +28,7 @@ const copy = {
         { title: 'Write', text: 'Open the computer and type. The editor suggests the machines it can reach.' },
         { title: 'Run', text: 'A shaft in its back powers it. The faster it spins, the faster your code runs.' },
         { title: 'Connect', text: 'The vault reports its iron and the motor gets a new speed.' },
-        { title: 'Show', text: 'Screens put the numbers up in flip pixels.', soon: true },
+        { title: 'Show', text: 'Screens put the numbers up in flip pixels.' },
       ],
       editor: { title: 'Brass Computer', run: 'Run', stop: 'Stop', console: 'Console', files: 'Files' },
       config: {
@@ -36,8 +36,8 @@ const copy = {
 local vault = bus.get("item_vault")
 local motor = bus.get("creative_motor")
 
-vault.onChange(function(v)
-  local iron = v.count("minecraft:iron_ingot")
+vault.onChange(function()
+  local iron = vault.count("minecraft:iron_ingot")
   print("iron: " .. iron)
   motor.setSpeed(iron > 64 and 128 or 32)
 end)`,
@@ -78,33 +78,33 @@ end)`,
         scene: 'desk',
         alt: 'A control desk built from casings, with a button, a switch, a knob, a slider, a lamp, two nixie digits, a gauge and a keypad.',
         title: 'Screens and control desks',
-        text: 'Brass Screens placed side by side join into one pane and the frame between them disappears. Panel controls go on any face, so you can build a control desk wherever the factory needs one.',
-        soonText: 'Programs drawing on the screens and reading the controls',
+        text: 'Brass Screens placed side by side join into one pane, and your program lays out a dashboard on it in a few lines of markup or draws it pixel by pixel. Panel controls go on any face: buttons, knobs and sliders your program reads, lamps, nixies and gauges it drives.',
         link: 'Screens and panels',
         href: routes.screens.en,
       },
     ],
     status: {
       title: 'What’s in the jar',
-      todayTitle: 'Today, in 0.1.0-alpha.1',
+      todayTitle: `Today, in ${FALLBACK.tag}`,
       today: [
         'The Brass Computer, with Lua and an in-game editor',
         'Redstone in and out of all six sides',
-        'Data ports, port expansions and cables',
-        'Drivers for kinetics, items and fluids',
-        'Brass Screens that join into one pane',
-        'Panel controls for building desks',
+        'Data ports, port hubs and cables',
+        'Drivers for Create’s and Minecraft’s blocks',
+        'Brass Screens your programs draw on',
+        'Panel controls programs read and drive',
+        'A panel speaker that plays notes and talks',
+        'Flight controls and instruments for Aeronautics ships',
         'Ponder scenes for the main blocks',
       ],
       nextTitle: 'Coming next',
       next: [
-        'Drawing on screens',
-        'Panel controls your programs can read',
         'Wireless towers and antennas',
         'A Flows panel with live data in the editor',
         'Focus mode for placing ports',
         'The spool winder, for survival',
-        'Linked Typewriter support',
+        'Recipes for a survival progression',
+        'The Universal Adapter and Bearing Servo at work',
       ],
       link: 'Everything that’s planned',
     },
@@ -134,7 +134,7 @@ end)`,
         { title: 'Escribe', text: 'Abre el ordenador y escribe. El editor te sugiere las máquinas a las que llega.' },
         { title: 'Ejecuta', text: 'Lo mueve un eje por detrás. Cuanto más rápido gira, más rápido va tu código.' },
         { title: 'Conecta', text: 'La bóveda dice cuánto hierro tiene y el motor cambia de velocidad.' },
-        { title: 'Muestra', text: 'Las pantallas sacan los números en píxeles giratorios.', soon: true },
+        { title: 'Muestra', text: 'Las pantallas sacan los números en píxeles giratorios.' },
       ],
       editor: { title: 'Ordenador de latón', run: 'Ejecutar', stop: 'Parar', console: 'Consola', files: 'Archivos' },
       config: {
@@ -142,8 +142,8 @@ end)`,
 local boveda = bus.get("item_vault")
 local motor = bus.get("creative_motor")
 
-boveda.onChange(function(b)
-  local hierro = b.count("minecraft:iron_ingot")
+boveda.onChange(function()
+  local hierro = boveda.count("minecraft:iron_ingot")
   print("hierro: " .. hierro)
   motor.setSpeed(hierro > 64 and 128 or 32)
 end)`,
@@ -184,33 +184,33 @@ end)`,
         scene: 'desk',
         alt: 'Un pupitre de control hecho con revestimientos, con pulsador, interruptor, mando giratorio, deslizador, piloto, dos dígitos nixie, indicador de aguja y teclado.',
         title: 'Pantallas y pupitres de control',
-        text: 'Las pantallas de latón que pones una al lado de otra se juntan en un solo panel y el marco entre ellas desaparece. Los controles de panel van en cualquier cara, así que puedes montar un pupitre de control donde lo necesite la fábrica.',
-        soonText: 'Que los programas dibujen en las pantallas y lean los controles',
+        text: 'Las pantallas de latón que pones una al lado de otra se juntan en un solo panel, y tu programa monta en él un cuadro de mando con unas líneas de marcado o lo dibuja píxel a píxel. Los controles de panel van en cualquier cara: pulsadores, mandos y deslizadores que tu programa lee, y pilotos, nixies e indicadores que maneja.',
         link: 'Pantallas y paneles',
         href: routes.screens.es,
       },
     ],
     status: {
       title: 'Qué trae el jar',
-      todayTitle: 'Hoy, en la 0.1.0-alpha.1',
+      todayTitle: `Hoy, en la ${FALLBACK.tag}`,
       today: [
         'El ordenador de latón, con Lua y editor dentro del juego',
         'Redstone de entrada y salida por las seis caras',
-        'Puertos de datos, ampliaciones de puertos y cables',
-        'Drivers para cinética, objetos y fluidos',
-        'Pantallas de latón que se juntan en un panel',
-        'Controles de panel para montar pupitres',
+        'Puertos de datos, hubs de puertos y cables',
+        'Drivers para los bloques de Create y de Minecraft',
+        'Pantallas de latón en las que dibujan tus programas',
+        'Controles de panel que los programas leen y manejan',
+        'Un altavoz de panel que toca notas y habla',
+        'Mandos e instrumentos de vuelo para naves de Aeronautics',
         'Escenas de Ponder para los bloques principales',
       ],
       nextTitle: 'Lo siguiente',
       next: [
-        'Dibujar en las pantallas',
-        'Controles de panel que tus programas pueden leer',
         'Torres y antenas inalámbricas',
         'Un panel de flujos con datos en directo en el editor',
         'Modo enfoque para colocar puertos',
         'La bobinadora, para supervivencia',
-        'Compatibilidad con la Linked Typewriter',
+        'Recetas para una progresión de supervivencia',
+        'El adaptador universal y el servo de rodamiento funcionando',
       ],
       link: 'Todo lo que está en camino',
     },

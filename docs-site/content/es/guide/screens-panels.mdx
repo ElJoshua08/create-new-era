@@ -1,38 +1,304 @@
 ---
 title: Pantallas y paneles
-description: Pantallas de latón, controles de panel, el adaptador universal y el servo de rodamiento, y lo que hacen hoy.
+description: Pantallas de latón, controles de panel e instrumentos de vuelo, qué hacen los jugadores con ellos y qué pueden hacer los programas.
 ---
 
-Estos bloques están en el mod, tienen receta y escena de Ponder, y se pueden colocar, girar con la llave inglesa y picar. Los programas todavía no pueden usarlos. Esta página cuenta lo que hace cada uno ahora, para que construyas con ellos mientras llega lo demás.
+Las pantallas de latón muestran lo que tus programas dibujan o maquetan. Los controles de panel son los botones, interruptores, mandos, pilotos y diales de un pupitre de mando: los jugadores los usan a mano, y los programas los leen y los manejan por el [bus de datos](./bus.mdx).
 
 ## Pantalla de latón
 
 ![Pantalla de latón](/img/blocks/brass_screen.png)
 
-Las pantallas de latón colocadas una junto a otra y mirando al mismo lado se unen en una sola pantalla: el marco de latón entre ellas desaparece. Vale cualquier rectángulo. Si giras una con la llave inglesa, se une a las pantallas con las que quede alineada después del giro.
+Una pantalla de latón es un panel de puntos giratorios: plaquitas que se dan la vuelta para mostrar un color nuevo.
 
-Cada bloque mostrará 48 por 48 píxeles giratorios, plaquitas que se dan la vuelta cuando cambian. Dibujar en las pantallas desde un programa llegará más adelante; de momento una pantalla es un panel en blanco. La [configuración del cliente](./config.mdx) ya tiene la opción para la forma de los píxeles.
+Las pantallas colocadas una junto a otra y mirando al mismo lado se unen en un solo **panel**: el marco de latón entre ellas desaparece. Vale cualquier rectángulo de hasta 8 por 8 bloques; más allá, las pantallas se separan en paneles propios. Si giras una con la llave inglesa, se une a las pantallas con las que quede alineada después del giro.
+
+Una pantalla tiene 24 por 24 puntos. Un panel gana 32 puntos por cada bloque que añades, porque el marco entre pantallas desaparece:
+
+| Panel | Puntos |
+| --- | --- |
+| 1 por 1 | 24 × 24 |
+| 2 por 1 | 56 × 24 |
+| 2 por 2 | 56 × 56 |
+| 3 por 2 | 88 × 56 |
+| 8 por 8 | 248 × 248 |
+
+La [configuración del cliente](./config.mdx) elige la forma de los puntos: placas cuadradas o discos redondos.
 
 <Recipe id="brass_screen" />
+
+### Conectar una pantalla al bus
+
+Pega un **puerto de datos de latón** en cualquier pantalla del panel y llévale un cable desde el ordenador. Un puerto de latón lee la pantalla y le da órdenes por la misma conexión. Con puertos de datos normales necesitas un puerto de entrada para mostrar y dibujar, y uno de salida para enterarte de toques y clics.
+
+El programa puede usar cualquier pantalla del panel: todas llegan a los mismos puntos. El dispositivo se llama `brass_screen` (o `brass_screen_2`, etc.).
+
+Hay dos formas de poner algo en una pantalla:
+
+- **Marcado**: describe una maqueta con unas pocas etiquetas (un título, filas de textos y valores, barras, botones) y cambia sus partes por id. Es lo más cómodo para paneles de estado y menús. Mira [Marcado de pantallas](./screen-markup.mdx).
+- **Dibujo**: pon puntos, dibuja líneas, rectángulos, círculos y texto tú mismo. Úsalo para lo que una maqueta no puede hacer, como una gráfica o un mapa.
+
+Lo que muestra una pantalla se queda en ella cuando el programa se para, y también al guardar y volver a cargar el mundo.
+
+### Dibujar
+
+Las posiciones van en puntos, con `(1, 1)` arriba a la izquierda. Lo que se sale del borde se recorta, así que puedes dibujar figuras que solo caben en parte.
+
+```lua
+local s = bus.get("brass_screen")
+s.clear()
+s.drawText(2, 2, "HORNO")
+s.drawRect(2, 14, 50, 9, "amber")
+s.fillRect(4, 16, 30, 5, "lime")
+s.fillCircle(46, 40, 6, "red")
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `clear(color?)` | Pone todos los puntos de un color, oscuro si no das ninguno. También olvida el marcado que se estuviera mostrando. |
+| `setDot(x, y, color)` | Cambia un punto. |
+| `getDot(x, y)` | El nombre del color de un punto. |
+| `fillRect(x, y, ancho, alto, color)` | Un rectángulo relleno, con la esquina de arriba a la izquierda en `(x, y)`. |
+| `drawRect(x, y, ancho, alto, color)` | El contorno de un rectángulo. |
+| `drawLine(x1, y1, x2, y2, color)` | Una línea, con los dos extremos incluidos. |
+| `drawCircle(x, y, radio, color)` | El contorno de un círculo alrededor de `(x, y)`. |
+| `fillCircle(x, y, radio, color)` | Un círculo relleno. |
+| `drawText(x, y, texto, color?, escala?)` | Texto con su esquina de arriba a la izquierda en `(x, y)`, en ámbar si no das color. `escala`, de 1 a 8, hace que cada punto sea un cuadrado de ese tamaño. `\n` empieza una línea nueva. Devuelve el ancho de la línea más larga, en puntos. |
+| `getTextWidth(texto, escala?)` | Lo que ocuparía un texto, en puntos, sin dibujarlo. |
+| `getSize()` | `{ width = …, height = … }` del panel entero, en puntos. |
+| `getWidth()`, `getHeight()` | Lo mismo, por separado. |
+| `getColors()` | La lista de nombres de color que puede mostrar un punto. |
+
+Los puntos que dibujas giran a la vez. Una maqueta nueva hecha con marcado gira en una onda de izquierda a derecha.
+
+### Colores
+
+Un punto muestra uno de 18 colores:
+
+- `"dark"`, la cara del propio punto, que también se escribe `"off"` o `"none"`;
+- `"amber"`, la tinta por defecto;
+- los 16 colores de tinte por su id: `"white"`, `"orange"`, `"magenta"`, `"light_blue"`, `"yellow"`, `"lime"`, `"pink"`, `"gray"`, `"light_gray"`, `"cyan"`, `"purple"`, `"blue"`, `"brown"`, `"green"`, `"red"`, `"black"`.
+
+También puedes dar `"#RRGGBB"`, `"#RGB"` o un número como `0x3366FF`: la pantalla elige el más parecido de los 18.
+
+### Texto
+
+Las pantallas escriben en Monocraft, la misma fuente que el editor. Cada carácter ocupa 6 puntos de ancho y una línea ocupa 11, a escala 1. Valen letras, números, signos y las letras con tilde de Latin-1 (`á`, `ñ`, `ü`…); cualquier otro carácter sale como `?`.
+
+Para centrar una línea, mídela antes:
+
+```lua
+local s = bus.get("brass_screen")
+local texto = "LISTO"
+local x = math.floor((s.getWidth() - s.getTextWidth(texto, 2)) / 2) + 1
+s.drawText(x, 10, texto, "lime", 2)
+```
+
+### Toques
+
+Hacer clic derecho en el cristal de un panel es un **toque**. `onTouch` ejecuta una función por cada uno, con dónde cayó, en puntos, y quién tocó:
+
+```lua
+local s = bus.get("brass_screen")
+s.clear()
+s.onTouch(function(x, y, jugador)
+  s.fillCircle(x, y, 2, "red")
+  print(jugador .. " ha tocado " .. x .. ", " .. y)
+end)
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `onTouch(fn)` | Ejecuta `fn(x, y, jugador, dispositivo)` con cada toque, hasta que el programa se pare. |
+| `getLastTouch()` | El último toque: `{ x = …, y = …, player = …, count = … }`, o `nil` si no ha habido ninguno. `count` sube en uno con cada toque. |
+
+Los toques en el marco de latón del borde del panel no cuentan. Los botones maquetados con marcado se oyen con `onClick`, en la página [Marcado de pantallas](./screen-markup.mdx#botones).
 
 ## Controles de panel
 
 ![Controles de panel](/img/controls.png)
 
-Bloques pequeños para montar pupitres de mando. Cada uno se pone en la cara que pinchas: suelos, paredes o techos. Todos se hacen con una placa de control y una pieza.
+Bloques pequeños para montar pupitres de mando. Cada uno se pone en la cara que pinchas: suelos, paredes o techos. Todos se hacen con una placa de control y una pieza; las recetas están en la página de [Recetas](./recipes.mdx#controles-de-panel).
 
-| Control | Qué hará |
+### Conectar un control al bus
+
+Lleva un cable directamente a la placa del control. Cada control trae su propia conexión, así que no hay que añadir puerto ni elegir entrada o salida: los programas lo leen y le dan órdenes por ese mismo cable.
+
+Cada control es un dispositivo con el nombre de su bloque: `panel_button`, `panel_knob`, `nixie_digit`, etc. Con las gafas de ingeniero puestas, al mirar un control ves su valor y si le llega un cable.
+
+Todos los controles tienen además `read()`, que da su estado como un solo valor, y `onChange(fn)`, que ejecuta `fn(valor, dispositivo)` cada vez que ese valor cambia:
+
+| Control | `read()` y `onChange` dan |
 | --- | --- |
-| Pulsador | Un botón; los programas verán cada pulsación. |
-| Interruptor | Una palanca de encendido y apagado que los programas pueden leer. |
-| Mando giratorio | Un mando que marca un valor. |
-| Deslizador | Un deslizador de 0 a 100 %. |
-| Piloto | Una luz que los programas pueden encender y colorear. |
-| Dígito nixie | Un dígito luminoso; una fila de ellos muestra un número. |
-| Indicador de aguja | Un dial con aguja que muestra un valor. |
-| Teclado | Doce teclas para escribir números en un programa. |
+| Pulsador | `true` mientras está pulsado |
+| Interruptor | `true` si está encendido |
+| Mando giratorio, Deslizador | su valor, dentro de su rango |
+| Piloto | `"off"`, `"amber"`, `"green"` o `"red"` |
+| Tubo nixie de panel | el texto de toda la fila |
+| Indicador de aguja | dónde está la aguja, de 0 a 1 |
+| Teclado | la última tecla pulsada, o `nil` |
+| Altavoz de panel | `nil` |
 
-Las recetas están en la página de [Recetas](./recipes.mdx#controles-de-panel).
+Un pupitre pequeño: un pulsador que enciende un piloto, un mando que mueve una aguja y unos nixies que cuentan las pulsaciones.
+
+```lua
+local boton = bus.get("panel_button")
+local piloto = bus.get("panel_lamp")
+local mando = bus.get("panel_knob")
+local aguja = bus.get("panel_gauge")
+local nixie = bus.get("nixie_digit")
+
+local pulsaciones = 0
+boton.onPress(function()
+  pulsaciones = pulsaciones + 1
+  nixie.show(pulsaciones)
+  piloto.set("green")
+end)
+
+mando.onChange(function(valor)
+  aguja.set(valor / 15)
+end)
+```
+
+### Pulsador
+
+![Pulsador](/img/blocks/panel_button.png)
+
+Un botón. Al pulsarlo se queda abajo medio segundo y vuelve a subir solo.
+
+| Función | Qué hace |
+| --- | --- |
+| `onPress(fn)` | Ejecuta `fn(dispositivo)` cada vez que se pulsa, no cuando vuelve a subir. |
+| `isPressed()` | `true` mientras está abajo. |
+
+### Interruptor
+
+![Interruptor](/img/blocks/panel_switch.png)
+
+Una palanca de encendido y apagado que se queda donde la dejas.
+
+| Función | Qué hace |
+| --- | --- |
+| `isOn()` | `true` si está encendido. |
+| `setOn(encendido)` | Lo cambia desde el programa, como si lo hubiera hecho un jugador. |
+
+### Mando giratorio y deslizador
+
+![Mando giratorio](/img/blocks/panel_knob.png) ![Deslizador](/img/blocks/panel_slider.png)
+
+Los dos marcan un valor. Para moverlos, mantén clic derecho sobre ellos y mueve el ratón de lado, como la palanca de gases de Create: Aeronautics. La vista se queda quieta mientras arrastras; el control salta de muesca en muesca y enseña dónde está bajo la mira: un anillo de muescas en el mando, una barra en el deslizador. Mantén **Ctrl** mientras arrastras para ir más fino. Con un cable, un puerto de datos o una llave inglesa en la mano, el clic derecho cablea el control en vez de girarlo.
+
+Van de 0 a 15 de uno en uno hasta que un programa les da un rango propio con `setRange`. Las marcas del dial del mando y las muescas del deslizador siguen el rango.
+
+```lua
+local trim = bus.get("panel_slider")
+trim.setRange(-1, 1, 0.1)
+trim.setValue(0.5)
+print(trim.getValue(), trim.getFraction())   -- 0.5   0.75
+
+trim.onChange(function(valor)
+  print("trim " .. valor)
+end)
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `getValue()` | Dónde está, dentro de su rango. |
+| `setValue(valor)` | Lo lleva a un valor, a la muesca más cercana. Los valores fuera del rango van a su extremo más cercano. |
+| `setRange(min, max, paso?)` | Le da un rango propio, de `min` a `max` en pasos de `paso` (1 si no lo pones). Conserva su valor lo más cerca que permita el rango nuevo. `max` tiene que ser mayor que `min`, y `paso` mayor que 0 y como mucho `max - min`. Los rangos muy finos se redondean a 1000 muescas para que se puedan seguir arrastrando. |
+| `getMinValue()`, `getMaxValue()` | Los extremos de su rango: 0 y 15 si `setRange` no los ha cambiado. |
+| `getStep()` | Cuánto lo mueve cada muesca. |
+| `getFraction()` | Qué parte de su rango lleva, de 0 a 1. |
+
+El rango se guarda con el bloque, así que se queda cuando el programa se para.
+
+### Piloto
+
+![Piloto](/img/blocks/panel_lamp.png)
+
+Una luz indicadora en ámbar, verde o rojo. Un piloto encendido da luz de verdad, y con shaders brilla como la llama de una antorcha.
+
+| Función | Qué hace |
+| --- | --- |
+| `set(luz)` | `"amber"`, `"green"`, `"red"` o `"off"`. `true` es ámbar, `false` apagado. |
+| `get()` | Su color ahora, o `"off"`. |
+| `setBrightness(nivel)` | Cuánta luz da mientras está encendido, de 0 a 15. Empieza en 15. |
+| `getBrightness()` | Ese nivel. |
+
+### Tubo nixie de panel
+
+![Tubo nixie de panel](/img/blocks/nixie_digit.png)
+
+El tubo nixie de Create sobre un panel. Brilla con cualquier carácter que le dé un programa: números, letras, signos. Su carácter mira a quien lo colocó, o hacia fuera de la pared en la que está.
+
+Los tubos uno al lado del otro, en la misma cara y leyéndose en el mismo sentido, se unen en una sola pantalla de hasta 64 tubos. Un cable a cualquier tubo de la fila, el primero, el último o uno del medio, maneja la fila entera.
+
+```lua
+local n = bus.get("nixie_digit")   -- una fila de cuatro tubos
+n.setText("HOLA")                  -- "HOLA"
+n.show(42)                         -- "  42"
+n.show(3.14159, 2)                 -- "3.14"
+n.show(12345)                      -- "----": no cabe en la fila
+n.setColor("lime")
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `setText(texto)` | Un carácter por tubo desde la izquierda. Los tubos que sobran se apagan. |
+| `show(numero, decimales?)` | Un número a la derecha de la fila, como un contador, con esos decimales si los das. Un número que no cabe sale como guiones. |
+| `setChar(indice, caracter)` | Un carácter en un tubo, contando desde 1 por la izquierda. `nil` apaga ese tubo. |
+| `clear()` | Apaga toda la fila. |
+| `setColor(color)` | Hace que toda la fila brille en un color de tinte: `"orange"` (el de siempre), `"lime"`, `"light_blue"`… |
+| `getText()` | Lo que muestra la fila, con un espacio por cada tubo apagado. |
+| `getChar(indice)` | El carácter de un tubo, o `nil` si está apagado. |
+| `getLength()` | Cuántos tubos tiene la fila. |
+| `getColor()` | El color con el que brilla la fila. |
+
+### Indicador de aguja
+
+![Indicador de aguja](/img/blocks/panel_gauge.png)
+
+Un dial con aguja para cualquier valor que un programa quiera mostrar. Los jugadores no pueden moverlo; solo los programas.
+
+| Función | Qué hace |
+| --- | --- |
+| `set(fraccion)` | Mueve la aguja: 0 es vacío, 1 lleno, 0.5 la mitad. Se mueve en 16 pasos. |
+| `get()` | Dónde está la aguja, de 0 a 1. |
+| `getMinValue()`, `getMaxValue()` | 0 y 1. |
+
+Para mostrar un valor con su propia escala, divídelo por el máximo de la escala: `aguja.set(rpm / 256)`.
+
+### Teclado
+
+![Teclado](/img/blocks/panel_keypad.png)
+
+Doce teclas: del 1 al 9, con `*`, `0` y `#` debajo. Haz clic derecho en la tecla que quieras.
+
+```lua
+local teclado = bus.get("panel_keypad")
+local escrito = ""
+teclado.onKey(function(tecla)
+  if tecla == "#" then
+    print(escrito == "1234" and "abierto" or "código incorrecto")
+    escrito = ""
+  else
+    escrito = escrito .. tecla
+  end
+end)
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `onKey(fn)` | Ejecuta `fn(tecla, dispositivo)` con cada tecla pulsada, siendo `tecla` de `"0"` a `"9"`, `"*"` o `"#"`. Pulsar dos veces la misma tecla lo ejecuta dos veces. |
+| `getKey()` | La última tecla pulsada, o `nil` antes de la primera. |
+
+### Altavoz de panel
+
+Reproduce cualquier sonido del juego, toca notas como un bloque musical y dice texto en voz alta. Tiene su propia página: [Altavoz de panel](./panel-speaker.mdx).
+
+## Instrumentos de vuelo
+
+Otros cuatro controles de panel leen el barco de Create: Aeronautics en el que están montados: el **altímetro**, el **giroscopio** (un horizonte artificial), la **brújula** y el **anemómetro**. Cada uno muestra su lectura en un dial, y los programas leen los mismos números, por ejemplo `getAltitude()`, `getAttitude()`, `getHeading()` y `getSpeed()`. Se cablean como cualquier otro control. Mira [Barcos](./ships.mdx) para lo que da cada uno y cómo volar con ellos.
 
 ## Adaptador universal
 

@@ -94,20 +94,21 @@ async function init(root: HTMLElement) {
   }
 
   // --- the screen ----------------------------------------------------------------------------
-  const screen = new FlipScreen(144, 96);
+  // 3×2 screens: 32 dots a block less the 8 the outer frame keeps, as in the game
+  const screen = new FlipScreen(88, 56);
   let shownKey = '';
   function dashboard(iron: number, history: number[]) {
     screen.clear();
-    screen.text(cfg.screenLabel, 8, 8, 2);
-    screen.text(String(iron), 8, 30, 4);
-    screen.text('RPM', 104, 8, 1);
-    screen.text(iron > 64 ? '128' : '32', 104, 20, 2);
-    const fill = iron > 64 ? 32 : 8;
-    for (let i = 0; i < 32; i += 2) screen.rect(104 + i, 40, 1, 6, i < fill ? 1 : 0);
-    for (let x = 8; x < 136; x += 2) screen.set(x, 66);
+    screen.text(cfg.screenLabel, 4, 4, 1);
+    screen.text(String(iron), 4, 14, 2);
+    screen.text('RPM', 62, 4, 1);
+    screen.text(iron > 64 ? '128' : '32', 62, 14, 1);
+    const fill = iron > 64 ? 20 : 6;
+    for (let i = 0; i < 20; i += 2) screen.rect(62 + i, 24, 1, 4, i < fill ? 1 : 0);
+    for (let x = 4; x < 84; x += 2) screen.set(x, 33);
     history.forEach((v, i) => {
-      const h = Math.max(1, Math.round(((v - 150) / (START_IRON - 150)) * 18));
-      screen.rect(8 + i * 8, 90 - h, 6, h);
+      const h = Math.max(1, Math.round(((v - 150) / (START_IRON - 150)) * 14));
+      screen.rect(4 + i * 5, 53 - h, 4, h);
     });
   }
 
@@ -210,9 +211,9 @@ async function init(root: HTMLElement) {
     screen.paint();
     if (t >= T_SCREEN - 0.5) {
       ctx.save();
-      view.faceTransform(m.faces.screen, 144, 96);
+      view.faceTransform(m.faces.screen, screen.cols, screen.rows);
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(screen.canvas, 0, 0, 144, 96);
+      ctx.drawImage(screen.canvas, 0, 0, screen.cols, screen.rows);
       ctx.restore();
     }
     view.sceneSpace();

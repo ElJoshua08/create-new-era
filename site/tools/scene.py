@@ -353,20 +353,20 @@ DYES = ["copper", "orange", "light_blue", "lime", "magenta", "white", "red"]
 
 
 def bus(assets, st):
-    """Ports on Create machines: copper flat along the floor, a dyed network hanging overhead."""
+    """Ports on Create machines, one cable each: copper flat along the floor, a dyed network hanging overhead."""
     s = Scene(assets)
     floor(s, 5, 3)
     s.model("create_new_era:block/brass_computer", (0, 1, 1), rot_y_state(180))
     s.model("create:block/fluid_tank/block_single_window", (2, 1, 0))
     s.model("create:block/item_vault", (4, 1, 0))
     s.model("create:block/encased_fan/block", (4, 1, 2), rot_y_state(180))
-    exp = port(s, "create_new_era:block/port_expansion", (0, 1, 1), "up", 5, 5)
     an = {
         "computer_east": port(s, "create_new_era:block/bus_port_out", (0, 1, 1), "east", 6, 5),
         "tank_south": port(s, "create_new_era:block/bus_port_out", (2, 1, 0), "south", 6, 6),
         "vault_top": port(s, "create_new_era:block/bus_port_out", (4, 1, 0), "up", 6, 6),
         "fan_top": port(s, "create_new_era:block/bus_port_in", (4, 1, 2), "up", 6, 6),
-        "expansion": exp + np.array([1.0, 0, 1.0]),
+        "fan_east": port(s, "create_new_era:block/bus_port_out", (4, 1, 2), "east", 6, 6),
+        "computer_east2": port(s, "create_new_era:block/bus_port_out", (0, 1, 1), "east", 6, 9),
     }
     dye = "create_new_era:block/cable/" + DYES[st["dye"]]
     r = 1.0
@@ -375,8 +375,8 @@ def bus(assets, st):
     cables = {
         "tank": [ce, np.array([ce[0], 16 + lift, ce[2]]), np.array([tk[0], 16 + lift, ce[2]]),
                  np.array([tk[0], 16 + lift, tk[2]]), tk],
-        "fan": sag_line(an["expansion"], an["fan_top"], 32),
-        "vault": sag_line(an["fan_top"], an["vault_top"]),
+        "fan": sag_line(an["computer_east2"], an["fan_top"], 32),
+        "vault": sag_line(an["fan_east"], an["vault_top"]),
     }
     s.tube(cables["tank"], r, COPPER)
     s.tube(cables["vault"], r, dye, group="dye")

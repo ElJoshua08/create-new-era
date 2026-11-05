@@ -1,6 +1,6 @@
 name: create-new-era
 
-# Static site for create-new-era.tryberyl.dev. Beryl routes the domain to 127.0.0.1:8098.
+# Landing page and docs (under /docs/) for create-new-era.tryberyl.dev. Beryl routes the domain to 127.0.0.1:8098.
 services:
   web:
     build: { context: .., dockerfile: deploy/website.Dockerfile }

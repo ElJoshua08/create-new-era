@@ -1,0 +1,149 @@
+---
+title: Marcado de pantallas
+description: Maqueta una pantalla de latón con unas pocas etiquetas en un archivo .screen, y luego cambia sus valores y oye sus botones.
+---
+
+La mayoría de las pantallas son un panel de estado o un menú pequeño: un título, unos números, una barra, un par de botones. En vez de dibujarlos punto a punto, los describes con unas pocas etiquetas, como se escribe una página web en HTML, y la pantalla los coloca. El aspecto viene incluido: no hay hoja de estilos, así que todas las pantallas mantienen el mismo estilo.
+
+Un programa muestra la maqueta una vez y luego cambia las partes a las que dio un `id`. La pantalla se vuelve a maquetar y gira solo los puntos que han cambiado.
+
+## Una primera pantalla
+
+En el editor del ordenador, crea un archivo llamado `granja.screen` y escribe:
+
+```xml
+<screen>
+  <title>GRANJA HIERRO</title>
+  <row><label>HIERRO</label><value id="hierro" align="right">0</value></row>
+  <bar id="carga" value="0.7"/>
+  <row><button id="marcha">MARCHA</button><button id="paro">PARO</button></row>
+</screen>
+```
+
+Y el programa, en `startup.lua`:
+
+```lua
+local pantalla = bus.get("brass_screen")
+local cofre = bus.get("chest")
+
+pantalla.show("granja")
+
+pantalla.onClick("marcha", function(jugador)
+  print(jugador .. " ha pulsado MARCHA")
+end)
+
+while true do
+  local hierro = cofre.count("minecraft:iron_ingot")
+  pantalla.set("hierro", hierro)
+  pantalla.set("carga", hierro / 1728)
+  sleep(1)
+end
+```
+
+`show("granja")` encuentra `granja` o `granja.screen` en el ordenador. La pantalla muestra el título en una banda arriba, la cantidad de hierro a la derecha de su fila, una barra llena al 70 % y dos botones que se reparten la última fila.
+
+La pantalla tiene que estar en el bus con un puerto de datos de latón, como en [Pantallas y paneles](./screens-panels.mdx#conectar-una-pantalla-al-bus).
+
+## Archivos .screen
+
+Un archivo cuyo nombre acaba en `.screen` es una maqueta. El editor lo trata como marcado, no como Lua:
+
+- etiquetas, atributos y valores salen en color;
+- al escribir `<` sugiere las etiquetas, y dentro de una etiqueta sugiere los atributos que admite y los valores que pueden tener;
+- un error se subraya mientras escribes, como un error en un programa;
+- dentro de `show("`, las sugerencias muestran los archivos `.screen` del ordenador.
+
+**Al guardar el archivo se vuelve a mostrar al momento** en todas las pantallas que lo estén mostrando, sin reiniciar el programa. Los valores que el programa puso con `set` se conservan. Si el marcado guardado tiene un error, las pantallas se quedan con lo que tenían y la consola dice en rojo qué falla.
+
+Solo un programa del ordenador que tiene el archivo puede mostrarlo.
+
+También puedes escribir el marcado directamente en el programa. Cualquier texto que empiece por `<` se toma como marcado y no como nombre de archivo:
+
+```lua
+pantalla.show("<title>HOLA</title><label>Todo bien</label>")
+```
+
+El `<screen>` que lo envuelve todo se puede omitir, como aquí.
+
+## Etiquetas
+
+Los elementos se apilan desde arriba, uno debajo de otro, separados por dos puntos, con dos puntos de margen alrededor del borde del panel.
+
+| Etiqueta | Qué es |
+| --- | --- |
+| `<screen>` | Toda la pantalla, la raíz. Admite `color` (la tinta de todo lo que lleva dentro, ámbar si no lo pones) y `background` (oscuro si no lo pones). |
+| `<title>` | Un encabezado: una banda del color de la tinta arriba, con el texto recortado en ella. |
+| `<row>` | Pone lo que lleva dentro uno al lado del otro. |
+| `<column>` | Pone lo que lleva dentro uno debajo de otro. Úsalo dentro de una fila para hacer columnas. |
+| `<label>` | Una línea de texto que se queda como está escrita. |
+| `<value>` | Una línea de texto que cambia un programa: ponle un `id` y llama a `set(id, valor)`. |
+| `<text>` | Una línea de texto, como `label`. |
+| `<bar>` | Una barra de progreso: un marco relleno hasta donde llegue `value`, de 0 a `max` (1 si no lo pones). |
+| `<button>` | Un texto en un recuadro. Ponle un `id` y un programa lo oye con `onClick`. |
+| `<divider>` | Una línea fina de lado a lado, para separar partes. |
+| `<spacer>` | Espacio vacío: `height` puntos de alto (4 si no lo pones), o un trozo de una fila. |
+
+En una fila, el texto ocupa lo que necesita, y los botones, barras, columnas, separadores y espacios se reparten el resto a partes iguales. El texto con `align="right"` va al extremo derecho de la fila, en orden.
+
+## Atributos
+
+Todas las etiquetas admiten estos:
+
+| Atributo | Valores |
+| --- | --- |
+| `id` | Un nombre para el elemento, para `set`, `get` y `onClick`. |
+| `color` | Su color, y el de todo lo que lleva dentro: `amber`, el nombre de un tinte (`lime`, `red`, `light_blue`…), `dark`, o `"#RRGGBB"` (el más parecido que pueda mostrar un punto). |
+| `align` | `left`, `center` o `right`. |
+| `size` | `big` dobla el texto; `small` es el tamaño normal. |
+
+Y algunas etiquetas tienen los suyos: `background` en `<screen>`, `value` y `max` en `<bar>`, `height` en `<spacer>`.
+
+Los colores son los mismos 18 que puede mostrar un punto; mira [Colores](./screens-panels.mdx#colores).
+
+## Errores
+
+Todas las etiquetas y atributos se comprueban antes de mostrar nada. Una etiqueta desconocida, un atributo que la etiqueta no admite, un color que no existe, un `align` o `size` que no es uno de sus valores, o una etiqueta sin cerrar: `show` para el programa con un mensaje que dice cuál, y la pantalla se queda con lo que tenía.
+
+```lua
+print(pcall(pantalla.show, "<blink>no</blink>"))
+-- false   unknown tag <blink>: use screen, title, row, column, label, value, text, bar, button, divider, spacer
+```
+
+## Cambiar lo que se muestra
+
+| Función | Qué hace |
+| --- | --- |
+| `show(archivo)` | Muestra en todo el panel un archivo `.screen` de este ordenador, por su nombre con o sin `.screen`. Un texto que empieza por `<` se muestra como marcado. |
+| `set(id, valor)` | Cambia un elemento por su id: el valor de una barra, el texto de cualquier otro. Los números se escriben como los escribe `print`, así que `42` y no `42.0`. |
+| `get(id)` | Lo que dice ahora un elemento, como texto: su texto, o el valor de una barra. `nil` si no se muestra nada o ningún elemento tiene ese id. |
+
+`set` para el programa si todavía no se muestra nada, o si ningún elemento tiene ese id.
+
+Los valores del programa se quedan en la pantalla. Aguantan que el programa se pare, que el mundo se vuelva a cargar y que el archivo se guarde de nuevo. Mostrar otra vez un archivo con `show` empieza de cero con los valores del propio archivo.
+
+Si añades o quitas pantallas del panel, la maqueta se ajusta al tamaño nuevo la próxima vez que el programa cambie un valor o la vuelva a mostrar.
+
+## Botones
+
+Pulsar un botón es hacer clic derecho sobre él. Solo se oyen los botones que tienen `id`.
+
+```lua
+pantalla.onClick("paro", function(jugador)
+  bus.get("panel_lamp").set("red")
+end)
+```
+
+| Función | Qué hace |
+| --- | --- |
+| `onClick(id, fn)` | Ejecuta `fn(jugador, dispositivo)` cada vez que un jugador pulsa el botón con ese id, hasta que el programa se pare. |
+| `getLastClick()` | El último botón pulsado: `{ id = …, player = …, count = … }`, o `nil` antes del primero. `count` sube en uno con cada clic. |
+
+Pulsar un botón también es un toque, así que `onTouch` lo oye también.
+
+## La onda
+
+Cuando se muestra o cambia una maqueta, los puntos que cambian giran en una onda que cruza el panel de izquierda a derecha, cada punto un poco desacompasado de sus vecinos. Los puntos que un programa dibuja con las funciones de dibujo giran a la vez.
+
+## Marcado y dibujo juntos
+
+Las funciones de dibujo de [Pantallas y paneles](./screens-panels.mdx#dibujar) funcionan encima de una maqueta: lo que dibujas se queda hasta que la maqueta se vuelve a colocar con el siguiente `set` o `show`. `clear()` borra la pantalla y olvida la maqueta, así que después solo queda lo que dibujes.

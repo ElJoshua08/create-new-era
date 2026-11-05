@@ -124,8 +124,10 @@ local function check(c)
 end
 
 check(chest)
-chest.onChange(check)
+chest.onChange(function(_, c) check(c) end)
 ```
+
+`onChange` hands its function the device's state first and the device second; this one only needs the chest.
 
 ### Stress meter
 
@@ -152,8 +154,8 @@ A fluid tank with an **output** port. Prints how full each of its tanks is whene
 ```lua
 local tank = bus.get("fluid_tank")
 
-tank.onChange(function(t)
-  for _, f in ipairs(t.fluids()) do
+tank.onChange(function(state)
+  for _, f in ipairs(state.fluids) do
     local pct = f.capacity > 0 and math.floor(f.amount / f.capacity * 100) or 0
     print((f.name ~= "" and f.name or "empty") .. ": " .. pct .. "%")
   end
@@ -168,7 +170,55 @@ Two Creative Motors, each with an output and an input port. Whenever you change 
 local leader = bus.get("creative_motor")
 local follower = bus.get("creative_motor_2")
 
-leader.onChange(function(m)
-  follower.setSpeed(m.getTargetSpeed())
+leader.onChange(function(state)
+  follower.setSpeed(state.targetSpeed)
+end)
+```
+
+## Panels
+
+These use [panel controls](./screens-panels.mdx), each cabled to the computer. A control's own connection lets programs both read it and drive it.
+
+### A button toggles a lamp
+
+A Panel Button and a Panel Lamp.
+
+```lua
+local button = bus.get("panel_button")
+local lamp = bus.get("panel_lamp")
+local on = false
+
+button.onPress(function()
+  on = not on
+  lamp.set(on and "green" or "off")
+end)
+```
+
+### A knob on a nixie row
+
+A Panel Knob and a row of Nixie Digits. The knob runs from 0 to 100 in steps of 5, and the nixies show where it's set.
+
+```lua
+local knob = bus.get("panel_knob")
+local nixie = bus.get("nixie_digit")
+
+knob.setRange(0, 100, 5)
+nixie.show(knob.getValue())
+knob.onChange(function(value)
+  nixie.show(value)
+end)
+```
+
+### A chat log that answers
+
+A Chat Log. It hears everyone in its dimension; anyone who says `!time` gets the program's running time back in chat, which reaches players within 128 blocks of the chat log.
+
+```lua
+local log = bus.get("chat_log")
+
+log.onMessage(function(message)
+  if message.text == "!time" then
+    log.say(message.player .. ": running for " .. math.floor(os.clock()) .. " s")
+  end
 end)
 ```

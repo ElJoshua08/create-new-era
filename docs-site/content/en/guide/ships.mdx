@@ -1,0 +1,133 @@
+---
+title: Ships
+description: Flying Create Aeronautics ships from a program, with their controls, sensors and the panel flight instruments.
+---
+
+With **Create: Aeronautics** installed, a program can fly a ship: set the throttle, turn the wheel, build the ship and land it, read where it's going and how it's flying. Create: New Era doesn't need Aeronautics to run; without it, Aeronautics' blocks simply aren't there, and the flight instruments at the end of this page read as if on solid ground.
+
+Everything on this page works through the [data bus](./bus.mdx) as usual: put a port on the block, cable it to the computer, and `bus.get` it by name. Aeronautics' blocks are named after their ids: `throttle_lever`, `steering_wheel`, `physics_assembler`, `navigation_table`, `optical_sensor`, `altitude_sensor`, `gimbal_sensor`, `velocity_sensor`, `propeller_bearing`. A brass port saves you thinking about which way the port faces.
+
+## Ports and cables on a ship
+
+When Aeronautics builds a ship from its blocks, the ports, cables, splices and hubs on those blocks go along with it, and so do the devices' names. When the ship is taken apart, they come back down with the blocks. A cable with one end on the ship and the other on the ground is removed.
+
+On a flying ship, ports and cables are drawn where the ship is, and pointing at them, outlining them and hitting them work there too. Put the computer on the ship as well, and the whole network flies with it.
+
+## Throttle Lever
+
+| Function | Port | Does |
+| --- | --- | --- |
+| `getValue()` | output | where the lever is set, as the signal it gives: 0-15 |
+| `setValue(value)` | input | sets it to give that signal, 0-15, as a player pulling it would |
+| `getMinValue()`, `getMaxValue()` | output | 0 and 15 |
+
+An inverted lever is taken into account: `setValue(15)` always means a signal of 15.
+
+## Steering Wheel
+
+| Function | Port | Does |
+| --- | --- | --- |
+| `getAngle()` | output | how far it's turned now, in degrees |
+| `getTargetAngle()` | output | the angle it's turning towards |
+| `getMaxAngle()` | output | how far it turns each way at most, as set on the wheel |
+| `setAngle(degrees)` | input | turns it to that angle, as a player's hands would |
+
+The wheel stays within its limit and catches up at its own pace, so `getAngle()` lags behind `getTargetAngle()` for a moment.
+
+## Physics Assembler
+
+| Function | Port | Does |
+| --- | --- | --- |
+| `isAssembled()` | output | whether its blocks are a ship now |
+| `getError()` | output | why the last try to build the ship failed, or nil |
+| `assemble()` | input | makes a ship of the blocks connected to it, as pulling its lever does |
+| `disassemble()` | input | lands the ship and puts its blocks back in the world |
+
+Both happen at the end of the tick, not in the middle of your program's line, so a computer on the ship it builds keeps running. Give it a moment before you check:
+
+```lua
+local assembler = bus.get("physics_assembler")
+assembler.assemble()
+sleep(0.1)
+if not assembler.isAssembled() then
+  print("couldn't build it:", assembler.getError())
+end
+```
+
+## Navigation Table
+
+| Function | Gives |
+| --- | --- |
+| `hasTarget()` | whether the map or compass on it points somewhere |
+| `getTarget()` | where it points: `{x, y, z}`, or nil |
+| `getDistance()` | how far the target is, in blocks |
+| `getRelativeAngle()` | how far the target is from straight ahead, in degrees |
+
+All of them read, so an output port is enough.
+
+## Optical Sensor
+
+| Function | Port | Does |
+| --- | --- | --- |
+| `hasHit()` | output | whether its beam hits a block within range |
+| `getDistance()` | output | how far that block is |
+| `getBlock()` | output | the block id it hits, or nil |
+| `getRange()` | output | how far the beam reaches |
+| `setRange(blocks)` | input | sets how far the beam reaches |
+
+## Propellers
+
+Propeller bearings and Aeronautics' small propellers have `getThrust()` (how hard it pushes its ship now), `getAirflow()` (how much air it moves) and `isActive()` (whether it's turning and pushing). A propeller bearing is also a bearing and a kinetic block, so it has `isAssembled()`, `assemble()`, `getSpeed()` and the rest from [Devices](./devices.mdx#machines-that-turn).
+
+## Sensors
+
+Aeronautics' own sensors give a program the numbers they measure, not only the redstone they turn them into. They only read.
+
+| Sensor | Functions |
+| --- | --- |
+| Altitude Sensor | `getAltitude()`: its height in the world, in blocks; `getAirPressure()`: 1 at the bottom of the world, thinning towards 0; `getSignal()`: 0-15, as set in its screen |
+| Gimbal Sensor | `getPitch()`, `getRoll()` in degrees; `getAngles()`: `{pitch, roll}`; `getPower(side)`: the signal out of `"up"`, `"down"`, `"north"`, `"south"`, `"east"` or `"west"` |
+| Velocity Sensor | `getSpeed()`: blocks a second along the way it points, negative going backwards; `getSignal()`: -15 to 15 |
+
+## Flight instruments
+
+This mod adds four panel instruments that read the ship they're built into. They're panel controls, so a cable goes straight into them with no port. Twelve o'clock on the dial is the way the ship flies: placed on a desk it points away from you, hung on a wall it points into the wall. Off a ship they read as if on solid ground: level, still, and heading the way twelve o'clock points.
+
+Each is crafted from a Control Plate and a Brass Sheet in any arrangement, plus a Clock (altimeter), a Precision Mechanism (gyroscope), a Compass (compass) or a Create Propeller (airspeed indicator).
+
+| Instrument | Functions | `read()` and `onChange` give |
+| --- | --- | --- |
+| Panel Altimeter | `getAltitude()`, `getHeightAboveGround()`, `getVerticalSpeed()` in blocks a second | its altitude |
+| Panel Gyroscope | `getPitch()` (nose up positive), `getRoll()` (right side down positive), `getHeading()`, `getAttitude()`: `{pitch, roll, heading}` | `{pitch, roll, heading}` |
+| Panel Compass | `getHeading()`: 0 north, 90 east, 180 south, 270 west; `getDirection()`: `"north"`, `"north_east"`... | its heading |
+| Panel Airspeed Indicator | `getSpeed()` through the world, `getAirspeed()` through the air, `getVelocity()`: `{x, y, z}`, `getMaxSpeed()`, `setMaxSpeed(speed)` | its speed |
+
+Speeds are in blocks a second, angles in degrees. The airspeed needle reaches the red at 40 blocks a second until a program sets another top speed.
+
+The altimeter's long needle goes round once every 100 blocks, the short one every 1000. The gyroscope is an artificial horizon: its ball tilts and rises with the ship.
+
+## An autopilot
+
+For a ship whose throttle lever drives its lift: it holds an altitude of 150 and steers towards the navigation table's target. Change the names to the ones `bus.list()` prints for you.
+
+```lua
+local throttle = bus.get("throttle_lever")
+local wheel = bus.get("steering_wheel")
+local nav = bus.get("navigation_table")
+local altimeter = bus.get("panel_altimeter")
+
+altimeter.onChange(function(altitude)
+  if altitude < 148 then throttle.setValue(15)
+  elseif altitude > 152 then throttle.setValue(4)
+  else throttle.setValue(9)
+  end
+end)
+
+nav.onChange(function()
+  if not nav.hasTarget() then return end
+  local turn = math.max(-1, math.min(1, nav.getRelativeAngle() / 45))
+  wheel.setAngle(turn * wheel.getMaxAngle())
+end)
+```
+
+If the ship turns away from the target, flip the sign of `turn`. The instruments' readings are rounded to a tenth for `onChange`, so it isn't woken by every jitter. The navigation table wakes it when the target or the angle to it changes by a degree.

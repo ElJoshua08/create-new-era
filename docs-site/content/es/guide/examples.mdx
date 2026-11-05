@@ -124,8 +124,10 @@ local function check(c)
 end
 
 check(chest)
-chest.onChange(check)
+chest.onChange(function(_, c) check(c) end)
 ```
+
+`onChange` le pasa a su función primero el estado del dispositivo y después el dispositivo; esta solo necesita el cofre.
 
 ### Medidor de estrés
 
@@ -152,8 +154,8 @@ Un tanque de fluidos con un puerto de **salida**. Escribe lo lleno que está cad
 ```lua
 local tank = bus.get("fluid_tank")
 
-tank.onChange(function(t)
-  for _, f in ipairs(t.fluids()) do
+tank.onChange(function(state)
+  for _, f in ipairs(state.fluids) do
     local pct = f.capacity > 0 and math.floor(f.amount / f.capacity * 100) or 0
     print((f.name ~= "" and f.name or "vacío") .. ": " .. pct .. "%")
   end
@@ -168,7 +170,55 @@ Dos motores creativos, cada uno con un puerto de salida y otro de entrada. Cuand
 local leader = bus.get("creative_motor")
 local follower = bus.get("creative_motor_2")
 
-leader.onChange(function(m)
-  follower.setSpeed(m.getTargetSpeed())
+leader.onChange(function(state)
+  follower.setSpeed(state.targetSpeed)
+end)
+```
+
+## Paneles
+
+Estos usan [controles de panel](./screens-panels.mdx), cada uno con un cable hasta el ordenador. La conexión propia de un control permite a los programas tanto leerlo como manejarlo.
+
+### Un pulsador enciende y apaga un piloto
+
+Un pulsador de panel y un piloto de panel.
+
+```lua
+local button = bus.get("panel_button")
+local lamp = bus.get("panel_lamp")
+local on = false
+
+button.onPress(function()
+  on = not on
+  lamp.set(on and "green" or "off")
+end)
+```
+
+### Un mando en una fila de nixies
+
+Un mando de panel y una fila de dígitos nixie. El mando va de 0 a 100 de 5 en 5, y los nixies muestran dónde está.
+
+```lua
+local knob = bus.get("panel_knob")
+local nixie = bus.get("nixie_digit")
+
+knob.setRange(0, 100, 5)
+nixie.show(knob.getValue())
+knob.onChange(function(value)
+  nixie.show(value)
+end)
+```
+
+### Un chat log que contesta
+
+Un chat log. Oye a todo el mundo en su dimensión; quien diga `!time` recibe en el chat cuánto tiempo lleva el programa en marcha, y eso llega a los jugadores a menos de 128 bloques del chat log.
+
+```lua
+local log = bus.get("chat_log")
+
+log.onMessage(function(message)
+  if message.text == "!time" then
+    log.say(message.player .. ": en marcha desde hace " .. math.floor(os.clock()) .. " s")
+  end
 end)
 ```

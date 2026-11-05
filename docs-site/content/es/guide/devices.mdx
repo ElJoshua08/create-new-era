@@ -1,35 +1,121 @@
 ---
 title: Dispositivos
-description: Leer máquinas, darles órdenes y reaccionar cuando cambian.
+description: Qué puede hacer un programa con cada bloque del bus, desde cofres y motores hasta puertas, rodamientos, chat logs y máquinas de escribir.
 ---
 
-`bus.get(name)` te da una tabla para un dispositivo. Sus funciones dependen de qué bloque sea; la lista completa está en la [referencia de la API de Lua](./lua.mdx#dispositivos). Esta página las enseña funcionando.
+`bus.get(name)` te da una tabla para un dispositivo. Sus funciones dependen de qué bloque sea: todo lo que gira, todo lo que guarda objetos o fluidos, y algunos bloques propios de Create, de Minecraft y de Aeronautics. Todo bloque con un puerto tiene unas cuantas funciones, sea lo que sea. El editor lista las funciones de cada dispositivo, con lo que hacen, al escribir `device.`.
 
-## Leer
+## Leer y dar órdenes
 
-Para leer hace falta un puerto de salida (ámbar) en el dispositivo.
+Las funciones que **leen** necesitan un puerto de salida (ámbar) en el dispositivo. Las que **dan órdenes** necesitan un puerto de entrada (verde). Un puerto de latón, o la conexión propia de un control de panel, hace las dos cosas. Mira [El bus de datos](./bus.mdx#puertos-de-datos).
+
+Llamar a una función que los puertos no permiten para el programa y dice qué puerto falta:
+
+```
+startup.lua:3: rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller
+```
+
+Cambia el puerto con la llave inglesa, añade un segundo puerto o usa uno de latón. Una función que el bloque no tiene en absoluto simplemente no está en su tabla: `device.setSpeed` en un cofre es nil.
+
+## Los errores señalan tu línea
+
+Cuando una función de un dispositivo falla, el error da la línea de tu programa que la llamó, no el código del mod. Un argumento mal puesto dice qué se esperaba:
+
+```lua
+local lamp = bus.get("redstone_lamp")
+lamp.setRedstone(99)
+```
+
+```
+startup.lua:2: bad argument #1 to 'setRedstone' (0-15 or true/false expected, got 99)
+```
+
+Un dispositivo que no está en la red dice `no device named 'chest_9' on this computer's network`.
+
+## Tablas
+
+Muchas funciones devuelven una tabla. `print` enseña lo que lleva dentro:
 
 ```lua
 local motor = bus.get("creative_motor")
-print(motor.getSpeed())          -- 64
+print(motor.getStress())     -- {capacity = ..., used = ...}
+print(motor.getPosition())   -- {x = 12, y = 64, z = -30}
+```
+
+Lee los campos por su nombre, `motor.getStress().used`, o recorre las listas con `ipairs`. El editor conoce los campos de las tablas que devuelven las funciones de los dispositivos, así que al escribir `stress.` después de `local stress = motor.getStress()` te ofrece `used` y `capacity`.
+
+## Cualquier bloque
+
+Estas funcionan en cualquier bloque con un puerto.
+
+| Función | Puerto | Da |
+| --- | --- | --- |
+| `getName()` | salida | su nombre en el bus, el que acepta `bus.get` |
+| `getType()` | salida | el id de su bloque, p. ej. `"create:mechanical_press"` |
+| `getPosition()` | salida | `{x, y, z}` |
+| `getState()` | salida | su estado de bloque: `{facing = "north", powered = false, ...}` |
+| `getRedstone()` | salida | la señal de redstone más fuerte que le llega, 0-15 |
+| `setRedstone(strength)` | entrada | le da señal, 0-15 o `true`/`false` |
+| `getRedstoneOutput()` | entrada | la señal que le dan sus puertos de entrada, 0-15 |
+| `read()` | salida | todo lo que se puede leer de él, en una tabla |
+
+Los bloques que se abren (puertas, trampillas, puertas de valla) tienen además `isOpen()` y `setOpen(open)`. Una puerta abre sus dos mitades. Los bloques que se encienden (hornos, lámparas, velas) tienen `isLit()`.
+
+```lua
+local door = bus.get("oak_door")
+door.setOpen(true)
+print(door.isOpen(), door.getState().half)   -- true  lower
+```
+
+## Redstone por un puerto
+
+`setRedstone` da señal al bloque por cada uno de sus puertos de entrada, como una palanca en la cara donde está el puerto. Así maneja un programa un embrague o una caja de cambios de Create, una puerta, una lámpara de redstone, un pistón: todo lo que reacciona a la redstone.
+
+```lua
+local clutch = bus.get("clutch")
+clutch.setRedstone(true)   -- el embrague se suelta
+sleep(2)
+clutch.setRedstone(false)  -- y vuelve a engranar
+```
+
+El bloque reacciona en el acto. La señal se queda cuando el programa para, y se guarda con el mundo, hasta que un programa la cambie. Solo la dan los puertos de entrada y los de latón; uno de salida no.
+
+## Máquinas que giran
+
+Todo lo cinético: ejes, cajas de engranajes, motores, prensas, ventiladores, sierras...
+
+```lua
+local motor = bus.get("creative_motor")
+print(motor.getSpeed())          -- 64, negativo si gira al revés
 print(motor.isOverstressed())    -- false
 
 local stress = motor.getStress()
 print(stress.used .. " / " .. stress.capacity .. " SU")
 ```
 
+El motor creativo y el controlador de velocidad rotacional tienen además `getTargetSpeed()`, `getMinValue()` (-256), `getMaxValue()` (256) y, con un puerto de entrada, `setSpeed(rpm)`:
+
+```lua
+local controller = bus.get("rotation_speed_controller")
+controller.setSpeed(-128)  -- números enteros de -256 a 256
+```
+
+## Objetos y fluidos
+
 Los inventarios dan cantidades por id de objeto:
 
 ```lua
 local chest = bus.get("chest")
 print(chest.count("minecraft:iron_ingot"))
+print(chest.getSlots())                -- 27
+print(chest.getSlot(1))                -- {count = 12, max = 64, name = "minecraft:iron_ingot"}, o nil
 
 for id, n in pairs(chest.items()) do
   print(id, n)
 end
 ```
 
-Los tanques dan una entrada por tanque:
+Las casillas se cuentan desde 1. Los tanques dan una entrada por tanque:
 
 ```lua
 local tank = bus.get("fluid_tank")
@@ -38,26 +124,144 @@ for _, t in ipairs(tank.fluids()) do
 end
 ```
 
-## Dar órdenes
+Con un puerto de entrada, un dispositivo puede pasar objetos y fluidos a otro dispositivo de la misma red, o sacarlos de él, por su nombre:
 
-Las órdenes necesitan un puerto de entrada (verde). De momento la única orden es la velocidad de un motor creativo o de un controlador de velocidad rotacional:
+| Función | Hace |
+| --- | --- |
+| `pushItems(to, count?, item?)` | mete hasta `count` objetos (64 si no lo pones) en `to`, solo `item` si lo das |
+| `pullItems(from, count?, item?)` | lo mismo en el otro sentido |
+| `pushFluid(to, amount?, fluid?)` | vierte hasta `amount` mB (1000 si no lo pones) en `to` |
+| `pullFluid(from, amount?, fluid?)` | lo mismo en el otro sentido |
+
+Cada una devuelve cuánto se movió. Solo el dispositivo al que llamas necesita puerto de entrada; el otro solo tiene que estar en la red.
 
 ```lua
-local controller = bus.get("rotation_speed_controller")
-controller.setSpeed(-128)  -- números enteros de -256 a 256
+local moved = bus.get("chest").pushItems("chest_2", 5, "minecraft:iron_ingot")
+print("movidos", moved)   -- movidos 5
 ```
 
-Si el puerto es de salida, el programa se para con `rotation_speed_controller.setSpeed needs an input port on rotation_speed_controller`. Cambia el puerto a entrada con la llave inglesa, o añade un segundo puerto.
+## Bloques de Create
+
+| Bloque | Funciones |
+| --- | --- |
+| Quemador de blaze | `getHeat()`: `"none"`, `"smouldering"`, `"fading"`, `"kindled"` o `"seething"`; `getFuelTime()` en ticks |
+| Prensa mecánica | `isPressing()` |
+| Mezcladora mecánica | `isMixing()` |
+| Velocímetro, estresómetro | `getDial()`: adónde apunta la aguja, de 0 a 1 |
+| Tubo Nixie | `getText()`; `setText(text)` y `clear()` (entrada) actúan sobre toda la fila de tubos |
+| Estación de tren | `getStationName()`, `hasTrain()`, `getTrainName()` (nil sin tren) |
+| Panel de visualización | `getLineCount()`, `getMaxChars()`; `setLine(line, text)` (entrada), líneas desde 1 |
+
+Los rodamientos (mecánicos, de molino y los de hélice de Aeronautics) y las máquinas que empujan artefactos (pistones, poleas, carros de pórtico) montan y desmontan lo que mueven, igual que al hacer clic en ellos:
+
+| Bloque | Leer | Órdenes |
+| --- | --- | --- |
+| Rodamientos | `isAssembled()`, `getAngle()` en grados, `getRotationSpeed()` en grados por tick | `assemble()`, `disassemble()` |
+| Pistones, poleas, pórticos | `isAssembled()`, `getExtension()` en bloques | `assemble()`, `disassemble()` |
+| Caja de cambios secuenciada | `isRunning()` | `rotate(degrees, speed?)`, `move(blocks, speed?)` |
+
+`assemble()` ocurre en el siguiente tick de la máquina, y solo si puede, como con un clic. La caja de cambios secuenciada hace un paso y para: `rotate(90)` gira 90° lo que tiene detrás, `move(3)` lo gira lo justo para mover un pistón, una polea o un pórtico tres bloques. Un número negativo va hacia atrás; `"fast"` como segundo argumento dobla la velocidad (si no, `"normal"`).
+
+```lua
+local bearing = bus.get("mechanical_bearing")
+bearing.assemble()
+sleep(0.5)
+print(bearing.isAssembled(), bearing.getAngle())
+
+local seq = bus.get("sequenced_gearshift")
+seq.rotate(90, "fast")
+while seq.isRunning() do sleep(0.1) end
+```
+
+## Bloques de Minecraft
+
+| Bloque | Funciones |
+| --- | --- |
+| Horno, ahumador, alto horno | `isBurning()`, `getCookProgress()` de 0 a 1, `getBurnTime()` en ticks |
+| Bloque musical | `getNote()` 0-24; `setNote(note)` y `play()` (entrada) |
+| Campana | `ring()` (entrada), devuelve si sonó |
+| Cartel | `getText()`: sus cuatro líneas de delante; `setText(line1, line2, line3, line4)` (entrada), las líneas que no pongas se borran |
+| Atril | `hasBook()`, `getPage()` desde 1 |
+| Colmena, nido de abejas | `getHoney()` 0-5, `getBees()` |
+| Compostador | `getFill()` 0-8 |
+
+```lua
+local sign = bus.get("oak_sign")
+sign.setText("Hierro", tostring(bus.get("chest").count("minecraft:iron_ingot")))
+```
+
+## Chat log
+
+El **chat log** es un bloque que oye todos los mensajes de chat de su dimensión y puede escribir en el chat. Ponle un puerto. Guarda los últimos 50 mensajes, y las gafas enseñan los últimos.
+
+| Función | Puerto | Hace |
+| --- | --- | --- |
+| `getMessages(count?)` | salida | los últimos mensajes, del más viejo al más nuevo, cada uno `{player, text, time}`; los 50 si no lo pones |
+| `getLast()` | salida | el mensaje más nuevo, o nil |
+| `say(text)` | entrada | lo dice en el chat como `[chat_log] text`, a todos los que estén a menos de 128 bloques |
+| `tell(player, text)` | entrada | se lo susurra a un jugador, esté donde esté; devuelve si está conectado |
+| `onMessage(fn)` | salida | ejecuta `fn(message, device)` con cada mensaje que oye |
+
+`time` es el tiempo de juego en que se dijo, en ticks. Con un puerto de latón puede hacer todo esto:
+
+```lua
+local log = bus.get("chat_log")
+log.onMessage(function(m)
+  if m.text == "!hierro" then
+    log.tell(m.player, "hierro: " .. bus.get("chest").count("minecraft:iron_ingot"))
+  end
+end)
+```
+
+<Recipe id="chat_log" />
+
+## Linked Typewriter
+
+Con Create: Aeronautics instalado, su **Linked Typewriter** (máquina de escribir enlazada) funciona en el bus. Un programa oye cada tecla que se pulsa en ella mientras alguien escribe, no solo las que tienen una frecuencia asignada, por rápido que vayan. Sus funciones solo leen, así que basta con un puerto de salida.
+
+| Función | Da |
+| --- | --- |
+| `getPressedKeys()` | las teclas pulsadas ahora, por nombre: `{"w", "space"}` |
+| `isPressed(key)` | si esa tecla está pulsada |
+| `isInUse()` | si alguien está escribiendo en ella |
+| `getUser()` | quién escribe, o nil |
+| `getTyped()` | el texto escrito en ella, los últimos 256 caracteres; la tecla de borrar quita uno |
+| `getKeyEvents(since?)` | cada tecla que bajó o subió después del evento número `since`, del más viejo al más nuevo: `{key, down, seq}`; guarda los últimos 64 |
+| `onKeyDown(fn)` | ejecuta `fn(key, device)` cuando baja cada tecla |
+| `onKeyUp(fn)` | ejecuta `fn(key, device)` cuando sube cada tecla |
+| `onKey(fn)` | ejecuta `fn(key, down, device)` en los dos casos |
+
+Las teclas se llaman `"a"` a `"z"`, `"0"` a `"9"`, `"space"`, `"enter"`, `"backspace"`, `"tab"`, `"escape"`, `"up"`, `"down"`, `"left"`, `"right"`, `"left_shift"`, `"right_shift"`, `"left_control"`, `"right_control"`, `"left_alt"`, `"right_alt"`, `"f1"` a `"f12"`, y los signos de puntuación como ellos mismos: `","`, `"."`, `"/"`, `";"`, `"'"`, `"["`, `"]"`, `"\\"`, `"-"`, `"="`, `` "`" ``. Las demás llegan como `"key_"` y un número. Las letras van siempre en minúscula.
+
+```lua
+local keys = bus.get("linked_typewriter")
+local motor = bus.get("creative_motor")
+
+keys.onKeyDown(function(key)
+  if key == "w" then motor.setSpeed(128)
+  elseif key == "s" then motor.setSpeed(-128)
+  elseif key == "enter" then print(keys.getTyped())
+  end
+end)
+
+keys.onKeyUp(function(key)
+  if key == "w" or key == "s" then motor.setSpeed(0) end
+end)
+```
+
+El resto de bloques de Aeronautics están en la página de [Barcos](./ships.mdx).
 
 ## Reaccionar a los cambios
 
-`device.onChange(fn)` ejecuta `fn` cada vez que cambia algo que podrías leer del dispositivo: su velocidad, si está sobreestresado, la velocidad a la que está puesto, sus objetos o sus fluidos. Recibe el dispositivo, así que una misma función puede servir para varios.
+`device.onChange(fn)` ejecuta `fn(value, device)` cada vez que cambia algo que podrías leer del dispositivo. `value` es lo que da `device.read()` en ese momento, y también recibe el dispositivo, así que una misma función puede servir para varios.
+
+Para una máquina, `read()` es una tabla con lo que tenga: `speed`, `overstressed`, `stress`, `targetSpeed`, `items`, `fluids` y `state` (su estado de bloque). Para un control de panel es el valor del control: si un interruptor está encendido, dónde está un deslizador.
 
 ```lua
 local chest = bus.get("chest")
 
-chest.onChange(function(c)
-  local iron = c.count("minecraft:iron_ingot")
+chest.onChange(function(state)
+  local iron = state.items["minecraft:iron_ingot"] or 0
   rs.setOutput("top", iron < 64)
 end)
 
@@ -66,13 +270,17 @@ print("vigilando el cofre")
 
 Este programa escribe una vez y luego espera. Como tiene un handler, no termina al ejecutar la última línea: sigue escuchando hasta que pulses **Parar** o dé un error. Entre cambio y cambio no cuesta nada.
 
+Qué cuenta como cambio: su velocidad, si está sobreestresado, la velocidad a la que está puesto, sus objetos, sus fluidos, su estado de bloque (una puerta que se abre, una lámpara que se enciende, la nota de un bloque musical), un mensaje que oye un chat log, una tecla en una máquina de escribir, la lectura de un sensor que se mueve una décima.
+
 Algunos detalles:
 
 - Los cambios se miran una vez por tick. Si un cofre cambia tres veces en un tick, el handler se ejecuta una vez.
 - Cada cambio arranca una ejecución nueva del handler, a la vez que el código principal y los demás handlers. Un handler puede usar `sleep`.
-- Un dispositivo que sale de la red, porque se rompió su bloque o se cortó un cable, también cuenta como cambio. Llamar a sus funciones después da error, así que usa `pcall` si eso puede pasar.
+- Un dispositivo que sale de la red, porque se rompió su bloque o se cortó un cable, también cuenta como cambio. Entonces `value` es nil, y llamar a sus funciones da error, así que usa `pcall` si eso puede pasar.
 - El estrés usado y la capacidad no se vigilan. Si los necesitas, consulta `getStress()` en un bucle.
 - Un error en cualquier handler para todo el programa.
+
+`onMessage`, `onKeyDown`, `onKeyUp` y `onKey` están hechos con `onChange`, igual que `onPress` de un botón de panel, `onKey` de un teclado numérico y `onTouch` y `onClick` de una pantalla.
 
 ## Consultar en un bucle
 

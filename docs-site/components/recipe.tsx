@@ -1,4 +1,5 @@
 import data from '@/lib/recipes.json';
+import { withBase } from '@/lib/shared';
 
 type Item = { en: string; es: string; icon: string; mod: string };
 type Grid = {
@@ -74,7 +75,7 @@ function Slot({
   return (
     <span className={`${size} relative grid place-items-center rounded-[3px] recipe-slot`} title={label}>
       {/* biome-ignore lint/performance/noImgElement: tiny pixel-art icons in a static export */}
-      <img src={icon ?? items[id].icon} alt={label} className="pixelated size-[78%]" loading="lazy" />
+      <img src={withBase(icon ?? items[id].icon)} alt={label} className="pixelated size-[78%]" loading="lazy" />
       {count && count > 1 ? (
         <span className="pixel absolute right-0.5 bottom-0 text-[13px] leading-none text-white [text-shadow:1px_1px_0_#3f3f3f]">
           {count}

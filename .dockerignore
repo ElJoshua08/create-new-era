@@ -1,0 +1,9 @@
+**/node_modules
+site/dist
+docs-site/out
+docs-site/.next
+docs-site/.source
+build
+run
+logs
+.gradle

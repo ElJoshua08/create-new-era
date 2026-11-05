@@ -21,6 +21,14 @@ Cuando se carga el mundo o el chunk, un ordenador que estaba en marcha arranca s
 
 Un programa que termina o da un error deja sus salidas como estaban. **Parar** las apaga todas.
 
+### El editor me subraya el código
+
+Es el editor revisándolo mientras escribes. En rojo, código que no compila: Ejecutar también se pararía ahí. En ámbar, un aviso: una función que el dispositivo o el módulo no tiene, un nombre de dispositivo que nada tiene en la red, o una anotación de tipo que no nombra ningún dispositivo de ella. El mensaje está al final de la línea. Mira [Problemas mientras escribes](./editor.mdx#problemas-mientras-escribes).
+
+### `onChange` me da una tabla, no el dispositivo
+
+La función recibe primero el estado del dispositivo y después el dispositivo: `fn(value, device)`. `value` es lo que devuelve `device.read()`. Escribe `function(_, device)` si quieres el dispositivo.
+
 ### `unknown side 'north'`
 
 Los lados se nombran desde el frente del ordenador: `front`, `back`, `left`, `right`, `top`, `bottom`. Los puntos cardinales no valen.
@@ -35,19 +43,19 @@ El nombre está mal, o el bloque no está conectado. Ejecuta esto para ver a qu�
 for _, d in ipairs(bus.list()) do print(d.name) end
 ```
 
-Si el bloque no sale: comprueba que tiene un puerto, que un cable va desde ese puerto hasta uno de los puertos del ordenador (pasar por otros puertos o empalmes vale), y que los colores coinciden por el camino.
+Si el bloque no sale: comprueba que tiene un puerto, que un cable va desde ese puerto hasta uno de los puertos del ordenador (pasar por hubs de puertos o empalmes vale), y que los colores coinciden por el camino.
 
 ### `needs an input port` o `needs an output port`
 
-Para leer hace falta un puerto de salida (luz ámbar) en el dispositivo, y para darle órdenes uno de entrada (verde). Haz clic derecho en el puerto con la llave inglesa para cambiarlo, o añade un segundo puerto para que el bloque tenga uno de cada.
+Para leer hace falta un puerto de salida (luz ámbar) en el dispositivo, y para darle órdenes uno de entrada (verde). Haz clic derecho en el puerto con la llave inglesa para cambiarlo, añade un segundo puerto para que el bloque tenga uno de cada, o usa un puerto de datos de latón, que hace las dos cosas.
 
 ### ¿Puedo renombrar un dispositivo?
 
 Dentro del juego, todavía no. Los nombres son el id del bloque más un número cuando ya está cogido (`chest`, `chest_2`). Un nombre se queda con su bloque hasta que se rompe.
 
-### Mi dispositivo no tiene funciones
+### Mi dispositivo casi no tiene funciones
 
-Un bloque que no gira y no guarda objetos ni fluidos, como una lámpara de redstone, aparece en la red pero de momento no tiene nada que leer ni controlar.
+Todo bloque de la red tiene unas cuantas: `getName`, `getType`, `getPosition`, `getState`, `getRedstone`, y `setRedstone` por un puerto de entrada. Los bloques cinéticos, los inventarios, los tanques y los bloques de [Dispositivos](./devices.mdx) tienen más. Escribe la variable y un `.` en el editor para ver lo que tiene este.
 
 ## Cables y puertos
 
@@ -55,9 +63,13 @@ Un bloque que no gira y no guarda objetos ni fluidos, como una lámpara de redst
 
 Los puertos no se pueden solapar. Pincha en un hueco libre de la cara.
 
-### «No le quedan puertos: una ampliación de puertos añade 4 más»
+### «Los puertos propios del ordenador van en los huecos de sus lados» / «No le quedan puertos»
 
-Un ordenador lleva 4 puertos, más 4 por cada ampliación de puertos, con hasta 3 ampliaciones.
+Un ordenador tiene cuatro huecos para puertos, dos en cada lado, y los ocupan sus propios puertos. Los puertos de datos solo van en esos huecos, así que en un ordenador no caben más. Para llegar a más máquinas, usa un [hub de puertos](./bus.mdx#hubs-de-puertos).
+
+### «Ese puerto ya tiene su cable: para juntar varios, usa un hub de puertos»
+
+Cada puerto acepta un solo cable. Llévalo a un [hub de puertos](./bus.mdx#hubs-de-puertos) o a un empalme, y junta allí los demás cables.
 
 ### «Esa pieza ya tiene cable de otro color»
 

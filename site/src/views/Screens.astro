@@ -1,92 +1,156 @@
 ---
 import Base from '../layouts/Base.astro';
 import SceneStage from '../components/SceneStage.astro';
-import { routes, ui, type Lang } from '../i18n/routes';
+import { routes, DOCS, type Lang } from '../i18n/routes';
+import { highlight } from '../scripts/lua';
+
+const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+/** Screen markup to HTML spans: tags as keywords, attribute values as strings. */
+const xml = (src: string) =>
+  esc(src).replace(/(&lt;\/?)([a-z]+)([^&]*?)(\/?&gt;)/g, (_, open, tag, attrs, close) =>
+    `${open}<span class="k">${tag}</span>${attrs.replace(/("[^"]*")/g, '<span class="s">$1</span>')}${close}`);
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const soon = ui[lang].soon;
+
+const markup = `<screen>
+  <title>IRON FARM</title>
+  <row>
+    <label>IRON</label>
+    <value id="iron" align="right">0</value>
+  </row>
+  <bar id="load" value="0"/>
+  <row>
+    <button id="start">START</button>
+    <button id="stop">STOP</button>
+  </row>
+</screen>`;
+
+const program = {
+  en: `local screen = bus.get("brass_screen")
+local chest = bus.get("chest")
+
+screen.show("farm")
+screen.onClick("start", function(player)
+  print(player .. " pressed START")
+end)
+
+while true do
+  local iron = chest.count("minecraft:iron_ingot")
+  screen.set("iron", iron)
+  screen.set("load", iron / 1728)
+  sleep(1)
+end`,
+  es: `local screen = bus.get("brass_screen")
+local chest = bus.get("chest")
+
+screen.show("farm")
+screen.onClick("start", function(player)
+  print(player .. " ha pulsado START")
+end)
+
+while true do
+  local iron = chest.count("minecraft:iron_ingot")
+  screen.set("iron", iron)
+  screen.set("load", iron / 1728)
+  sleep(1)
+end`,
+}[lang];
 
 const copy = {
   en: {
     title: 'Screens and panels',
-    description: 'Brass Screens that join into one big display of flip pixels, and panel controls for building control desks in a Create factory.',
-    lede: 'Brass Screens that join into one big display, and small controls for building a desk to run the factory from. Both are in the game today. Hooking them up to your programs comes next.',
+    description: 'Brass Screens that join into one big flip-dot display your programs draw on, and panel controls for building a control desk in a Create factory.',
+    lede: 'Brass Screens that join into one big flip-dot display, and small controls for building a desk to run the factory from. Your programs draw on the screens, read the controls and drive the lamps, nixies and gauges.',
     screens: {
       title: 'One pane, however big',
       text: [
-        'Screens facing the same way join up and the brass frame between them disappears, so any rectangle of them reads as a single display. Turn one with a wrench and it joins whatever it now lines up with.',
-        'Each block holds 48 by 48 flip pixels that turn over when they change. You can have square plates or round discs, whichever you prefer, in the client config.',
+        'Screens facing the same way join up and the brass frame between them disappears, so any rectangle of them, up to 8 by 8, reads as a single display. Turn one with a wrench and it joins whatever it now lines up with.',
+        'Each block adds 32 dots each way, made of physical flip dots that turn over when they change, in a ripple across the pane. A 2 by 2 pane is 56 by 56 dots.',
       ],
       apart: 'Apart',
       joined: 'Joined',
-      draw: 'Draw on the pixels with your mouse or finger. Programs will be able to do the same.',
+      draw: 'Draw on the dots with your mouse or finger. In the game, programs draw and players touch.',
       clear: 'Clear',
       alt: 'A wall of twelve Brass Screens, four wide and three high, joined into one pane.',
     },
+    program: {
+      title: 'A dashboard in a few lines',
+      text: [
+        'Lay a screen out in a .screen file: a title, rows of labels and values, bars and buttons. The screen arranges them and keeps the look, so there is no styling to write.',
+        'The program shows the file once, then changes the parts that have an id. Only the dots that change turn over. Save the file and every screen showing it updates at once, without restarting anything.',
+        'For anything else, draw it yourself: dots, lines, rectangles, circles and text in Monocraft, in 18 colours, and hear where players touch.',
+      ],
+      file: 'farm.screen',
+      lua: 'startup.lua',
+      docs: 'Screen markup in the docs',
+    },
     panels: {
       title: 'Build a control desk',
-      text: 'Each control is a control plate with one part on it, and it sits on floors, walls or ceilings. Put a few next to each other and you have a desk.',
-      soonText: 'Programs reading the controls and driving the lamps, digits and gauges',
+      text: 'Each control is a control plate with one part on it, and it sits on floors, walls or ceilings. Cable straight into the plate and the control is on the bus: players press and turn it, programs read it and drive it.',
       alt: 'A control desk on andesite and brass casings with every panel control on it.',
       items: [
-        ['panel_button', 'Button', 'A push button for programs to react to.'],
-        ['panel_switch', 'Switch', 'An on/off lever.'],
-        ['panel_knob', 'Knob', 'A rotary knob that dials in a value.'],
-        ['panel_slider', 'Slider', 'A fader from 0 to 100%.'],
-        ['panel_lamp', 'Lamp', 'A light your program switches on.'],
-        ['nixie_digit', 'Nixie digit', 'One glowing digit. Line several up for a number.'],
-        ['panel_gauge', 'Gauge', 'A needle that points at a value.'],
+        ['panel_button', 'Button', 'A push button. Programs hear every press.'],
+        ['panel_switch', 'Switch', 'An on/off lever that players and programs can both flip.'],
+        ['panel_knob', 'Knob', 'Dials in a value. Programs give it its own range and step.'],
+        ['panel_slider', 'Slider', 'A fader, with notches where its range says.'],
+        ['panel_lamp', 'Lamp', 'A light in three colours that glows like a torch.'],
+        ['nixie_digit', 'Nixie tube', 'Glows any character. Rows of up to 64 work as one display.'],
+        ['panel_gauge', 'Gauge', 'A needle a program points at a value.'],
         ['panel_keypad', 'Keypad', 'For typing numbers into a program.'],
+        ['panel_speaker', 'Speaker', 'Plays sounds and notes, and reads text aloud.'],
       ],
+      docs: 'Every control in the docs',
     },
-    soonTitle: 'Coming to screens',
-    soonItems: [
-      ['Drawing from programs', 'Text, numbers, bars and graphs on any pane, with a small UI library for dashboards that look good without much code.'],
-      ['Linked Typewriter support', 'Type into a running program from a Linked Typewriter.'],
-    ],
-    next: 'What else is planned',
+    next: 'What’s still to come',
   },
   es: {
     title: 'Pantallas y paneles',
-    description: 'Pantallas de latón que se juntan en una gran pantalla de píxeles giratorios, y controles de panel para montar pupitres de control en tu fábrica de Create.',
-    lede: 'Pantallas de latón que se juntan en una sola pantalla grande y pequeños controles para montar un pupitre desde el que manejar la fábrica. Las dos cosas ya están en el juego. Conectarlas a tus programas es lo siguiente.',
+    description: 'Pantallas de latón que se juntan en una gran pantalla de puntos giratorios en la que dibujan tus programas, y controles de panel para montar pupitres de control en tu fábrica de Create.',
+    lede: 'Pantallas de latón que se juntan en una sola pantalla grande de puntos giratorios y pequeños controles para montar un pupitre desde el que manejar la fábrica. Tus programas dibujan en las pantallas, leen los controles y manejan pilotos, nixies e indicadores.',
     screens: {
       title: 'Un solo panel, del tamaño que quieras',
       text: [
-        'Las pantallas que miran al mismo lado se juntan y el marco de latón entre ellas desaparece, así que cualquier rectángulo de pantallas se ve como una sola. Gira una con la llave inglesa y se unirá a las que queden alineadas con ella.',
-        'Cada bloque tiene 48 por 48 píxeles giratorios que se dan la vuelta al cambiar. Pueden ser placas cuadradas o discos redondos, como prefieras, en la configuración del cliente.',
+        'Las pantallas que miran al mismo lado se juntan y el marco de latón entre ellas desaparece, así que cualquier rectángulo de pantallas, hasta 8 por 8, se ve como una sola. Gira una con la llave inglesa y se unirá a las que queden alineadas con ella.',
+        'Cada bloque suma 32 puntos en cada sentido, puntos físicos que se dan la vuelta al cambiar, en una onda que recorre el panel. Un panel de 2 por 2 tiene 56 por 56 puntos.',
       ],
       apart: 'Separadas',
       joined: 'Juntas',
-      draw: 'Dibuja en los píxeles con el ratón o con el dedo. Los programas podrán hacer lo mismo.',
+      draw: 'Dibuja en los puntos con el ratón o con el dedo. En el juego dibujan los programas y tocan los jugadores.',
       clear: 'Borrar',
       alt: 'Una pared de doce pantallas de latón, cuatro de ancho y tres de alto, unidas en un solo panel.',
     },
+    program: {
+      title: 'Un cuadro de mando en pocas líneas',
+      text: [
+        'Describe la pantalla en un archivo .screen: un título, filas de etiquetas y valores, barras y botones. La pantalla los coloca y se encarga del aspecto, así que no hay estilos que escribir.',
+        'El programa muestra el archivo una vez y luego cambia las partes que tienen id. Solo giran los puntos que cambian. Guarda el archivo y todas las pantallas que lo muestran se actualizan al momento, sin reiniciar nada.',
+        'Para todo lo demás, dibújalo tú: puntos, líneas, rectángulos, círculos y texto en Monocraft, en 18 colores, y entérate de dónde tocan los jugadores.',
+      ],
+      file: 'farm.screen',
+      lua: 'startup.lua',
+      docs: 'El marcado de pantallas en los docs',
+    },
     panels: {
       title: 'Monta un pupitre de control',
-      text: 'Cada control es una placa de control con una pieza encima, y va en suelos, paredes o techos. Pon unos cuantos juntos y ya tienes un pupitre.',
-      soonText: 'Que los programas lean los controles y manejen pilotos, dígitos e indicadores',
+      text: 'Cada control es una placa de control con una pieza encima, y va en suelos, paredes o techos. Lleva un cable directamente a la placa y el control queda en el bus: los jugadores lo pulsan y lo giran, y los programas lo leen y lo manejan.',
       alt: 'Un pupitre de control sobre revestimientos de andesita y latón con todos los controles de panel.',
       items: [
-        ['panel_button', 'Pulsador', 'Un botón al que pueden reaccionar los programas.'],
-        ['panel_switch', 'Interruptor', 'Una palanca de encendido y apagado.'],
-        ['panel_knob', 'Mando giratorio', 'Una rueda para ajustar un valor.'],
-        ['panel_slider', 'Deslizador', 'Un fader del 0 al 100 %.'],
-        ['panel_lamp', 'Piloto', 'Una luz que enciende tu programa.'],
-        ['nixie_digit', 'Dígito nixie', 'Un dígito que brilla. Pon varios en fila para formar un número.'],
-        ['panel_gauge', 'Indicador de aguja', 'Una aguja que señala un valor.'],
+        ['panel_button', 'Pulsador', 'Un botón. Los programas se enteran de cada pulsación.'],
+        ['panel_switch', 'Interruptor', 'Una palanca que pueden mover tanto los jugadores como los programas.'],
+        ['panel_knob', 'Mando giratorio', 'Ajusta un valor. Los programas le dan su propio rango y paso.'],
+        ['panel_slider', 'Deslizador', 'Un fader con muescas donde diga su rango.'],
+        ['panel_lamp', 'Piloto', 'Una luz de tres colores que brilla como una antorcha.'],
+        ['nixie_digit', 'Tubo nixie', 'Enciende cualquier carácter. Filas de hasta 64 funcionan como una sola pantalla.'],
+        ['panel_gauge', 'Indicador de aguja', 'Una aguja que un programa apunta a un valor.'],
         ['panel_keypad', 'Teclado', 'Para meter números en un programa.'],
+        ['panel_speaker', 'Altavoz', 'Reproduce sonidos y notas, y lee texto en voz alta.'],
       ],
+      docs: 'Todos los controles en los docs',
     },
-    soonTitle: 'Lo que llega a las pantallas',
-    soonItems: [
-      ['Dibujar desde los programas', 'Texto, números, barras y gráficas en cualquier panel, con una pequeña librería para hacer paneles de control que se vean bien sin mucho código.'],
-      ['Compatibilidad con la Linked Typewriter', 'Escribe en un programa en marcha desde una Linked Typewriter.'],
-    ],
-    next: 'Qué más está en camino',
+    next: 'Lo que falta por llegar',
   },
 }[lang];
 const s = copy.screens;
@@ -114,8 +178,30 @@ const s = copy.screens;
           </div>
           <button type="button" class="btn wall__clear" data-clear>{s.clear}</button>
         </div>
-        <p class="wall__hint"><span class="soon">{soon}</span> {s.draw}</p>
+        <p class="wall__hint">{s.draw}</p>
       </SceneStage>
+    </div>
+  </section>
+
+  <section class="section--tight program">
+    <div class="wrap split">
+      <div>
+        <h2>{copy.program.title}</h2>
+        <div class="prose sp">
+          {copy.program.text.map((t) => <p>{t}</p>)}
+        </div>
+        <a class="more" href={`${DOCS}/${lang}/guide/screen-markup/`}>{copy.program.docs}</a>
+      </div>
+      <div class="files">
+        <div class="window">
+          <div class="window__bar">{copy.program.file}</div>
+          <pre class="codeblock"><code set:html={xml(markup)} /></pre>
+        </div>
+        <div class="window">
+          <div class="window__bar">{copy.program.lua}</div>
+          <pre class="codeblock"><code set:html={highlight(program)} /></pre>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -125,7 +211,6 @@ const s = copy.screens;
         <div>
           <h2>{copy.panels.title}</h2>
           <p class="prose sp">{copy.panels.text}</p>
-          <p class="panels__soon"><span class="soon">{soon}</span> {copy.panels.soonText}</p>
         </div>
         <SceneStage scene="desk" alt={copy.panels.alt} />
       </div>
@@ -142,27 +227,13 @@ const s = copy.screens;
           ))
         }
       </ul>
+      <p class="panels__links">
+        <a class="more" href={`${DOCS}/${lang}/guide/screens-panels/`}>{copy.panels.docs}</a>
+        <a class="more" href={routes.roadmap[lang]}>{copy.next}</a>
+      </p>
     </div>
   </section>
 
-  <section class="section--tight">
-    <div class="wrap">
-      <h2>{copy.soonTitle}</h2>
-      <ul class="next">
-        {
-          copy.soonItems.map(([h, t]) => (
-            <li>
-              <h3>
-                {h} <span class="soon">{soon}</span>
-              </h3>
-              <p>{t}</p>
-            </li>
-          ))
-        }
-      </ul>
-      <a class="more" href={routes.roadmap[lang]}>{copy.next}</a>
-    </div>
-  </section>
 </Base>
 
 <script>
@@ -231,6 +302,24 @@ const s = copy.screens;
   .panels {
     background: var(--ground-2);
   }
+  .files {
+    display: grid;
+    gap: 1.2rem;
+    min-width: 0;
+  }
+  .files .codeblock {
+    font-size: 0.8rem;
+  }
+  .program .more {
+    display: inline-block;
+    margin-top: 1.4rem;
+  }
+  .panels__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2.5rem;
+    margin-top: 2.2rem;
+  }
   .panels__soon {
     margin-top: 1.2rem;
     color: var(--ink-3);
@@ -241,7 +330,7 @@ const s = copy.screens;
     padding: 0;
     margin: clamp(32px, 5vw, 64px) 0 0;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 2rem 2rem;
   }
   .controls li {

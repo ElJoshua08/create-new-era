@@ -21,6 +21,14 @@ When the world or the chunk loads, a computer that was running starts its progra
 
 A program that finishes or errors leaves its outputs as they were. **Stop** turns them all off.
 
+### The editor underlines my code
+
+That's the editor checking as you type. Red is code that won't compile: Run would stop on it too. Amber is a warning: a function the device or module doesn't have, a device name nothing on the network has, or a type annotation naming no device there. The message is at the end of the line. See [Problems while you type](./editor.mdx#problems-while-you-type).
+
+### `onChange` gives me a table, not the device
+
+The function gets the device's state first and the device second: `fn(value, device)`. `value` is what `device.read()` returns. Write `function(_, device)` if you want the device.
+
 ### `unknown side 'north'`
 
 Sides are named from the computer's front: `front`, `back`, `left`, `right`, `top`, `bottom`. Compass directions don't work.
@@ -35,19 +43,19 @@ The name is wrong, or the block isn't connected. Run this to see what the comput
 for _, d in ipairs(bus.list()) do print(d.name) end
 ```
 
-If the block isn't there: check that it has a port, that a cable runs from that port back to one of the computer's ports (through other ports or splices is fine), and that the colours along the way match.
+If the block isn't there: check that it has a port, that a cable runs from that port back to one of the computer's ports (through port hubs or splices is fine), and that the colours along the way match.
 
 ### `needs an input port` or `needs an output port`
 
-Reading needs an output port (amber light) on the device, giving orders needs an input port (green). Right-click the port with a wrench to switch it, or add a second port so the block has one of each.
+Reading needs an output port (amber light) on the device, giving orders needs an input port (green). Right-click the port with a wrench to switch it, add a second port so the block has one of each, or use a Brass Data Port, which does both.
 
 ### Can I rename a device?
 
 Not in game yet. Names are the block id plus a number when it's taken (`chest`, `chest_2`). A name stays with its block until the block is broken.
 
-### My device has no functions
+### My device has hardly any functions
 
-A block that doesn't turn and holds no items or fluids, like a redstone lamp, shows up on the network but has nothing to read or control yet.
+Every block on the network has a few: `getName`, `getType`, `getPosition`, `getState`, `getRedstone`, and `setRedstone` through an input port. Kinetic blocks, inventories, tanks and the blocks listed in [Devices](./devices.mdx) have more. Type the variable and a `.` in the editor to see what this one has.
 
 ## Cables and ports
 
@@ -55,9 +63,13 @@ A block that doesn't turn and holds no items or fluids, like a redstone lamp, sh
 
 Ports don't overlap. Click a free spot on the face.
 
-### "No ports left: a Port Expansion adds 4 more"
+### "The computer's own ports go in the sockets on its sides" / "No ports left"
 
-A computer holds 4 ports, plus 4 per Port Expansion, with up to 3 expansions.
+A computer has four sockets for ports, two on each side, and its own ports fill them. Data ports only go in those sockets, so there's no room for more ports on a computer. To reach more machines, use a [Port Hub](./bus.mdx#port-hubs).
+
+### "That port already has its cable: bring several together at a Port Hub"
+
+Each port takes one cable. Run it to a [Port Hub](./bus.mdx#port-hubs) or a splice, and join the other cables there.
 
 ### "That part already has cable of another colour"
 

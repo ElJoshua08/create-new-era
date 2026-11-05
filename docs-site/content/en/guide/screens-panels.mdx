@@ -1,38 +1,304 @@
 ---
 title: Screens and panels
-description: Brass Screens, panel controls, the Universal Adapter and the Bearing Servo, and what they do today.
+description: Brass Screens, panel controls and flight instruments, what players do with them and what programs can do.
 ---
 
-These blocks are in the mod, have recipes and Ponder scenes, and can be placed, rotated with the wrench and mined. Programs can't use them yet. This page says what each one does now, so you can build with them while the rest arrives.
+Brass Screens show what your programs draw or lay out. Panel controls are the buttons, switches, knobs, lamps and dials of a control desk: players use them by hand, and programs read and drive them over the [data bus](./bus.mdx).
 
 ## Brass Screen
 
 ![Brass Screen](/img/blocks/brass_screen.png)
 
-Brass Screens placed next to each other and facing the same way join into one display: the brass frame between them disappears. Any rectangle works. Turn one with a wrench and it joins whatever screens it lines up with after the turn.
+A Brass Screen is a display of flip dots: small plates that turn over to show a new colour.
 
-Each block will show 48 by 48 flip pixels, small plates that turn over when they change. Drawing on screens from a program is coming; for now a screen is a blank panel. The [client config](./config.mdx) already has the option for the pixel shape.
+Screens placed next to each other and facing the same way join into one **pane**: the brass frame between them disappears. Any rectangle up to 8 by 8 blocks works; past that the screens split into panes of their own. Turn one with a wrench and it joins whatever screens it lines up with after the turn.
+
+One screen has 24 by 24 dots. A pane has 32 more dots for each block it adds, because the frame between screens is gone:
+
+| Pane | Dots |
+| --- | --- |
+| 1 by 1 | 24 × 24 |
+| 2 by 1 | 56 × 24 |
+| 2 by 2 | 56 × 56 |
+| 3 by 2 | 88 × 56 |
+| 8 by 8 | 248 × 248 |
+
+The [client config](./config.mdx) picks the shape of the dots: square plates or round discs.
 
 <Recipe id="brass_screen" />
+
+### Putting a screen on the bus
+
+Stick a **Brass Data Port** on any screen of the pane and cable it to the computer. A brass port reads the screen and gives it orders through one connection. With plain data ports you need an input port to show and draw, and an output port to hear touches and clicks.
+
+The program can use any screen of the pane: they all reach the same dots. The device is called `brass_screen` (or `brass_screen_2` and so on).
+
+There are two ways to put something on a screen:
+
+- **Markup**: describe a layout with a few tags (a title, rows of labels and values, bars, buttons) and change its parts by id. This is the easy way for status boards and menus. See [Screen markup](./screen-markup.mdx).
+- **Drawing**: set dots, draw lines, rectangles, circles and text yourself. Use it for what a layout can't do, like a graph or a map.
+
+What a screen shows stays on it after the program stops, and through saving and reloading the world.
+
+### Drawing
+
+Positions are in dots, with `(1, 1)` at the top left. Anything past the edge is cut off, so you can draw shapes that only partly fit.
+
+```lua
+local s = bus.get("brass_screen")
+s.clear()
+s.drawText(2, 2, "FURNACE")
+s.drawRect(2, 14, 50, 9, "amber")
+s.fillRect(4, 16, 30, 5, "lime")
+s.fillCircle(46, 40, 6, "red")
+```
+
+| Function | What it does |
+| --- | --- |
+| `clear(colour?)` | Turns every dot to one colour, dark if none is given. It also forgets any markup that was shown. |
+| `setDot(x, y, colour)` | Turns one dot. |
+| `getDot(x, y)` | The colour name of one dot. |
+| `fillRect(x, y, width, height, colour)` | A filled rectangle, top left at `(x, y)`. |
+| `drawRect(x, y, width, height, colour)` | A rectangle's outline. |
+| `drawLine(x1, y1, x2, y2, colour)` | A line, both ends included. |
+| `drawCircle(x, y, radius, colour)` | A circle's outline round `(x, y)`. |
+| `fillCircle(x, y, radius, colour)` | A filled circle. |
+| `drawText(x, y, text, colour?, scale?)` | Text with its top left at `(x, y)`, amber if no colour is given. `scale` from 1 to 8 makes each dot a square that many dots wide. `\n` starts a new line. Returns how wide the longest line was, in dots. |
+| `getTextWidth(text, scale?)` | How wide some text would be, in dots, without drawing it. |
+| `getSize()` | `{ width = …, height = … }` of the whole pane, in dots. |
+| `getWidth()`, `getHeight()` | The same, one at a time. |
+| `getColors()` | The list of colour names a dot can show. |
+
+Dots you draw turn over at once. A new layout from markup turns over in a ripple from left to right instead.
+
+### Colours
+
+A dot shows one of 18 colours:
+
+- `"dark"`, the dot's own face, also written `"off"` or `"none"`;
+- `"amber"`, the default ink;
+- the 16 dye colours by their ids: `"white"`, `"orange"`, `"magenta"`, `"light_blue"`, `"yellow"`, `"lime"`, `"pink"`, `"gray"`, `"light_gray"`, `"cyan"`, `"purple"`, `"blue"`, `"brown"`, `"green"`, `"red"`, `"black"`.
+
+You can also give `"#RRGGBB"`, `"#RGB"` or a number like `0x3366FF`: the screen picks the nearest of the 18.
+
+### Text
+
+Screens write in Monocraft, the same font as the editor. Each character is 6 dots wide and a line takes 11 dots, at scale 1. Letters, digits, punctuation and the accented letters of Latin-1 (`á`, `ñ`, `ü`…) all work; any other character shows as `?`.
+
+To centre a line, measure it first:
+
+```lua
+local s = bus.get("brass_screen")
+local text = "READY"
+local x = math.floor((s.getWidth() - s.getTextWidth(text, 2)) / 2) + 1
+s.drawText(x, 10, text, "lime", 2)
+```
+
+### Touches
+
+Right-clicking the glass of a pane is a **touch**. `onTouch` runs a function for each one, with where it landed in dots and who touched it:
+
+```lua
+local s = bus.get("brass_screen")
+s.clear()
+s.onTouch(function(x, y, player)
+  s.fillCircle(x, y, 2, "red")
+  print(player .. " touched " .. x .. ", " .. y)
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `onTouch(fn)` | Runs `fn(x, y, player, device)` for every touch, until the program stops. |
+| `getLastTouch()` | The last touch: `{ x = …, y = …, player = …, count = … }`, or `nil` if there hasn't been one. `count` goes up by one with every touch. |
+
+Touches on the brass frame round the pane's edge don't count. Buttons laid out with markup are heard with `onClick`, on the [Screen markup](./screen-markup.mdx#buttons) page.
 
 ## Panel controls
 
 ![Panel controls](/img/controls.png)
 
-Small blocks for building control desks. Each one sits on the face you click: floors, walls or ceilings. They're all made from a Control Plate and one part.
+Small blocks for building control desks. Each one sits on the face you click: floors, walls or ceilings. They're all made from a Control Plate and one part; recipes are on the [Recipes](./recipes.mdx#panel-controls) page.
 
-| Control | What it will do |
+### Putting a control on the bus
+
+Run a cable straight into the control's plate. Every control comes with its own connection, so there's no port to add and no output or input to pick: programs read it and give it orders through that one cable.
+
+Each control is a device named after its block: `panel_button`, `panel_knob`, `nixie_digit` and so on. With engineer's goggles on, looking at a control shows its value and whether a cable reaches it.
+
+Every control also has `read()`, which gives its state as one value, and `onChange(fn)`, which runs `fn(value, device)` each time that value changes:
+
+| Control | `read()` and `onChange` give |
 | --- | --- |
-| Panel Button | A push button; programs will see each press. |
-| Panel Switch | An on/off lever programs can read. |
-| Panel Knob | A dial that sets a value. |
-| Panel Slider | A fader from 0 to 100%. |
-| Panel Lamp | A light programs can switch and colour. |
-| Nixie Digit | One glowing digit; a row of them shows a number. |
-| Panel Gauge | A needle dial that shows a value. |
-| Panel Keypad | Twelve keys to type numbers into a program. |
+| Panel Button | `true` while pressed |
+| Panel Switch | `true` when on |
+| Panel Knob, Panel Slider | its value, in its range |
+| Panel Lamp | `"off"`, `"amber"`, `"green"` or `"red"` |
+| Nixie Digit | the text along the whole row |
+| Panel Gauge | where the needle is, from 0 to 1 |
+| Panel Keypad | the last key pressed, or `nil` |
+| Panel Speaker | `nil` |
 
-Recipes are on the [Recipes](./recipes.mdx#panel-controls) page.
+Here is a small desk: a button that lights a lamp, a knob that moves a gauge, and nixies that count presses.
+
+```lua
+local button = bus.get("panel_button")
+local lamp = bus.get("panel_lamp")
+local knob = bus.get("panel_knob")
+local gauge = bus.get("panel_gauge")
+local nixie = bus.get("nixie_digit")
+
+local presses = 0
+button.onPress(function()
+  presses = presses + 1
+  nixie.show(presses)
+  lamp.set("green")
+end)
+
+knob.onChange(function(value)
+  gauge.set(value / 15)
+end)
+```
+
+### Panel Button
+
+![Panel Button](/img/blocks/panel_button.png)
+
+A push button. Pressed, it stays down for half a second and springs back up on its own.
+
+| Function | What it does |
+| --- | --- |
+| `onPress(fn)` | Runs `fn(device)` each time it's pressed down, not when it pops back up. |
+| `isPressed()` | `true` while it's down. |
+
+### Panel Switch
+
+![Panel Switch](/img/blocks/panel_switch.png)
+
+An on/off lever that stays where you leave it.
+
+| Function | What it does |
+| --- | --- |
+| `isOn()` | `true` when it's on. |
+| `setOn(on)` | Flips it from the program, as if a player had. |
+
+### Panel Knob and Panel Slider
+
+![Panel Knob](/img/blocks/panel_knob.png) ![Panel Slider](/img/blocks/panel_slider.png)
+
+Both set a value. To move one, hold right-click on it and move the mouse sideways, like Create: Aeronautics' throttle lever. The view stays still while you drag; the control clicks from notch to notch and shows where it is under the crosshair: a ring of notches for the knob, a bar for the slider. Hold **Ctrl** while dragging for fine steps. With a cable, a data port or a wrench in hand, right-click wires the control instead of turning it.
+
+They go from 0 to 15 in steps of 1 until a program gives them a range of their own with `setRange`. The marks on the knob's dial and the slider's notches follow the range.
+
+```lua
+local trim = bus.get("panel_slider")
+trim.setRange(-1, 1, 0.1)
+trim.setValue(0.5)
+print(trim.getValue(), trim.getFraction())   -- 0.5   0.75
+
+trim.onChange(function(value)
+  print("trim " .. value)
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `getValue()` | Where it's set, in its range. |
+| `setValue(value)` | Moves it to a value, to the nearest step. Values outside the range go to its nearest end. |
+| `setRange(min, max, step?)` | Gives it its own range, from `min` to `max` in steps of `step` (1 if left out). It keeps its value as near as the new range allows. `max` must be more than `min`, and `step` more than 0 and at most `max - min`. Very fine ranges round to 1000 notches so they can still be dragged. |
+| `getMinValue()`, `getMaxValue()` | The ends of its range: 0 and 15 unless `setRange` changed them. |
+| `getStep()` | How much each notch moves it. |
+| `getFraction()` | How far along its range it is, from 0 to 1. |
+
+The range is kept with the block, so it stays after the program stops.
+
+### Panel Lamp
+
+![Panel Lamp](/img/blocks/panel_lamp.png)
+
+An indicator light in amber, green or red. A lit lamp gives off real light, and glows like a torch flame under shader packs.
+
+| Function | What it does |
+| --- | --- |
+| `set(light)` | `"amber"`, `"green"`, `"red"` or `"off"`. `true` is amber, `false` is off. |
+| `get()` | Its colour now, or `"off"`. |
+| `setBrightness(level)` | How much light it gives off while lit, 0 to 15. It starts at 15. |
+| `getBrightness()` | That level. |
+
+### Nixie Digit
+
+![Nixie Digit](/img/blocks/nixie_digit.png)
+
+Create's nixie tube on a panel. It glows any character a program gives it: digits, letters, symbols. Its character faces whoever placed it, or out of the wall it's on.
+
+Tubes side by side, on the same face and reading the same way, join into one display of up to 64 tubes. A cable to any tube in the row, the first, the last or one in the middle, drives the whole row.
+
+```lua
+local n = bus.get("nixie_digit")   -- a row of four tubes
+n.setText("HI!")                   -- "HI!", the last tube dark
+n.show(42)                         -- "  42"
+n.show(3.14159, 2)                 -- "3.14"
+n.show(12345)                      -- "----": too long for the row
+n.setColor("lime")
+```
+
+| Function | What it does |
+| --- | --- |
+| `setText(text)` | One character a tube from the left. Tubes past the end of the text go dark. |
+| `show(number, decimals?)` | A number on the right of the row, like a counter, with that many decimals if given. A number too long for the row shows dashes. |
+| `setChar(index, char)` | One character on one tube, counting from 1 at the left. `nil` turns that tube dark. |
+| `clear()` | Turns the whole row dark. |
+| `setColor(colour)` | Makes the whole row glow in a dye colour: `"orange"` (the default), `"lime"`, `"light_blue"`… |
+| `getText()` | What the row shows, a space for each dark tube. |
+| `getChar(index)` | The character on one tube, or `nil` if it's dark. |
+| `getLength()` | How many tubes are in the row. |
+| `getColor()` | The colour the row glows. |
+
+### Panel Gauge
+
+![Panel Gauge](/img/blocks/panel_gauge.png)
+
+A needle dial for any value a program wants to show. Players can't move it; only programs can.
+
+| Function | What it does |
+| --- | --- |
+| `set(fraction)` | Moves the needle: 0 is empty, 1 full, 0.5 halfway. It moves in 16 steps. |
+| `get()` | Where the needle is, 0 to 1. |
+| `getMinValue()`, `getMaxValue()` | 0 and 1. |
+
+To show a value with its own scale, divide by the top of the scale: `gauge.set(rpm / 256)`.
+
+### Panel Keypad
+
+![Panel Keypad](/img/blocks/panel_keypad.png)
+
+Twelve keys: 1 to 9, with `*`, `0` and `#` under them. Right-click the key you want.
+
+```lua
+local pad = bus.get("panel_keypad")
+local typed = ""
+pad.onKey(function(key)
+  if key == "#" then
+    print(typed == "1234" and "open" or "wrong code")
+    typed = ""
+  else
+    typed = typed .. key
+  end
+end)
+```
+
+| Function | What it does |
+| --- | --- |
+| `onKey(fn)` | Runs `fn(key, device)` for every key pressed, `key` being `"0"` to `"9"`, `"*"` or `"#"`. Pressing the same key twice runs it twice. |
+| `getKey()` | The last key pressed, or `nil` before the first. |
+
+### Panel Speaker
+
+Plays any sound in the game, plays notes like a note block, and speaks text aloud. It has a page of its own: [Panel Speaker](./panel-speaker.mdx).
+
+## Flight instruments
+
+Four more panel controls read the Create: Aeronautics ship they're built into: the **altimeter**, the **gyroscope** (an artificial horizon), the **compass** and the **airspeed indicator**. Each shows its reading on a dial, and programs read the same numbers, for example `getAltitude()`, `getAttitude()`, `getHeading()` and `getSpeed()`. They cable up like any other control. See [Ships](./ships.mdx#flight-instruments) for what each one gives and how to fly with them.
 
 ## Universal Adapter
 
