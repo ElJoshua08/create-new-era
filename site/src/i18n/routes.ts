@@ -15,8 +15,8 @@ export const routes: Record<Page, Record<Lang, string>> = {
 export const DOCS = '/docs';
 export const REPO = 'https://github.com/ElJoshua08/create-new-era';
 export const FALLBACK = {
-  tag: '0.1.0-alpha.3',
-  url: 'https://github.com/ElJoshua08/create-new-era/releases/download/v0.1.0-alpha.3/create_new_era-0.1.0-alpha.3.jar',
+  tag: '0.1.0-alpha.4',
+  url: 'https://github.com/ElJoshua08/create-new-era/releases/download/v0.1.0-alpha.4/create_new_era-0.1.0-alpha.4.jar',
 };
 
 export const ui = {
